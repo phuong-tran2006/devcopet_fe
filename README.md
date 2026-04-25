@@ -1,73 +1,64 @@
-# React + TypeScript + Vite
+🎮 DevCopet - Gamified Programming Learning Platform
+DevCopet là nền tảng học lập trình kết hợp nuôi thú cưng AI, tập trung vào trải nghiệm học tập qua cơ chế Game-map và Evolution Loop. Dự án được xây dựng trên nền tảng React + TypeScript + Vite với cấu trúc chuẩn Bulletproof.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+🛠️ Bộ công cụ & Workflow
+Dự án này áp dụng quy trình kiểm soát chất lượng tự động. Bạn không thể commit nếu code không sạch hoặc message không đúng chuẩn:
 
-Currently, two official plugins are available:
+Husky & lint-staged: Tự động chạy Prettier để nắn dòng và ESLint để check lỗi ngay khi bạn gõ lệnh git commit.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Commitlint: Bắt buộc sử dụng chuẩn Conventional Commits. Mọi lời nhắn commit phải bắt đầu bằng:
 
-## React Compiler
+feat: (tính năng mới)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+fix: (sửa lỗi)
 
-## Expanding the ESLint configuration
+docs: (tài liệu/readme)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+style:, refactor:, chore:...
 
-```js
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
+📂 Cấu trúc thư mục
+Chúng ta tổ chức dự án theo Features để dễ dàng quản lý các hệ Pet và Map:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+</pre>
+Plaintext
+src/
+├── assets/          # Hình ảnh Pet (Lửa, Nước, Lá), hiệu ứng tiến hóa
+├── features/        # Các tính năng chính của game
+│   ├── tutorial/    # Tài liệu học & Quiz trắc nghiệm
+│   ├── game-map/    # Logic kéo thả code & Hệ thống Node
+│   └── dashboard/   # Theo dõi sự phát triển của Pet
+├── components/      # UI components dùng chung (Buttons, Modals)
+└── types/           # Định nghĩa TypeScript cho Pet và User
+</pre>
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+🚀 Hướng dẫn khởi chạy
+Cài đặt (Sẽ tự động kích hoạt Husky):
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+PowerShell
 
-```js
-// eslint.config.js
-import reactX from "eslint-plugin-react-x";
-import reactDom from "eslint-plugin-react-dom";
+<pre>
+npm install
+</pre>
 
-export default defineConfig([
-  globalIgnores(["dist"]),
-  {
-    files: ["**/*.{ts,tsx}"],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs["recommended-typescript"],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+Chạy môi trường Dev:
+
+PowerShell
+
+<pre>
+npm run dev
+</pre>
+
+Lệnh hỗ trợ:
+
+<pre>npm run lint: Kiểm tra lỗi logic/cú pháp.</pre>
+
+</pre>npm run format: Tự động căn chỉnh lại toàn bộ code.</pre>
+
+⚠️ Lưu ý kỹ thuật cho Windows (Fix lỗi Commit)
+Nếu bạn gặp lỗi cannot spawn .husky/pre-commit khi thực hiện commit:
+
+Mở file .husky/pre-commit trong VS Code.
+
+Nhìn xuống góc dưới bên phải, đổi định dạng từ CRLF sang LF.
+
+Đảm bảo Encoding là UTF-8.
