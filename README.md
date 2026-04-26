@@ -26,7 +26,8 @@ refactor: Chỉnh sửa lại code nhưng không làm thay đổi logic hay tín
 📂 Cấu trúc thư mục
 Chúng ta tổ chức dự án theo Features để dễ dàng quản lý các hệ Pet và Map:
 
-</pre>
+</markdown>
+```
 src/
 ├── assets/                       <-- Lưu trữ tài nguyên tĩnh
 │   ├── images/                   <-- Hình ảnh thú cưng, icon hệ thống
@@ -75,7 +76,8 @@ src/
 ├── utils/                        <-- Các hàm helper (vd: format thời gian, tính logic exp)
 ├── App.tsx                       <-- File entry của component
 └── main.tsx                      <-- File khởi chạy React/Vue
-</pre>
+```
+</markdown>
 
 🚀 Hướng dẫn khởi chạy
 Cài đặt (Sẽ tự động kích hoạt Husky):
