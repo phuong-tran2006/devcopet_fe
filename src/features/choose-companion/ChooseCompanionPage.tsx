@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { EGGS_DATA } from "./constants"; // Chỉnh lại đường dẫn vì cùng thư mục
-import EggCard from "./EggCard"; // Chỉnh lại đường dẫn vì cùng thư mục
+import { EGGS_DATA } from "./constants";
+import EggCard from "./EggCard";
 
 export default function ChooseCompanionPage() {
   const [selected, setSelected] = useState<number | null>(null);

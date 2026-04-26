@@ -1,7 +1,7 @@
 import { Outlet } from "@tanstack/react-router";
 
 function App() {
-  return <Outlet />; // Nơi các page được render ra
+  return <Outlet />;
 }
 
 export default App;
