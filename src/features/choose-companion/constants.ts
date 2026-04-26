@@ -1,6 +1,6 @@
-import fireEgg from "../../assets/fire.png";
-import waterEgg from "../../assets/water.png";
-import plantEgg from "../../assets/plant.png";
+import fireEgg from "../../assets/images/fire.png";
+import waterEgg from "../../assets/images/water.png";
+import plantEgg from "../../assets/images/plant.png";
 
 export interface EggData {
   id: number;
