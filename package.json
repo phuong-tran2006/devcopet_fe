@@ -12,8 +12,16 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@tailwindcss/vite": "^4.2.4",
+    "@tanstack/react-devtools": "^0.10.2",
+    "@tanstack/react-hotkeys": "^0.10.0",
+    "@tanstack/react-hotkeys-devtools": "^0.7.0",
+    "@tanstack/react-router": "^1.168.24",
+    "@tanstack/react-router-devtools": "^1.166.13",
+    "@tanstack/router-vite-plugin": "^1.166.42",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5"
+    "react-dom": "^19.2.5",
+    "tailwindcss": "^4.2.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",
