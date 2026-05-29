@@ -1,28 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { cva } from 'class-variance-authority';
 import { twMerge } from 'tailwind-merge';
-
-const dropdownClasses = cva(
-  'w-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-teal-light focus:border-primary-teal-light disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer',
-  {
-    variants: {
-      variant: {
-        default: 'bg-background-card border-border-primary text-text-bright hover:border-primary-teal-light',
-        filled: 'bg-background-input border-border-primary text-text-primary',
-        outline: 'bg-transparent border-2 border-border-primary text-text-primary',
-      },
-      size: {
-        small: 'text-sm px-3 py-2',
-        medium: 'text-base px-4 py-3',
-        large: 'text-lg px-5 py-4',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'medium',
-    },
-  }
-);
 
 const Dropdown = ({
   // Required parameters with defaults
@@ -32,7 +9,7 @@ const Dropdown = ({
   text_font_weight = "400",
   text_line_height = "20px",
   text_text_align = "left",
-  text_color = "#d4e4f6",
+  text_color = "#879392",
   fill_background_color = "#11212e",
   border_border = "1 solid #3e4949",
   border_border_radius = "8px",
@@ -93,7 +70,7 @@ const Dropdown = ({
     fontWeight: text_font_weight || '400',
     lineHeight: text_line_height || '20px',
     textAlign: text_text_align || 'left',
-    color: text_color || '#d4e4f6',
+    color: text_color || '#879392',
     backgroundColor: fill_background_color || '#11212e',
     border: `${borderWidth}px ${borderStyle} ${borderColor}`,
     borderRadius: border_border_radius || '8px',
@@ -178,9 +155,7 @@ const Dropdown = ({
         }}
         style={dropdownStyles}
         className={twMerge(
-          dropdownClasses({ variant, size }),
-          'flex items-center justify-between',
-          optionalClasses,
+          'flex items-center justify-between bg-[#11212e] border border-[#3e4949] px-4 py-3',
           error && 'border-red-500 focus:ring-red-500',
           className
         )}
@@ -204,7 +179,7 @@ const Dropdown = ({
         <ul
           id={`${id || name}-listbox`}
           role="listbox"
-          className="absolute z-50 w-full mt-1 bg-background-card border border-border-primary rounded-lg shadow-lg max-h-60 overflow-auto"
+          className="absolute z-50 w-full mt-1 bg-[#11212e] border border-[#3e4949] rounded-lg shadow-lg max-h-60 overflow-auto text-[#879392]"
           style={{
             top: '100%',
             fontFamily: text_font_family,
@@ -233,9 +208,9 @@ const Dropdown = ({
                   }}
                   tabIndex={0}
                   className={twMerge(
-                    'px-4 py-3 cursor-pointer transition-colors duration-150',
-                    'hover:bg-background-secondary focus:bg-background-secondary focus:outline-none',
-                    isSelected && 'bg-primary-teal bg-opacity-10 text-primary-teal-light font-medium'
+                    'px-4 py-3 cursor-pointer transition-colors duration-150 text-[#879392]',
+                    'hover:bg-[#76d6d520] focus:bg-[#76d6d520] focus:outline-none',
+                    isSelected && 'bg-[#d8bfd830] text-[#d8bfd8] font-medium'
                   )}
                 >
                   {optionLabel}

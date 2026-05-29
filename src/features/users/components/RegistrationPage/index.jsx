@@ -5,10 +5,11 @@ import EditText from '../../../../components/ui/EditText';
 import Dropdown from '../../../../components/ui/Dropdown';
 import CheckBox from '../../../../components/ui/CheckBox';
 import EmailProviderIcon from '../../../../components/ui/EmailProviderIcon';
+import { EmailIcon, LockIcon } from '../../../../components/ui/icons';
 import {
-  facebookIcon,
-  githubIcon,
   googleIcon,
+  githubIcon,
+  facebookIcon,
   mascotAxolotl,
   socialIconClassName,
 } from '../../constants/authImages';
@@ -64,7 +65,21 @@ const RegistrationPage = () => {
     if (!formData?.codingExperience) nextErrors.codingExperience = 'Select your experience level.';
     if (!formData?.email?.trim()) nextErrors.email = 'Email is required.';
     if (!formData?.password) nextErrors.password = 'Password is required.';
-    if (formData?.password && formData.password.length < 12) nextErrors.password = 'Password must be at least 12 characters.';
+    if (formData?.password && formData.password.length < 12) nextErrors.password = 'Must be at least 12 characters.';
+    if (formData?.password && formData.password.length >= 12) {
+      const hasUpper = /[A-Z]/.test(formData.password);
+      const hasLower = /[a-z]/.test(formData.password);
+      const hasNumber = /[0-9]/.test(formData.password);
+      const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password);
+      const missing = [];
+      if (!hasUpper) missing.push('uppercase');
+      if (!hasLower) missing.push('lowercase');
+      if (!hasNumber) missing.push('number');
+      if (!hasSymbol) missing.push('symbol');
+      if (missing.length > 0) {
+        nextErrors.password = 'Must include ' + missing.join(', ') + '.';
+      }
+    }
     if (formData?.confirmPassword !== formData?.password) nextErrors.confirmPassword = 'Passwords do not match.';
     if (!formData?.agreeToTerms) nextErrors.agreeToTerms = 'You must agree to continue.';
 
@@ -77,21 +92,16 @@ const RegistrationPage = () => {
   return (
     <>
       <main className="relative min-h-screen w-full flex items-center justify-center bg-[#041521] overflow-hidden">
-        {/* Background Images */}
-        <div className="absolute inset-0 w-full h-full">
-          <img
-            src="/images/img_image.png"
-            alt=""
-            className="absolute top-0 left-0 w-full h-auto max-h-[956px] object-cover opacity-30"
-            loading="lazy"
-          />
-          <img
-            src="/images/img_overlay_blur.png"
-            alt=""
-            className="hidden lg:block absolute top-0 right-0 w-[30%] max-w-[444px] h-auto opacity-50"
-            loading="lazy"
-          />
-        </div>
+        {/* Background gradient overlay */}
+        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#041521] via-[#0a1a24] to-[#041521] pointer-events-none" />
+
+        {/* Decorative blur elements */}
+        <div
+          className="hidden lg:block absolute top-0 right-0 w-[30%] max-w-[444px] h-auto opacity-30 pointer-events-none"
+          style={{
+            background: 'radial-gradient(ellipse at top right, #76d6d520 0%, transparent 70%)',
+          }}
+        />
 
         {/* Main Content Container */}
         <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16">
@@ -99,20 +109,12 @@ const RegistrationPage = () => {
             
             {/* Left Section - Hero Content */}
             <section className="w-full lg:w-[26%] flex flex-col items-center lg:items-start gap-6 sm:gap-8 lg:gap-12">
-              {/* Background Blur Image */}
-              <img
-                src="/images/img_overlay_blur_374x448.png"
-                alt=""
-                className="hidden lg:block w-[86%] max-w-[448px] h-auto opacity-40"
-                loading="lazy"
-              />
-
               {/* Logo */}
-              <div className="flex items-center justify-center gap-2 -mt-8 lg:-mt-[326px]">
+              <div className="flex items-center justify-center lg:justify-start gap-2">
                 <img
                   src={mascotAxolotl}
                   alt="Devcopet logo"
-                  className="h-6 w-6 rounded-full object-cover object-top sm:h-8 sm:w-8"
+                  className="h-8 w-8 rounded-full object-cover object-top"
                   loading="eager"
                 />
                 <h2 className="text-lg sm:text-xl md:text-2xl font-bold font-['Montserrat'] text-[#d8bfd8]">
@@ -121,29 +123,14 @@ const RegistrationPage = () => {
               </div>
 
               {/* Mascot & Welcome Message */}
-              <div className="w-full flex flex-col items-center gap-6 sm:gap-8 lg:gap-12 px-4 sm:px-6 lg:px-8">
-                <div className="relative w-full max-w-[352px] flex items-end justify-end">
+              <div className="w-full flex flex-col items-center lg:items-start gap-6 sm:gap-8 lg:gap-12 px-4 sm:px-6 lg:px-0">
+                <div className="relative w-full max-w-[352px] flex items-end justify-center lg:justify-start">
                   <img
                     src={mascotAxolotl}
                     alt="Devcopet mascot welcoming you to sign up"
-                    className="h-auto w-32 object-contain sm:w-48 md:w-64"
+                    className="h-auto w-48 object-contain sm:w-56 md:w-64 lg:w-72"
                     loading="eager"
                   />
-                  <div 
-                    className="absolute bottom-0 right-0 bg-[#0d1d2a99] border-2 border-[#d8bfd866] rounded-xl p-4 sm:p-5 md:p-6 shadow-[0px_4px_12px_#888888ff] flex flex-col gap-4 sm:gap-5 md:gap-6"
-                    style={{ marginTop: '26px' }}
-                  >
-                    <p className="text-sm sm:text-base font-bold font-['Open_Sans'] leading-5 text-center text-[#d8bfd8]">
-                      Join me to start<br />coding!
-                    </p>
-                    <div 
-                      className="w-5 h-2.5 border-t-[10px] border-l-[10px] border-r-[10px]"
-                      style={{
-                        borderImage: 'linear-gradient(90deg, #d8bfd8 0%, #00000000 100%)',
-                        borderImageSlice: 1
-                      }}
-                    />
-                  </div>
                 </div>
 
                 {/* Hero Text */}
@@ -161,20 +148,16 @@ const RegistrationPage = () => {
                 </div>
               </div>
 
-              {/* System Version */}
-              <p className="hidden lg:block text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c899] mt-auto">
-                SYSTEM VERSION: 2.4.0-STABLE
-              </p>
             </section>
 
             {/* Right Section - Registration Form */}
             <section className="w-full lg:w-[52%] flex items-center justify-center">
               <div 
-                className="w-full max-w-[570px] bg-[#0d1d2a99] border border-[#76d6d519] rounded-xl shadow-[0px_25px_50px_#0000003f] overflow-hidden"
+                className="w-full max-w-[570px] bg-[#0d1d2a] border border-[#76d6d519] rounded-xl shadow-[0px 25px 50px #0000003f] overflow-hidden"
               >
-                {/* Top Gradient Line */}
+                {/* Top gradient line */}
                 <div 
-                  className="w-full h-1"
+                  className="w-full h-0.5 rounded-full"
                   style={{
                     background: 'linear-gradient(90deg, #008080 0%, #d8bfd8 50%, #008080 100%)'
                   }}
@@ -294,23 +277,21 @@ const RegistrationPage = () => {
                       </div>
 
                       {/* Email Address */}
-                      <div className="flex flex-col gap-1 mt-6">
+                      <div className="flex flex-col gap-1">
                         <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
                           Email Address
                         </label>
                         <div className="relative">
-                          <img
-                            src="/images/img_container.svg"
-                            alt=""
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-[14px]"
-                          />
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none z-10">
+                            <EmailIcon className="w-4 h-4" />
+                          </span>
                           <EditText
                             name="email"
                             type="email"
                             placeholder="hello@developer.com"
                             value={formData?.email}
                             onChange={handleInputChange}
-                            className="pl-12"
+                            className="pl-11"
                             required
                             layout_gap=""
                             layout_width=""
@@ -330,18 +311,16 @@ const RegistrationPage = () => {
                         </div>
                       </div>
 
-                      {/* Master Password */}
-                      <div className="flex flex-col gap-2 mt-6">
+                      {/* Password */}
+                      <div className="flex flex-col gap-2">
                         <div className="flex flex-col gap-1">
                           <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
-                            Master Password
+                            Password
                           </label>
                           <div className="relative">
-                            <img
-                              src="/images/img_container_blue_gray_400.svg"
-                              alt=""
-                              className="absolute left-4 top-1/2 -translate-y-1/2 w-3 h-[14px]"
-                            />
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none z-10">
+                              <LockIcon className="w-4 h-4" />
+                            </span>
                             <EditText
                               name="password"
                               type="password"
@@ -368,28 +347,26 @@ const RegistrationPage = () => {
                           </div>
                         </div>
                         <p className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c87f] pl-1">
-                          MINIMUM 12 CHARACTERS WITH SYMBOLS
+                          Minimum 12 characters with symbols
                         </p>
                       </div>
 
                       {/* Confirm Password */}
-                      <div className="flex flex-col gap-1 mt-6">
+                      <div className="flex flex-col gap-1">
                         <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
                           Confirm Password
                         </label>
                         <div className="relative">
-                          <img
-                            src="/images/img_container_blue_gray_400_14x16.svg"
-                            alt=""
-                            className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-[14px]"
-                          />
+                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none z-10">
+                            <LockIcon className="w-4 h-4" />
+                          </span>
                           <EditText
                             name="confirmPassword"
                             type="password"
                             placeholder="••••••••••••"
                             value={formData?.confirmPassword}
                             onChange={handleInputChange}
-                            className="pl-12"
+                            className="pl-11"
                             required
                             layout_gap=""
                             layout_width=""
@@ -431,60 +408,55 @@ const RegistrationPage = () => {
                       </div>
 
                       {/* Submit Button */}
-                      <div className="mt-12 relative">
-                        <img
-                          src="/images/img_overlay.png"
-                          alt=""
-                          className="absolute left-0 top-0 w-[6px] h-full object-cover rounded-l-lg"
-                        />
+                      <div className="mt-8">
                         <Button
                           type="submit"
                           text="Start Your Journey"
-                          className="w-full pl-10"
+                          text_font_size="16"
+                          className="w-full"
                           disabled={!formData?.agreeToTerms}
                           layout_width=""
                           padding=""
                           position=""
                           layout_gap=""
                           margin=""
-                          variant=""
-                          size=""
-                          onClick={() => {}}
+                          variant="primary"
+                          size="medium"
                           leftIcon={null}
                           rightIcon={null}
                         />
                       </div>
 
                       {/* Social Login Section */}
-                      <div className="flex flex-col gap-6 mt-6 pt-6 border-t border-[#3e49494c]">
+                      <div className="flex flex-col gap-6 pt-6 border-t border-[#3e49494c]">
                         <p className="text-base font-normal font-['Roboto'] leading-[19px] text-center text-[#bdc9c8b2]">
                           OR SYNC WITH IDENTITY PROVIDER
                         </p>
                         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-[26px]">
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-colors duration-200 hover:bg-[#ffffff0c]"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                             aria-label="Sign up with Google"
                           >
                             <img src={googleIcon} alt="" className={socialIconClassName} />
                           </button>
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-colors duration-200 hover:bg-[#ffffff0c]"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                             aria-label="Sign up with GitHub"
                           >
                             <img src={githubIcon} alt="" className={socialIconClassName} />
                           </button>
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-colors duration-200 hover:bg-[#ffffff0c]"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                             aria-label="Sign up with Facebook"
                           >
                             <img src={facebookIcon} alt="" className={socialIconClassName} />
                           </button>
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 text-[#d8bfd8] transition-colors duration-200 hover:bg-[#ffffff0c]"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 text-[#d8bfd8] transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                             aria-label="Sign up with Email"
                           >
                             <EmailProviderIcon className={socialIconClassName} />
@@ -514,23 +486,16 @@ const RegistrationPage = () => {
 
         {/* Help Button - Fixed Position */}
         <button
-          className="fixed bottom-8 right-8 flex items-center gap-2 bg-[#0d1d2a99] border border-[#d8bfd84c] rounded-3xl px-3 py-3 shadow-[0px_4px_12px_#888888ff] hover:bg-[#0d1d2acc] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#d8bfd8] z-50"
+          className="fixed bottom-8 right-8 flex items-center gap-2 bg-[#0d1d2a] border border-[#d8bfd84c] rounded-3xl px-4 py-3 shadow-[0px 4px 12px #888888ff] hover:bg-[#0d1d2acc] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#d8bfd8] z-50"
           aria-label="Need assistance"
         >
-          <img
-            src="/images/img_icon.svg"
-            alt=""
-            className="w-5 h-5"
-          />
+          <svg className="w-5 h-5 text-[#d8bfd8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+          </svg>
           <span className="text-base font-normal font-['Roboto'] leading-[19px] text-[#d8bfd8]">
             Need assistance?
           </span>
         </button>
-
-        {/* System Version - Mobile */}
-        <p className="lg:hidden fixed bottom-4 left-1/2 -translate-x-1/2 text-sm sm:text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c899] z-10">
-          SYSTEM VERSION: 2.4.0-STABLE
-        </p>
       </main>
     </>
   );

@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import Header from '../../../../components/layout/Header';
 import Button from '../../../../components/ui/Button';
+import { EmailIcon, LockIcon, EyeIcon, EyeOffIcon } from '../../../../components/ui/icons';
 import {
-  facebookIcon,
-  githubIcon,
   googleIcon,
+  githubIcon,
+  facebookIcon,
   mascotAxolotl,
   socialIconClassName,
 } from '../../constants/authImages';
@@ -18,13 +19,12 @@ const Login = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    document.title = 'Login | Devcopet Learn';
+    document.title = 'Login';
   }, []);
 
   const handleLogin = (e) => {
-    e?.preventDefault();
+    if (e) e.preventDefault();
     setError('');
-    // TODO: wire to users/api once backend is ready
     if (!email || !password) {
       setError('Please enter email and password.');
       return;
@@ -37,12 +37,12 @@ const Login = () => {
 
   return (
     <>
-      <main className="relative w-full min-h-screen overflow-hidden">
+      <main className="relative h-screen w-full min-h-screen overflow-hidden bg-[#041521]">
         {/* Background gradient overlay */}
         <div
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full pointer-events-none"
           style={{
-            background: 'linear-gradient(90deg, #00808026 0%, #00808000 100%)',
+            background: 'linear-gradient(90deg, #00808010 0%, transparent 50%)',
           }}
         />
 
@@ -51,43 +51,43 @@ const Login = () => {
           {/* Header */}
           <Header />
 
-          {/* Main content area */}
-          <div className="flex-1 flex flex-col lg:flex-row items-center justify-center px-4 sm:px-6 lg:px-10 py-8 sm:py-12 lg:py-0 -mt-8 lg:-mt-16">
-            {/* Left side - Mascot image */}
-            <div className="hidden lg:block w-full lg:w-1/4 mb-8 lg:mb-0">
-              <img
-                src={mascotAxolotl}
-                alt="Devcopet mascot character"
-                className="w-full max-w-[200px] lg:max-w-[316px] h-auto mx-auto object-contain"
-              />
-            </div>
-
-            {/* Center - Login form */}
-            <div className="w-full max-w-md lg:max-w-lg flex flex-col items-center gap-8 sm:gap-10 lg:gap-12 lg:ml-8">
+          {/* Main content area - centered */}
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+            {/* Center - Login form wrapper */}
+            <div className="w-full max-w-md flex flex-col items-center gap-8 sm:gap-10">
               {/* Title */}
               <h1
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-[48px] font-bold text-center text-text-bright"
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-white"
                 style={{
                   fontFamily: 'Montserrat',
                   lineHeight: '1.2',
+                  textShadow: '0px 0px 8px #76d6d544',
                 }}
               >
-                Log in to Devcopet Learn
+                Login
               </h1>
 
               {/* Login form card */}
               <div
-                className="w-full bg-background-input bg-opacity-70 border border-border-accent-medium rounded-lg sm:rounded-xl p-6 sm:p-8"
+                className="w-full bg-[#0d1d2a] border border-[#ffffff30] rounded-xl p-6 sm:p-8"
                 style={{
-                  boxShadow: '0px 0px 20px #0080800c',
+                  boxShadow: '0px 25px 50px #0000003f, 0px 0px 20px #0080800c',
                 }}
               >
+                {/* Top gradient line */}
+                <div
+                  className="w-full h-0.5 mb-6 rounded-full"
+                  style={{
+                    background: 'linear-gradient(90deg, #008080 0%, #d8bfd8 50%, #008080 100%)',
+                  }}
+                />
+
                 <form onSubmit={handleLogin} className="flex flex-col gap-6 sm:gap-7">
                   {/* Email field */}
                   <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="email"
-                      className="text-sm text-text-primary"
+                      className="text-sm font-normal text-white pl-1"
                       style={{
                         fontFamily: 'Open Sans',
                         fontSize: '14px',
@@ -97,11 +97,9 @@ const Login = () => {
                       Email Address
                     </label>
                     <div className="relative">
-                      <img
-                        src="/images/img_container_gray_400.svg"
-                        alt=""
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5"
-                      />
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none">
+                        <EmailIcon className="w-4 h-4" />
+                      </span>
                       <input
                         type="email"
                         id="email"
@@ -110,7 +108,7 @@ const Login = () => {
                         onChange={(e) => setEmail(e?.target?.value)}
                         placeholder="admin@devcopet.io"
                         required
-                        className="w-full pl-10 pr-3 py-2.5 bg-background-input border border-border-white rounded-lg text-base text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-teal-light focus:border-primary-teal-light"
+                        className="w-full pl-11 pr-3 py-2.5 bg-[#0a1a24] border border-[#76d6d533] rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-[#008080] transition-colors"
                         style={{
                           fontFamily: 'Open Sans',
                           fontSize: '16px',
@@ -125,7 +123,7 @@ const Login = () => {
                     <div className="flex flex-row justify-between items-center">
                       <label
                         htmlFor="password"
-                        className="text-sm text-text-primary"
+                        className="text-sm font-normal text-white pl-1"
                         style={{
                           fontFamily: 'Open Sans',
                           fontSize: '14px',
@@ -136,7 +134,7 @@ const Login = () => {
                       </label>
                       <a
                         href="/forgot-password"
-                        className="text-sm text-text-accent hover:underline"
+                        className="text-sm text-white hover:underline hover:text-[#d8bfd8] transition-colors"
                         style={{
                           fontFamily: 'Open Sans',
                           fontSize: '14px',
@@ -147,11 +145,9 @@ const Login = () => {
                       </a>
                     </div>
                     <div className="relative">
-                      <img
-                        src="/images/img_container_gray_400_20x16.svg"
-                        alt=""
-                        className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-5"
-                      />
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none">
+                        <LockIcon className="w-4 h-4" />
+                      </span>
                       <input
                         type={showPassword ? 'text' : 'password'}
                         id="password"
@@ -160,7 +156,7 @@ const Login = () => {
                         onChange={(e) => setPassword(e?.target?.value)}
                         placeholder="••••••••"
                         required
-                        className="w-full pl-9 pr-10 py-2.5 bg-background-input border border-border-white rounded-lg text-base text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary-teal-light focus:border-primary-teal-light"
+                        className="w-full pl-11 pr-11 py-2.5 bg-[#0a1a24] border border-[#76d6d533] rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-[#008080] transition-colors"
                         style={{
                           fontFamily: 'Open Sans',
                           fontSize: '16px',
@@ -170,14 +166,10 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 focus:outline-none"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#76d6d5] hover:text-[#d8bfd8] focus:outline-none transition-colors"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
-                        <img
-                          src="/images/img_icon_gray_400.svg"
-                          alt=""
-                          className="w-5 h-5"
-                        />
+                        {showPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
                       </button>
                     </div>
                   </div>
@@ -186,6 +178,7 @@ const Login = () => {
                   <Button
                     type="submit"
                     text="Login"
+                    text_font_size="16"
                     className="w-full"
                     layout_width="full"
                     padding="default"
@@ -194,7 +187,6 @@ const Login = () => {
                     margin="none"
                     variant="primary"
                     size="medium"
-                    onClick={handleLogin}
                     leftIcon={null}
                     rightIcon={null}
                   />
@@ -209,19 +201,18 @@ const Login = () => {
                   <div className="flex flex-col gap-3">
                     {/* Divider with text */}
                     <div className="flex flex-row items-center gap-4">
-                      <div className="flex-1 h-px bg-background-transparent-light" />
+                      <div className="flex-1 h-px bg-[#3e49494c]" />
                       <span
-                        className="text-xs font-bold uppercase text-text-primary"
+                        className="text-xs text-white"
                         style={{
                           fontFamily: 'Open Sans',
                           fontSize: '12px',
                           lineHeight: '17px',
-                          letterSpacing: '0.5px',
                         }}
                       >
-                        OR CONTINUE WITH
+                        or continue with
                       </span>
-                      <div className="flex-1 h-px bg-background-transparent-light" />
+                      <div className="flex-1 h-px bg-[#3e49494c]" />
                     </div>
 
                     {/* Social login buttons */}
@@ -229,7 +220,7 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => handleSocialLogin('google')}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-border-primary p-3 transition-colors duration-200 hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary-teal-light"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                         aria-label="Continue with Google"
                       >
                         <img
@@ -241,7 +232,7 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => handleSocialLogin('github')}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-border-primary p-3 transition-colors duration-200 hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary-teal-light"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                         aria-label="Continue with GitHub"
                       >
                         <img
@@ -253,7 +244,7 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => handleSocialLogin('facebook')}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-border-primary p-3 transition-colors duration-200 hover:bg-background-secondary focus:outline-none focus:ring-2 focus:ring-primary-teal-light"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
                         aria-label="Continue with Facebook"
                       >
                         <img
@@ -264,38 +255,15 @@ const Login = () => {
                       </button>
                     </div>
 
-                    {/* New user section */}
-                    <div className="flex flex-col gap-4 sm:gap-[18px] items-center mt-2">
-                      {/* Divider with background */}
-                      <div className="relative w-full flex items-center justify-center py-2">
-                        <div
-                          className="absolute inset-0 bg-center bg-no-repeat bg-contain"
-                          style={{
-                            backgroundImage: "url('/images/img_container_blue_gray_800.svg')",
-                          }}
-                        />
-                        <div className="relative px-6 py-2 bg-background-tertiary">
-                          <span
-                            className="text-xs font-bold uppercase text-text-secondary"
-                            style={{
-                              fontFamily: 'Nimbus Sans',
-                              fontSize: '12px',
-                              lineHeight: '15px',
-                            }}
-                          >
-                            NEW HERE?
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Create account link */}
+                    {/* Create account link */}
+                    <div className="flex flex-col items-center gap-3 mt-2">
                       <Link
                         to="/register"
                         className="flex flex-row items-center gap-1 hover:opacity-80 transition-opacity duration-200"
                         onClick={() => {}}
                       >
                         <span
-                          className="text-sm font-medium text-text-accent"
+                          className="text-sm font-medium text-white hover:text-[#d8bfd8] transition-colors"
                           style={{
                             fontFamily: 'Roboto',
                             fontSize: '13px',
@@ -304,11 +272,9 @@ const Login = () => {
                         >
                           Create an Account
                         </span>
-                        <img
-                          src="/images/img_arrow_right.svg"
-                          alt=""
-                          className="w-3 h-3"
-                        />
+                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
                       </Link>
                     </div>
                   </div>
@@ -317,7 +283,7 @@ const Login = () => {
 
               {/* Terms and privacy */}
               <p
-                className="text-center text-sm text-text-secondary opacity-60 max-w-md px-4"
+                className="text-center text-sm text-white opacity-60 max-w-md px-4"
                 style={{
                   fontFamily: 'Open Sans',
                   fontSize: '14px',
@@ -325,13 +291,13 @@ const Login = () => {
                 }}
               >
                 <span>By continuing, you agree to Devcopet&apos;s </span>
-                <a href="/terms" className="text-text-accent opacity-70 hover:underline"
+                <a href="/terms" className="text-white opacity-70 hover:underline"
                   onClick={() => {}}
                 >
                   Terms of Service
                 </a>
                 <span> and </span>
-                <a href="/privacy" className="text-text-accent opacity-70 hover:underline"
+                <a href="/privacy" className="text-white opacity-70 hover:underline"
                   onClick={() => {}}
                 >
                   Privacy Policy.
@@ -345,7 +311,7 @@ const Login = () => {
         <div
           className="hidden lg:block absolute bottom-0 right-0 w-[400px] h-[350px] lg:w-[576px] lg:h-[506px] rounded-full opacity-10 pointer-events-none"
           style={{
-            background: '#76d6d519',
+            background: '#76d6d5',
             filter: 'blur(60px)',
             boxShadow: '0px 4px 120px #888888ff',
           }}

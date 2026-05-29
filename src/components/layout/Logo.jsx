@@ -11,7 +11,7 @@ const Logo = ({ className, onClick }) => {
         className
       )}
       onClick={onClick}
-      aria-label="Devcopet Learn home"
+      aria-label="Devcopet home"
     >
       <img
         src={mascotAxolotl}
@@ -19,10 +19,10 @@ const Logo = ({ className, onClick }) => {
         className="h-8 w-8 shrink-0 rounded-full object-cover object-top sm:h-9 sm:w-9"
       />
       <span
-        className="text-lg font-bold text-text-bright sm:text-xl"
+        className="text-lg font-bold text-white sm:text-xl"
         style={{ fontFamily: 'Montserrat' }}
       >
-        Devcopet Learn
+        Devcopet
       </span>
     </a>
   );

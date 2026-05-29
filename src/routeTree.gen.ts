@@ -10,7 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LessonRouteImport } from './routes/lesson'
+import { Route as CourseRouteImport } from './routes/course'
+import { Route as ChapterRouteImport } from './routes/chapter'
 import { Route as IndexRouteImport } from './routes/index'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -18,9 +23,34 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LessonRoute = LessonRouteImport.update({
+  id: '/lesson',
+  path: '/lesson',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseRoute = CourseRouteImport.update({
+  id: '/course',
+  path: '/course',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChapterRoute = ChapterRouteImport.update({
+  id: '/chapter',
+  path: '/chapter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,31 +61,76 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/chapter': typeof ChapterRoute
+  '/course': typeof CourseRoute
+  '/lesson': typeof LessonRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
+  '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/chapter': typeof ChapterRoute
+  '/course': typeof CourseRoute
+  '/lesson': typeof LessonRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
+  '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/chapter': typeof ChapterRoute
+  '/course': typeof CourseRoute
+  '/lesson': typeof LessonRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
+  '/quiz': typeof QuizRoute
   '/register': typeof RegisterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths:
+    | '/'
+    | '/chapter'
+    | '/course'
+    | '/lesson'
+    | '/login'
+    | '/map'
+    | '/quiz'
+    | '/register'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
-  id: '__root__' | '/' | '/login' | '/register'
+  to:
+    | '/'
+    | '/chapter'
+    | '/course'
+    | '/lesson'
+    | '/login'
+    | '/map'
+    | '/quiz'
+    | '/register'
+  id:
+    | '__root__'
+    | '/'
+    | '/chapter'
+    | '/course'
+    | '/lesson'
+    | '/login'
+    | '/map'
+    | '/quiz'
+    | '/register'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ChapterRoute: typeof ChapterRoute
+  CourseRoute: typeof CourseRoute
+  LessonRoute: typeof LessonRoute
   LoginRoute: typeof LoginRoute
+  MapRoute: typeof MapRoute
+  QuizRoute: typeof QuizRoute
   RegisterRoute: typeof RegisterRoute
 }
 
@@ -68,11 +143,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lesson': {
+      id: '/lesson'
+      path: '/lesson'
+      fullPath: '/lesson'
+      preLoaderRoute: typeof LessonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course': {
+      id: '/course'
+      path: '/course'
+      fullPath: '/course'
+      preLoaderRoute: typeof CourseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chapter': {
+      id: '/chapter'
+      path: '/chapter'
+      fullPath: '/chapter'
+      preLoaderRoute: typeof ChapterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,7 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ChapterRoute: ChapterRoute,
+  CourseRoute: CourseRoute,
+  LessonRoute: LessonRoute,
   LoginRoute: LoginRoute,
+  MapRoute: MapRoute,
+  QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
 }
 export const routeTree = rootRouteImport
