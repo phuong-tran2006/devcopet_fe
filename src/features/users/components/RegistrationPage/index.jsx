@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import Button from '../../../../components/ui/Button';
 import EditText from '../../../../components/ui/EditText';
 import Dropdown from '../../../../components/ui/Dropdown';
 import CheckBox from '../../../../components/ui/CheckBox';
 import EmailProviderIcon from '../../../../components/ui/EmailProviderIcon';
 import { EmailIcon, LockIcon } from '../../../../components/ui/icons';
+import { useAuth } from '../../../../contexts/AuthContext';
 import {
   googleIcon,
   githubIcon,
@@ -26,10 +27,21 @@ const RegistrationPage = () => {
     agreeToTerms: false,
   });
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+
+  const { login: authLogin, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = 'Create account | Devcopet Learn';
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/course');
+    }
+  }, [isAuthenticated, navigate]);
 
   const codingExperienceLevels = useMemo(
     () => [
@@ -47,6 +59,9 @@ const RegistrationPage = () => {
       ...prev,
       [name]: value
     }));
+    if (errors[name]) {
+      setErrors(prev => ({ ...prev, [name]: '' }));
+    }
   };
 
   const handleCheckboxChange = (e) => {
@@ -54,39 +69,77 @@ const RegistrationPage = () => {
       ...prev,
       agreeToTerms: e?.target?.checked
     }));
+    if (errors.agreeToTerms) {
+      setErrors(prev => ({ ...prev, agreeToTerms: '' }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e?.preventDefault();
     const nextErrors = {};
     if (!formData?.fullName?.trim()) nextErrors.fullName = 'Full name is required.';
     if (!formData?.username?.trim()) nextErrors.username = 'Username is required.';
+    if (formData?.username?.trim() && formData.username.length < 3) {
+      nextErrors.username = 'Username must be at least 3 characters.';
+    }
     if (!formData?.dateOfBirth) nextErrors.dateOfBirth = 'Date of birth is required.';
     if (!formData?.codingExperience) nextErrors.codingExperience = 'Select your experience level.';
     if (!formData?.email?.trim()) nextErrors.email = 'Email is required.';
-    if (!formData?.password) nextErrors.password = 'Password is required.';
-    if (formData?.password && formData.password.length < 12) nextErrors.password = 'Must be at least 12 characters.';
-    if (formData?.password && formData.password.length >= 12) {
-      const hasUpper = /[A-Z]/.test(formData.password);
-      const hasLower = /[a-z]/.test(formData.password);
-      const hasNumber = /[0-9]/.test(formData.password);
-      const hasSymbol = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(formData.password);
-      const missing = [];
-      if (!hasUpper) missing.push('uppercase');
-      if (!hasLower) missing.push('lowercase');
-      if (!hasNumber) missing.push('number');
-      if (!hasSymbol) missing.push('symbol');
-      if (missing.length > 0) {
-        nextErrors.password = 'Must include ' + missing.join(', ') + '.';
-      }
+    if (formData?.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      nextErrors.email = 'Please enter a valid email address.';
     }
-    if (formData?.confirmPassword !== formData?.password) nextErrors.confirmPassword = 'Passwords do not match.';
+    if (!formData?.password) nextErrors.password = 'Password is required.';
+    if (formData?.password && formData.password.length < 6) {
+      nextErrors.password = 'Password must be at least 6 characters.';
+    }
+    if (formData?.confirmPassword !== formData?.password) {
+      nextErrors.confirmPassword = 'Passwords do not match.';
+    }
     if (!formData?.agreeToTerms) nextErrors.agreeToTerms = 'You must agree to continue.';
 
     setErrors(nextErrors);
     if (Object.keys(nextErrors).length > 0) return;
 
-    // TODO: wire to users/api once backend is ready
+    setLoading(true);
+    try {
+      const { authAPI } = await import('../../../../services/api');
+      const { token, user } = await authAPI.register({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+        codingExperience: formData.codingExperience,
+        dateOfBirth: formData.dateOfBirth,
+      });
+      
+      setSuccessMessage('Account created successfully! Redirecting to login...');
+      authLogin(token, user);
+      
+      setTimeout(() => {
+        navigate('/course');
+      }, 1500);
+    } catch (err) {
+      setErrors({ submit: err.message || 'Registration failed. Please try again.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSocialLogin = (provider) => {
+    const { googleAuth, githubAuth, facebookAuth } = require('../../../../services/api');
+    switch (provider) {
+      case 'google':
+        googleAuth();
+        break;
+      case 'github':
+        githubAuth();
+        break;
+      case 'facebook':
+        facebookAuth();
+        break;
+      default:
+        break;
+    }
   };
 
   return (
@@ -409,12 +462,22 @@ const RegistrationPage = () => {
 
                       {/* Submit Button */}
                       <div className="mt-8">
+                        {successMessage && (
+                          <div className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-center" style={{ fontFamily: 'Roboto' }}>
+                            {successMessage}
+                          </div>
+                        )}
+                        {errors.submit && (
+                          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-center" style={{ fontFamily: 'Roboto' }}>
+                            {errors.submit}
+                          </div>
+                        )}
                         <Button
                           type="submit"
-                          text="Start Your Journey"
+                          text={loading ? 'Creating Account...' : 'Start Your Journey'}
                           text_font_size="16"
                           className="w-full"
-                          disabled={!formData?.agreeToTerms}
+                          disabled={loading || !formData?.agreeToTerms}
                           layout_width=""
                           padding=""
                           position=""
@@ -435,28 +498,36 @@ const RegistrationPage = () => {
                         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-[26px]">
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                            onClick={() => handleSocialLogin('google')}
+                            disabled={loading}
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Google"
                           >
                             <img src={googleIcon} alt="" className={socialIconClassName} />
                           </button>
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                            onClick={() => handleSocialLogin('github')}
+                            disabled={loading}
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with GitHub"
                           >
                             <img src={githubIcon} alt="" className={socialIconClassName} />
                           </button>
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                            onClick={() => handleSocialLogin('facebook')}
+                            disabled={loading}
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Facebook"
                           >
                             <img src={facebookIcon} alt="" className={socialIconClassName} />
                           </button>
                           <button
                             type="button"
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 text-[#d8bfd8] transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                            onClick={() => navigate('/login')}
+                            disabled={loading}
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 text-[#d8bfd8] transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Email"
                           >
                             <EmailProviderIcon className={socialIconClassName} />

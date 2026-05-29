@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from '@tanstack/react-router';
 import Logo from '../../../../components/layout/Logo';
 import { mascotAxolotl } from '../../constants/authImages';
+import { useAuth } from '../../../../contexts/AuthContext';
 
 // Color palette
 const colors = {
@@ -101,7 +102,13 @@ const TwitterIcon = () => (
 );
 
 const LandingPage = () => {
-  const navItems = ['Tutorial', { label: 'Roadmap', path: '/chapter' }, 'Community', 'About'];
+  const navItems = ['Tutorial', { label: 'Roadmap', path: '/course' }, 'Community', 'About'];
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = '/';
+  };
 
   return (
     <div className="relative min-h-screen w-full bg-[#041521] overflow-y-auto">
@@ -166,21 +173,52 @@ const LandingPage = () => {
 
             {/* Auth Buttons */}
             <div className="flex items-center gap-3">
-              <button
-                className="px-4 py-2 text-sm sm:text-base font-medium text-[#76d6d5] border border-[#76d6d5] rounded-lg hover:bg-[#76d6d510] transition-all duration-200"
-                style={{ fontFamily: 'Roboto' }}
-              >
-                Sign In
-              </button>
-              <button
-                className="px-4 py-2 text-sm sm:text-base font-medium text-[#041521] bg-[#76d6d5] rounded-lg hover:bg-[#65c5c4] transition-all duration-200"
-                style={{
-                  fontFamily: 'Roboto',
-                  boxShadow: '0px 0px 15px #76d6d540',
-                }}
-              >
-                Register
-              </button>
+              {isAuthenticated ? (
+                <>
+                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-[#0d1d2a] rounded-lg border border-[#3e4949]">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#76d6d5] to-[#d8bfd8] flex items-center justify-center text-[#041521] text-sm font-bold">
+                      {user?.username?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+                    <span className="text-sm text-[#d4e4f6]" style={{ fontFamily: 'Roboto' }}>
+                      {user?.username || 'User'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => window.location.href = '/course'}
+                    className="px-4 py-2 text-sm sm:text-base font-medium text-[#041521] bg-[#76d6d5] rounded-lg hover:bg-[#65c5c4] transition-all duration-200"
+                    style={{ fontFamily: 'Roboto' }}
+                  >
+                    Continue Learning
+                  </button>
+                  <button
+                    onClick={handleLogout}
+                    className="px-4 py-2 text-sm sm:text-base font-medium text-[#76d6d5] border border-[#76d6d5] rounded-lg hover:bg-[#76d6d510] transition-all duration-200"
+                    style={{ fontFamily: 'Roboto' }}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 text-sm sm:text-base font-medium text-[#76d6d5] border border-[#76d6d5] rounded-lg hover:bg-[#76d6d510] transition-all duration-200"
+                    style={{ fontFamily: 'Roboto' }}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-4 py-2 text-sm sm:text-base font-medium text-[#041521] bg-[#76d6d5] rounded-lg hover:bg-[#65c5c4] transition-all duration-200"
+                    style={{
+                      fontFamily: 'Roboto',
+                      boxShadow: '0px 0px 15px #76d6d540',
+                    }}
+                  >
+                    Register
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -233,21 +271,46 @@ const LandingPage = () => {
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-10">
-                <button
-                  className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#041521] bg-[#76d6d5] rounded-xl hover:bg-[#65c5c4] transition-all duration-200"
-                  style={{
-                    fontFamily: 'Montserrat',
-                    boxShadow: '0px 4px 20px #76d6d540',
-                  }}
-                >
-                  Get Started Free
-                </button>
-                <button
-                  className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#76d6d5] border-2 border-[#76d6d5] rounded-xl hover:bg-[#76d6d510] transition-all duration-200"
-                  style={{ fontFamily: 'Montserrat' }}
-                >
-                  Watch Demo
-                </button>
+                {isAuthenticated ? (
+                  <>
+                    <button
+                      onClick={() => window.location.href = '/course'}
+                      className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#041521] bg-[#76d6d5] rounded-xl hover:bg-[#65c5c4] transition-all duration-200"
+                      style={{
+                        fontFamily: 'Montserrat',
+                        boxShadow: '0px 4px 20px #76d6d540',
+                      }}
+                    >
+                      Continue Learning
+                    </button>
+                    <button
+                      onClick={handleLogout}
+                      className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#76d6d5] border-2 border-[#76d6d5] rounded-xl hover:bg-[#76d6d510] transition-all duration-200"
+                      style={{ fontFamily: 'Montserrat' }}
+                    >
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      to="/register"
+                      className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#041521] bg-[#76d6d5] rounded-xl hover:bg-[#65c5c4] transition-all duration-200 text-center"
+                      style={{
+                        fontFamily: 'Montserrat',
+                        boxShadow: '0px 4px 20px #76d6d540',
+                      }}
+                    >
+                      Get Started Free
+                    </Link>
+                    <button
+                      className="px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-[#76d6d5] border-2 border-[#76d6d5] rounded-xl hover:bg-[#76d6d510] transition-all duration-200"
+                      style={{ fontFamily: 'Montserrat' }}
+                    >
+                      Watch Demo
+                    </button>
+                  </>
+                )}
               </div>
 
               {/* Stats */}

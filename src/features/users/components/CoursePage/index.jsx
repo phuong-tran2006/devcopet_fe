@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate } from '@tanstack/react-router';
 import Logo from '../../../../components/layout/Logo';
+import { getCourses } from '../../../../services/api';
 
 // Color palette
 const colors = {
@@ -44,46 +45,90 @@ const PlayIcon = () => (
   </svg>
 );
 
-// Course data
-const courses = [
-  {
-    id: 1,
-    icon: '🐍',
-    name: 'Python',
-    description: 'Learn the fundamentals of Python programming from scratch',
-    progress: 37,
-    lessons: 8,
-    completed: 3,
-  },
-  {
-    id: 2,
-    icon: '☕',
-    name: 'Java',
-    description: 'Master object-oriented programming with Java',
-    progress: 0,
-    lessons: 10,
-    completed: 0,
-  },
-  {
-    id: 3,
-    icon: '⚡',
-    name: 'C++',
-    description: 'Build high-performance applications with C++',
-    progress: 0,
-    lessons: 12,
-    completed: 0,
-  },
-];
+// Loading Skeleton Component
+const CourseCardSkeleton = () => (
+  <div className="bg-[#0d1d2a] border border-[#3e4949] rounded-xl overflow-hidden animate-pulse">
+    <div className="h-32 bg-[#3e494920]" />
+    <div className="p-5">
+      <div className="h-6 bg-[#3e494920] rounded w-24 mb-2" />
+      <div className="h-4 bg-[#3e494920] rounded w-full mb-4" />
+      <div className="h-10 bg-[#3e494920] rounded" />
+    </div>
+  </div>
+);
+
+// Error State Component
+const ErrorState = ({ message, onRetry }) => (
+  <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className="w-16 h-16 mb-4 rounded-full bg-[#ff5f5620] flex items-center justify-center">
+      <svg className="w-8 h-8 text-[#ff5f56]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+    </div>
+    <p className="text-[#bdc9c8] mb-4" style={{ fontFamily: 'Roboto' }}>
+      {message || 'Failed to load courses'}
+    </p>
+    <button
+      onClick={onRetry}
+      className="px-4 py-2 bg-[#76d6d5] text-[#041521] rounded-lg font-medium hover:bg-[#76d6d5cc] transition-colors"
+    >
+      Try Again
+    </button>
+  </div>
+);
 
 const CoursePage = () => {
   const navItems = ['Tutorial', 'Roadmap', 'Community', 'About'];
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('popular');
+  
+  // API State
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch courses on mount
+  useEffect(() => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getCourses();
+        const data = await response.json();
+        setCourses(data);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+        setError(err.message || 'Failed to load courses');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourses();
+  }, []);
 
   const filteredCourses = courses.filter(course =>
     course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     course.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleRetry = () => {
+    const fetchCourses = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getCourses();
+        const data = await response.json();
+        setCourses(data);
+      } catch (err) {
+        console.error('Failed to fetch courses:', err);
+        setError(err.message || 'Failed to load courses');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  };
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#041521]">
@@ -167,98 +212,125 @@ const CoursePage = () => {
             />
           </div>
 
+          {/* Error State */}
+          {error && !loading && (
+            <ErrorState message={error} onRetry={handleRetry} />
+          )}
+
           {/* Course Grid (3 columns) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {filteredCourses.map((course) => (
-              <div
-                key={course.id}
-                className="bg-[#0d1d2a] border border-[#3e4949] rounded-xl overflow-hidden hover:border-[#76d6d5] transition-all duration-200 group"
-                style={{ boxShadow: '0px 4px 15px #00000025' }}
-              >
-                {/* Course Header with Gradient */}
+            {loading ? (
+              // Loading skeletons
+              <>
+                <CourseCardSkeleton />
+                <CourseCardSkeleton />
+                <CourseCardSkeleton />
+              </>
+            ) : (
+              // Course cards
+              filteredCourses.map((course) => (
                 <div
-                  className="h-32 relative flex items-center justify-center"
-                  style={{
-                    background: course.progress > 0
-                      ? 'linear-gradient(135deg, #76d6d515 0%, #d8bfd810 100%)'
-                      : 'linear-gradient(135deg, #3e494915 0%, transparent 100%)',
-                  }}
+                  key={course.id}
+                  className="bg-[#0d1d2a] border border-[#3e4949] rounded-xl overflow-hidden hover:border-[#76d6d5] transition-all duration-200 group"
+                  style={{ boxShadow: '0px 4px 15px #00000025' }}
                 >
-                  <span className="text-6xl">{course.icon}</span>
-
-                  {/* Progress Indicator */}
-                  {course.progress > 0 && (
-                    <div className="absolute top-3 right-3">
-                      <div className="px-2 py-1 bg-[#04152180] rounded-full">
-                        <span className="text-xs text-[#76d6d5] font-medium" style={{ fontFamily: 'Roboto' }}>
-                          {course.progress}%
-                        </span>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Course Content */}
-                <div className="p-5">
-                  {/* Course Name */}
-                  <h3
-                    className="text-lg font-semibold text-[#d4e4f6] mb-2"
-                    style={{ fontFamily: 'Montserrat' }}
+                  {/* Course Header with Gradient */}
+                  <div
+                    className="h-32 relative flex items-center justify-center"
+                    style={{
+                      background: course.progress > 0
+                        ? 'linear-gradient(135deg, #76d6d515 0%, #d8bfd810 100%)'
+                        : 'linear-gradient(135deg, #3e494915 0%, transparent 100%)',
+                    }}
                   >
-                    {course.name}
-                  </h3>
+                    <span className="text-6xl">{course.icon}</span>
 
-                  {/* Description */}
-                  <p className="text-xs text-[#bdc9c8] mb-4 line-clamp-2" style={{ fontFamily: 'Roboto' }}>
-                    {course.description}
-                  </p>
-
-                  {/* Progress Bar */}
-                  {course.progress > 0 && (
-                    <div className="mb-4">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-xs text-[#bdc9c8]" style={{ fontFamily: 'Roboto' }}>
-                          {course.completed}/{course.lessons} lessons
-                        </span>
-                        <span className="text-xs text-[#76d6d5]" style={{ fontFamily: 'Roboto' }}>
-                          {course.progress}%
-                        </span>
+                    {/* Progress Indicator */}
+                    {course.progress > 0 && (
+                      <div className="absolute top-3 right-3">
+                        <div className="px-2 py-1 bg-[#04152180] rounded-full">
+                          <span className="text-xs text-[#76d6d5] font-medium" style={{ fontFamily: 'Roboto' }}>
+                            {course.progress}%
+                          </span>
+                        </div>
                       </div>
-                      <div className="w-full h-1.5 bg-[#3e4949] rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-[#76d6d5] rounded-full transition-all duration-500"
-                          style={{ width: `${course.progress}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
 
-                  {/* Continue Button */}
-                  <Link
-                    to={course.progress > 0 ? '/chapter' : '/chapter'}
-                    className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#76d6d5] text-[#041521] rounded-lg font-medium hover:bg-[#76d6d5cc] transition-colors"
-                    style={{ fontFamily: 'Roboto' }}
-                  >
-                    <PlayIcon />
-                    {course.progress > 0 ? 'Continue' : 'Start'}
-                  </Link>
+                  {/* Course Content */}
+                  <div className="p-5">
+                    {/* Course Name */}
+                    <h3
+                      className="text-lg font-semibold text-[#d4e4f6] mb-2"
+                      style={{ fontFamily: 'Montserrat' }}
+                    >
+                      {course.name}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-xs text-[#bdc9c8] mb-4 line-clamp-2" style={{ fontFamily: 'Roboto' }}>
+                      {course.description}
+                    </p>
+
+                    {/* Progress Bar */}
+                    {course.progress > 0 && (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="text-xs text-[#bdc9c8]" style={{ fontFamily: 'Roboto' }}>
+                            {course.completed}/{course.lessons} lessons
+                          </span>
+                          <span className="text-xs text-[#76d6d5]" style={{ fontFamily: 'Roboto' }}>
+                            {course.progress}%
+                          </span>
+                        </div>
+                        <div className="w-full h-1.5 bg-[#3e4949] rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#76d6d5] rounded-full transition-all duration-500"
+                            style={{ width: `${course.progress}%` }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Continue Button - Now uses route params */}
+                    <Link
+                      to="/chapter/$courseId"
+                      params={{ courseId: course.id }}
+                      className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#76d6d5] text-[#041521] rounded-lg font-medium hover:bg-[#76d6d5cc] transition-colors"
+                      style={{ fontFamily: 'Roboto' }}
+                    >
+                      <PlayIcon />
+                      {course.progress > 0 ? 'Continue' : 'Start'}
+                    </Link>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Load More / Pagination */}
-          <div className="flex items-center justify-center">
-            <button
-              className="flex items-center gap-2 px-6 py-3 bg-[#0d1d2a] border border-[#3e4949] text-[#bdc9c8] rounded-xl hover:border-[#76d6d5] hover:text-[#76d6d5] transition-colors"
-              style={{ fontFamily: 'Roboto' }}
-            >
-              <span>Load More Courses</span>
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-              </svg>
-            </button>
-          </div>
+          {!loading && !error && filteredCourses.length > 0 && (
+            <div className="flex items-center justify-center">
+              <button
+                className="flex items-center gap-2 px-6 py-3 bg-[#0d1d2a] border border-[#3e4949] text-[#bdc9c8] rounded-xl hover:border-[#76d6d5] hover:text-[#76d6d5] transition-colors"
+                style={{ fontFamily: 'Roboto' }}
+              >
+                <span>Load More Courses</span>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                </svg>
+              </button>
+            </div>
+          )}
+
+          {/* No results found */}
+          {!loading && !error && filteredCourses.length === 0 && courses.length > 0 && (
+            <div className="text-center py-12">
+              <p className="text-[#bdc9c8]" style={{ fontFamily: 'Roboto' }}>
+                No courses found matching "{searchQuery}"
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>

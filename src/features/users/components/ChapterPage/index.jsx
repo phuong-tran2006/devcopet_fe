@@ -1,6 +1,7 @@
-import React from 'react';
-import { Link } from '@tanstack/react-router';
+import React, { useState, useEffect } from 'react';
+import { Link, useParams } from '@tanstack/react-router';
 import Logo from '../../../../components/layout/Logo';
+import { getCourse, getCourseChapters } from '../../../../services/api';
 
 // Color palette
 const colors = {
@@ -62,6 +63,12 @@ const FunctionIcon = () => (
   </svg>
 );
 
+const DataIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+  </svg>
+);
+
 const TrophyIcon = () => (
   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
@@ -74,48 +81,127 @@ const StarIcon = () => (
   </svg>
 );
 
+// Icon mapping
+const getIconComponent = (iconName) => {
+  const icons = {
+    book: BookIcon,
+    code: CodeIcon,
+    function: FunctionIcon,
+    data: DataIcon,
+  };
+  return icons[iconName] || BookIcon;
+};
+
+// Loading Skeleton Component
+const ChapterSkeleton = () => (
+  <div className="space-y-6">
+    {[1, 2, 3].map((i) => (
+      <div key={i} className="bg-[#0d1d2a] border border-[#3e4949] rounded-xl p-5 ml-4 animate-pulse">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-[#3e494920] rounded-xl" />
+            <div>
+              <div className="h-5 bg-[#3e494920] rounded w-32 mb-2" />
+              <div className="h-4 bg-[#3e494920] rounded w-24" />
+            </div>
+          </div>
+        </div>
+        <div className="space-y-2 ml-14">
+          {[1, 2].map((j) => (
+            <div key={j} className="flex items-center gap-3 p-3 rounded-lg border bg-[#04152180] border-[#3e4949]">
+              <div className="w-8 h-8 bg-[#3e494920] rounded-lg" />
+              <div className="flex-1">
+                <div className="h-4 bg-[#3e494920] rounded w-32 mb-1" />
+                <div className="h-3 bg-[#3e494920] rounded w-48" />
+              </div>
+              <div className="w-16 h-6 bg-[#3e494920] rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+// Error State Component
+const ErrorState = ({ message, onRetry }) => (
+  <div className="flex flex-col items-center justify-center py-12 text-center">
+    <div className="w-16 h-16 mb-4 rounded-full bg-[#ff5f5620] flex items-center justify-center">
+      <svg className="w-8 h-8 text-[#ff5f56]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+      </svg>
+    </div>
+    <p className="text-[#bdc9c8] mb-4" style={{ fontFamily: 'Roboto' }}>
+      {message || 'Failed to load chapters'}
+    </p>
+    <button
+      onClick={onRetry}
+      className="px-4 py-2 bg-[#76d6d5] text-[#041521] rounded-lg font-medium hover:bg-[#76d6d5cc] transition-colors"
+    >
+      Try Again
+    </button>
+  </div>
+);
+
 const ChapterPage = () => {
+  const { courseId } = useParams({ from: '/chapter/$courseId' });
   const navItems = ['Tutorial', 'Roadmap', 'Community', 'About'];
 
-  // Module data
-  const modules = [
-    {
-      id: 1,
-      title: 'Module 1: Basics',
-      subtitle: 'Learn the fundamentals',
-      icon: BookIcon,
-      status: 'completed',
-      rank: 'Moss Green',
-      lessons: [
-        { id: 1, title: 'Hello World', description: 'Write your first Python program', duration: '10 min', status: 'completed' },
-        { id: 2, title: 'Variables & Data Types', description: 'Store and manipulate data', duration: '15 min', status: 'completed' },
-      ],
-    },
-    {
-      id: 2,
-      title: 'Module 2: Control Flow',
-      subtitle: 'Make decisions in code',
-      icon: CodeIcon,
-      status: 'active',
-      rank: 'Teal',
-      lessons: [
-        { id: 3, title: 'If Statements', description: 'Conditional execution', duration: '12 min', status: 'completed' },
-        { id: 4, title: 'Loops', description: 'Repeat actions with for and while', duration: '18 min', status: 'active' },
-        { id: 5, title: 'Break & Continue', description: 'Control loop execution', duration: '10 min', status: 'locked' },
-      ],
-    },
-    {
-      id: 3,
-      title: 'Module 3: Functions',
-      subtitle: 'Organize and reuse code',
-      icon: FunctionIcon,
-      status: 'locked',
-      rank: 'Thistle',
-      lessons: [
-        { id: 6, title: 'Function Basics', description: 'Define and call functions', duration: '15 min', status: 'locked' },
-      ],
-    },
-  ];
+  // API State
+  const [course, setCourse] = useState(null);
+  const [chapters, setChapters] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch course and chapters
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [courseResponse, chaptersResponse] = await Promise.all([
+          getCourse(courseId),
+          getCourseChapters(courseId),
+        ]);
+        const courseData = await courseResponse.json();
+        const chaptersData = await chaptersResponse.json();
+        setCourse(courseData);
+        setChapters(chaptersData);
+      } catch (err) {
+        console.error('Failed to fetch course data:', err);
+        setError(err.message || 'Failed to load course');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (courseId) {
+      fetchData();
+    }
+  }, [courseId]);
+
+  const handleRetry = () => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const [courseResponse, chaptersResponse] = await Promise.all([
+          getCourse(courseId),
+          getCourseChapters(courseId),
+        ]);
+        const courseData = await courseResponse.json();
+        const chaptersData = await chaptersResponse.json();
+        setCourse(courseData);
+        setChapters(chaptersData);
+      } catch (err) {
+        console.error('Failed to fetch course data:', err);
+        setError(err.message || 'Failed to load course');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  };
 
   const getStatusBadge = (status, rank) => {
     const badgeStyles = {
@@ -158,6 +244,127 @@ const ChapterPage = () => {
         return 'bg-[#04152180] border-[#3e4949] opacity-60';
     }
   };
+
+  const getLessonLink = (lesson) => {
+    // Navigate to lesson detail page
+    return `/lesson/detail/${lesson.id}`;
+  };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-[#041521]">
+        <header
+          className="shrink-0 w-full h-16 bg-[#041521] border-b border-[#3e4949] flex items-center px-6"
+          style={{ boxShadow: '0px 4px 20px #00808019' }}
+        >
+          <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between">
+            <Logo />
+            <nav className="hidden md:flex items-center gap-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item}
+                  to="/"
+                  className="text-sm font-medium text-[#bdc9c8] hover:text-[#76d6d5] transition-colors duration-200"
+                  style={{ fontFamily: 'Roboto' }}
+                >
+                  {item}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-4">
+              <div className="w-9 h-9 rounded-full bg-[#d8bfd8] text-[#041521] font-semibold flex items-center justify-center">
+                Y
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 py-8 px-6">
+          <div className="max-w-[1024px] mx-auto">
+            {/* Header Skeleton */}
+            <div className="flex items-start justify-between mb-8">
+              <div className="flex-1">
+                <div className="h-4 bg-[#3e494920] rounded w-24 mb-3" />
+                <div className="h-8 bg-[#3e494920] rounded w-64 mb-2" />
+                <div className="h-4 bg-[#3e494920] rounded w-96" />
+              </div>
+              <div className="flex flex-col items-end gap-3">
+                <div className="h-8 bg-[#3e494920] rounded w-32" />
+                <div className="w-40 h-6 bg-[#3e494920] rounded" />
+              </div>
+            </div>
+            <ChapterSkeleton />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-[#041521]">
+        <header
+          className="shrink-0 w-full h-16 bg-[#041521] border-b border-[#3e4949] flex items-center px-6"
+          style={{ boxShadow: '0px 4px 20px #00808019' }}
+        >
+          <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between">
+            <Logo />
+            <nav className="hidden md:flex items-center gap-8">
+              {navItems.map((item) => (
+                <Link
+                  key={item}
+                  to="/"
+                  className="text-sm font-medium text-[#bdc9c8] hover:text-[#76d6d5] transition-colors duration-200"
+                  style={{ fontFamily: 'Roboto' }}
+                >
+                  {item}
+                </Link>
+              ))}
+            </nav>
+            <div className="flex items-center gap-4">
+              <div className="w-9 h-9 rounded-full bg-[#d8bfd8] text-[#041521] font-semibold flex items-center justify-center">
+                Y
+              </div>
+            </div>
+          </div>
+        </header>
+        <main className="flex-1 py-8 px-6">
+          <div className="max-w-[1024px] mx-auto">
+            <ErrorState message={error} onRetry={handleRetry} />
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Not found state
+  if (!course) {
+    return (
+      <div className="flex flex-col min-h-screen w-full bg-[#041521]">
+        <header
+          className="shrink-0 w-full h-16 bg-[#041521] border-b border-[#3e4949] flex items-center px-6"
+          style={{ boxShadow: '0px 4px 20px #00808019' }}
+        >
+          <div className="w-full max-w-[1440px] mx-auto flex items-center justify-between">
+            <Logo />
+          </div>
+        </header>
+        <main className="flex-1 py-8 px-6">
+          <div className="max-w-[1024px] mx-auto text-center">
+            <h2 className="text-2xl font-bold text-[#d4e4f6] mb-4">Course Not Found</h2>
+            <p className="text-[#bdc9c8] mb-4">The course you're looking for doesn't exist.</p>
+            <Link
+              to="/course"
+              className="px-4 py-2 bg-[#76d6d5] text-[#041521] rounded-lg font-medium hover:bg-[#76d6d5cc] transition-colors inline-block"
+            >
+              Back to Courses
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-[#041521]">
@@ -208,9 +415,13 @@ const ChapterPage = () => {
             <div className="flex-1">
               {/* Breadcrumb */}
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-sm text-[#bdc9c8]" style={{ fontFamily: 'Roboto' }}>
-                  Python
-                </span>
+                <Link
+                  to="/course"
+                  className="text-sm text-[#bdc9c8] hover:text-[#76d6d5] transition-colors"
+                  style={{ fontFamily: 'Roboto' }}
+                >
+                  {course.name}
+                </Link>
                 <span className="text-sm text-[#3e4949]">›</span>
                 <span className="text-sm text-[#76d6d5]" style={{ fontFamily: 'Roboto' }}>
                   Chapter
@@ -222,12 +433,12 @@ const ChapterPage = () => {
                 className="text-3xl font-bold text-[#d4e4f6] mb-2"
                 style={{ fontFamily: 'Montserrat', textShadow: '0px 0px 20px #76d6d530' }}
               >
-                Master Python Curriculum
+                Master {course.name} Curriculum
               </h1>
 
               {/* Description */}
               <p className="text-sm text-[#bdc9c8] max-w-lg" style={{ fontFamily: 'Roboto' }}>
-                A comprehensive learning path covering all Python fundamentals from basics to advanced concepts
+                {course.description}
               </p>
             </div>
 
@@ -239,7 +450,7 @@ const ChapterPage = () => {
                     Students
                   </div>
                   <div className="text-lg font-bold text-[#d4e4f6]" style={{ fontFamily: 'Montserrat' }}>
-                    3.2k
+                    {course.totalStudents?.toLocaleString() || '0'}
                   </div>
                 </div>
                 <div className="text-right">
@@ -247,7 +458,7 @@ const ChapterPage = () => {
                     Lessons
                   </div>
                   <div className="text-lg font-bold text-[#d4e4f6]" style={{ fontFamily: 'Montserrat' }}>
-                    8
+                    {course.totalLessons || 0}
                   </div>
                 </div>
               </div>
@@ -259,11 +470,14 @@ const ChapterPage = () => {
                     Progress
                   </span>
                   <span className="text-xs font-medium text-[#76d6d5]" style={{ fontFamily: 'Roboto' }}>
-                    25%
+                    {course.progress || 0}%
                   </span>
                 </div>
                 <div className="w-full h-2 bg-[#3e4949] rounded-full overflow-hidden">
-                  <div className="h-full bg-[#76d6d5] rounded-full" style={{ width: '25%' }} />
+                  <div
+                    className="h-full bg-[#76d6d5] rounded-full"
+                    style={{ width: `${course.progress || 0}%` }}
+                  />
                 </div>
               </div>
 
@@ -271,7 +485,7 @@ const ChapterPage = () => {
               <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#76d6d520] rounded-full">
                 <div className="w-3 h-3 rounded-full bg-[#76d6d5]" />
                 <span className="text-sm font-medium text-[#76d6d5]" style={{ fontFamily: 'Roboto' }}>
-                  Moss Green Rank
+                  {course.rank} Rank
                 </span>
               </div>
             </div>
@@ -284,10 +498,10 @@ const ChapterPage = () => {
 
             {/* Modules */}
             <div className="space-y-6">
-              {modules.map((module, moduleIndex) => {
-                const ModuleIcon = module.icon;
+              {chapters.map((chapter, moduleIndex) => {
+                const ModuleIcon = getIconComponent(chapter.icon);
                 return (
-                  <div key={module.id} className="relative">
+                  <div key={chapter.id} className="relative">
                     {/* Module Card */}
                     <div className="bg-[#0d1d2a] border border-[#3e4949] rounded-xl p-5 ml-4">
                       {/* Module Header */}
@@ -296,9 +510,9 @@ const ChapterPage = () => {
                           {/* Module Icon */}
                           <div
                             className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                              module.status === 'completed'
+                              chapter.status === 'completed'
                                 ? 'bg-[#76d6d520] text-[#76d6d5]'
-                                : module.status === 'active'
+                                : chapter.status === 'active'
                                 ? 'bg-[#d8bfd820] text-[#d8bfd8]'
                                 : 'bg-[#3e494920] text-[#bdc9c8]'
                             }`}
@@ -312,24 +526,25 @@ const ChapterPage = () => {
                               className="text-base font-semibold text-[#d4e4f6]"
                               style={{ fontFamily: 'Montserrat' }}
                             >
-                              {module.title}
+                              {chapter.title}
                             </h3>
                             <p className="text-xs text-[#bdc9c8]" style={{ fontFamily: 'Roboto' }}>
-                              {module.subtitle}
+                              {chapter.subtitle}
                             </p>
                           </div>
                         </div>
 
                         {/* Status Badge */}
-                        {getStatusBadge(module.status, module.rank)}
+                        {getStatusBadge(chapter.status, chapter.rank)}
                       </div>
 
                       {/* Lessons */}
                       <div className="space-y-2 ml-14">
-                        {module.lessons.map((lesson) => (
+                        {chapter.lessons.map((lesson) => (
                           <Link
                             key={lesson.id}
-                            to="/lesson"
+                            to="/lesson/detail/$lessonId"
+                            params={{ lessonId: lesson.id.toString() }}
                             className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-200 hover:border-[#76d6d5] ${getLessonStyles(lesson.status)}`}
                           >
                             {/* Lesson Icon */}
@@ -392,7 +607,7 @@ const ChapterPage = () => {
                   Featured Achievement
                 </h3>
                 <p className="text-sm text-[#bdc9c8]" style={{ fontFamily: 'Roboto' }}>
-                  Pythonista's Awakening
+                  {course.name}ista's Awakening
                 </p>
               </div>
               <div className="flex items-center gap-1">

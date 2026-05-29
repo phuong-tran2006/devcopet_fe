@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from '@tanstack/react-router';
+import { Link, useNavigate } from '@tanstack/react-router';
 import Header from '../../../../components/layout/Header';
 import Button from '../../../../components/ui/Button';
 import { EmailIcon, LockIcon, EyeIcon, EyeOffIcon } from '../../../../components/ui/icons';
+import { useAuth } from '../../../../contexts/AuthContext';
 import {
   googleIcon,
   githubIcon,
@@ -17,22 +18,63 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const { login: authLogin, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = 'Login';
+    document.title = 'Login - Devcopet';
   }, []);
 
-  const handleLogin = (e) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/course');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleLogin = async (e) => {
     if (e) e.preventDefault();
     setError('');
+
     if (!email || !password) {
-      setError('Please enter email and password.');
+      setError('Please enter both email and password.');
       return;
+    }
+
+    setLoading(true);
+    try {
+      const { authAPI } = await import('../../../../services/api');
+      const { token, user } = await authAPI.login({ email, password });
+      authLogin(token, user);
+      navigate('/course');
+    } catch (err) {
+      setError(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleSocialLogin = (provider) => {
-    // Social login logic would go here
+    const { googleAuth, githubAuth, facebookAuth } = require('../../../../services/api');
+    switch (provider) {
+      case 'google':
+        googleAuth();
+        break;
+      case 'github':
+        githubAuth();
+        break;
+      case 'facebook':
+        facebookAuth();
+        break;
+      default:
+        break;
+    }
+  };
+
+  const handleInputChange = (setter) => (e) => {
+    setter(e?.target?.value);
+    if (error) setError('');
   };
 
   return (
@@ -105,7 +147,7 @@ const Login = () => {
                         id="email"
                         name="email"
                         value={email}
-                        onChange={(e) => setEmail(e?.target?.value)}
+                        onChange={handleInputChange(setEmail)}
                         placeholder="admin@devcopet.io"
                         required
                         className="w-full pl-11 pr-3 py-2.5 bg-[#0a1a24] border border-[#76d6d533] rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-[#008080] transition-colors"
@@ -114,6 +156,7 @@ const Login = () => {
                           fontSize: '16px',
                           lineHeight: '22px',
                         }}
+                        disabled={loading}
                       />
                     </div>
                   </div>
@@ -153,7 +196,7 @@ const Login = () => {
                         id="password"
                         name="password"
                         value={password}
-                        onChange={(e) => setPassword(e?.target?.value)}
+                        onChange={handleInputChange(setPassword)}
                         placeholder="••••••••"
                         required
                         className="w-full pl-11 pr-11 py-2.5 bg-[#0a1a24] border border-[#76d6d533] rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-[#008080] transition-colors"
@@ -162,6 +205,7 @@ const Login = () => {
                           fontSize: '16px',
                           lineHeight: '22px',
                         }}
+                        disabled={loading}
                       />
                       <button
                         type="button"
@@ -177,7 +221,7 @@ const Login = () => {
                   {/* Login button */}
                   <Button
                     type="submit"
-                    text="Login"
+                    text={loading ? 'Signing in...' : 'Login'}
                     text_font_size="16"
                     className="w-full"
                     layout_width="full"
@@ -189,6 +233,7 @@ const Login = () => {
                     size="medium"
                     leftIcon={null}
                     rightIcon={null}
+                    disabled={loading}
                   />
 
                   {error ? (
@@ -220,7 +265,8 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => handleSocialLogin('google')}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                        disabled={loading}
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with Google"
                       >
                         <img
@@ -232,7 +278,8 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => handleSocialLogin('github')}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                        disabled={loading}
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with GitHub"
                       >
                         <img
@@ -244,7 +291,8 @@ const Login = () => {
                       <button
                         type="button"
                         onClick={() => handleSocialLogin('facebook')}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080]"
+                        disabled={loading}
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with Facebook"
                       >
                         <img
