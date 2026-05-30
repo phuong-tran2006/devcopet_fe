@@ -1,8 +1,9 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
 import Logo from '../../../../components/layout/Logo';
+import Footer from '../../../../components/layout/Footer';
 import { mascotAxolotl } from '../../constants/authImages';
-import { useAuth } from '../../../../contexts/AuthContext';
+import { useAuthStore } from '../../store/auth.store';
 
 // Color palette
 const colors = {
@@ -102,8 +103,13 @@ const TwitterIcon = () => (
 );
 
 const LandingPage = () => {
-  const navItems = ['Tutorial', { label: 'Roadmap', path: '/course' }, 'Community', 'About'];
-  const { isAuthenticated, user, logout } = useAuth();
+  const navItems = [
+    { label: 'Tutorial', path: '/course' },
+    { label: 'Roadmap', path: '/roadmap' },
+    'Community',
+    'About'
+  ];
+  const { isAuthenticated, user, logout } = useAuthStore();
 
   const handleLogout = () => {
     logout();
@@ -175,14 +181,6 @@ const LandingPage = () => {
             <div className="flex items-center gap-3">
               {isAuthenticated ? (
                 <>
-                  <div className="hidden sm:flex items-center gap-2 px-3 py-2 bg-[#0d1d2a] rounded-lg border border-[#3e4949]">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#76d6d5] to-[#d8bfd8] flex items-center justify-center text-[#041521] text-sm font-bold">
-                      {user?.username?.charAt(0)?.toUpperCase() || 'U'}
-                    </div>
-                    <span className="text-sm text-[#d4e4f6]" style={{ fontFamily: 'Roboto' }}>
-                      {user?.username || 'User'}
-                    </span>
-                  </div>
                   <button
                     onClick={() => window.location.href = '/course'}
                     className="px-4 py-2 text-sm sm:text-base font-medium text-[#041521] bg-[#76d6d5] rounded-lg hover:bg-[#65c5c4] transition-all duration-200"
@@ -190,13 +188,35 @@ const LandingPage = () => {
                   >
                     Continue Learning
                   </button>
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 text-sm sm:text-base font-medium text-[#76d6d5] border border-[#76d6d5] rounded-lg hover:bg-[#76d6d510] transition-all duration-200"
-                    style={{ fontFamily: 'Roboto' }}
-                  >
-                    Logout
-                  </button>
+
+                  <div className="relative group cursor-pointer ml-2">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#76d6d5] to-[#d8bfd8] flex items-center justify-center text-[#041521] text-sm font-bold border-2 border-transparent group-hover:border-[#76d6d5] transition-all duration-300 shadow-[0_0_15px_rgba(118,214,213,0.3)] hover:shadow-[0_0_20px_rgba(118,214,213,0.5)]">
+                      {user?.username?.charAt(0)?.toUpperCase() || user?.email?.charAt(0)?.toUpperCase() || 'U'}
+                    </div>
+
+                    {/* Dropdown Menu */}
+                    <div className="absolute top-12 right-0 w-36 bg-[#0d1d2a] border border-[#3e4949] rounded-xl shadow-[0_10px_25px_rgba(0,0,0,0.5)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-right group-hover:scale-100 scale-95">
+                      <div className="flex flex-col gap-1 p-2">
+                        <button
+                          className="w-full text-left px-3 py-2 text-sm text-[#d4e4f6] hover:bg-[#1a2d40] rounded-lg transition-colors font-medium flex items-center gap-2 cursor-default"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          Profile
+                        </button>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full text-left px-3 py-2 text-sm text-[#ff6b6b] hover:bg-[#ff6b6b15] rounded-lg transition-colors font-medium flex items-center gap-2"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </>
               ) : (
                 <>
@@ -677,80 +697,100 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ========== 5. COMMUNITY SECTION ========== */}
-      <section
-        className="w-full py-16 sm:py-20 md:py-24 border-t border-[#3e494930]"
-        style={{ minHeight: '467px' }}
-      >
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
-          <div className="flex flex-col lg:flex-row items-stretch gap-8 lg:gap-12">
-            {/* Left: Content */}
-            <div className="flex-1 flex flex-col justify-center">
-              <h2
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-[#d4e4f6] mb-4 sm:mb-6"
-                style={{
-                  fontFamily: 'Montserrat',
-                  textShadow: '0px 0px 15px #76d6d530',
-                }}
-              >
-                Join our community
-              </h2>
-              <p
-                className="text-base sm:text-lg text-[#bdc9c8] mb-6 sm:mb-8 max-w-lg"
-                style={{ fontFamily: 'Roboto' }}
-              >
-                Connect with fellow learners, share your progress, and get support from our active community of developers.
+      {/* ========== 6. JOIN THE COLONY ========== */}
+      <section className="w-full relative py-20 lg:py-32">
+        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-20 relative z-10">
+          <div className="flex flex-col lg:flex-row justify-between gap-12 lg:gap-8 mb-16">
+            {/* Left side: Join the Colony */}
+            <div className="lg:w-1/2 flex flex-col justify-center">
+              <h2 className="text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Montserrat' }}>Join the Colony</h2>
+              <p className="text-[#bdc9c8] mb-10 max-w-lg leading-relaxed text-lg" style={{ fontFamily: 'Roboto' }}>
+                Learning to code shouldn't be a solo mission. Devcopet is built by a global team of developers, educators, and gamers who believe the best way to learn is together.
               </p>
-              {/* Social Icons */}
-              <div className="flex gap-4">
-                <a
-                  href="/discord"
-                  className="w-12 h-12 rounded-xl bg-[#0d1d2a] border border-[#3e4949] flex items-center justify-center text-[#76d6d5] hover:bg-[#76d6d515] hover:border-[#76d6d5] transition-all duration-200"
-                >
-                  <DiscordIcon />
-                </a>
-                <a
-                  href="/twitter"
-                  className="w-12 h-12 rounded-xl bg-[#0d1d2a] border border-[#3e4949] flex items-center justify-center text-[#d8bfd8] hover:bg-[#d8bfd815] hover:border-[#d8bfd8] transition-all duration-200"
-                >
-                  <TwitterIcon />
-                </a>
+              <div className="flex flex-wrap gap-4">
+                <button className="px-6 py-2.5 rounded-full border border-[#3e4949] text-white font-medium hover:border-[#76d6d5] hover:text-[#76d6d5] hover:bg-[#76d6d5]/10 transition-all flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z" /></svg>
+                  DISCORD
+                </button>
+                <button className="px-6 py-2.5 rounded-full border border-[#3e4949] text-white font-medium hover:border-[#d8bfd8] hover:text-[#d8bfd8] hover:bg-[#d8bfd8]/10 transition-all flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clipRule="evenodd" /></svg>
+                  GITHUB
+                </button>
+                <button className="px-6 py-2.5 rounded-full border border-[#3e4949] text-white font-medium hover:border-[#7FE3DD] hover:text-[#7FE3DD] hover:bg-[#7FE3DD]/10 transition-all flex items-center gap-2">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" /></svg>
+                  LINKEDIN
+                </button>
               </div>
             </div>
 
-            {/* Right: Testimonial Card */}
-            <div className="flex-shrink-0 w-full lg:w-[450px]">
-              <div
-                className="bg-[#0d1d2a] border border-[#3e4949] rounded-2xl p-6 sm:p-8 hover:border-[#76d6d5] transition-all duration-300"
-                style={{
-                  boxShadow: '0px 4px 20px #00000030',
-                }}
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  {/* Avatar */}
-                  <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#76d6d5] to-[#d8bfd8] flex items-center justify-center text-[#041521] text-xl font-bold">
-                    S
+            {/* Right side: Core Team */}
+            <div className="lg:w-1/2 flex lg:justify-end mt-12 lg:mt-0">
+              <div className="w-full max-w-xl bg-[#0d1d2a]/50 backdrop-blur-md border border-[#1a2d40] rounded-[32px] p-8 hover:border-[#3e4949] transition-all duration-300 shadow-2xl">
+                <h3 className="text-xl font-bold text-white mb-6" style={{ fontFamily: 'Montserrat' }}>Our Core Team</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-4 mb-8">
+                  {/* Team Member 1 */}
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-[#3e4949] bg-gradient-to-br from-[#0d1d2a] to-[#041521] shadow-inner flex items-center justify-center flex-shrink-0 group-hover:border-[#76d6d5] transition-colors">
+                      <span className="text-lg font-bold text-[#76d6d5]">N</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-base group-hover:text-[#76d6d5] transition-colors whitespace-nowrap">Hoàng Nhân</h4>
+                      <p className="text-[10px] text-[#7D8A95] tracking-widest mt-1 uppercase font-semibold">BACKEND</p>
+                    </div>
                   </div>
-                  <div>
-                    <h4
-                      className="text-lg font-semibold text-[#d4e4f6]"
-                      style={{ fontFamily: 'Montserrat' }}
-                    >
-                      Sarah Chen
-                    </h4>
-                    <p
-                      className="text-sm text-[#bdc9c8]"
-                      style={{ fontFamily: 'Roboto' }}
-                    >
-                      Full Stack Developer
-                    </p>
+                  {/* Team Member 2 */}
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-[#3e4949] bg-gradient-to-br from-[#0d1d2a] to-[#041521] shadow-inner flex items-center justify-center flex-shrink-0 group-hover:border-[#d8bfd8] transition-colors">
+                      <span className="text-lg font-bold text-[#d8bfd8]">Y</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-base group-hover:text-[#d8bfd8] transition-colors whitespace-nowrap">Yến Phương</h4>
+                      <p className="text-[10px] text-[#7D8A95] tracking-widest mt-1 uppercase font-semibold">FRONTEND</p>
+                    </div>
+                  </div>
+                  {/* Team Member 3 */}
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-[#3e4949] bg-gradient-to-br from-[#0d1d2a] to-[#041521] shadow-inner flex items-center justify-center flex-shrink-0 group-hover:border-[#3b82f6] transition-colors">
+                      <span className="text-lg font-bold text-[#3b82f6]">C</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-base group-hover:text-[#3b82f6] transition-colors whitespace-nowrap">Chí Thành</h4>
+                      <p className="text-[10px] text-[#7D8A95] tracking-widest mt-1 uppercase font-semibold">BACKEND</p>
+                    </div>
+                  </div>
+                  {/* Team Member 4 */}
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-[#3e4949] bg-gradient-to-br from-[#0d1d2a] to-[#041521] shadow-inner flex items-center justify-center flex-shrink-0 group-hover:border-[#22c55e] transition-colors">
+                      <span className="text-lg font-bold text-[#22c55e]">T</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-base group-hover:text-[#22c55e] transition-colors whitespace-nowrap">Tiến Thành</h4>
+                      <p className="text-[10px] text-[#7D8A95] tracking-widest mt-1 uppercase font-semibold">FRONTEND</p>
+                    </div>
+                  </div>
+                  {/* Team Member 5 */}
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-[#3e4949] bg-gradient-to-br from-[#0d1d2a] to-[#041521] shadow-inner flex items-center justify-center flex-shrink-0 group-hover:border-[#f59e0b] transition-colors">
+                      <span className="text-lg font-bold text-[#f59e0b]">T</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-base group-hover:text-[#f59e0b] transition-colors whitespace-nowrap">Tuấn Kiệt</h4>
+                      <p className="text-[10px] text-[#7D8A95] tracking-widest mt-1 uppercase font-semibold">BACKEND</p>
+                    </div>
+                  </div>
+                  {/* Team Member 6 */}
+                  <div className="flex items-center gap-4 group cursor-pointer">
+                    <div className="w-12 h-12 rounded-full border border-[#3e4949] bg-gradient-to-br from-[#0d1d2a] to-[#041521] shadow-inner flex items-center justify-center flex-shrink-0 group-hover:border-[#ec4899] transition-colors">
+                      <span className="text-lg font-bold text-[#ec4899]">Đ</span>
+                    </div>
+                    <div>
+                      <h4 className="text-white font-semibold text-base group-hover:text-[#ec4899] transition-colors whitespace-nowrap">Đức Tường</h4>
+                      <p className="text-[10px] text-[#7D8A95] tracking-widest mt-1 uppercase font-semibold">MENTOR</p>
+                    </div>
                   </div>
                 </div>
-                <p
-                  className="text-base sm:text-lg text-[#bdc9c8] italic leading-relaxed"
-                  style={{ fontFamily: 'Roboto' }}
-                >
-                  "Devcopet transformed my learning journey. The gamified approach kept me motivated, and within 6 months, I landed my first developer job!"
+                <p className="text-sm text-[#7D8A95] italic border-t border-[#1a2d40] pt-6 leading-relaxed">
+                  "We're always looking for contributors! Help us build the future of education."
                 </p>
               </div>
             </div>
@@ -758,22 +798,8 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ========== 6. FOOTER ========== */}
-      <footer
-        className="w-full py-8 sm:py-10 border-t border-[#3e494930]"
-        style={{ minHeight: '90px' }}
-      >
-        <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
-          <div className="flex justify-center">
-            <p
-              className="text-sm sm:text-base text-[#bdc9c8]"
-              style={{ fontFamily: 'Roboto' }}
-            >
-              &copy; 2025 Devcopet. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
+      {/* ========== 7. FOOTER ========== */}
+      <Footer />
     </div>
   );
 };

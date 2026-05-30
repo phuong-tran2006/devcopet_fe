@@ -9,6 +9,14 @@
   --color-leaf: #22c55e;
 }
 
+@layer base {
+  html,
+  body,
+  #root {
+    @apply bg-[#041521] text-white m-0 p-0 min-h-screen;
+  }
+}
+
 @layer components {
   .companion-container {
     @apply min-h-screen w-full bg-white flex flex-col items-center pt-20 px-5 box-border font-sans;

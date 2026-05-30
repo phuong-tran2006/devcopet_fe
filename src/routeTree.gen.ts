@@ -8,273 +8,293 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as RegisterRouteImport } from './routes/register'
-import { Route as QuizRouteImport } from './routes/quiz'
-import { Route as MapRouteImport } from './routes/map'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as LessonRouteImport } from './routes/lesson'
-import { Route as CourseRouteImport } from './routes/course'
-import { Route as ChapterRouteImport } from './routes/chapter'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
-import { Route as ChapterCourseIdRouteImport } from './routes/chapter/$courseId'
-import { Route as LessonDetailLessonIdRouteImport } from './routes/lesson/detail/$lessonId'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as RegisterRouteImport } from "./routes/register";
+import { Route as QuizRouteImport } from "./routes/quiz";
+import { Route as MapRouteImport } from "./routes/map";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as LessonRouteImport } from "./routes/lesson";
+import { Route as CourseRouteImport } from "./routes/course";
+import { Route as ChapterRouteImport } from "./routes/chapter";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as LessonLessonIdRouteImport } from "./routes/lesson/$lessonId";
+import { Route as ChapterCourseIdRouteImport } from "./routes/chapter/$courseId";
+import { Route as AuthCallbackRouteImport } from "./routes/auth.callback";
+import { Route as LessonDetailLessonIdRouteImport } from "./routes/lesson/detail/$lessonId";
 
 const RegisterRoute = RegisterRouteImport.update({
-  id: '/register',
-  path: '/register',
+  id: "/register",
+  path: "/register",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const QuizRoute = QuizRouteImport.update({
-  id: '/quiz',
-  path: '/quiz',
+  id: "/quiz",
+  path: "/quiz",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const MapRoute = MapRouteImport.update({
-  id: '/map',
-  path: '/map',
+  id: "/map",
+  path: "/map",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LessonRoute = LessonRouteImport.update({
-  id: '/lesson',
-  path: '/lesson',
+  id: "/lesson",
+  path: "/lesson",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const CourseRoute = CourseRouteImport.update({
-  id: '/course',
-  path: '/course',
+  id: "/course",
+  path: "/course",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ChapterRoute = ChapterRouteImport.update({
-  id: '/chapter',
-  path: '/chapter',
+  id: "/chapter",
+  path: "/chapter",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
-  id: '/$lessonId',
-  path: '/$lessonId',
+  id: "/$lessonId",
+  path: "/$lessonId",
   getParentRoute: () => LessonRoute,
-} as any)
+} as any);
 const ChapterCourseIdRoute = ChapterCourseIdRouteImport.update({
-  id: '/$courseId',
-  path: '/$courseId',
+  id: "/$courseId",
+  path: "/$courseId",
   getParentRoute: () => ChapterRoute,
-} as any)
+} as any);
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: "/auth/callback",
+  path: "/auth/callback",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const LessonDetailLessonIdRoute = LessonDetailLessonIdRouteImport.update({
-  id: '/detail/$lessonId',
-  path: '/detail/$lessonId',
+  id: "/detail/$lessonId",
+  path: "/detail/$lessonId",
   getParentRoute: () => LessonRoute,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/chapter': typeof ChapterRouteWithChildren
-  '/course': typeof CourseRoute
-  '/lesson': typeof LessonRouteWithChildren
-  '/login': typeof LoginRoute
-  '/map': typeof MapRoute
-  '/quiz': typeof QuizRoute
-  '/register': typeof RegisterRoute
-  '/chapter/$courseId': typeof ChapterCourseIdRoute
-  '/lesson/$lessonId': typeof LessonLessonIdRoute
-  '/lesson/detail/$lessonId': typeof LessonDetailLessonIdRoute
+  "/": typeof IndexRoute;
+  "/chapter": typeof ChapterRouteWithChildren;
+  "/course": typeof CourseRoute;
+  "/lesson": typeof LessonRouteWithChildren;
+  "/login": typeof LoginRoute;
+  "/map": typeof MapRoute;
+  "/quiz": typeof QuizRoute;
+  "/register": typeof RegisterRoute;
+  "/auth/callback": typeof AuthCallbackRoute;
+  "/chapter/$courseId": typeof ChapterCourseIdRoute;
+  "/lesson/$lessonId": typeof LessonLessonIdRoute;
+  "/lesson/detail/$lessonId": typeof LessonDetailLessonIdRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/chapter': typeof ChapterRouteWithChildren
-  '/course': typeof CourseRoute
-  '/lesson': typeof LessonRouteWithChildren
-  '/login': typeof LoginRoute
-  '/map': typeof MapRoute
-  '/quiz': typeof QuizRoute
-  '/register': typeof RegisterRoute
-  '/chapter/$courseId': typeof ChapterCourseIdRoute
-  '/lesson/$lessonId': typeof LessonLessonIdRoute
-  '/lesson/detail/$lessonId': typeof LessonDetailLessonIdRoute
+  "/": typeof IndexRoute;
+  "/chapter": typeof ChapterRouteWithChildren;
+  "/course": typeof CourseRoute;
+  "/lesson": typeof LessonRouteWithChildren;
+  "/login": typeof LoginRoute;
+  "/map": typeof MapRoute;
+  "/quiz": typeof QuizRoute;
+  "/register": typeof RegisterRoute;
+  "/auth/callback": typeof AuthCallbackRoute;
+  "/chapter/$courseId": typeof ChapterCourseIdRoute;
+  "/lesson/$lessonId": typeof LessonLessonIdRoute;
+  "/lesson/detail/$lessonId": typeof LessonDetailLessonIdRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/chapter': typeof ChapterRouteWithChildren
-  '/course': typeof CourseRoute
-  '/lesson': typeof LessonRouteWithChildren
-  '/login': typeof LoginRoute
-  '/map': typeof MapRoute
-  '/quiz': typeof QuizRoute
-  '/register': typeof RegisterRoute
-  '/chapter/$courseId': typeof ChapterCourseIdRoute
-  '/lesson/$lessonId': typeof LessonLessonIdRoute
-  '/lesson/detail/$lessonId': typeof LessonDetailLessonIdRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/chapter": typeof ChapterRouteWithChildren;
+  "/course": typeof CourseRoute;
+  "/lesson": typeof LessonRouteWithChildren;
+  "/login": typeof LoginRoute;
+  "/map": typeof MapRoute;
+  "/quiz": typeof QuizRoute;
+  "/register": typeof RegisterRoute;
+  "/auth/callback": typeof AuthCallbackRoute;
+  "/chapter/$courseId": typeof ChapterCourseIdRoute;
+  "/lesson/$lessonId": typeof LessonLessonIdRoute;
+  "/lesson/detail/$lessonId": typeof LessonDetailLessonIdRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
+  fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
-    | '/'
-    | '/chapter'
-    | '/course'
-    | '/lesson'
-    | '/login'
-    | '/map'
-    | '/quiz'
-    | '/register'
-    | '/chapter/$courseId'
-    | '/lesson/$lessonId'
-    | '/lesson/detail/$lessonId'
-  fileRoutesByTo: FileRoutesByTo
+    | "/"
+    | "/chapter"
+    | "/course"
+    | "/lesson"
+    | "/login"
+    | "/map"
+    | "/quiz"
+    | "/register"
+    | "/auth/callback"
+    | "/chapter/$courseId"
+    | "/lesson/$lessonId"
+    | "/lesson/detail/$lessonId";
+  fileRoutesByTo: FileRoutesByTo;
   to:
-    | '/'
-    | '/chapter'
-    | '/course'
-    | '/lesson'
-    | '/login'
-    | '/map'
-    | '/quiz'
-    | '/register'
-    | '/chapter/$courseId'
-    | '/lesson/$lessonId'
-    | '/lesson/detail/$lessonId'
+    | "/"
+    | "/chapter"
+    | "/course"
+    | "/lesson"
+    | "/login"
+    | "/map"
+    | "/quiz"
+    | "/register"
+    | "/auth/callback"
+    | "/chapter/$courseId"
+    | "/lesson/$lessonId"
+    | "/lesson/detail/$lessonId";
   id:
-    | '__root__'
-    | '/'
-    | '/chapter'
-    | '/course'
-    | '/lesson'
-    | '/login'
-    | '/map'
-    | '/quiz'
-    | '/register'
-    | '/chapter/$courseId'
-    | '/lesson/$lessonId'
-    | '/lesson/detail/$lessonId'
-  fileRoutesById: FileRoutesById
+    | "__root__"
+    | "/"
+    | "/chapter"
+    | "/course"
+    | "/lesson"
+    | "/login"
+    | "/map"
+    | "/quiz"
+    | "/register"
+    | "/auth/callback"
+    | "/chapter/$courseId"
+    | "/lesson/$lessonId"
+    | "/lesson/detail/$lessonId";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ChapterRoute: typeof ChapterRouteWithChildren
-  CourseRoute: typeof CourseRoute
-  LessonRoute: typeof LessonRouteWithChildren
-  LoginRoute: typeof LoginRoute
-  MapRoute: typeof MapRoute
-  QuizRoute: typeof QuizRoute
-  RegisterRoute: typeof RegisterRoute
+  IndexRoute: typeof IndexRoute;
+  ChapterRoute: typeof ChapterRouteWithChildren;
+  CourseRoute: typeof CourseRoute;
+  LessonRoute: typeof LessonRouteWithChildren;
+  LoginRoute: typeof LoginRoute;
+  MapRoute: typeof MapRoute;
+  QuizRoute: typeof QuizRoute;
+  RegisterRoute: typeof RegisterRoute;
+  AuthCallbackRoute: typeof AuthCallbackRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/register': {
-      id: '/register'
-      path: '/register'
-      fullPath: '/register'
-      preLoaderRoute: typeof RegisterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/quiz': {
-      id: '/quiz'
-      path: '/quiz'
-      fullPath: '/quiz'
-      preLoaderRoute: typeof QuizRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/map': {
-      id: '/map'
-      path: '/map'
-      fullPath: '/map'
-      preLoaderRoute: typeof MapRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lesson': {
-      id: '/lesson'
-      path: '/lesson'
-      fullPath: '/lesson'
-      preLoaderRoute: typeof LessonRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/course': {
-      id: '/course'
-      path: '/course'
-      fullPath: '/course'
-      preLoaderRoute: typeof CourseRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chapter': {
-      id: '/chapter'
-      path: '/chapter'
-      fullPath: '/chapter'
-      preLoaderRoute: typeof ChapterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/lesson/$lessonId': {
-      id: '/lesson/$lessonId'
-      path: '/$lessonId'
-      fullPath: '/lesson/$lessonId'
-      preLoaderRoute: typeof LessonLessonIdRouteImport
-      parentRoute: typeof LessonRoute
-    }
-    '/chapter/$courseId': {
-      id: '/chapter/$courseId'
-      path: '/$courseId'
-      fullPath: '/chapter/$courseId'
-      preLoaderRoute: typeof ChapterCourseIdRouteImport
-      parentRoute: typeof ChapterRoute
-    }
-    '/lesson/detail/$lessonId': {
-      id: '/lesson/detail/$lessonId'
-      path: '/detail/$lessonId'
-      fullPath: '/lesson/detail/$lessonId'
-      preLoaderRoute: typeof LessonDetailLessonIdRouteImport
-      parentRoute: typeof LessonRoute
-    }
+    "/register": {
+      id: "/register";
+      path: "/register";
+      fullPath: "/register";
+      preLoaderRoute: typeof RegisterRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/quiz": {
+      id: "/quiz";
+      path: "/quiz";
+      fullPath: "/quiz";
+      preLoaderRoute: typeof QuizRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/map": {
+      id: "/map";
+      path: "/map";
+      fullPath: "/map";
+      preLoaderRoute: typeof MapRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/login": {
+      id: "/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/lesson": {
+      id: "/lesson";
+      path: "/lesson";
+      fullPath: "/lesson";
+      preLoaderRoute: typeof LessonRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/course": {
+      id: "/course";
+      path: "/course";
+      fullPath: "/course";
+      preLoaderRoute: typeof CourseRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/chapter": {
+      id: "/chapter";
+      path: "/chapter";
+      fullPath: "/chapter";
+      preLoaderRoute: typeof ChapterRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/lesson/$lessonId": {
+      id: "/lesson/$lessonId";
+      path: "/$lessonId";
+      fullPath: "/lesson/$lessonId";
+      preLoaderRoute: typeof LessonLessonIdRouteImport;
+      parentRoute: typeof LessonRoute;
+    };
+    "/chapter/$courseId": {
+      id: "/chapter/$courseId";
+      path: "/$courseId";
+      fullPath: "/chapter/$courseId";
+      preLoaderRoute: typeof ChapterCourseIdRouteImport;
+      parentRoute: typeof ChapterRoute;
+    };
+    "/auth/callback": {
+      id: "/auth/callback";
+      path: "/auth/callback";
+      fullPath: "/auth/callback";
+      preLoaderRoute: typeof AuthCallbackRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/lesson/detail/$lessonId": {
+      id: "/lesson/detail/$lessonId";
+      path: "/detail/$lessonId";
+      fullPath: "/lesson/detail/$lessonId";
+      preLoaderRoute: typeof LessonDetailLessonIdRouteImport;
+      parentRoute: typeof LessonRoute;
+    };
   }
 }
 
 interface ChapterRouteChildren {
-  ChapterCourseIdRoute: typeof ChapterCourseIdRoute
+  ChapterCourseIdRoute: typeof ChapterCourseIdRoute;
 }
 
 const ChapterRouteChildren: ChapterRouteChildren = {
   ChapterCourseIdRoute: ChapterCourseIdRoute,
-}
+};
 
 const ChapterRouteWithChildren =
-  ChapterRoute._addFileChildren(ChapterRouteChildren)
+  ChapterRoute._addFileChildren(ChapterRouteChildren);
 
 interface LessonRouteChildren {
-  LessonLessonIdRoute: typeof LessonLessonIdRoute
-  LessonDetailLessonIdRoute: typeof LessonDetailLessonIdRoute
+  LessonLessonIdRoute: typeof LessonLessonIdRoute;
+  LessonDetailLessonIdRoute: typeof LessonDetailLessonIdRoute;
 }
 
 const LessonRouteChildren: LessonRouteChildren = {
   LessonLessonIdRoute: LessonLessonIdRoute,
   LessonDetailLessonIdRoute: LessonDetailLessonIdRoute,
-}
+};
 
 const LessonRouteWithChildren =
-  LessonRoute._addFileChildren(LessonRouteChildren)
+  LessonRoute._addFileChildren(LessonRouteChildren);
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -285,7 +305,8 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
-}
+  AuthCallbackRoute: AuthCallbackRoute,
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

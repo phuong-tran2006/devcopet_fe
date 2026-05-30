@@ -6,7 +6,8 @@ import Dropdown from '../../../../components/ui/Dropdown';
 import CheckBox from '../../../../components/ui/CheckBox';
 import EmailProviderIcon from '../../../../components/ui/EmailProviderIcon';
 import { EmailIcon, LockIcon } from '../../../../components/ui/icons';
-import { useAuth } from '../../../../contexts/AuthContext';
+import { useAuthStore } from '../../store/auth.store';
+import { authApi } from '../../api/auth.api';
 import {
   googleIcon,
   githubIcon,
@@ -30,7 +31,7 @@ const RegistrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { login: authLogin, isAuthenticated } = useAuth();
+  const { setAuth, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,7 +40,7 @@ const RegistrationPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/course');
+      navigate({ to: '/course' });
     }
   }, [isAuthenticated, navigate]);
 
@@ -102,8 +103,7 @@ const RegistrationPage = () => {
 
     setLoading(true);
     try {
-      const { authAPI } = await import('../../../../services/api');
-      const { token, user } = await authAPI.register({
+      const response = await authApi.register({
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -112,12 +112,14 @@ const RegistrationPage = () => {
         dateOfBirth: formData.dateOfBirth,
       });
       
-      setSuccessMessage('Account created successfully! Redirecting to login...');
-      authLogin(token, user);
+      setSuccessMessage('Account created successfully! Redirecting...');
       
-      setTimeout(() => {
-        navigate('/course');
-      }, 1500);
+      if (response.accessToken) {
+        setAuth(response.accessToken, response.refreshToken, response.user);
+        setTimeout(() => navigate({ to: '/course' }), 1500);
+      } else {
+        setTimeout(() => navigate({ to: '/login' }), 1500);
+      }
     } catch (err) {
       setErrors({ submit: err.message || 'Registration failed. Please try again.' });
     } finally {
@@ -126,20 +128,7 @@ const RegistrationPage = () => {
   };
 
   const handleSocialLogin = (provider) => {
-    const { googleAuth, githubAuth, facebookAuth } = require('../../../../services/api');
-    switch (provider) {
-      case 'google':
-        googleAuth();
-        break;
-      case 'github':
-        githubAuth();
-        break;
-      case 'facebook':
-        facebookAuth();
-        break;
-      default:
-        break;
-    }
+    window.location.href = `http://localhost:3000/auth/${provider}`;
   };
 
   return (
@@ -217,16 +206,16 @@ const RegistrationPage = () => {
                 />
 
                 {/* Form Content */}
-                <div className="px-6 sm:px-8 md:px-11 lg:px-12 py-8 sm:py-10 md:py-12 lg:py-[50px]">
-                  <form onSubmit={handleSubmit} className="flex flex-col gap-10 sm:gap-12">
+                <div className="px-6 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-10">
+                  <form onSubmit={handleSubmit} className="flex flex-col gap-8">
                     
                     {/* Form Fields Container */}
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-4">
                       
                       {/* Full Name & Username Row */}
-                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
                             Full Name
                           </label>
                           <EditText
@@ -235,25 +224,12 @@ const RegistrationPage = () => {
                             value={formData?.fullName}
                             onChange={handleInputChange}
                             required
-                            layout_gap=""
-                            layout_width=""
-                            padding=""
-                            position=""
-                            margin=""
-                            variant=""
-                            size=""
-                            defaultValue=""
-                            onFocus={() => {}}
-                            onBlur={() => {}}
                             id="fullName"
-                            label=""
                             error={errors?.fullName}
-                            helperText=""
-                            className=""
                           />
                         </div>
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
                             Username
                           </label>
                           <EditText
@@ -262,29 +238,16 @@ const RegistrationPage = () => {
                             value={formData?.username}
                             onChange={handleInputChange}
                             required
-                            layout_gap=""
-                            layout_width=""
-                            padding=""
-                            position=""
-                            margin=""
-                            variant=""
-                            size=""
-                            defaultValue=""
-                            onFocus={() => {}}
-                            onBlur={() => {}}
                             id="username"
-                            label=""
                             error={errors?.username}
-                            helperText=""
-                            className=""
                           />
                         </div>
                       </div>
 
                       {/* Date of Birth & Coding Experience Row */}
-                      <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                      <div className="flex flex-col sm:flex-row gap-4">
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
                             Date of Birth
                           </label>
                           <EditText
@@ -294,15 +257,12 @@ const RegistrationPage = () => {
                             onChange={handleInputChange}
                             required
                             id="dateOfBirth"
-                            label=""
                             error={errors?.dateOfBirth}
-                            helperText=""
-                            className=""
                           />
                         </div>
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
-                            Coding Experience
+                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                            Experience Level
                           </label>
                           <Dropdown
                             name="codingExperience"
@@ -311,27 +271,15 @@ const RegistrationPage = () => {
                             value={formData?.codingExperience}
                             onChange={handleInputChange}
                             required
-                            layout_gap=""
-                            layout_width=""
-                            padding=""
-                            position=""
-                            variant=""
-                            size=""
-                            defaultValue=""
-                            onFocus={() => {}}
-                            onBlur={() => {}}
                             id="codingExperience"
-                            label=""
                             error={errors?.codingExperience}
-                            helperText=""
-                            className=""
                           />
                         </div>
                       </div>
 
                       {/* Email Address */}
                       <div className="flex flex-col gap-1">
-                        <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
+                        <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
                           Email Address
                         </label>
                         <div className="relative">
@@ -346,29 +294,18 @@ const RegistrationPage = () => {
                             onChange={handleInputChange}
                             className="pl-11"
                             required
-                            layout_gap=""
-                            layout_width=""
-                            padding=""
-                            position=""
-                            margin=""
-                            variant=""
-                            size=""
-                            defaultValue=""
-                            onFocus={() => {}}
-                            onBlur={() => {}}
                             id="email"
-                            label=""
                             error={errors?.email}
-                            helperText=""
                           />
                         </div>
                       </div>
 
-                      {/* Password */}
-                      <div className="flex flex-col gap-2">
-                        <div className="flex flex-col gap-1">
-                          <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
-                            Password
+                      {/* Password & Confirm Password Row */}
+                      <div className="flex flex-col sm:flex-row gap-4">
+                        <div className="w-full flex flex-col gap-1">
+                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1 flex justify-between">
+                            <span>Password</span>
+                            <span className="text-xs text-[#bdc9c87f]">Min 6 chars</span>
                           </label>
                           <div className="relative">
                             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none z-10">
@@ -377,86 +314,49 @@ const RegistrationPage = () => {
                             <EditText
                               name="password"
                               type="password"
-                              placeholder="••••••••••••"
+                              placeholder="••••••••"
                               value={formData?.password}
                               onChange={handleInputChange}
                               className="pl-11"
                               required
-                              layout_gap=""
-                              layout_width=""
-                              padding=""
-                              position=""
-                              margin=""
-                              variant=""
-                              size=""
-                              defaultValue=""
-                              onFocus={() => {}}
-                              onBlur={() => {}}
                               id="password"
-                              label=""
                               error={errors?.password}
-                              helperText=""
                             />
                           </div>
                         </div>
-                        <p className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c87f] pl-1">
-                          Minimum 12 characters with symbols
-                        </p>
-                      </div>
-
-                      {/* Confirm Password */}
-                      <div className="flex flex-col gap-1">
-                        <label className="text-base font-normal font-['Roboto'] leading-[19px] text-[#bdc9c8] pl-1">
-                          Confirm Password
-                        </label>
-                        <div className="relative">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none z-10">
-                            <LockIcon className="w-4 h-4" />
-                          </span>
-                          <EditText
-                            name="confirmPassword"
-                            type="password"
-                            placeholder="••••••••••••"
-                            value={formData?.confirmPassword}
-                            onChange={handleInputChange}
-                            className="pl-11"
-                            required
-                            layout_gap=""
-                            layout_width=""
-                            padding=""
-                            position=""
-                            margin=""
-                            variant=""
-                            size=""
-                            defaultValue=""
-                            onFocus={() => {}}
-                            onBlur={() => {}}
-                            id="confirmPassword"
-                            label=""
-                            error={errors?.confirmPassword}
-                            helperText=""
-                          />
+                        <div className="w-full flex flex-col gap-1">
+                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                            Confirm Password
+                          </label>
+                          <div className="relative">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none z-10">
+                              <LockIcon className="w-4 h-4" />
+                            </span>
+                            <EditText
+                              name="confirmPassword"
+                              type="password"
+                              placeholder="••••••••"
+                              value={formData?.confirmPassword}
+                              onChange={handleInputChange}
+                              className="pl-11"
+                              required
+                              id="confirmPassword"
+                              error={errors?.confirmPassword}
+                            />
+                          </div>
                         </div>
                       </div>
 
                       {/* Terms Checkbox */}
-                      <div className="mt-9">
+                      <div className="mt-4">
                         <CheckBox
                           text="I agree to the Protocol Terms and Privacy Policy"
                           checked={formData?.agreeToTerms}
                           onChange={handleCheckboxChange}
                           required
-                          layout_gap=""
-                          layout_width=""
-                          margin=""
-                          position=""
-                          variant=""
-                          size=""
                           name="agreeToTerms"
                           id="agreeToTerms"
-                          value=""
                           error={errors?.agreeToTerms}
-                          className=""
                         />
                       </div>
 
@@ -525,7 +425,7 @@ const RegistrationPage = () => {
                           </button>
                           <button
                             type="button"
-                            onClick={() => navigate('/login')}
+                            onClick={() => navigate({ to: '/login' })}
                             disabled={loading}
                             className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 text-[#d8bfd8] transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Email"

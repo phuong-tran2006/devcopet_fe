@@ -1,9 +1,12 @@
 import React from 'react';
 import { Navigate, useLocation } from '@tanstack/react-router';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuthStore } from '../features/users/store/auth.store';
 
 export function ProtectedRoute({ children, redirectTo = '/login' }) {
-  const { isAuthenticated, loading, initialized } = useAuth();
+  const { isAuthenticated } = useAuthStore();
+  // Assume initialized for Zustand store as it's sync
+  const initialized = true;
+  const loading = false;
   const location = useLocation();
 
   if (!initialized || loading) {

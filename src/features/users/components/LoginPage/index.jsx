@@ -3,7 +3,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import Header from '../../../../components/layout/Header';
 import Button from '../../../../components/ui/Button';
 import { EmailIcon, LockIcon, EyeIcon, EyeOffIcon } from '../../../../components/ui/icons';
-import { useAuth } from '../../../../contexts/AuthContext';
+import { useAuthStore } from '../../store/auth.store';
+import { authApi } from '../../api/auth.api';
 import {
   googleIcon,
   githubIcon,
@@ -20,7 +21,7 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login: authLogin, isAuthenticated } = useAuth();
+  const { setAuth, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +30,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/course');
+      navigate({ to: '/course' });
     }
   }, [isAuthenticated, navigate]);
 
@@ -44,10 +45,9 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const { authAPI } = await import('../../../../services/api');
-      const { token, user } = await authAPI.login({ email, password });
-      authLogin(token, user);
-      navigate('/course');
+      const response = await authApi.login({ email, password });
+      setAuth(response.accessToken, response.refreshToken, response.user);
+      navigate({ to: '/course' });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -56,20 +56,7 @@ const Login = () => {
   };
 
   const handleSocialLogin = (provider) => {
-    const { googleAuth, githubAuth, facebookAuth } = require('../../../../services/api');
-    switch (provider) {
-      case 'google':
-        googleAuth();
-        break;
-      case 'github':
-        githubAuth();
-        break;
-      case 'facebook':
-        facebookAuth();
-        break;
-      default:
-        break;
-    }
+    window.location.href = `http://localhost:3000/auth/${provider}`;
   };
 
   const handleInputChange = (setter) => (e) => {
@@ -308,7 +295,7 @@ const Login = () => {
                       <Link
                         to="/register"
                         className="flex flex-row items-center gap-1 hover:opacity-80 transition-opacity duration-200"
-                        onClick={() => {}}
+                        onClick={() => { }}
                       >
                         <span
                           className="text-sm font-medium text-white hover:text-[#d8bfd8] transition-colors"
@@ -340,13 +327,13 @@ const Login = () => {
               >
                 <span>By continuing, you agree to Devcopet&apos;s </span>
                 <a href="/terms" className="text-white opacity-70 hover:underline"
-                  onClick={() => {}}
+                  onClick={() => { }}
                 >
                   Terms of Service
                 </a>
                 <span> and </span>
                 <a href="/privacy" className="text-white opacity-70 hover:underline"
-                  onClick={() => {}}
+                  onClick={() => { }}
                 >
                   Privacy Policy.
                 </a>

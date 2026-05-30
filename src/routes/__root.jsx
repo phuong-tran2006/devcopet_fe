@@ -1,11 +1,10 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-import { AuthProvider, useAuth } from "../contexts/AuthContext";
 import "../index.css";
 
 // Wrapper component that provides auth context to the router
 function RootContent() {
-  const auth = useAuth();
+
   
   return (
     <>
@@ -17,9 +16,7 @@ function RootContent() {
 
 export const Route = createRootRoute({
   component: () => (
-    <AuthProvider>
-      <RootContent />
-    </AuthProvider>
+    <RootContent />
   ),
   notFoundComponent: () => (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#041521] text-[#d4e4f6]">
