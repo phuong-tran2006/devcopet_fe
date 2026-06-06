@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from '@tanstack/react-router';
+import { useParams } from '@tanstack/react-router';
 import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import { courseApi } from '../api/course.api';
+import LessonQuiz from '../../quizzes/components/LessonQuiz';
 
 const LessonDetailPage = () => {
   const { lessonId } = useParams({ strict: false });
@@ -103,21 +104,8 @@ const LessonDetailPage = () => {
           </ReactMarkdown>
         </article>
 
-        {/* Action Bottom */}
-        <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
-          <div>
-            <h3 className="font-headline-sm text-white mb-2">Ready to test your knowledge?</h3>
-            <p className="text-[14px] text-on-surface-variant">Complete the quiz to earn XP and progress to the next lesson.</p>
-          </div>
-          <Link
-            to="/lesson/$lessonId/quiz"
-            params={{ lessonId: lesson._id }}
-            className="w-full md:w-auto flex-shrink-0 bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)] whitespace-nowrap"
-          >
-            <span className="material-symbols-outlined text-[20px]">assignment</span>
-            Start Quiz
-          </Link>
-        </div>
+        {/* Quiz Section */}
+        <LessonQuiz lessonId={lesson._id} />
 
       </div>
     </main>
