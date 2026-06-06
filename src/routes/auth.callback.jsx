@@ -18,7 +18,7 @@ function AuthCallbackPage() {
     if (accessToken) {
       // Store tokens and set auth state
       setAuth(accessToken, refreshToken || '', null); // User info could be fetched next or decoded from JWT
-      navigate({ to: '/course' });
+      navigate({ to: '/' });
     } else {
       // Failed or no token
       navigate({ to: '/login' });

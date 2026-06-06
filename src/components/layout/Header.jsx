@@ -52,7 +52,6 @@ const Header = () => {
 
         {/* Navigation */}
         <nav className="hidden md:flex items-center gap-8 h-full">
-          <NavLink to="/course" label="Tutorial" />
           <NavLink to="/roadmap" label="Roadmap" />
           <NavLink to="/dashboard" label="Dashboard" />
           <NavLink to="/leaderboard" label="Leaderboard" />
