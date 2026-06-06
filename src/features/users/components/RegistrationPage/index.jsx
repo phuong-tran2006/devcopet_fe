@@ -5,6 +5,7 @@ import EditText from '../../../../components/ui/EditText';
 import Dropdown from '../../../../components/ui/Dropdown';
 import CheckBox from '../../../../components/ui/CheckBox';
 import EmailProviderIcon from '../../../../components/ui/EmailProviderIcon';
+import MouseTrail from '../../../../components/ui/MouseTrail';
 import { EmailIcon, LockIcon } from '../../../../components/ui/icons';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
@@ -133,17 +134,26 @@ const RegistrationPage = () => {
 
   return (
     <>
-      <main className="relative min-h-screen w-full flex items-center justify-center bg-[#041521] overflow-hidden">
-        {/* Background gradient overlay */}
-        <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-[#041521] via-[#0a1a24] to-[#041521] pointer-events-none" />
-
-        {/* Decorative blur elements */}
-        <div
-          className="hidden lg:block absolute top-0 right-0 w-[30%] max-w-[444px] h-auto opacity-30 pointer-events-none"
-          style={{
-            background: 'radial-gradient(ellipse at top right, #76d6d520 0%, transparent 70%)',
-          }}
-        />
+      <MouseTrail />
+      <main className="relative min-h-screen w-full flex items-center justify-center bg-surface">
+        {/* Background Grid & Streaks */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-1.5 h-1.5 bg-[#00daf8] rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
+            <div className="absolute w-1 h-1 bg-[#feb700] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
+            
+            <div className="absolute w-1 h-1 bg-[#00daf8] rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
+            <div className="absolute w-1.5 h-1.5 bg-[#00daf8] rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
+            <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
+            
+            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-[#00daf8] to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
+            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#feb700] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
+          </div>
+          <div className="absolute inset-0 digital-grid opacity-20"></div>
+        </div>
 
         {/* Main Content Container */}
         <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16">
@@ -177,10 +187,7 @@ const RegistrationPage = () => {
 
                 {/* Hero Text */}
                 <div className="flex flex-col gap-3 text-center lg:text-left px-4 sm:px-6">
-                  <h1 
-                    className="text-2xl sm:text-3xl md:text-4xl font-bold font-['Montserrat'] leading-tight text-[#d4e4f6]"
-                    style={{ textShadow: '0px 0px 8px #76d6d599' }}
-                  >
+                  <h1 className="font-headline-lg text-headline-lg md:text-[48px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim to-secondary-fixed-dim">
                     Start Your<br />Adventure
                   </h1>
                   <p className="text-sm sm:text-base font-normal font-['Open_Sans'] leading-6 text-[#bdc9c8]">
@@ -194,16 +201,7 @@ const RegistrationPage = () => {
 
             {/* Right Section - Registration Form */}
             <section className="w-full lg:w-[52%] flex items-center justify-center">
-              <div 
-                className="w-full max-w-[570px] bg-[#0d1d2a] border border-[#76d6d519] rounded-xl shadow-[0px 25px 50px #0000003f] overflow-hidden"
-              >
-                {/* Top gradient line */}
-                <div 
-                  className="w-full h-0.5 rounded-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #008080 0%, #d8bfd8 50%, #008080 100%)'
-                  }}
-                />
+              <div className="w-full max-w-[570px] bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_0_20px_rgba(0,218,248,0.1)] overflow-hidden">
 
                 {/* Form Content */}
                 <div className="px-6 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-10">
@@ -391,7 +389,7 @@ const RegistrationPage = () => {
                       </div>
 
                       {/* Social Login Section */}
-                      <div className="flex flex-col gap-6 pt-6 border-t border-[#3e49494c]">
+                      <div className="flex flex-col gap-6 pt-6 border-t border-white/10">
                         <p className="text-base font-normal font-['Roboto'] leading-[19px] text-center text-[#bdc9c8b2]">
                           OR SYNC WITH IDENTITY PROVIDER
                         </p>
@@ -400,7 +398,7 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => handleSocialLogin('google')}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Google"
                           >
                             <img src={googleIcon} alt="" className={socialIconClassName} />
@@ -409,7 +407,7 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => handleSocialLogin('github')}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with GitHub"
                           >
                             <img src={githubIcon} alt="" className={socialIconClassName} />
@@ -418,7 +416,7 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => handleSocialLogin('facebook')}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Facebook"
                           >
                             <img src={facebookIcon} alt="" className={socialIconClassName} />
@@ -427,7 +425,7 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => navigate({ to: '/login' })}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 text-[#d8bfd8] transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 text-white transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Email"
                           >
                             <EmailProviderIcon className={socialIconClassName} />

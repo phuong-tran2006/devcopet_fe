@@ -11,10 +11,9 @@
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as RegisterRouteImport } from "./routes/register";
 import { Route as LoginRouteImport } from "./routes/login";
+import { Route as CourseRouteImport } from "./routes/course";
 import { Route as IndexRouteImport } from "./routes/index";
-import { Route as CourseIndexRouteImport } from "./routes/course/index";
 import { Route as LessonLessonIdRouteImport } from "./routes/lesson/$lessonId";
-import { Route as CourseCourseIdRouteImport } from "./routes/course/$courseId";
 import { Route as AuthCallbackRouteImport } from "./routes/auth.callback";
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -27,24 +26,19 @@ const LoginRoute = LoginRouteImport.update({
   path: "/login",
   getParentRoute: () => rootRouteImport,
 } as any);
+const CourseRoute = CourseRouteImport.update({
+  id: "/course",
+  path: "/course",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const IndexRoute = IndexRouteImport.update({
   id: "/",
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
-const CourseIndexRoute = CourseIndexRouteImport.update({
-  id: "/course/",
-  path: "/course/",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
   id: "/lesson/$lessonId",
   path: "/lesson/$lessonId",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
-  id: "/course/$courseId",
-  path: "/course/$courseId",
   getParentRoute: () => rootRouteImport,
 } as any);
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
@@ -55,70 +49,63 @@ const AuthCallbackRoute = AuthCallbackRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
+  "/course": typeof CourseRoute;
   "/login": typeof LoginRoute;
   "/register": typeof RegisterRoute;
   "/auth/callback": typeof AuthCallbackRoute;
-  "/course/$courseId": typeof CourseCourseIdRoute;
   "/lesson/$lessonId": typeof LessonLessonIdRoute;
-  "/course/": typeof CourseIndexRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
+  "/course": typeof CourseRoute;
   "/login": typeof LoginRoute;
   "/register": typeof RegisterRoute;
   "/auth/callback": typeof AuthCallbackRoute;
-  "/course/$courseId": typeof CourseCourseIdRoute;
   "/lesson/$lessonId": typeof LessonLessonIdRoute;
-  "/course": typeof CourseIndexRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
+  "/course": typeof CourseRoute;
   "/login": typeof LoginRoute;
   "/register": typeof RegisterRoute;
   "/auth/callback": typeof AuthCallbackRoute;
-  "/course/$courseId": typeof CourseCourseIdRoute;
   "/lesson/$lessonId": typeof LessonLessonIdRoute;
-  "/course/": typeof CourseIndexRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | "/"
+    | "/course"
     | "/login"
     | "/register"
     | "/auth/callback"
-    | "/course/$courseId"
-    | "/lesson/$lessonId"
-    | "/course/";
+    | "/lesson/$lessonId";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
+    | "/course"
     | "/login"
     | "/register"
     | "/auth/callback"
-    | "/course/$courseId"
-    | "/lesson/$lessonId"
-    | "/course";
+    | "/lesson/$lessonId";
   id:
     | "__root__"
     | "/"
+    | "/course"
     | "/login"
     | "/register"
     | "/auth/callback"
-    | "/course/$courseId"
-    | "/lesson/$lessonId"
-    | "/course/";
+    | "/lesson/$lessonId";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
+  CourseRoute: typeof CourseRoute;
   LoginRoute: typeof LoginRoute;
   RegisterRoute: typeof RegisterRoute;
   AuthCallbackRoute: typeof AuthCallbackRoute;
-  CourseCourseIdRoute: typeof CourseCourseIdRoute;
   LessonLessonIdRoute: typeof LessonLessonIdRoute;
-  CourseIndexRoute: typeof CourseIndexRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -137,6 +124,13 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof LoginRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    "/course": {
+      id: "/course";
+      path: "/course";
+      fullPath: "/course";
+      preLoaderRoute: typeof CourseRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/": {
       id: "/";
       path: "/";
@@ -144,25 +138,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/course/": {
-      id: "/course/";
-      path: "/course";
-      fullPath: "/course/";
-      preLoaderRoute: typeof CourseIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/lesson/$lessonId": {
       id: "/lesson/$lessonId";
       path: "/lesson/$lessonId";
       fullPath: "/lesson/$lessonId";
       preLoaderRoute: typeof LessonLessonIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/course/$courseId": {
-      id: "/course/$courseId";
-      path: "/course/$courseId";
-      fullPath: "/course/$courseId";
-      preLoaderRoute: typeof CourseCourseIdRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/auth/callback": {
@@ -177,12 +157,11 @@ declare module "@tanstack/react-router" {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CourseRoute: CourseRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-  CourseCourseIdRoute: CourseCourseIdRoute,
   LessonLessonIdRoute: LessonLessonIdRoute,
-  CourseIndexRoute: CourseIndexRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

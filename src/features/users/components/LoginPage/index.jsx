@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from '@tanstack/react-router';
-import Header from '../../../../components/layout/Header';
 import Button from '../../../../components/ui/Button';
+import MouseTrail from '../../../../components/ui/MouseTrail';
 import { EmailIcon, LockIcon, EyeIcon, EyeOffIcon } from '../../../../components/ui/icons';
 import { useAuthStore } from '../../store/auth.store';
 import { authApi } from '../../api/auth.api';
@@ -66,50 +66,40 @@ const Login = () => {
 
   return (
     <>
-      <main className="relative h-screen w-full min-h-screen overflow-hidden bg-[#041521]">
-        {/* Background gradient overlay */}
-        <div
-          className="absolute inset-0 w-full h-full pointer-events-none"
-          style={{
-            background: 'linear-gradient(90deg, #00808010 0%, transparent 50%)',
-          }}
-        />
+      <MouseTrail />
+      <main className="relative w-full min-h-screen bg-surface">
+        {/* Background Grid & Streaks */}
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-1.5 h-1.5 bg-[#00daf8] rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
+            <div className="absolute w-1 h-1 bg-[#feb700] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
+            
+            <div className="absolute w-1 h-1 bg-[#00daf8] rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
+            <div className="absolute w-1.5 h-1.5 bg-[#00daf8] rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
+            <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
+            
+            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-[#00daf8] to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
+            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#feb700] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
+          </div>
+          <div className="absolute inset-0 digital-grid opacity-20"></div>
+        </div>
 
         {/* Content wrapper */}
-        <div className="relative z-10 flex flex-col w-full min-h-screen">
-          {/* Header */}
-          <Header />
-
+        <div className="relative z-10 flex flex-col w-full h-full">
           {/* Main content area - centered */}
-          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-10 py-8 sm:py-12">
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-10 pt-8 pb-8">
             {/* Center - Login form wrapper */}
             <div className="w-full max-w-md flex flex-col items-center gap-8 sm:gap-10">
               {/* Title */}
-              <h1
-                className="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-white"
-                style={{
-                  fontFamily: 'Montserrat',
-                  lineHeight: '1.2',
-                  textShadow: '0px 0px 8px #76d6d544',
-                }}
-              >
+              <h1 className="font-headline-lg text-headline-lg md:text-[48px] font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim to-secondary-fixed-dim">
                 Login
               </h1>
 
               {/* Login form card */}
-              <div
-                className="w-full bg-[#0d1d2a] border border-[#ffffff30] rounded-xl p-6 sm:p-8"
-                style={{
-                  boxShadow: '0px 25px 50px #0000003f, 0px 0px 20px #0080800c',
-                }}
-              >
-                {/* Top gradient line */}
-                <div
-                  className="w-full h-0.5 mb-6 rounded-full"
-                  style={{
-                    background: 'linear-gradient(90deg, #008080 0%, #d8bfd8 50%, #008080 100%)',
-                  }}
-                />
+              <div className="w-full bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl p-6 sm:p-8 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
 
                 <form onSubmit={handleLogin} className="flex flex-col gap-6 sm:gap-7">
                   {/* Email field */}
@@ -126,7 +116,7 @@ const Login = () => {
                       Email Address
                     </label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-fixed-dim pointer-events-none">
                         <EmailIcon className="w-4 h-4" />
                       </span>
                       <input
@@ -137,12 +127,7 @@ const Login = () => {
                         onChange={handleInputChange(setEmail)}
                         placeholder="admin@devcopet.io"
                         required
-                        className="w-full pl-11 pr-3 py-2.5 bg-[#0a1a24] border border-[#76d6d533] rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-[#008080] transition-colors"
-                        style={{
-                          fontFamily: 'Open Sans',
-                          fontSize: '16px',
-                          lineHeight: '22px',
-                        }}
+                        className="w-full pl-11 pr-3 py-2.5 bg-surface/50 border border-white/10 rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-colors"
                         disabled={loading}
                       />
                     </div>
@@ -175,7 +160,7 @@ const Login = () => {
                       </a>
                     </div>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#76d6d5] pointer-events-none">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary-fixed-dim pointer-events-none">
                         <LockIcon className="w-4 h-4" />
                       </span>
                       <input
@@ -186,18 +171,13 @@ const Login = () => {
                         onChange={handleInputChange(setPassword)}
                         placeholder="••••••••"
                         required
-                        className="w-full pl-11 pr-11 py-2.5 bg-[#0a1a24] border border-[#76d6d533] rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-[#008080] focus:border-[#008080] transition-colors"
-                        style={{
-                          fontFamily: 'Open Sans',
-                          fontSize: '16px',
-                          lineHeight: '22px',
-                        }}
+                        className="w-full pl-11 pr-11 py-2.5 bg-surface/50 border border-white/10 rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-colors"
                         disabled={loading}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[#76d6d5] hover:text-[#d8bfd8] focus:outline-none transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-fixed-dim hover:text-white focus:outline-none transition-colors"
                         aria-label={showPassword ? 'Hide password' : 'Show password'}
                       >
                         {showPassword ? <EyeOffIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
@@ -253,7 +233,7 @@ const Login = () => {
                         type="button"
                         onClick={() => handleSocialLogin('google')}
                         disabled={loading}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with Google"
                       >
                         <img
@@ -266,7 +246,7 @@ const Login = () => {
                         type="button"
                         onClick={() => handleSocialLogin('github')}
                         disabled={loading}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with GitHub"
                       >
                         <img
@@ -279,7 +259,7 @@ const Login = () => {
                         type="button"
                         onClick={() => handleSocialLogin('facebook')}
                         disabled={loading}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-[#3e4949] bg-transparent p-3 transition-all duration-200 hover:bg-[#ffffff0c] focus:outline-none focus:ring-2 focus:ring-[#008080] disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with Facebook"
                       >
                         <img
@@ -342,15 +322,6 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Decorative blur circle - bottom right */}
-        <div
-          className="hidden lg:block absolute bottom-0 right-0 w-[400px] h-[350px] lg:w-[576px] lg:h-[506px] rounded-full opacity-10 pointer-events-none"
-          style={{
-            background: '#76d6d5',
-            filter: 'blur(60px)',
-            boxShadow: '0px 4px 120px #888888ff',
-          }}
-        />
       </main>
     </>
   );

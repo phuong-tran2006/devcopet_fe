@@ -2,14 +2,13 @@ import React, { useState } from 'react';
 import { twMerge } from 'tailwind-merge';
 
 const HeaderMenu = ({ mobile = false }) => {
-  const [activeItem, setActiveItem] = useState('Tutorial');
+  const [activeItem, setActiveItem] = useState('Course');
 
   const menuItems = [
-    { label: 'Tutorial', path: '/tutorial' },
+    { label: 'Course', path: '/course' },
     { label: 'Roadmap', path: '/roadmap' },
-    { label: 'Dashboard', path: '/dashboard' },
-    { label: 'Leaderboard', path: '/leaderboard' },
     { label: 'Arena', path: '/arena' },
+    { label: 'Leaderboard', path: '/leaderboard' },
   ];
 
   const handleItemClick = (label) => {

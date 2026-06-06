@@ -18,7 +18,7 @@ const Header = () => {
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
         <div className="flex flex-row justify-between items-center py-6 sm:py-7 md:py-8 gap-4">
           {/* Logo */}
-          <Logo className="" onClick={() => {}} />
+          <Logo className="" onClick={() => { }} />
 
           {/* Hamburger Menu Icon (Mobile only) */}
           <button
@@ -46,12 +46,12 @@ const Header = () => {
           <div
             className="hidden lg:flex flex-row gap-3 items-center justify-center px-1 py-1 bg-background-secondary border border-border-primary rounded-xl"
           >
-            <Link href="/notifications" ariaLabel="Notifications" onClick={() => {}} className="">
+            <Link href="/notifications" ariaLabel="Notifications" onClick={() => { }} className="">
               <svg className="w-5 h-5 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
             </Link>
-            <Link href="/messages" ariaLabel="Messages" onClick={() => {}} className="">
+            <Link href="/messages" ariaLabel="Messages" onClick={() => { }} className="">
               <svg className="w-5 h-5 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
               </svg>
@@ -60,7 +60,7 @@ const Header = () => {
               href="/profile"
               ariaLabel="User profile"
               className="flex items-center justify-center border border-border-accent-strong rounded-lg p-1"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               <img
                 src={mascotAxolotl}
@@ -79,15 +79,15 @@ const Header = () => {
           )}
         >
           <HeaderMenu mobile />
-          
+
           {/* Mobile Action Icons */}
           <div className="flex flex-row gap-4 items-center justify-center mt-6 pt-6 border-t border-border-primary">
-            <Link href="/notifications" ariaLabel="Notifications" className="p-2" onClick={() => {}}>
+            <Link href="/notifications" ariaLabel="Notifications" className="p-2" onClick={() => { }}>
               <svg className="w-6 h-6 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
             </Link>
-            <Link href="/messages" ariaLabel="Messages" className="p-2" onClick={() => {}}>
+            <Link href="/messages" ariaLabel="Messages" className="p-2" onClick={() => { }}>
               <svg className="w-6 h-6 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
               </svg>
@@ -96,7 +96,7 @@ const Header = () => {
               href="/profile"
               ariaLabel="User profile"
               className="flex items-center justify-center border border-border-accent-strong rounded-lg p-2"
-              onClick={() => {}}
+              onClick={() => { }}
             >
               <img
                 src={mascotAxolotl}

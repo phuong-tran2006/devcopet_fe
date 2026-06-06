@@ -1,5 +1,7 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import Header from "../components/layout/Header";
+import Footer from "../components/layout/Footer";
 import "../index.css";
 
 // Wrapper component that provides auth context to the router
@@ -7,10 +9,14 @@ function RootContent() {
 
 
   return (
-    <>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
+    <div className="flex flex-col min-h-screen w-full bg-surface">
+      <Header />
+      <div className="flex-1 flex flex-col w-full relative pt-[80px]">
+        <Outlet />
+      </div>
+      <Footer />
+      {/* <TanStackRouterDevtools /> */}
+    </div>
   );
 }
 

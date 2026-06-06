@@ -2,22 +2,27 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="w-full bg-[#041521] border-t border-[#3e494930] py-4">
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 md:px-12 lg:px-20">
-
-        {/* Bottom Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="text-xl font-bold text-[#d8bfd8]" style={{ fontFamily: 'Montserrat' }}>Devcopet</div>
-          <div className="flex flex-wrap justify-center gap-6 text-[13px] text-[#7D8A95] font-semibold tracking-wider">
-            <a href="#" className="hover:text-white transition-colors">PRIVACY POLICY</a>
-            <a href="#" className="hover:text-white transition-colors">TERMS</a>
-            <a href="#" className="hover:text-white transition-colors">CONTACT</a>
-          </div>
-          <div className="text-[11px] text-[#5c6b7a] uppercase font-medium tracking-wide">
-            © 2024 DEVCOPET INC. EVOLUTION COMPLETE.
-          </div>
+    <footer className="bg-surface-container-lowest border-t border-white/5 w-full py-12">
+      <div className="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter">
+        <div className="flex flex-col items-center md:items-start gap-4">
+          <span className="font-code-md text-code-md text-primary-fixed-dim font-bold">Gravity Code Terminal</span>
+          <p className="font-label-sm text-label-sm text-on-tertiary-fixed-variant">© 2024 Gravity Code Terminal. All systems operational.</p>
         </div>
-
+        <div className="flex flex-wrap gap-8 justify-center">
+          <a className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Documentation</a>
+          <a className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Changelog</a>
+          <a className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Privacy Protocol</a>
+          <a className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Security</a>
+          <a className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors" href="#">Neural Link</a>
+        </div>
+        <div className="flex gap-4">
+          <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-on-surface">
+            <span className="material-symbols-outlined text-[20px]">terminal</span>
+          </button>
+          <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-on-surface">
+            <span className="material-symbols-outlined text-[20px]">hub</span>
+          </button>
+        </div>
       </div>
     </footer>
   );

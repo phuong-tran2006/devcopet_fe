@@ -7,13 +7,105 @@
   --color-fire: #ef4444;
   --color-water: #3b82f6;
   --color-leaf: #22c55e;
+
+  --color-surface: #131313;
+  --color-surface-dim: #131313;
+  --color-surface-bright: #393939;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-surface-container-low: #1c1b1b;
+  --color-surface-container: #20201f;
+  --color-surface-container-high: #2a2a2a;
+  --color-surface-container-highest: #353535;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #bac9cd;
+  --color-inverse-surface: #e5e2e1;
+  --color-inverse-on-surface: #313030;
+  --color-outline: #859397;
+  --color-outline-variant: #3b494c;
+  --color-surface-tint: #00daf8;
+  --color-primary: #baf2ff;
+  --color-on-primary: #00363f;
+  --color-primary-container: #00e0ff;
+  --color-on-primary-container: #005f6d;
+  --color-inverse-primary: #006877;
+  --color-secondary: #ffdb9d;
+  --color-on-secondary: #412d00;
+  --color-secondary-container: #feb700;
+  --color-on-secondary-container: #6b4b00;
+  --color-tertiary: #e8e8e8;
+  --color-on-tertiary: #303030;
+  --color-tertiary-container: #cccccc;
+  --color-on-tertiary-container: #565656;
+  --color-error: #ffb4ab;
+  --color-on-error: #690005;
+  --color-error-container: #93000a;
+  --color-on-error-container: #ffdad6;
+  --color-primary-fixed: #a5eeff;
+  --color-primary-fixed-dim: #00daf8;
+  --color-on-primary-fixed: #001f25;
+  --color-on-primary-fixed-variant: #004e5a;
+  --color-secondary-fixed: #ffdea8;
+  --color-secondary-fixed-dim: #ffba20;
+  --color-on-secondary-fixed: #271900;
+  --color-on-secondary-fixed-variant: #5e4200;
+  --color-tertiary-fixed: #e2e2e2;
+  --color-tertiary-fixed-dim: #c6c6c6;
+  --color-on-tertiary-fixed: #1b1b1b;
+  --color-on-tertiary-fixed-variant: #474747;
+  --color-background: #131313;
+  --color-on-background: #e5e2e1;
+  --color-surface-variant: #353535;
+
+  --spacing-grid-unit: 8px;
+  --spacing-margin-desktop: 64px;
+  --spacing-container-max: 1440px;
+  --spacing-margin-mobile: 16px;
+  --spacing-gutter: 24px;
+
+  --font-code-md: "JetBrains Mono";
+  --font-label-sm: "JetBrains Mono";
+  --font-headline-md: "Geist";
+  --font-headline-lg: "Geist";
+  --font-body-md: "Geist";
+  --font-headline-sm: "Geist";
+  --font-body-lg: "Geist";
+
+  --text-code-md: 14px;
+  --text-code-md--line-height: 1.5;
+  --text-code-md--font-weight: 400;
+
+  --text-label-sm: 12px;
+  --text-label-sm--line-height: 1;
+  --text-label-sm--letter-spacing: 0.05em;
+  --text-label-sm--font-weight: 500;
+
+  --text-headline-md: 32px;
+  --text-headline-md--line-height: 1.2;
+  --text-headline-md--font-weight: 600;
+
+  --text-headline-lg: 48px;
+  --text-headline-lg--line-height: 1.2;
+  --text-headline-lg--letter-spacing: -0.02em;
+  --text-headline-lg--font-weight: 700;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+
+  --text-headline-sm: 24px;
+  --text-headline-sm--line-height: 1.3;
+  --text-headline-sm--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
 }
 
 @layer base {
   html,
   body,
   #root {
-    @apply bg-[#041521] text-white m-0 p-0 min-h-screen;
+    @apply m-0 p-0 min-h-screen bg-background text-on-surface overflow-x-hidden;
   }
 }
 
@@ -37,5 +129,82 @@
 
   .btn-back {
     @apply mt-20 bg-transparent border-none text-gray-400 cursor-pointer text-base transition-colors duration-200 hover:text-primary;
+  }
+
+  .digital-grid {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+
+  .glow-cyan {
+    box-shadow: 0 0 20px rgba(0, 218, 248, 0.4);
+  }
+
+  /* Spinning Border Card Effect */
+  .spinning-border-card {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .spinning-border-card > * {
+    position: relative;
+    z-index: 2;
+  }
+
+  .spinning-border-card::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(
+      transparent,
+      transparent,
+      transparent,
+      var(--glow-color, #00daf8)
+    );
+    animation: spin 4s linear infinite;
+    z-index: -2;
+  }
+
+  .spinning-border-card::after {
+    content: "";
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: #0a0a0a; /* Dark background to hide the middle of the conic gradient */
+    z-index: -1;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  .ease-out-cubic {
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings:
+      "FILL" 0,
+      "wght" 400,
+      "GRAD" 0,
+      "opsz" 24;
+  }
+
+  .streak-bg {
+    background-image: url("https://lh3.googleusercontent.com/aida/AP1WRLsKnhr8DtgBSYHuRdfVyLGsj9Mq4vyNoTllfQlkAq_KlC9l0DFSB9w8kcZx0j3KlWcDhbpHaruEBSoe_XrTo8c1kKRkisLbcCyiaI4StOgxe4wwng-35-Neyy6ShvCOCV_IDwWFHPvLm-uLC604G65cO7-XQwnwzDLc2htU4Xc1hGGvpqPLYiAPIIaY3ofALfshiKgvRB5fJ44KM1JObAf4CAnt2cidO7Us5mNMHF_lA6aTQFcImpqZBuVK");
+    background-size: cover;
+    background-position: center;
+    mix-blend-mode: screen;
   }
 }
