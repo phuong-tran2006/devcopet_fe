@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from '@tanstack/react-router';
 
 const CoursePage = () => {
   useEffect(() => {
@@ -122,9 +123,9 @@ const CoursePage = () => {
                     <div className="h-full bg-primary-fixed-dim w-[65%] rounded-full shadow-[0_0_10px_rgba(0,218,248,0.5)]"></div>
                   </div>
 
-                  <button className="w-full bg-[#8cecf5] text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:bg-primary-fixed hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(140,236,245,0.3)]">
+                  <Link to="/courses/$courseId" params={{ courseId: 'python-basic' }} className="w-full bg-[#8cecf5] text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:bg-primary-fixed hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(140,236,245,0.3)]">
                     Continue <span className="material-symbols-outlined text-[14px]">arrow_forward</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </div>
