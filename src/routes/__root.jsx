@@ -5,7 +5,7 @@ import "../index.css";
 // Wrapper component that provides auth context to the router
 function RootContent() {
 
-  
+
   return (
     <>
       <Outlet />

@@ -24,11 +24,11 @@ const MarkdownRenderer = ({ content }) => {
             <h1
               style={{
                 fontFamily: '"Montserrat", sans-serif',
-                fontSize: '24px',
+                fontSize: '26px',
                 fontWeight: 700,
-                color: '#E5E9EC',
-                marginBottom: '16px',
-                marginTop: '32px',
+                color: '#F8FAFC',
+                marginBottom: '20px',
+                marginTop: '40px',
                 lineHeight: 1.3,
               }}
             >
@@ -40,10 +40,10 @@ const MarkdownRenderer = ({ content }) => {
               style={{
                 fontFamily: '"Montserrat", sans-serif',
                 fontSize: '20px',
-                fontWeight: 600,
-                color: '#D1D9E0',
-                marginBottom: '12px',
-                marginTop: '28px',
+                fontWeight: 700,
+                color: '#F8FAFC',
+                marginBottom: '16px',
+                marginTop: '32px',
                 lineHeight: 1.3,
               }}
             >
@@ -71,9 +71,9 @@ const MarkdownRenderer = ({ content }) => {
               style={{
                 fontFamily: '"Roboto", sans-serif',
                 fontSize: '15px',
-                color: '#8FA3B5',
+                color: '#CBD5E1',
                 lineHeight: 1.75,
-                marginBottom: '14px',
+                marginBottom: '16px',
               }}
             >
               {children}
@@ -109,7 +109,7 @@ const MarkdownRenderer = ({ content }) => {
               style={{
                 fontFamily: '"Roboto", sans-serif',
                 fontSize: '15px',
-                color: '#8FA3B5',
+                color: '#CBD5E1',
                 lineHeight: 1.75,
                 paddingLeft: '24px',
                 marginBottom: '14px',
@@ -130,69 +130,16 @@ const MarkdownRenderer = ({ content }) => {
 
             if (!inline && language) {
               return (
-                <div style={{ marginBottom: '20px', marginTop: '8px' }}>
-                  {language && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                        padding: '8px 16px',
-                        background: '#0E1A24',
-                        borderRadius: '8px 8px 0 0',
-                        borderBottom: '1px solid #1C2D3C',
-                      }}
-                    >
-                      <span
-                        style={{
-                          width: '10px',
-                          height: '10px',
-                          borderRadius: '50%',
-                          background: '#FF5F56',
-                          display: 'inline-block',
-                        }}
-                      />
-                      <span
-                        style={{
-                          width: '10px',
-                          height: '10px',
-                          borderRadius: '50%',
-                          background: '#FFBD2E',
-                          display: 'inline-block',
-                        }}
-                      />
-                      <span
-                        style={{
-                          width: '10px',
-                          height: '10px',
-                          borderRadius: '50%',
-                          background: '#27C93F',
-                          display: 'inline-block',
-                        }}
-                      />
-                      <span
-                        style={{
-                          fontFamily: 'Roboto Mono, monospace',
-                          fontSize: '11px',
-                          color: '#576978',
-                          marginLeft: '8px',
-                          textTransform: 'lowercase',
-                        }}
-                      >
-                        {language}
-                      </span>
-                    </div>
-                  )}
+                <div style={{ marginBottom: '24px', marginTop: '16px' }}>
                   <SyntaxHighlighter
                     style={vscDarkPlus}
                     language={language || 'text'}
                     PreTag="div"
                     customStyle={{
                       margin: 0,
-                      borderRadius: language ? '0 0 8px 8px' : '8px',
-                      background: '#0A1520',
-                      border: '1px solid #1C2D3C',
-                      borderTop: language ? 'none' : '1px solid #1C2D3C',
+                      borderRadius: '8px',
+                      background: '#161B22',
+                      border: '1px solid #1E293B',
                       fontSize: '14px',
                       padding: '16px',
                     }}
@@ -209,12 +156,12 @@ const MarkdownRenderer = ({ content }) => {
               <code
                 style={{
                   fontFamily: 'Roboto Mono, monospace',
-                  fontSize: '13px',
-                  color: '#7FE3DD',
-                  background: '#0A1D28',
-                  padding: '2px 6px',
+                  fontSize: '13.5px',
+                  color: '#10B981',
+                  background: '#161B22',
+                  padding: '3px 6px',
                   borderRadius: '4px',
-                  border: '1px solid #1C2D3C',
+                  border: '1px solid #1E293B',
                 }}
                 {...props}
               >
@@ -227,10 +174,10 @@ const MarkdownRenderer = ({ content }) => {
           blockquote: ({ children }) => (
             <blockquote
               style={{
-                borderLeft: '3px solid #7FE3DD',
+                borderLeft: '4px solid #10B981',
                 paddingLeft: '16px',
-                margin: '16px 0',
-                color: '#7D8A95',
+                margin: '24px 0',
+                color: '#94A3B8',
                 fontStyle: 'italic',
               }}
             >

@@ -10,32 +10,16 @@
 
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as RegisterRouteImport } from "./routes/register";
-import { Route as QuizRouteImport } from "./routes/quiz";
-import { Route as MapRouteImport } from "./routes/map";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as IndexRouteImport } from "./routes/index";
-import { Route as LessonIndexRouteImport } from "./routes/lesson/index";
 import { Route as CourseIndexRouteImport } from "./routes/course/index";
-import { Route as ChapterIndexRouteImport } from "./routes/chapter/index";
 import { Route as LessonLessonIdRouteImport } from "./routes/lesson/$lessonId";
 import { Route as CourseCourseIdRouteImport } from "./routes/course/$courseId";
-import { Route as ChapterCourseIdRouteImport } from "./routes/chapter/$courseId";
 import { Route as AuthCallbackRouteImport } from "./routes/auth.callback";
-import { Route as LessonDetailLessonIdRouteImport } from "./routes/lesson/detail/$lessonId";
 
 const RegisterRoute = RegisterRouteImport.update({
   id: "/register",
   path: "/register",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const QuizRoute = QuizRouteImport.update({
-  id: "/quiz",
-  path: "/quiz",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const MapRoute = MapRouteImport.update({
-  id: "/map",
-  path: "/map",
   getParentRoute: () => rootRouteImport,
 } as any);
 const LoginRoute = LoginRouteImport.update({
@@ -48,19 +32,9 @@ const IndexRoute = IndexRouteImport.update({
   path: "/",
   getParentRoute: () => rootRouteImport,
 } as any);
-const LessonIndexRoute = LessonIndexRouteImport.update({
-  id: "/lesson/",
-  path: "/lesson/",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const CourseIndexRoute = CourseIndexRouteImport.update({
   id: "/course/",
   path: "/course/",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const ChapterIndexRoute = ChapterIndexRouteImport.update({
-  id: "/chapter/",
-  path: "/chapter/",
   getParentRoute: () => rootRouteImport,
 } as any);
 const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
@@ -73,130 +47,78 @@ const CourseCourseIdRoute = CourseCourseIdRouteImport.update({
   path: "/course/$courseId",
   getParentRoute: () => rootRouteImport,
 } as any);
-const ChapterCourseIdRoute = ChapterCourseIdRouteImport.update({
-  id: "/chapter/$courseId",
-  path: "/chapter/$courseId",
-  getParentRoute: () => rootRouteImport,
-} as any);
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
   id: "/auth/callback",
   path: "/auth/callback",
-  getParentRoute: () => rootRouteImport,
-} as any);
-const LessonDetailLessonIdRoute = LessonDetailLessonIdRouteImport.update({
-  id: "/lesson/detail/$lessonId",
-  path: "/lesson/detail/$lessonId",
   getParentRoute: () => rootRouteImport,
 } as any);
 
 export interface FileRoutesByFullPath {
   "/": typeof IndexRoute;
   "/login": typeof LoginRoute;
-  "/map": typeof MapRoute;
-  "/quiz": typeof QuizRoute;
   "/register": typeof RegisterRoute;
   "/auth/callback": typeof AuthCallbackRoute;
-  "/chapter/$courseId": typeof ChapterCourseIdRoute;
   "/course/$courseId": typeof CourseCourseIdRoute;
   "/lesson/$lessonId": typeof LessonLessonIdRoute;
-  "/chapter/": typeof ChapterIndexRoute;
   "/course/": typeof CourseIndexRoute;
-  "/lesson/": typeof LessonIndexRoute;
-  "/lesson/detail/$lessonId": typeof LessonDetailLessonIdRoute;
 }
 export interface FileRoutesByTo {
   "/": typeof IndexRoute;
   "/login": typeof LoginRoute;
-  "/map": typeof MapRoute;
-  "/quiz": typeof QuizRoute;
   "/register": typeof RegisterRoute;
   "/auth/callback": typeof AuthCallbackRoute;
-  "/chapter/$courseId": typeof ChapterCourseIdRoute;
   "/course/$courseId": typeof CourseCourseIdRoute;
   "/lesson/$lessonId": typeof LessonLessonIdRoute;
-  "/chapter": typeof ChapterIndexRoute;
   "/course": typeof CourseIndexRoute;
-  "/lesson": typeof LessonIndexRoute;
-  "/lesson/detail/$lessonId": typeof LessonDetailLessonIdRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/": typeof IndexRoute;
   "/login": typeof LoginRoute;
-  "/map": typeof MapRoute;
-  "/quiz": typeof QuizRoute;
   "/register": typeof RegisterRoute;
   "/auth/callback": typeof AuthCallbackRoute;
-  "/chapter/$courseId": typeof ChapterCourseIdRoute;
   "/course/$courseId": typeof CourseCourseIdRoute;
   "/lesson/$lessonId": typeof LessonLessonIdRoute;
-  "/chapter/": typeof ChapterIndexRoute;
   "/course/": typeof CourseIndexRoute;
-  "/lesson/": typeof LessonIndexRoute;
-  "/lesson/detail/$lessonId": typeof LessonDetailLessonIdRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | "/"
     | "/login"
-    | "/map"
-    | "/quiz"
     | "/register"
     | "/auth/callback"
-    | "/chapter/$courseId"
     | "/course/$courseId"
     | "/lesson/$lessonId"
-    | "/chapter/"
-    | "/course/"
-    | "/lesson/"
-    | "/lesson/detail/$lessonId";
+    | "/course/";
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/"
     | "/login"
-    | "/map"
-    | "/quiz"
     | "/register"
     | "/auth/callback"
-    | "/chapter/$courseId"
     | "/course/$courseId"
     | "/lesson/$lessonId"
-    | "/chapter"
-    | "/course"
-    | "/lesson"
-    | "/lesson/detail/$lessonId";
+    | "/course";
   id:
     | "__root__"
     | "/"
     | "/login"
-    | "/map"
-    | "/quiz"
     | "/register"
     | "/auth/callback"
-    | "/chapter/$courseId"
     | "/course/$courseId"
     | "/lesson/$lessonId"
-    | "/chapter/"
-    | "/course/"
-    | "/lesson/"
-    | "/lesson/detail/$lessonId";
+    | "/course/";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
   LoginRoute: typeof LoginRoute;
-  MapRoute: typeof MapRoute;
-  QuizRoute: typeof QuizRoute;
   RegisterRoute: typeof RegisterRoute;
   AuthCallbackRoute: typeof AuthCallbackRoute;
-  ChapterCourseIdRoute: typeof ChapterCourseIdRoute;
   CourseCourseIdRoute: typeof CourseCourseIdRoute;
   LessonLessonIdRoute: typeof LessonLessonIdRoute;
-  ChapterIndexRoute: typeof ChapterIndexRoute;
   CourseIndexRoute: typeof CourseIndexRoute;
-  LessonIndexRoute: typeof LessonIndexRoute;
-  LessonDetailLessonIdRoute: typeof LessonDetailLessonIdRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -206,20 +128,6 @@ declare module "@tanstack/react-router" {
       path: "/register";
       fullPath: "/register";
       preLoaderRoute: typeof RegisterRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/quiz": {
-      id: "/quiz";
-      path: "/quiz";
-      fullPath: "/quiz";
-      preLoaderRoute: typeof QuizRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/map": {
-      id: "/map";
-      path: "/map";
-      fullPath: "/map";
-      preLoaderRoute: typeof MapRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/login": {
@@ -236,25 +144,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/lesson/": {
-      id: "/lesson/";
-      path: "/lesson";
-      fullPath: "/lesson/";
-      preLoaderRoute: typeof LessonIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/course/": {
       id: "/course/";
       path: "/course";
       fullPath: "/course/";
       preLoaderRoute: typeof CourseIndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/chapter/": {
-      id: "/chapter/";
-      path: "/chapter";
-      fullPath: "/chapter/";
-      preLoaderRoute: typeof ChapterIndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/lesson/$lessonId": {
@@ -271,25 +165,11 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof CourseCourseIdRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/chapter/$courseId": {
-      id: "/chapter/$courseId";
-      path: "/chapter/$courseId";
-      fullPath: "/chapter/$courseId";
-      preLoaderRoute: typeof ChapterCourseIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
     "/auth/callback": {
       id: "/auth/callback";
       path: "/auth/callback";
       fullPath: "/auth/callback";
       preLoaderRoute: typeof AuthCallbackRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/lesson/detail/$lessonId": {
-      id: "/lesson/detail/$lessonId";
-      path: "/lesson/detail/$lessonId";
-      fullPath: "/lesson/detail/$lessonId";
-      preLoaderRoute: typeof LessonDetailLessonIdRouteImport;
       parentRoute: typeof rootRouteImport;
     };
   }
@@ -298,17 +178,11 @@ declare module "@tanstack/react-router" {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   LoginRoute: LoginRoute,
-  MapRoute: MapRoute,
-  QuizRoute: QuizRoute,
   RegisterRoute: RegisterRoute,
   AuthCallbackRoute: AuthCallbackRoute,
-  ChapterCourseIdRoute: ChapterCourseIdRoute,
   CourseCourseIdRoute: CourseCourseIdRoute,
   LessonLessonIdRoute: LessonLessonIdRoute,
-  ChapterIndexRoute: ChapterIndexRoute,
   CourseIndexRoute: CourseIndexRoute,
-  LessonIndexRoute: LessonIndexRoute,
-  LessonDetailLessonIdRoute: LessonDetailLessonIdRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
