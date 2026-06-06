@@ -15,7 +15,7 @@ function RootContent() {
         <Outlet />
       </div>
       <Footer />
-      {/* <TanStackRouterDevtools /> */}
+      <TanStackRouterDevtools />
     </div>
   );
 }
