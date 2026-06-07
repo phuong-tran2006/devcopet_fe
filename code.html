@@ -1,0 +1,630 @@
+<!doctype html>
+
+<html class="dark" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Gravity Code | Master Python Curriculum</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-bright": "#393939",
+              "on-tertiary-fixed": "#1b1b1b",
+              "surface-tint": "#00daf8",
+              surface: "#131313",
+              tertiary: "#e8e8e8",
+              "secondary-fixed-dim": "#ffba20",
+              "on-secondary": "#412d00",
+              "on-primary-fixed-variant": "#004e5a",
+              secondary: "#ffdb9d",
+              "on-error-container": "#ffdad6",
+              error: "#ffb4ab",
+              "primary-fixed": "#a5eeff",
+              "outline-variant": "#3b494c",
+              "inverse-primary": "#006877",
+              "error-container": "#93000a",
+              "on-secondary-fixed": "#271900",
+              "surface-container-high": "#2a2a2a",
+              "on-tertiary-container": "#565656",
+              "surface-container-lowest": "#0e0e0e",
+              "primary-fixed-dim": "#00daf8",
+              "primary-container": "#00e0ff",
+              outline: "#859397",
+              "on-background": "#e5e2e1",
+              "on-primary-fixed": "#001f25",
+              "inverse-on-surface": "#313030",
+              "surface-container-highest": "#353535",
+              "surface-container": "#20201f",
+              "on-primary": "#00363f",
+              "on-primary-container": "#005f6d",
+              "surface-dim": "#131313",
+              "on-error": "#690005",
+              background: "#131313",
+              "tertiary-fixed-dim": "#c6c6c6",
+              "on-tertiary": "#303030",
+              "on-tertiary-fixed-variant": "#474747",
+              "inverse-surface": "#e5e2e1",
+              "secondary-fixed": "#ffdea8",
+              "surface-container-low": "#1c1b1b",
+              "on-surface-variant": "#bac9cd",
+              "tertiary-container": "#cccccc",
+              "on-secondary-fixed-variant": "#5e4200",
+              "surface-variant": "#353535",
+              "on-secondary-container": "#6b4b00",
+              primary: "#baf2ff",
+              "on-surface": "#e5e2e1",
+              "tertiary-fixed": "#e2e2e2",
+              "secondary-container": "#feb700",
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+            spacing: {
+              "margin-desktop": "64px",
+              gutter: "24px",
+              "grid-unit": "8px",
+              "container-max": "1440px",
+              "margin-mobile": "16px",
+            },
+            fontFamily: {
+              "label-sm": ["JetBrains Mono"],
+              "code-md": ["JetBrains Mono"],
+              "body-md": ["Geist"],
+              "body-lg": ["Geist"],
+              "headline-sm": ["Geist"],
+              "headline-md": ["Geist"],
+              "headline-lg": ["Geist"],
+            },
+            fontSize: {
+              "label-sm": [
+                "12px",
+                { lineHeight: "1", letterSpacing: "0.05em", fontWeight: "500" },
+              ],
+              "code-md": ["14px", { lineHeight: "1.5", fontWeight: "400" }],
+              "body-md": ["16px", { lineHeight: "1.6", fontWeight: "400" }],
+              "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+              "headline-sm": ["24px", { lineHeight: "1.3", fontWeight: "600" }],
+              "headline-md": ["32px", { lineHeight: "1.2", fontWeight: "600" }],
+              "headline-lg": [
+                "48px",
+                {
+                  lineHeight: "1.2",
+                  letterSpacing: "-0.02em",
+                  fontWeight: "700",
+                },
+              ],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        background-color: #000000;
+        overflow-x: hidden;
+        color: #e5e2e1;
+        font-family: "Geist", sans-serif;
+      }
+
+      .starfield {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -2;
+        background: radial-gradient(circle at center, #0a0a0a 0%, #000000 100%);
+      }
+
+      .digital-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background-image:
+          linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      .gradient-border-cyan {
+        position: relative;
+        background: rgba(19, 19, 19, 0.7);
+        border-radius: 0.5rem;
+      }
+      .gradient-border-cyan::before {
+        content: "";
+        position: absolute;
+        inset: -1px;
+        border-radius: 0.5rem;
+        padding: 1px;
+        background: linear-gradient(
+          135deg,
+          #00daf8 0%,
+          transparent 50%,
+          #ffba20 100%
+        );
+        -webkit-mask:
+          linear-gradient(#fff 0 0) content-box,
+          linear-gradient(#fff 0 0);
+        -webkit-mask-composite: xor;
+        mask-composite: exclude;
+        pointer-events: none;
+      }
+
+      .glass-panel {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .luminescent-glow-cyan {
+        box-shadow: 0 0 12px rgba(0, 218, 248, 0.3);
+      }
+
+      .module-connector {
+        position: absolute;
+        left: 20px;
+        top: 40px;
+        bottom: -40px;
+        width: 1px;
+        background: linear-gradient(
+          to bottom,
+          rgba(255, 255, 255, 0.1) 0%,
+          transparent 100%
+        );
+      }
+
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+    </style>
+  </head>
+  <body class="dark min-h-screen">
+    <div class="starfield" id="starfield"></div>
+    <div class="digital-grid"></div>
+    <!-- TopNavBar -->
+    <header
+      class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-margin-desktop py-4 bg-surface/10 backdrop-blur-xl border-b border-white/10"
+    >
+      <div class="flex items-center gap-8">
+        <span
+          class="text-headline-sm font-headline-sm font-bold tracking-tighter text-primary-fixed-dim"
+          >Gravity Code</span
+        >
+        <nav class="hidden md:flex gap-6">
+          <a
+            class="text-label-sm font-label-sm text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1 transition-all duration-300"
+            href="#"
+            >Course</a
+          >
+          <a
+            class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/5 transition-all duration-300"
+            href="#"
+            >RoadMap</a
+          >
+          <a
+            class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/5 transition-all duration-300"
+            href="#"
+            >LeaderBoard</a
+          >
+          <a
+            class="text-label-sm font-label-sm text-on-surface-variant hover:text-on-surface transition-colors hover:bg-white/5 transition-all duration-300"
+            href="#"
+            >Arena</a
+          >
+        </nav>
+      </div>
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <span
+            class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed-dim transition-colors"
+            >notifications</span
+          >
+          <span
+            class="absolute top-0 right-0 w-2 h-2 bg-secondary rounded-full border border-surface"
+          ></span>
+        </div>
+        <span
+          class="material-symbols-outlined text-on-surface-variant cursor-pointer hover:text-primary-fixed-dim transition-colors"
+          >settings</span
+        >
+        <div
+          class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-white/10"
+        >
+          <img
+            alt="User profile avatar"
+            class="w-full h-full object-cover"
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBcpXMkbgt5757WLUqVmbnoCU342ens03r0axF754Z1cm-Wuw3gZjWwJAyfyr86URpsLKC2NA0kB26mXzi2YyVLoWQsM0FnNmr3mrPSn5pouxwYbD9cCs2bt7gcbUBTTc65febrJ9z__Y-xjHMD9PCZI7WuJlhr5jaVks_OjEgTfoc9kYiXh6dfCnU9Xz1tZ6PfHIJPp8jAs-dM7TKI2iCC8NTGEKV0y0lxCfBCfO0hZf_9bk4gXrMPDhlMK6z0cNzFFMN98gGKtWgq"
+          />
+        </div>
+      </div>
+    </header>
+    <main class="pt-32 pb-20 px-margin-desktop max-w-container-max mx-auto">
+      <!-- Hero & Progress Section -->
+      <div
+        class="flex flex-col lg:flex-row justify-between items-start gap-gutter mb-16"
+      >
+        <div class="max-w-2xl">
+          <div class="flex items-center gap-3 mb-4">
+            <span
+              class="px-3 py-1 bg-primary/10 text-primary-fixed-dim border border-primary/20 rounded-full font-label-sm text-label-sm"
+              >MASTER PYTHON</span
+            >
+            <span class="text-label-sm font-label-sm opacity-50"
+              >• 6 Modules • 42 Lessons</span
+            >
+          </div>
+          <h1 class="text-headline-lg font-headline-lg text-on-surface mb-4">
+            Master Python Curriculum
+          </h1>
+          <p class="text-body-lg font-body-lg text-on-surface-variant">
+            A gamified, comprehensive journey from zero to production-ready
+            Python architecture. Level up your pets as you conquer the code.
+          </p>
+        </div>
+        <!-- Progress Card -->
+        <div
+          class="w-full lg:w-80 glass-panel p-6 rounded-xl relative overflow-hidden"
+        >
+          <div class="flex justify-between items-end mb-4">
+            <div>
+              <h3
+                class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mb-1"
+              >
+                Overall Progress
+              </h3>
+              <span
+                class="text-headline-sm font-headline-sm text-primary-fixed-dim"
+                >42%</span
+              >
+            </div>
+            <span
+              class="material-symbols-outlined text-primary-fixed-dim opacity-50"
+              >analytics</span
+            >
+          </div>
+          <div class="h-1 w-full bg-white/10 rounded-full mb-6 overflow-hidden">
+            <div
+              class="h-full bg-gradient-to-r from-primary-fixed-dim to-secondary-container luminescent-glow-cyan"
+              style="width: 42%"
+            ></div>
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <div
+              class="bg-white/5 p-3 rounded-lg border border-white/5 text-center"
+            >
+              <div class="text-headline-sm font-headline-sm text-on-surface">
+                18
+              </div>
+              <div
+                class="text-label-sm font-label-sm text-on-surface-variant uppercase opacity-60"
+              >
+                Mastered
+              </div>
+            </div>
+            <div
+              class="bg-white/5 p-3 rounded-lg border border-white/5 text-center"
+            >
+              <div class="text-headline-sm font-headline-sm text-on-surface">
+                24
+              </div>
+              <div
+                class="text-label-sm font-label-sm text-on-surface-variant uppercase opacity-60"
+              >
+                Unlocked
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Curriculum Grid -->
+      <div class="space-y-12">
+        <!-- Module 1: The Foundations -->
+        <section class="relative">
+          <div class="module-connector"></div>
+          <div class="flex items-start gap-6 mb-8 relative z-10">
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-lg bg-primary/20 text-primary-fixed-dim border border-primary/30 luminescent-glow-cyan"
+            >
+              <span class="material-symbols-outlined">terminal</span>
+            </div>
+            <div>
+              <h2 class="text-headline-sm font-headline-sm text-on-surface">
+                Module 1: The Foundations
+              </h2>
+              <p class="text-label-sm font-label-sm text-primary-fixed-dim">
+                100% Completed • Moss Green Rank
+              </p>
+            </div>
+          </div>
+          <div class="ml-16 grid grid-cols-1 gap-4">
+            <!-- Lesson 1 -->
+            <div
+              class="gradient-border-cyan group p-6 flex flex-col md:flex-row justify-between items-center transition-all duration-300 hover:bg-white/5 active:scale-[0.98]"
+            >
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-10 h-10 rounded-full border-2 border-primary-fixed-dim flex items-center justify-center text-primary-fixed-dim bg-primary/5"
+                >
+                  <span
+                    class="material-symbols-outlined"
+                    style="font-variation-settings: &quot;FILL&quot; 1"
+                    >check_circle</span
+                  >
+                </div>
+                <div>
+                  <h4
+                    class="text-body-lg font-body-lg text-on-surface font-semibold"
+                  >
+                    Environment Alchemy
+                  </h4>
+                  <p class="text-body-md font-body-md text-on-surface-variant">
+                    Installing Python and setting up your IDE command center.
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 md:mt-0 flex flex-col items-end">
+                <span
+                  class="text-label-sm font-label-sm text-primary-fixed-dim uppercase tracking-widest"
+                  >Mastered</span
+                >
+                <div
+                  class="h-1 w-24 bg-primary-fixed-dim mt-2 rounded-full"
+                ></div>
+              </div>
+            </div>
+            <!-- Lesson 2 -->
+            <div
+              class="gradient-border-cyan group p-6 flex flex-col md:flex-row justify-between items-center transition-all duration-300 hover:bg-white/5 active:scale-[0.98]"
+            >
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-10 h-10 rounded-full border-2 border-secondary-fixed-dim flex items-center justify-center text-secondary-fixed-dim bg-secondary/5"
+                >
+                  <span class="material-symbols-outlined">play_arrow</span>
+                </div>
+                <div>
+                  <h4
+                    class="text-body-lg font-body-lg text-on-surface font-semibold"
+                  >
+                    Variables
+                  </h4>
+                  <p class="text-body-md font-body-md text-on-surface-variant">
+                    Mastering strings, integers, and dynamic typing.
+                  </p>
+                </div>
+              </div>
+              <div class="mt-4 md:mt-0 flex flex-col items-end">
+                <span
+                  class="text-label-sm font-label-sm text-secondary-fixed-dim uppercase tracking-widest"
+                  >In Progress</span
+                >
+                <div
+                  class="h-1 w-24 bg-white/10 mt-2 rounded-full overflow-hidden"
+                >
+                  <div
+                    class="h-full bg-secondary-fixed-dim"
+                    style="width: 65%"
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- Module 2: Logic & Control Flow -->
+        <section class="relative opacity-60">
+          <div class="module-connector"></div>
+          <div class="flex items-start gap-6 mb-8 relative z-10">
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-highest border border-white/10 text-on-surface-variant"
+            >
+              <span class="material-symbols-outlined">account_tree</span>
+            </div>
+            <div>
+              <h2 class="text-headline-sm font-headline-sm text-on-surface">
+                Module 2: Logic &amp; Control Flow
+              </h2>
+              <p
+                class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-2"
+              >
+                <span class="material-symbols-outlined text-[14px]">lock</span>
+                Locked • Teal Rank
+              </p>
+            </div>
+          </div>
+          <div class="ml-16 grid grid-cols-1 gap-4">
+            <div
+              class="glass-panel p-6 flex flex-col md:flex-row justify-between items-center rounded-lg border border-white/5 grayscale"
+            >
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-on-surface-variant"
+                >
+                  <span class="material-symbols-outlined">lock</span>
+                </div>
+                <div>
+                  <h4
+                    class="text-body-lg font-body-lg text-on-surface font-semibold"
+                  >
+                    The Boolean Gates
+                  </h4>
+                  <p class="text-body-md font-body-md text-on-surface-variant">
+                    Navigating if, elif, and else logic structures.
+                  </p>
+                </div>
+              </div>
+              <span
+                class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mt-4 md:mt-0"
+                >Unlocked</span
+              >
+            </div>
+            <div
+              class="glass-panel p-6 flex flex-col md:flex-row justify-between items-center rounded-lg border border-white/5 grayscale"
+            >
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-on-surface-variant"
+                >
+                  <span class="material-symbols-outlined">lock</span>
+                </div>
+                <div>
+                  <h4
+                    class="text-body-lg font-body-lg text-on-surface font-semibold"
+                  >
+                    Infinite Loops
+                  </h4>
+                  <p class="text-body-md font-body-md text-on-surface-variant">
+                    Harnessing while and for loops to automate repetition.
+                  </p>
+                </div>
+              </div>
+              <span
+                class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mt-4 md:mt-0"
+                >Unlocked</span
+              >
+            </div>
+          </div>
+        </section>
+        <!-- Module 3: Functional Mastery -->
+        <section class="relative opacity-30">
+          <div class="flex items-start gap-6 mb-8 relative z-10">
+            <div
+              class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-highest border border-white/10 text-on-surface-variant"
+            >
+              <span class="material-symbols-outlined">function</span>
+            </div>
+            <div>
+              <h2 class="text-headline-sm font-headline-sm text-on-surface">
+                Module 3: Functional Mastery
+              </h2>
+              <p
+                class="text-label-sm font-label-sm text-on-surface-variant flex items-center gap-2"
+              >
+                <span class="material-symbols-outlined text-[14px]">lock</span>
+                Locked • Thistle Rank
+              </p>
+            </div>
+          </div>
+          <div class="ml-16">
+            <div
+              class="glass-panel p-6 flex flex-col md:flex-row justify-between items-center rounded-lg border border-white/5 grayscale"
+            >
+              <div class="flex items-center gap-6">
+                <div
+                  class="w-10 h-10 rounded-full border border-white/5 flex items-center justify-center text-on-surface-variant"
+                >
+                  <span class="material-symbols-outlined">lock</span>
+                </div>
+                <div>
+                  <h4
+                    class="text-body-lg font-body-lg text-on-surface font-semibold"
+                  >
+                    Reusable Spells
+                  </h4>
+                  <p class="text-body-md font-body-md text-on-surface-variant">
+                    Defining and calling functions with parameters.
+                  </p>
+                </div>
+              </div>
+              <span
+                class="text-label-sm font-label-sm text-on-surface-variant uppercase tracking-widest mt-4 md:mt-0"
+                >Locked</span
+              >
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+    <!-- SideNavBar (Hidden on main curriculum focus, but referenced in structure) -->
+    <footer
+      class="w-full py-6 px-margin-desktop flex justify-between items-center opacity-60 border-t border-white/5 bg-transparent"
+    >
+      <span class="text-label-sm font-label-sm text-on-tertiary-container"
+        >© 2024 GRAVITY CODE - SYSTEM STATUS: OPTIMAL</span
+      >
+      <div class="flex gap-6">
+        <a
+          class="text-label-sm font-label-sm text-on-tertiary-container hover:text-on-surface hover:underline transition-all"
+          href="#"
+          >Documentation</a
+        >
+        <a
+          class="text-label-sm font-label-sm text-on-tertiary-container hover:text-on-surface hover:underline transition-all"
+          href="#"
+          >Support</a
+        >
+        <a
+          class="text-label-sm font-label-sm text-on-tertiary-container hover:text-on-surface hover:underline transition-all"
+          href="#"
+          >Privacy</a
+        >
+        <a
+          class="text-label-sm font-label-sm text-on-tertiary-container hover:text-on-surface hover:underline transition-all"
+          href="#"
+          >Terms</a
+        >
+      </div>
+    </footer>
+    <script>
+      // Simple starfield generation
+      const starfield = document.getElementById("starfield");
+      const count = 150;
+
+      for (let i = 0; i < count; i++) {
+        const star = document.createElement("div");
+        star.className = "absolute bg-white rounded-full";
+        const size = Math.random() * 2;
+        star.style.width = `${size}px`;
+        star.style.height = `${size}px`;
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.opacity = Math.random();
+        star.style.boxShadow = `0 0 ${size * 2}px white`;
+
+        // Add slight parallax or blink effect
+        star.style.transition = "opacity 2s ease-in-out";
+        setInterval(
+          () => {
+            star.style.opacity = Math.random() * 0.8 + 0.2;
+          },
+          2000 + Math.random() * 3000,
+        );
+
+        starfield.appendChild(star);
+      }
+
+      // Parallax scroll effect for grid
+      window.addEventListener("scroll", () => {
+        const grid = document.querySelector(".digital-grid");
+        const offset = window.pageYOffset * 0.1;
+        grid.style.backgroundPositionY = `${offset}px`;
+      });
+    </script>
+  </body>
+</html>

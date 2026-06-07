@@ -9,50 +9,232 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ChooseCompanionRouteImport } from './routes/choose-companion'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as CourseRouteImport } from './routes/course'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingSettingRouteImport } from './routes/setting/setting'
+import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as LessonLessonIdQuizRouteImport } from './routes/lesson/$lessonId.quiz'
 
-const ChooseCompanionRoute = ChooseCompanionRouteImport.update({
-  id: '/choose-companion',
-  path: '/choose-companion',
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseRoute = CourseRouteImport.update({
+  id: '/course',
+  path: '/course',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingSettingRoute = SettingSettingRouteImport.update({
+  id: '/setting/setting',
+  path: '/setting/setting',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
+  id: '/lesson/$lessonId',
+  path: '/lesson/$lessonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthCallbackRoute = AuthCallbackRouteImport.update({
+  id: '/auth/callback',
+  path: '/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LessonLessonIdQuizRoute = LessonLessonIdQuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => LessonLessonIdRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/choose-companion': typeof ChooseCompanionRoute
+  '/': typeof IndexRoute
+  '/course': typeof CourseRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/setting/setting': typeof SettingSettingRoute
+  '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
 }
 export interface FileRoutesByTo {
-  '/choose-companion': typeof ChooseCompanionRoute
+  '/': typeof IndexRoute
+  '/course': typeof CourseRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/setting/setting': typeof SettingSettingRoute
+  '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/choose-companion': typeof ChooseCompanionRoute
+  '/': typeof IndexRoute
+  '/course': typeof CourseRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/setting/setting': typeof SettingSettingRoute
+  '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/choose-companion'
+  fullPaths:
+    | '/'
+    | '/course'
+    | '/login'
+    | '/register'
+    | '/auth/callback'
+    | '/courses/$courseId'
+    | '/lesson/$lessonId'
+    | '/setting/setting'
+    | '/lesson/$lessonId/quiz'
   fileRoutesByTo: FileRoutesByTo
-  to: '/choose-companion'
-  id: '__root__' | '/choose-companion'
+  to:
+    | '/'
+    | '/course'
+    | '/login'
+    | '/register'
+    | '/auth/callback'
+    | '/courses/$courseId'
+    | '/lesson/$lessonId'
+    | '/setting/setting'
+    | '/lesson/$lessonId/quiz'
+  id:
+    | '__root__'
+    | '/'
+    | '/course'
+    | '/login'
+    | '/register'
+    | '/auth/callback'
+    | '/courses/$courseId'
+    | '/lesson/$lessonId'
+    | '/setting/setting'
+    | '/lesson/$lessonId/quiz'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  ChooseCompanionRoute: typeof ChooseCompanionRoute
+  IndexRoute: typeof IndexRoute
+  CourseRoute: typeof CourseRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  LessonLessonIdRoute: typeof LessonLessonIdRouteWithChildren
+  SettingSettingRoute: typeof SettingSettingRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/choose-companion': {
-      id: '/choose-companion'
-      path: '/choose-companion'
-      fullPath: '/choose-companion'
-      preLoaderRoute: typeof ChooseCompanionRouteImport
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course': {
+      id: '/course'
+      path: '/course'
+      fullPath: '/course'
+      preLoaderRoute: typeof CourseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setting/setting': {
+      id: '/setting/setting'
+      path: '/setting/setting'
+      fullPath: '/setting/setting'
+      preLoaderRoute: typeof SettingSettingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lesson/$lessonId': {
+      id: '/lesson/$lessonId'
+      path: '/lesson/$lessonId'
+      fullPath: '/lesson/$lessonId'
+      preLoaderRoute: typeof LessonLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/lesson/$lessonId/quiz': {
+      id: '/lesson/$lessonId/quiz'
+      path: '/quiz'
+      fullPath: '/lesson/$lessonId/quiz'
+      preLoaderRoute: typeof LessonLessonIdQuizRouteImport
+      parentRoute: typeof LessonLessonIdRoute
     }
   }
 }
 
+interface LessonLessonIdRouteChildren {
+  LessonLessonIdQuizRoute: typeof LessonLessonIdQuizRoute
+}
+
+const LessonLessonIdRouteChildren: LessonLessonIdRouteChildren = {
+  LessonLessonIdQuizRoute: LessonLessonIdQuizRoute,
+}
+
+const LessonLessonIdRouteWithChildren = LessonLessonIdRoute._addFileChildren(
+  LessonLessonIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  ChooseCompanionRoute: ChooseCompanionRoute,
+  IndexRoute: IndexRoute,
+  CourseRoute: CourseRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+  AuthCallbackRoute: AuthCallbackRoute,
+  CoursesCourseIdRoute: CoursesCourseIdRoute,
+  LessonLessonIdRoute: LessonLessonIdRouteWithChildren,
+  SettingSettingRoute: SettingSettingRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
