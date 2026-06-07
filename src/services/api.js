@@ -1,13 +1,13 @@
 /**
  * API Service Layer
- * 
+ *
  * This module provides API functions for authentication and user management.
  * Uses mock data with simulated delays for development when no backend is available.
  * Can be easily swapped for real API calls by updating the fetch functions.
  */
 
 // Base URL configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "/api";
 
 // Simulate network delay for mock data (ms)
 const MOCK_DELAY = 800;
@@ -19,10 +19,10 @@ const MOCK_DELAY = 800;
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 function getAuthHeaders() {
-  const token = localStorage.getItem('accessToken');
+  const token = localStorage.getItem("accessToken");
   return {
-    'Content-Type': 'application/json',
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 }
 
@@ -32,28 +32,28 @@ function getAuthHeaders() {
 
 const mockUsers = [
   {
-    id: '1',
-    username: 'demo_user',
-    email: 'demo@devcopet.io',
-    password: 'demo123',
-    fullName: 'Demo User',
+    id: "1",
+    username: "demo_user",
+    email: "demo@devcopet.io",
+    password: "demo123",
+    fullName: "Demo User",
     avatar: null,
-    codingExperience: 'intermediate',
-    dateOfBirth: '1995-06-15',
-    createdAt: '2024-01-15T10:30:00Z',
-    role: 'user',
+    codingExperience: "intermediate",
+    dateOfBirth: "1995-06-15",
+    createdAt: "2024-01-15T10:30:00Z",
+    role: "user",
   },
   {
-    id: 'admin',
-    username: 'admin',
-    email: 'admin@devcopet.io',
-    password: 'admin123',
-    fullName: 'Administrator',
+    id: "admin",
+    username: "admin",
+    email: "admin@devcopet.io",
+    password: "admin123",
+    fullName: "Administrator",
     avatar: null,
-    codingExperience: 'expert',
+    codingExperience: "expert",
     dateOfBirth: null,
-    createdAt: '2024-01-01T00:00:00Z',
-    role: 'admin',
+    createdAt: "2024-01-01T00:00:00Z",
+    role: "admin",
   },
 ];
 
@@ -82,22 +82,22 @@ export const register = async (data) => {
 
   // Mock implementation
   await delay(MOCK_DELAY);
-  
+
   // Validate required fields
   if (!data.email || !data.password || !data.username) {
-    throw new Error('Email, username, and password are required');
+    throw new Error("Email, username, and password are required");
   }
 
   // Check if email already exists
-  const existingUser = mockUsers.find(u => u.email === data.email);
+  const existingUser = mockUsers.find((u) => u.email === data.email);
   if (existingUser) {
-    throw new Error('Email already registered');
+    throw new Error("Email already registered");
   }
 
   // Check if username already exists
-  const existingUsername = mockUsers.find(u => u.username === data.username);
+  const existingUsername = mockUsers.find((u) => u.username === data.username);
   if (existingUsername) {
-    throw new Error('Username already taken');
+    throw new Error("Username already taken");
   }
 
   // Create new user
@@ -108,7 +108,7 @@ export const register = async (data) => {
     password: data.password,
     fullName: data.fullName || data.username,
     avatar: null,
-    codingExperience: data.codingExperience || 'beginner',
+    codingExperience: data.codingExperience || "beginner",
     dateOfBirth: data.dateOfBirth || null,
     createdAt: new Date().toISOString(),
   };
@@ -118,7 +118,7 @@ export const register = async (data) => {
   // Return mock token and user data
   const token = `mock_token_${Date.now()}`;
   const { password, ...userWithoutPassword } = newUser;
-  
+
   return {
     token,
     user: userWithoutPassword,
@@ -146,33 +146,33 @@ export const login = async (data) => {
   await delay(MOCK_DELAY);
 
   if (!data.email || !data.password) {
-    throw new Error('Email and password are required');
+    throw new Error("Email and password are required");
   }
 
   // Find user by email (for demo, also check password)
-  const user = mockUsers.find(u => u.email === data.email);
-  
+  const user = mockUsers.find((u) => u.email === data.email);
+
   if (!user) {
-    throw new Error('Invalid email or password');
+    throw new Error("Invalid email or password");
   }
 
   // Check password - demo user accepts any password, others require exact match
-  const isDemoUser = user.email === 'demo@devcopet.io';
-  const isAdminUser = user.email === 'admin@devcopet.io';
-  
+  const isDemoUser = user.email === "demo@devcopet.io";
+  const isAdminUser = user.email === "admin@devcopet.io";
+
   if (!isDemoUser && !isAdminUser && user.password !== data.password) {
-    throw new Error('Invalid email or password');
+    throw new Error("Invalid email or password");
   }
-  
+
   // For admin user, also check password
-  if (isAdminUser && data.password !== 'admin123') {
-    throw new Error('Invalid email or password');
+  if (isAdminUser && data.password !== "admin123") {
+    throw new Error("Invalid email or password");
   }
 
   // Generate mock token
   const token = `mock_token_${Date.now()}`;
   currentMockUser = user;
-  
+
   const { password, ...userWithoutPassword } = user;
 
   return {
@@ -215,17 +215,17 @@ export const getMe = async () => {
 
   // Mock implementation
   await delay(MOCK_DELAY);
-  
-  const token = localStorage.getItem('accessToken');
-  
+
+  const token = localStorage.getItem("accessToken");
+
   if (!token) {
-    throw new Error('No token found');
+    throw new Error("No token found");
   }
 
   if (!currentMockUser) {
     // Try to find the user from mockUsers based on token
     // In a real app, the backend would validate the token
-    throw new Error('Session expired');
+    throw new Error("Session expired");
   }
 
   const { password, ...userWithoutPassword } = currentMockUser;
@@ -266,7 +266,6 @@ export const apiConfig = {
   useMock: true,
   mockDelay: MOCK_DELAY,
 };
-
 
 // =============================================================================
 // Auth API Export (for convenience)

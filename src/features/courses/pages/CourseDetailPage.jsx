@@ -1,13 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from '@tanstack/react-router';
-import { courseApi } from '../api/course.api';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "@tanstack/react-router";
+import { courseApi } from "../api/course.api";
 
 /* ───────────── Helper: Dot Grid Decoration ───────────── */
-const DotGrid = ({ className = '', rows = 5, cols = 5 }) => (
+const DotGrid = ({ className = "", rows = 5, cols = 5 }) => (
   <div className={`absolute pointer-events-none opacity-20 ${className}`}>
-    <div className="grid" style={{ gridTemplateColumns: `repeat(${cols}, 12px)`, gap: '10px' }}>
+    <div
+      className="grid"
+      style={{ gridTemplateColumns: `repeat(${cols}, 12px)`, gap: "10px" }}
+    >
       {Array.from({ length: rows * cols }).map((_, i) => (
-        <div key={i} className="w-[3px] h-[3px] rounded-full bg-on-surface-variant" />
+        <div
+          key={i}
+          className="w-[3px] h-[3px] rounded-full bg-on-surface-variant"
+        />
       ))}
     </div>
   </div>
@@ -15,14 +21,23 @@ const DotGrid = ({ className = '', rows = 5, cols = 5 }) => (
 
 /* ───────────── Module Icon component ───────────── */
 const ModuleIcon = ({ index, isActive }) => {
-  const icons = ['play_lesson', 'hub', 'functions', 'data_object', 'terminal', 'code_blocks'];
+  const icons = [
+    "play_lesson",
+    "hub",
+    "functions",
+    "data_object",
+    "terminal",
+    "code_blocks",
+  ];
   const icon = icons[index % icons.length];
   return (
-    <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
-      isActive
-        ? 'bg-secondary-fixed-dim/20 text-secondary-fixed-dim border border-secondary-fixed-dim/30'
-        : 'bg-[#1b2532] text-on-surface-variant/40 border border-[#1e293b]'
-    }`}>
+    <div
+      className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
+        isActive
+          ? "bg-secondary-fixed-dim/20 text-secondary-fixed-dim border border-secondary-fixed-dim/30"
+          : "bg-[#1b2532] text-on-surface-variant/40 border border-[#1e293b]"
+      }`}
+    >
       <span className="material-symbols-outlined text-[24px]">{icon}</span>
     </div>
   );
@@ -32,24 +47,24 @@ const ModuleIcon = ({ index, isActive }) => {
 const StatusBadge = ({ status }) => {
   const config = {
     mastered: {
-      label: 'MASTERED',
-      color: 'text-primary-fixed-dim',
-      barColor: 'bg-primary-fixed-dim',
+      label: "MASTERED",
+      color: "text-primary-fixed-dim",
+      barColor: "bg-primary-fixed-dim",
     },
     in_progress: {
-      label: 'IN PROGRESS',
-      color: 'text-secondary-fixed-dim',
-      barColor: 'bg-secondary-fixed-dim',
+      label: "IN PROGRESS",
+      color: "text-secondary-fixed-dim",
+      barColor: "bg-secondary-fixed-dim",
     },
     unlocked: {
-      label: 'UNLOCKED',
-      color: 'text-on-surface-variant/60',
-      barColor: 'bg-transparent',
+      label: "UNLOCKED",
+      color: "text-on-surface-variant/60",
+      barColor: "bg-transparent",
     },
     locked: {
-      label: 'LOCKED',
-      color: 'text-on-surface-variant/60',
-      barColor: 'bg-transparent',
+      label: "LOCKED",
+      color: "text-on-surface-variant/60",
+      barColor: "bg-transparent",
     },
   };
 
@@ -60,7 +75,7 @@ const StatusBadge = ({ status }) => {
       <span className={`font-label-sm text-[11px] tracking-[0.1em] ${c.color}`}>
         {c.label}
       </span>
-      {(status === 'mastered' || status === 'in_progress') && (
+      {(status === "mastered" || status === "in_progress") && (
         <div className={`h-[3px] w-16 rounded-full ${c.barColor}`} />
       )}
     </div>
@@ -71,39 +86,40 @@ const StatusBadge = ({ status }) => {
 const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
   // For demo: first lesson mastered, second in_progress, rest unlocked/locked
   const getStatus = () => {
-    if (!isModuleActive) return 'locked';
-    if (lessonIndex === 0) return 'mastered';
-    if (lessonIndex === 1) return 'in_progress';
-    return 'unlocked';
+    if (!isModuleActive) return "locked";
+    if (lessonIndex === 0) return "mastered";
+    if (lessonIndex === 1) return "in_progress";
+    return "unlocked";
   };
 
   const status = getStatus();
-  const isClickable = status !== 'locked';
+  const isClickable = status !== "locked";
 
   const iconMap = {
-    mastered: 'check_circle',
-    in_progress: 'play_circle',
-    unlocked: 'lock_open',
-    locked: 'lock',
+    mastered: "check_circle",
+    in_progress: "play_circle",
+    unlocked: "lock_open",
+    locked: "lock",
   };
 
   const borderColor = {
-    mastered: 'border-primary-fixed-dim/40 hover:border-primary-fixed-dim/70',
-    in_progress: 'border-secondary-fixed-dim/40 hover:border-secondary-fixed-dim/70',
-    unlocked: 'border-[#1e293b] hover:border-[#2a3a4d]',
-    locked: 'border-[#1e293b]/50',
+    mastered: "border-primary-fixed-dim/40 hover:border-primary-fixed-dim/70",
+    in_progress:
+      "border-secondary-fixed-dim/40 hover:border-secondary-fixed-dim/70",
+    unlocked: "border-[#1e293b] hover:border-[#2a3a4d]",
+    locked: "border-[#1e293b]/50",
   };
 
   const iconColor = {
-    mastered: 'text-primary-fixed-dim',
-    in_progress: 'text-secondary-fixed-dim',
-    unlocked: 'text-on-surface-variant/50',
-    locked: 'text-on-surface-variant/70',
+    mastered: "text-primary-fixed-dim",
+    in_progress: "text-secondary-fixed-dim",
+    unlocked: "text-on-surface-variant/50",
+    locked: "text-on-surface-variant/70",
   };
 
-  const Wrapper = isClickable ? Link : 'div';
+  const Wrapper = isClickable ? Link : "div";
   const wrapperProps = isClickable
-    ? { to: '/lesson/$lessonId', params: { lessonId: lesson._id } }
+    ? { to: "/lesson/$lessonId", params: { lessonId: lesson._id } }
     : {};
 
   return (
@@ -111,25 +127,35 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
       {...wrapperProps}
       className={`flex items-center justify-between px-6 py-5 rounded-xl border transition-all duration-300 group
         ${borderColor[status]}
-        ${isClickable ? 'cursor-pointer bg-[#121c25]/60 hover:bg-[#1b2532]/80' : 'cursor-default bg-[#121c25]/40'}
+        ${isClickable ? "cursor-pointer bg-[#121c25]/60 hover:bg-[#1b2532]/80" : "cursor-default bg-[#121c25]/40"}
       `}
     >
       <div className="flex items-center gap-4">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center border ${
-          status === 'mastered' ? 'border-primary-fixed-dim/40 bg-primary-fixed-dim/10' :
-          status === 'in_progress' ? 'border-secondary-fixed-dim/40 bg-secondary-fixed-dim/10' :
-          'border-[#1e293b] bg-transparent'
-        }`}>
-          <span className={`material-symbols-outlined text-[20px] ${iconColor[status]}`}>
+        <div
+          className={`w-10 h-10 rounded-full flex items-center justify-center border ${
+            status === "mastered"
+              ? "border-primary-fixed-dim/40 bg-primary-fixed-dim/10"
+              : status === "in_progress"
+                ? "border-secondary-fixed-dim/40 bg-secondary-fixed-dim/10"
+                : "border-[#1e293b] bg-transparent"
+          }`}
+        >
+          <span
+            className={`material-symbols-outlined text-[20px] ${iconColor[status]}`}
+          >
             {iconMap[status]}
           </span>
         </div>
         <div>
-          <h4 className={`font-body-md text-[15px] font-semibold ${isClickable ? 'text-white group-hover:text-primary-fixed' : 'text-on-surface-variant/80'} transition-colors`}>
+          <h4
+            className={`font-body-md text-[15px] font-semibold ${isClickable ? "text-white group-hover:text-primary-fixed" : "text-on-surface-variant/80"} transition-colors`}
+          >
             {lesson.title}
           </h4>
           {lesson.description && (
-            <p className={`font-body-md text-[13px] mt-0.5 ${isClickable ? 'text-on-surface-variant/70' : 'text-on-surface-variant/60'}`}>
+            <p
+              className={`font-body-md text-[13px] mt-0.5 ${isClickable ? "text-on-surface-variant/70" : "text-on-surface-variant/60"}`}
+            >
               {lesson.description}
             </p>
           )}
@@ -149,14 +175,21 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
   const isActive = index === 0;
 
   useEffect(() => {
-    courseApi.getLessons(chapter._id)
-      .then(data => setLessons(data || []))
+    courseApi
+      .getLessons(chapter._id)
+      .then((data) => setLessons(data || []))
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
   }, [chapter._id]);
 
   const getRankLabel = () => {
-    const ranks = ['Moss Green Rank', 'Teal Rank', 'Thistle Rank', 'Amber Rank', 'Crimson Rank'];
+    const ranks = [
+      "Moss Green Rank",
+      "Teal Rank",
+      "Thistle Rank",
+      "Amber Rank",
+      "Crimson Rank",
+    ];
     return ranks[index % ranks.length];
   };
 
@@ -170,7 +203,9 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
       <div className="flex items-start gap-4 mb-6">
         <ModuleIcon index={index} isActive={isActive} />
         <div>
-          <h2 className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? 'text-white' : 'text-on-surface-variant/60'}`}>
+          <h2
+            className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? "text-white" : "text-on-surface-variant/60"}`}
+          >
             Module {index + 1}: {chapter.title}
           </h2>
           <div className="flex items-center gap-2 mt-1.5">
@@ -179,18 +214,24 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
                 <span className="font-label-sm text-[11px] text-primary-fixed-dim tracking-[0.08em]">
                   100% Completed
                 </span>
-                <span className="text-on-surface-variant/40 text-[11px]">•</span>
+                <span className="text-on-surface-variant/40 text-[11px]">
+                  •
+                </span>
                 <span className="font-label-sm text-[11px] text-secondary-fixed-dim tracking-[0.08em]">
                   {getRankLabel()}
                 </span>
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">lock</span>
+                <span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">
+                  lock
+                </span>
                 <span className="font-label-sm text-[11px] text-on-surface-variant/50 tracking-[0.08em]">
                   Locked
                 </span>
-                <span className="text-on-surface-variant/40 text-[11px]">•</span>
+                <span className="text-on-surface-variant/40 text-[11px]">
+                  •
+                </span>
                 <span className="font-label-sm text-[11px] text-on-surface-variant/50 tracking-[0.08em]">
                   {getRankLabel()}
                 </span>
@@ -240,20 +281,25 @@ const CourseDetailPage = () => {
   useEffect(() => {
     if (!courseId) return;
 
-    courseApi.getCourses()
-      .then(courses => {
-        const found = courses.find(c => c.slug === courseId || c._id === courseId);
-        if (!found) throw new Error('Course not found');
+    courseApi
+      .getCourses()
+      .then((courses) => {
+        const found = courses.find(
+          (c) => c.slug === courseId || c._id === courseId,
+        );
+        if (!found) throw new Error("Course not found");
         setCourse(found);
         return courseApi.getChapters(found._id);
       })
-      .then(data => setChapters(data || []))
-      .catch(err => console.error(err))
+      .then((data) => setChapters(data || []))
+      .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [courseId]);
 
   useEffect(() => {
-    document.title = course ? `${course.title} - Devcopet` : 'Course - Devcopet';
+    document.title = course
+      ? `${course.title} - Devcopet`
+      : "Course - Devcopet";
   }, [course]);
 
   if (loading) {
@@ -272,9 +318,13 @@ const CourseDetailPage = () => {
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <span className="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-4">error</span>
+        <span className="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-4">
+          error
+        </span>
         <h2 className="font-headline-md text-white mb-2">Course Not Found</h2>
-        <p className="text-on-surface-variant">The course you're looking for doesn't exist.</p>
+        <p className="text-on-surface-variant">
+          The course you're looking for doesn't exist.
+        </p>
         <Link
           to="/course"
           className="mt-6 bg-primary-fixed-dim/20 text-primary-fixed-dim px-6 py-2.5 rounded-lg font-bold hover:bg-primary-fixed-dim hover:text-on-primary-fixed transition-all"
@@ -286,16 +336,16 @@ const CourseDetailPage = () => {
   }
 
   // Stats
-  const totalLessons = course.totalLessons || chapters.reduce((sum, ch) => sum + (ch.totalLessons || 0), 0);
+  const totalLessons =
+    course.totalLessons ||
+    chapters.reduce((sum, ch) => sum + (ch.totalLessons || 0), 0);
   const totalModules = chapters.length || course.totalChapters || 0;
 
   return (
     <main className="w-full relative pb-20 min-h-screen">
       <div className="max-w-[1100px] mx-auto px-4 md:px-10 lg:px-16 pt-8">
-
         {/* ─── Hero Section ─── */}
         <section className="flex flex-col lg:flex-row items-start justify-between gap-8 mb-16">
-
           {/* Left: Course Info */}
           <div className="flex-1">
             {/* Back + Badge */}
@@ -303,13 +353,17 @@ const CourseDetailPage = () => {
               to="/course"
               className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-white transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
             >
-              <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[14px]">
+                arrow_back
+              </span>
               All Courses
             </Link>
 
             <div className="flex items-center gap-4 mb-5 flex-wrap">
               <span className="inline-block px-3.5 py-1.5 bg-primary-fixed-dim/15 text-primary-fixed-dim border border-primary-fixed-dim/30 rounded font-label-sm text-[10px] tracking-[0.15em] uppercase">
-                {course.programmingLanguage ? `MASTER ${course.programmingLanguage.toUpperCase()}` : course.level?.toUpperCase()}
+                {course.programmingLanguage
+                  ? `MASTER ${course.programmingLanguage.toUpperCase()}`
+                  : course.level?.toUpperCase()}
               </span>
               <span className="font-label-sm text-[11px] text-on-surface-variant/60 tracking-[0.08em]">
                 • {totalModules} Modules • {totalLessons} Lessons
@@ -321,7 +375,8 @@ const CourseDetailPage = () => {
             </h1>
 
             <p className="font-body-lg text-[16px] text-on-surface-variant leading-relaxed max-w-xl">
-              {course.description || 'A gamified, comprehensive journey from zero to production-ready architecture. Level up your pets as you conquer the code.'}
+              {course.description ||
+                "A gamified, comprehensive journey from zero to production-ready architecture. Level up your pets as you conquer the code."}
             </p>
           </div>
 
@@ -347,7 +402,7 @@ const CourseDetailPage = () => {
                 <div className="h-1 bg-[#1b2532] rounded-full mt-3 overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-primary-fixed-dim to-primary-fixed rounded-full shadow-[0_0_12px_rgba(0,218,248,0.5)] transition-all duration-1000 ease-out"
-                    style={{ width: '42%' }}
+                    style={{ width: "42%" }}
                   />
                 </div>
               </div>
@@ -355,13 +410,17 @@ const CourseDetailPage = () => {
               {/* Stats Row */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-[#1b2532] rounded-lg p-3 text-center border border-[#1e293b]">
-                  <div className="font-headline-sm text-[22px] font-bold text-white">18</div>
+                  <div className="font-headline-sm text-[22px] font-bold text-white">
+                    18
+                  </div>
                   <div className="font-label-sm text-[9px] text-on-surface-variant tracking-[0.12em] uppercase mt-1">
                     Mastered
                   </div>
                 </div>
                 <div className="bg-[#1b2532] rounded-lg p-3 text-center border border-[#1e293b]">
-                  <div className="font-headline-sm text-[22px] font-bold text-white">24</div>
+                  <div className="font-headline-sm text-[22px] font-bold text-white">
+                    24
+                  </div>
                   <div className="font-label-sm text-[9px] text-on-surface-variant tracking-[0.12em] uppercase mt-1">
                     Unlocked
                   </div>
@@ -384,8 +443,12 @@ const CourseDetailPage = () => {
 
           {chapters.length === 0 && (
             <div className="bg-[#121c25] rounded-xl border border-[#1e293b] p-16 text-center shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-              <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">inventory_2</span>
-              <h3 className="font-headline-sm text-white mb-2">No Modules Found</h3>
+              <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">
+                inventory_2
+              </span>
+              <h3 className="font-headline-sm text-white mb-2">
+                No Modules Found
+              </h3>
               <p className="text-on-surface-variant/60 text-[14px]">
                 The curriculum for this course is still being prepared.
               </p>

@@ -1,6 +1,6 @@
-import React from 'react';
+import React from "react";
 
-const EmailProviderIcon = ({ className = 'h-6 w-6' }) => (
+const EmailProviderIcon = ({ className = "h-6 w-6" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"

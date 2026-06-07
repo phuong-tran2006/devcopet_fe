@@ -1,6 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router';
-import CoursePage from '../features/courses/pages/CoursePage';
+import { createFileRoute } from "@tanstack/react-router";
+import CoursePage from "../features/courses/pages/CoursePage";
 
-export const Route = createFileRoute('/course')({
+export const Route = createFileRoute("/course")({
   component: CoursePage,
 });

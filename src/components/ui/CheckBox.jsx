@@ -1,26 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { cva } from 'class-variance-authority';
-import { twMerge } from 'tailwind-merge';
+import React, { useState, useEffect } from "react";
+import { cva } from "class-variance-authority";
+import { twMerge } from "tailwind-merge";
 
 const checkboxClasses = cva(
-  'flex items-center cursor-pointer transition-all duration-200',
+  "flex items-center cursor-pointer transition-all duration-200",
   {
     variants: {
       variant: {
-        default: 'hover:opacity-80',
-        accent: 'hover:opacity-90',
+        default: "hover:opacity-80",
+        accent: "hover:opacity-90",
       },
       size: {
-        small: 'text-sm',
-        medium: 'text-base',
-        large: 'text-lg',
+        small: "text-sm",
+        medium: "text-base",
+        large: "text-lg",
       },
     },
     defaultVariants: {
-      variant: 'default',
-      size: 'medium',
+      variant: "default",
+      size: "medium",
     },
-  }
+  },
 );
 
 const CheckBox = ({
@@ -32,13 +32,13 @@ const CheckBox = ({
   text_line_height = "22px",
   text_text_align = "left",
   text_color = "#bdc9c8",
-  
+
   // Optional parameters (no defaults)
   layout_gap,
   layout_width,
   margin,
   position,
-  
+
   // Standard React props
   variant,
   size,
@@ -54,29 +54,39 @@ const CheckBox = ({
   className,
   ...props
 }) => {
-  const [isChecked, setIsChecked] = useState(checked !== undefined ? checked : defaultChecked);
+  const [isChecked, setIsChecked] = useState(
+    checked !== undefined ? checked : defaultChecked,
+  );
 
   // Safe validation for optional parameters
-  const hasValidWidth = layout_width && typeof layout_width === 'string' && layout_width?.trim() !== '';
-  const hasValidMargin = margin && typeof margin === 'string' && margin?.trim() !== '';
-  const hasValidPosition = position && typeof position === 'string' && position?.trim() !== '';
-  const hasValidGap = layout_gap && typeof layout_gap === 'string' && layout_gap?.trim() !== '';
+  const hasValidWidth =
+    layout_width &&
+    typeof layout_width === "string" &&
+    layout_width?.trim() !== "";
+  const hasValidMargin =
+    margin && typeof margin === "string" && margin?.trim() !== "";
+  const hasValidPosition =
+    position && typeof position === "string" && position?.trim() !== "";
+  const hasValidGap =
+    layout_gap && typeof layout_gap === "string" && layout_gap?.trim() !== "";
 
   // Build optional Tailwind classes
   const optionalClasses = [
-    hasValidWidth ? `w-[${layout_width}]` : '',
-    hasValidMargin ? `m-[${margin}]` : '',
-    hasValidPosition ? position : '',
-  ]?.filter(Boolean)?.join(' ');
+    hasValidWidth ? `w-[${layout_width}]` : "",
+    hasValidMargin ? `m-[${margin}]` : "",
+    hasValidPosition ? position : "",
+  ]
+    ?.filter(Boolean)
+    ?.join(" ");
 
   // Build inline styles for required parameters
   const textStyles = {
-    fontSize: text_font_size ? `${text_font_size}px` : '16px',
-    fontFamily: text_font_family || 'Open Sans',
-    fontWeight: text_font_weight || '400',
-    lineHeight: text_line_height || '22px',
-    textAlign: text_text_align || 'left',
-    color: text_color || '#bdc9c8',
+    fontSize: text_font_size ? `${text_font_size}px` : "16px",
+    fontFamily: text_font_family || "Open Sans",
+    fontWeight: text_font_weight || "400",
+    lineHeight: text_line_height || "22px",
+    textAlign: text_text_align || "left",
+    color: text_color || "#bdc9c8",
   };
 
   // Update internal state when controlled checked prop changes
@@ -88,19 +98,19 @@ const CheckBox = ({
 
   const handleChange = (e) => {
     const newChecked = e?.target?.checked;
-    
+
     // Only update internal state if not controlled
     if (checked === undefined) {
       setIsChecked(newChecked);
     }
-    
-    if (typeof onChange === 'function') {
+
+    if (typeof onChange === "function") {
       onChange(e);
     }
   };
 
   const handleKeyDown = (e) => {
-    if (e?.key === ' ' || e?.key === 'Enter') {
+    if (e?.key === " " || e?.key === "Enter") {
       e?.preventDefault();
       if (!disabled) {
         const syntheticEvent = {
@@ -116,10 +126,10 @@ const CheckBox = ({
     <label
       className={twMerge(
         checkboxClasses({ variant, size }),
-        hasValidGap ? `gap-[${layout_gap}]` : 'gap-3',
+        hasValidGap ? `gap-[${layout_gap}]` : "gap-3",
         optionalClasses,
-        disabled && 'opacity-50 cursor-not-allowed',
-        className
+        disabled && "opacity-50 cursor-not-allowed",
+        className,
       )}
       onKeyDown={handleKeyDown}
       tabIndex={disabled ? -1 : 0}
@@ -135,17 +145,18 @@ const CheckBox = ({
           disabled={disabled}
           required={required}
           className="sr-only peer"
-          aria-invalid={error ? 'true' : 'false'}
+          aria-invalid={error ? "true" : "false"}
           {...props}
         />
         <div
           className={twMerge(
-            'w-5 h-5 border-2 rounded transition-all duration-200 flex items-center justify-center',
-            'peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-primary-teal-light',
+            "w-5 h-5 border-2 rounded transition-all duration-200 flex items-center justify-center",
+            "peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-primary-teal-light",
             isChecked
-              ? 'bg-primary-teal border-primary-teal' :'bg-transparent border-border-primary',
-            error && 'border-red-500',
-            disabled && 'cursor-not-allowed'
+              ? "bg-primary-teal border-primary-teal"
+              : "bg-transparent border-border-primary",
+            error && "border-red-500",
+            disabled && "cursor-not-allowed",
           )}
         >
           {isChecked && (

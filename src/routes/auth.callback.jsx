@@ -1,14 +1,18 @@
-import { createFileRoute, useNavigate, useSearch } from '@tanstack/react-router';
-import { useEffect } from 'react';
-import { useAuthStore } from '../features/users/store/auth.store';
+import {
+  createFileRoute,
+  useNavigate,
+  useSearch,
+} from "@tanstack/react-router";
+import { useEffect } from "react";
+import { useAuthStore } from "../features/users/store/auth.store";
 
-export const Route = createFileRoute('/auth/callback')({
+export const Route = createFileRoute("/auth/callback")({
   component: AuthCallbackPage,
 });
 
 function AuthCallbackPage() {
   const navigate = useNavigate();
-  const search = useSearch({ from: '/auth/callback' });
+  const search = useSearch({ from: "/auth/callback" });
   const { setAuth } = useAuthStore();
 
   useEffect(() => {
@@ -17,11 +21,11 @@ function AuthCallbackPage() {
 
     if (accessToken) {
       // Store tokens and set auth state
-      setAuth(accessToken, refreshToken || '', null); // User info could be fetched next or decoded from JWT
-      navigate({ to: '/' });
+      setAuth(accessToken, refreshToken || "", null); // User info could be fetched next or decoded from JWT
+      navigate({ to: "/" });
     } else {
       // Failed or no token
-      navigate({ to: '/login' });
+      navigate({ to: "/login" });
     }
   }, [search, navigate, setAuth]);
 
