@@ -1,6 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createFileRoute } from "@tanstack/react-router";
-import React from "react";
 import { useTheme } from "../../contexts/ThemeContext";
 import Header from "../../components/layout/Header";
 

@@ -140,17 +140,17 @@ const RegistrationPage = () => {
         <div className="absolute inset-0 pointer-events-none z-0">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#00daf8] rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
-            <div className="absolute w-1 h-1 bg-[#feb700] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-1.5 h-1.5 bg-primary-fixed-dim rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
+            <div className="absolute w-1 h-1 bg-secondary rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
             <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
             
-            <div className="absolute w-1 h-1 bg-[#00daf8] rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-1 h-1 bg-primary-fixed-dim rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
             <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#00daf8] rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
+            <div className="absolute w-1.5 h-1.5 bg-primary-fixed-dim rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
             <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
             
-            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-[#00daf8] to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
-            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#feb700] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
+            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-primary-fixed-dim to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
+            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-secondary to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
           </div>
           <div className="absolute inset-0 digital-grid opacity-20"></div>
         </div>
