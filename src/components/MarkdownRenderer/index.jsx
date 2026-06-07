@@ -3,6 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
+import CodeRunnerBlock from '../CodeRunnerBlock';
 
 /**
  * MarkdownRenderer
@@ -125,10 +126,18 @@ const MarkdownRenderer = ({ content }) => {
 
           // ── Inline Code ───────────────────────────────────
           code: ({ inline, className, children, ...props }) => {
-            const match = /language-(\w+)/.exec(className || '');
-            const language = match ? match[1] : '';
+            const language = className ? className.replace('language-', '').trim() : '';
+            console.log('MARKDOWN CODE BLOCK:', { className, language });
 
             if (!inline && language) {
+              if (language === 'python-run') {
+                return (
+                  <CodeRunnerBlock 
+                    initialCode={String(children).replace(/\n$/, '')} 
+                  />
+                );
+              }
+
               return (
                 <div style={{ marginBottom: '24px', marginTop: '16px' }}>
                   <SyntaxHighlighter

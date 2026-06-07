@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
+import CodeRunnerBlock from '../../../components/CodeRunnerBlock';
 import { courseApi } from '../api/course.api';
 import LessonQuiz from '../../quizzes/components/LessonQuiz';
 
@@ -82,17 +83,30 @@ const LessonDetailPage = () => {
             remarkPlugins={[remarkGfm]}
             components={{
               code({ node, inline, className, children, ...props }) {
-                const match = /language-(\w+)/.exec(className || '');
-                return !inline && match ? (
-                  <SyntaxHighlighter
-                    {...props}
-                    children={String(children).replace(/\n$/, '')}
-                    style={atomDark}
-                    language={match[1]}
-                    PreTag="div"
-                    className="rounded-xl my-6 border border-white/10 !bg-[#121c25]"
-                  />
-                ) : (
+                const language = className ? className.replace('language-', '').trim() : '';
+                
+                if (!inline && language) {
+                  if (language === 'python-run') {
+                    return (
+                      <CodeRunnerBlock 
+                        initialCode={String(children).replace(/\n$/, '')} 
+                      />
+                    );
+                  }
+                  
+                  return (
+                    <SyntaxHighlighter
+                      {...props}
+                      children={String(children).replace(/\n$/, '')}
+                      style={atomDark}
+                      language={language}
+                      PreTag="div"
+                      className="rounded-xl my-6 border border-white/10 !bg-[#121c25]"
+                    />
+                  );
+                }
+                
+                return (
                   <code {...props} className={`${className} bg-surface-container-high text-primary-fixed px-1.5 py-0.5 rounded font-code-md text-[13px]`}>
                     {children}
                   </code>
