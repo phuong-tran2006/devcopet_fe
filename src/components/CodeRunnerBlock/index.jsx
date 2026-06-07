@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   const [code, setCode] = useState(initialCode || '');
-  const [output, setOutput] = useState('Click Run to execute...');
-  const [status, setStatus] = useState('ready'); // ready | loading | running | done | error
+  const [output, setOutput] = useState('Loading Python Engine...');
+  const [status, setStatus] = useState('loading'); // loading | ready | running | done | error | timeout
   
   const workerRef = useRef(null);
   const timeoutRef = useRef(null);
@@ -22,14 +22,33 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
     };
   }, []);
 
-  const initWorker = () => {
+  const initWorker = (isRestart = false) => {
     if (workerRef.current) {
       workerRef.current.terminate();
     }
     workerRef.current = new Worker('/pyodide-worker.js');
+    setStatus('loading');
+    
+    if (!isRestart) {
+      setOutput('Loading Python Engine...');
+    }
     
     workerRef.current.onmessage = (event) => {
-      const { id, output: runOutput, error } = event.data;
+      const data = event.data;
+      
+      if (data.type === 'ready') {
+        setStatus('ready');
+        // Only set "Ready!" text if it's the first load (not a timeout recovery)
+        setOutput(prev => {
+          if (prev === 'Loading Python Engine...' || prev === 'Running...') {
+            return 'Ready! Click Run to execute...';
+          }
+          return prev;
+        });
+        return;
+      }
+
+      const { id, output: runOutput, error } = data;
       
       // Ensure we only process the result of the current run
       if (id !== currentRunId.current) return;
@@ -49,7 +68,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   };
 
   const handleRun = () => {
-    if (status === 'running') return;
+    if (status === 'running' || status === 'loading') return;
     
     if (code.length > 10240) { // 10KB limit
       setOutput('Error: Code length exceeds the 10KB limit.');
@@ -72,17 +91,17 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
         workerRef.current.terminate();
       }
       setOutput('Execution timed out.');
-      setStatus('error');
+      setStatus('timeout');
       
       // Re-initialize the worker for future runs
-      initWorker();
+      initWorker(true);
     }, 5000);
   };
 
   const handleReset = () => {
-    if (status === 'running') return; // Do not allow reset while running
+    if (status === 'running' || status === 'loading') return; // Do not allow reset while running
     setCode(initialCode || '');
-    setOutput('Click Run to execute...');
+    setOutput('Ready! Click Run to execute...');
     setStatus('ready');
   };
 
@@ -115,7 +134,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
         <div className="flex items-center gap-3">
           <button
             onClick={handleReset}
-            disabled={status === 'running'}
+            disabled={status === 'running' || status === 'loading'}
             className="text-[12px] font-bold text-on-surface-variant hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[16px]">refresh</span>
@@ -124,15 +143,15 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           
           <button
             onClick={handleRun}
-            disabled={status === 'running'}
+            disabled={status === 'running' || status === 'loading'}
             className="flex items-center gap-1 bg-primary-fixed-dim hover:bg-primary-fixed text-on-primary-fixed text-[13px] font-bold px-4 py-1.5 rounded-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {status === 'running' ? (
+            {status === 'running' || status === 'loading' ? (
               <div className="w-3.5 h-3.5 border-2 border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
             ) : (
               <span className="material-symbols-outlined text-[16px]">play_arrow</span>
             )}
-            RUN
+            {status === 'loading' ? 'LOADING...' : 'RUN'}
           </button>
         </div>
       </div>
@@ -155,7 +174,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           Output
         </div>
         <pre className={`font-mono text-[13.5px] leading-relaxed whitespace-pre-wrap ${
-          status === 'error' ? 'text-[#F87171]' : status === 'done' ? 'text-[#10B981]' : 'text-[#94A3B8]'
+          output.includes('timed out') ? 'text-[#FBBF24]' : status === 'error' ? 'text-[#F87171]' : status === 'done' ? 'text-[#10B981]' : 'text-[#94A3B8]'
         }`}>
           {output}
         </pre>

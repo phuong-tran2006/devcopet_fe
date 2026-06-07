@@ -5,6 +5,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import CodeRunnerBlock from '../../../components/CodeRunnerBlock';
+import CourseSidebar from '../components/CourseSidebar';
 import { courseApi } from '../api/course.api';
 import LessonQuiz from '../../quizzes/components/LessonQuiz';
 
@@ -50,51 +51,65 @@ const LessonDetailPage = () => {
   }
 
   return (
-    <main className="w-full relative pb-20 px-4 md:px-10 lg:px-16 bg-surface min-h-screen">
-      <div className="max-w-[1200px] mx-auto pt-8 flex flex-col lg:flex-row gap-10">
-        
-        {/* Left Sidebar Dashboard */}
-        <aside className="w-full lg:w-[320px] shrink-0 flex flex-col gap-6">
-          {/* Back navigation */}
+    <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-80px)] bg-surface overflow-hidden">
+      
+      {/* Cột trái: Sidebar (Danh sách bài học) */}
+      {lesson && lesson.courseId && (
+        <CourseSidebar courseId={lesson.courseId} currentLessonId={lesson._id} />
+      )}
+
+      {/* Cột phải: Nội dung bài học */}
+      <main className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar">
+        {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
+        <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-[#1e293b] pb-4">
+          <button className="flex items-center gap-2 text-on-surface-variant hover:text-white">
+            <span className="material-symbols-outlined text-[20px]">menu_open</span>
+            <span className="font-label-sm tracking-widest text-[11px] uppercase">Danh sách bài học</span>
+          </button>
+          <span className="font-label-sm text-primary-fixed-dim tracking-widest text-[10px] uppercase border border-primary-fixed-dim/30 px-2 py-1 rounded bg-primary-fixed-dim/10">Bài 2</span>
+        </div>
+
+        <div className="max-w-[900px] mx-auto lg:pt-10">
+          
+          {/* Back navigation (chỉ hiện trên Mobile, vì Desktop có nút ở Sidebar) */}
           <button 
             onClick={() => window.history.back()}
-            className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest w-fit"
+            className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
           >
             <span className="material-symbols-outlined text-[16px]">arrow_back</span>
             Back to Modules
           </button>
 
-          <div className="sticky top-24 bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 shadow-lg flex flex-col gap-5">
-            <div className="p-4 bg-primary-fixed-dim/10 rounded-xl w-fit">
+          {/* Current Lesson Dashboard Info */}
+          <div className="bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-lg">
+            <div className="p-4 bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
               <span className="material-symbols-outlined text-4xl text-primary-fixed-dim">
-                import_contacts
+                play_lesson
               </span>
             </div>
-            
-            <div>
+            <div className="flex-1">
               <div className="text-[12px] font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">
                 Currently Learning
               </div>
-              <h2 className="font-headline-sm text-on-surface text-[22px] font-bold leading-tight mb-2">
+              <h2 className="font-headline-sm text-on-surface text-[20px] mb-2 font-bold">
                 {lesson.title}
               </h2>
+              <p className="text-on-surface-variant text-[14px] line-clamp-2">
+                {lesson.description || "Review the concepts from this lesson before taking the quiz. Make sure you understand the core logic!"}
+              </p>
             </div>
-
-            <div className="flex flex-col gap-3 pt-4 border-t border-outline/20">
-              <div className="flex items-center gap-3 text-[14px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[20px] text-[#4ade80]">military_tech</span>
-                XP Reward: <span className="text-on-surface">{lesson.points || 100}</span>
+            <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
+              <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px] text-[#4ade80]">military_tech</span>
+                XP Reward: {lesson.points || 100}
               </div>
-              <div className="flex items-center gap-3 text-[14px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[20px] text-[#f87171]">local_fire_department</span>
-                Difficulty: <span className="text-on-surface capitalize">{lesson.difficulty || 'Normal'}</span>
+              <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px] text-[#f87171]">local_fire_department</span>
+                Difficulty: <span className="capitalize">{lesson.difficulty || 'Normal'}</span>
               </div>
             </div>
           </div>
-        </aside>
 
-        {/* Right Main Content */}
-        <div className="flex-1 min-w-0">
           {/* Lesson Header */}
           <header className="mb-10 pb-8 border-b border-outline/20">
             <div className="inline-block px-3 py-1 bg-primary-fixed-dim/10 text-primary-fixed-dim border border-primary-fixed-dim/20 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">
@@ -103,11 +118,6 @@ const LessonDetailPage = () => {
             <h1 className="font-headline-lg text-[32px] md:text-[42px] font-bold text-on-surface leading-tight mb-4">
               {lesson.title}
             </h1>
-            {lesson.description && (
-              <p className="font-body-lg text-on-surface-variant text-[16px] md:text-[18px]">
-                {lesson.description}
-              </p>
-            )}
           </header>
 
           {/* Markdown Content */}
@@ -154,9 +164,8 @@ const LessonDetailPage = () => {
           {/* Quiz Section */}
           <LessonQuiz lessonId={lesson._id} />
         </div>
-
-      </div>
-    </main>
+      </main>
+    </div>
   );
 };
 

@@ -6,6 +6,7 @@ async function loadPyodideAndPackages() {
   self.pyodide = await loadPyodide({
     indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/",
   });
+  self.postMessage({ type: 'ready' });
 }
 
 pyodideReadyPromise = loadPyodideAndPackages();
