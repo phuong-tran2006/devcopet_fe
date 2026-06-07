@@ -48,7 +48,7 @@ const StatusBadge = ({ status }) => {
     },
     locked: {
       label: 'LOCKED',
-      color: 'text-on-surface-variant/30',
+      color: 'text-on-surface-variant/60',
       barColor: 'bg-transparent',
     },
   };
@@ -91,14 +91,14 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
     mastered: 'border-primary-fixed-dim/40 hover:border-primary-fixed-dim/70',
     in_progress: 'border-secondary-fixed-dim/40 hover:border-secondary-fixed-dim/70',
     unlocked: 'border-[#1e293b] hover:border-[#2a3a4d]',
-    locked: 'border-transparent',
+    locked: 'border-[#1e293b]/50',
   };
 
   const iconColor = {
     mastered: 'text-primary-fixed-dim',
     in_progress: 'text-secondary-fixed-dim',
     unlocked: 'text-on-surface-variant/50',
-    locked: 'text-on-surface-variant/25',
+    locked: 'text-on-surface-variant/70',
   };
 
   const Wrapper = isClickable ? Link : 'div';
@@ -111,7 +111,7 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
       {...wrapperProps}
       className={`flex items-center justify-between px-6 py-5 rounded-xl border transition-all duration-300 group
         ${borderColor[status]}
-        ${isClickable ? 'cursor-pointer bg-[#121c25]/60 hover:bg-[#1b2532]/80' : 'cursor-default bg-transparent opacity-40'}
+        ${isClickable ? 'cursor-pointer bg-[#121c25]/60 hover:bg-[#1b2532]/80' : 'cursor-default bg-[#121c25]/40'}
       `}
     >
       <div className="flex items-center gap-4">
@@ -125,11 +125,11 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
           </span>
         </div>
         <div>
-          <h4 className={`font-body-md text-[15px] font-semibold ${isClickable ? 'text-white group-hover:text-primary-fixed' : 'text-on-surface-variant/40'} transition-colors`}>
+          <h4 className={`font-body-md text-[15px] font-semibold ${isClickable ? 'text-white group-hover:text-primary-fixed' : 'text-on-surface-variant/80'} transition-colors`}>
             {lesson.title}
           </h4>
           {lesson.description && (
-            <p className={`font-body-md text-[13px] mt-0.5 ${isClickable ? 'text-on-surface-variant/70' : 'text-on-surface-variant/25'}`}>
+            <p className={`font-body-md text-[13px] mt-0.5 ${isClickable ? 'text-on-surface-variant/70' : 'text-on-surface-variant/60'}`}>
               {lesson.description}
             </p>
           )}
@@ -170,7 +170,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
       <div className="flex items-start gap-4 mb-6">
         <ModuleIcon index={index} isActive={isActive} />
         <div>
-          <h2 className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? 'text-white' : 'text-on-surface-variant/40'}`}>
+          <h2 className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? 'text-white' : 'text-on-surface-variant/60'}`}>
             Module {index + 1}: {chapter.title}
           </h2>
           <div className="flex items-center gap-2 mt-1.5">
@@ -186,12 +186,12 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[14px] text-on-surface-variant/30">lock</span>
-                <span className="font-label-sm text-[11px] text-on-surface-variant/30 tracking-[0.08em]">
+                <span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">lock</span>
+                <span className="font-label-sm text-[11px] text-on-surface-variant/50 tracking-[0.08em]">
                   Locked
                 </span>
-                <span className="text-on-surface-variant/20 text-[11px]">•</span>
-                <span className="font-label-sm text-[11px] text-on-surface-variant/30 tracking-[0.08em]">
+                <span className="text-on-surface-variant/40 text-[11px]">•</span>
+                <span className="font-label-sm text-[11px] text-on-surface-variant/50 tracking-[0.08em]">
                   {getRankLabel()}
                 </span>
               </>

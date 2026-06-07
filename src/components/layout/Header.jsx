@@ -79,7 +79,7 @@ const Header = () => {
                 Login
               </Link>
               <Link to="/register" className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-2 px-6 rounded-lg glow-cyan hover:bg-primary-container transition-all duration-300 ease-out-cubic active:scale-95">
-                Initialize
+                Sign Up
               </Link>
             </>
           )}
