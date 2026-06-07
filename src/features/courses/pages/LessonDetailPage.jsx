@@ -5,6 +5,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import remarkGfm from 'remark-gfm';
 import CodeRunnerBlock from '../../../components/CodeRunnerBlock';
+import CourseSidebar from '../components/CourseSidebar';
 import { courseApi } from '../api/course.api';
 import LessonQuiz from '../../quizzes/components/LessonQuiz';
 
@@ -50,17 +51,34 @@ const LessonDetailPage = () => {
   }
 
   return (
-    <main className="w-full relative pb-20 px-4 md:px-10 lg:px-16 bg-surface">
-      <div className="max-w-[800px] mx-auto pt-8">
-        
-        {/* Back navigation */}
-        <button 
-          onClick={() => window.history.back()}
-          className="inline-flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
-        >
-          <span className="material-symbols-outlined text-[16px]">arrow_back</span>
-          Back to Modules
-        </button>
+    <div className="flex flex-col lg:flex-row w-full h-[calc(100vh-80px)] bg-surface overflow-hidden">
+      
+      {/* Cột trái: Sidebar (Danh sách bài học) */}
+      {lesson && lesson.courseId && (
+        <CourseSidebar courseId={lesson.courseId} currentLessonId={lesson._id} />
+      )}
+
+      {/* Cột phải: Nội dung bài học */}
+      <main className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar">
+        {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
+        <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-[#1e293b] pb-4">
+          <button className="flex items-center gap-2 text-on-surface-variant hover:text-white">
+            <span className="material-symbols-outlined text-[20px]">menu_open</span>
+            <span className="font-label-sm tracking-widest text-[11px] uppercase">Danh sách bài học</span>
+          </button>
+          <span className="font-label-sm text-primary-fixed-dim tracking-widest text-[10px] uppercase border border-primary-fixed-dim/30 px-2 py-1 rounded bg-primary-fixed-dim/10">Bài 2</span>
+        </div>
+
+        <div className="max-w-[800px] mx-auto lg:pt-10">
+          
+          {/* Back navigation (chỉ hiện trên Mobile, vì Desktop có nút ở Sidebar) */}
+          <button 
+            onClick={() => window.history.back()}
+            className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            Back to Modules
+          </button>
 
         {/* Lesson Header */}
         <header className="mb-10 pb-8 border-b border-white/10">
@@ -121,8 +139,9 @@ const LessonDetailPage = () => {
         {/* Quiz Section */}
         <LessonQuiz lessonId={lesson._id} />
 
-      </div>
-    </main>
+        </div>
+      </main>
+    </div>
   );
 };
 
