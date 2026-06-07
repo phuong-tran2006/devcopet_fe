@@ -73,7 +73,7 @@ const LandingPage = () => {
               <span className="material-symbols-outlined text-[18px] text-primary-fixed-dim" style={{fontVariationSettings: "'FILL' 1"}}>terminal</span>
               <span className="font-label-sm text-label-sm text-primary-fixed-dim uppercase tracking-widest">SYSTEM ONLINE: V2.4.0</span>
             </div>
-            <h1 className="font-headline-lg text-headline-lg md:text-[84px] leading-tight font-extrabold tracking-tight text-white">
+            <h1 className="font-headline-lg text-headline-lg md:text-[84px] leading-tight font-extrabold tracking-tight text-on-surface">
               Explore the Depths of <br/>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim via-cyan-300 to-secondary-fixed-dim">Coding</span>
             </h1>
@@ -84,7 +84,7 @@ const LandingPage = () => {
               <button className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-4 px-10 rounded-lg text-[18px] glow-cyan hover:scale-105 transition-all duration-300 ease-out-cubic active:scale-95">
                 Get Started Now
               </button>
-              <button className="border border-white/20 hover:border-white/40 backdrop-blur-md text-white font-bold py-4 px-10 rounded-lg text-[18px] transition-all duration-300 ease-out-cubic active:scale-95">
+              <button className="border border-outline/20 hover:border-outline/40 backdrop-blur-md text-on-surface font-bold py-4 px-10 rounded-lg text-[18px] transition-all duration-300 ease-out-cubic active:scale-95">
                 View Roadmap
               </button>
             </div>
@@ -98,7 +98,7 @@ const LandingPage = () => {
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                 <span className="material-symbols-outlined text-3xl">psychology</span>
               </div>
-              <h3 className="font-headline-sm text-headline-sm mb-4 text-white">Personalized Roadmap</h3>
+              <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">Personalized Roadmap</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Our AI system analyzes your skills and suggests an optimized learning path tailored to your learning pace.</p>
             </div>
             
@@ -106,7 +106,7 @@ const LandingPage = () => {
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                 <span className="material-symbols-outlined text-3xl">groups</span>
               </div>
-              <h3 className="font-headline-sm text-headline-sm mb-4 text-white">Mentor Community</h3>
+              <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">Mentor Community</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Connect directly with experts from leading tech corporations to receive 1:1 personalized feedback.</p>
             </div>
             
@@ -114,7 +114,7 @@ const LandingPage = () => {
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                 <span className="material-symbols-outlined text-3xl">code_blocks</span>
               </div>
-              <h3 className="font-headline-sm text-headline-sm mb-4 text-white">Real-world Projects</h3>
+              <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">Real-world Projects</h3>
               <p className="font-body-md text-body-md text-on-surface-variant">Learn by building actual products. Solve complex technical problems within a professional terminal environment.</p>
             </div>
           </div>
@@ -123,7 +123,7 @@ const LandingPage = () => {
         {/* Trending Courses */}
         <section className="relative py-24 px-margin-desktop z-10 max-w-container-max mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-headline-lg text-headline-lg md:text-[48px] text-white mb-4">Everything you need to become a developer</h2>
+            <h2 className="font-headline-lg text-headline-lg md:text-[48px] text-on-surface mb-4">Everything you need to become a developer</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {/* Card 1: Interactive Learning */}
@@ -132,7 +132,7 @@ const LandingPage = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                   <span className="material-symbols-outlined text-3xl">extension</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-white">Interactive Learning</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Interactive Learning</h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant mb-6">Hands-on exercises with instant feedback</p>
               <div className="space-y-2">
@@ -151,7 +151,7 @@ const LandingPage = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                   <span className="material-symbols-outlined text-3xl">work</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-white">Real-world Projects</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Real-world Projects</h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">Build portfolio-worthy applications</p>
             </div>
@@ -162,7 +162,7 @@ const LandingPage = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                   <span className="material-symbols-outlined text-3xl">forum</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-white">Community Support</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Community Support</h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">Join thousands of learners and mentors</p>
             </div>
@@ -173,7 +173,7 @@ const LandingPage = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                   <span className="material-symbols-outlined text-3xl">auto_awesome</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-white">AI Assistance</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">AI Assistance</h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">Get help from our AI-powered coding assistant</p>
             </div>
@@ -184,7 +184,7 @@ const LandingPage = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                   <span className="material-symbols-outlined text-3xl">verified</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-white">Certificate</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Certificate</h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">Earn verified certificates upon completion</p>
             </div>
@@ -195,7 +195,7 @@ const LandingPage = () => {
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                   <span className="material-symbols-outlined text-3xl">apartment</span>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-white">Career Path</h3>
+                <h3 className="font-headline-sm text-headline-sm text-on-surface">Career Path</h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">Follow structured learning paths from beginner to professional developer</p>
             </div>
@@ -206,7 +206,7 @@ const LandingPage = () => {
         <section className="relative py-24 px-margin-desktop z-10 max-w-container-max mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <h2 className="font-headline-lg text-headline-lg text-white">Join the Colony</h2>
+              <h2 className="font-headline-lg text-headline-lg text-on-surface">Join the Colony</h2>
               <p className="font-body-lg text-body-lg text-on-surface-variant max-w-md">Learning to code shouldn't be a solo mission. Devcopet is built by a global team of developers, educators, and gamers who believe the best way to learn is together.</p>
               <div className="flex flex-wrap gap-4">
                 <a className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all" href="#">
@@ -224,48 +224,48 @@ const LandingPage = () => {
               </div>
             </div>
             
-            <div ref={addToRefs} className="bg-surface/40 backdrop-blur-xl border border-white/20 rounded-xl p-8 spinning-border-card">
-              <h3 className="font-headline-sm text-headline-sm text-white mb-8">Our Core Team</h3>
+            <div ref={addToRefs} className="bg-surface/40 backdrop-blur-xl border border-outline/20 rounded-xl p-8 spinning-border-card">
+              <h3 className="font-headline-sm text-headline-sm text-on-surface mb-8">Our Core Team</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-primary-fixed-dim/30 flex items-center justify-center text-primary-fixed-dim font-bold">N</div>
                   <div>
-                    <div className="text-white font-bold">Hoàng Nhân</div>
+                    <div className="text-on-surface font-bold">Hoàng Nhân</div>
                     <div className="text-label-sm text-on-surface-variant uppercase tracking-widest">Backend</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-secondary-container/30 flex items-center justify-center text-secondary-container font-bold">Y</div>
                   <div>
-                    <div className="text-white font-bold">Yến Phương</div>
+                    <div className="text-on-surface font-bold">Yến Phương</div>
                     <div className="text-label-sm text-on-surface-variant uppercase tracking-widest">Frontend</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-primary-fixed-dim/30 flex items-center justify-center text-primary-fixed-dim font-bold">C</div>
                   <div>
-                    <div className="text-white font-bold">Chí Thành</div>
+                    <div className="text-on-surface font-bold">Chí Thành</div>
                     <div className="text-label-sm text-on-surface-variant uppercase tracking-widest">Backend</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-secondary-container/30 flex items-center justify-center text-secondary-container font-bold">T</div>
                   <div>
-                    <div className="text-white font-bold">Tiến Thành</div>
+                    <div className="text-on-surface font-bold">Tiến Thành</div>
                     <div className="text-label-sm text-on-surface-variant uppercase tracking-widest">Frontend</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-primary-fixed-dim/30 flex items-center justify-center text-primary-fixed-dim font-bold">T</div>
                   <div>
-                    <div className="text-white font-bold">Tuấn Kiệt</div>
+                    <div className="text-on-surface font-bold">Tuấn Kiệt</div>
                     <div className="text-label-sm text-on-surface-variant uppercase tracking-widest">Backend</div>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full border border-primary-container/30 flex items-center justify-center text-primary-container font-bold">Đ</div>
                   <div>
-                    <div className="text-white font-bold">Đức Tường</div>
+                    <div className="text-on-surface font-bold">Đức Tường</div>
                     <div className="text-label-sm text-on-surface-variant uppercase tracking-widest">Mentor</div>
                   </div>
                 </div>

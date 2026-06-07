@@ -5,6 +5,7 @@ import { courseApi } from '../api/course.api';
 const QuizPage = () => {
   const { lessonId } = useParams({ strict: false });
   const [quizData, setQuizData] = useState(null);
+  const [lessonData, setLessonData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [answers, setAnswers] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -13,15 +14,14 @@ const QuizPage = () => {
   useEffect(() => {
     document.title = 'Quiz - Devcopet';
     if (lessonId) {
-      courseApi.getLessonQuiz(lessonId)
-        .then(data => {
-          // data could be { questions: [...] } or an array of questions directly
-          const questions = Array.isArray(data) ? data : data.questions || [];
-          setQuizData({ ...data, questions });
-        })
-        .catch(err => {
-          console.error(err);
-          setQuizData({ questions: [] }); // Fallback on error
+      Promise.all([
+        courseApi.getLessonQuiz(lessonId).catch(err => ({ questions: [] })),
+        courseApi.getLessonDetail(lessonId).catch(err => null)
+      ])
+        .then(([quizRes, lessonRes]) => {
+          const questions = Array.isArray(quizRes) ? quizRes : quizRes.questions || [];
+          setQuizData({ ...quizRes, questions });
+          setLessonData(lessonRes);
         })
         .finally(() => setLoading(false));
     }
@@ -72,9 +72,9 @@ const QuizPage = () => {
   if (questions.length === 0) {
     return (
       <main className="w-full min-h-screen relative flex items-center justify-center bg-surface px-4">
-        <div className="bg-[#121c25] rounded-xl border border-white/10 p-10 text-center max-w-md w-full shadow-2xl">
+        <div className="bg-surface-variant/20 rounded-xl border border-outline/20 p-10 text-center max-w-md w-full shadow-2xl">
           <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">quiz</span>
-          <h2 className="font-headline-md text-white mb-2">No Quiz Found</h2>
+          <h2 className="font-headline-md text-on-surface mb-2">No Quiz Found</h2>
           <p className="text-on-surface-variant text-[14px] mb-6">There are no questions available for this lesson.</p>
           <Link 
             to="/lesson/$lessonId"
@@ -93,17 +93,17 @@ const QuizPage = () => {
       <div className="max-w-[800px] mx-auto pt-8">
         
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4 border-b border-white/10 pb-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
           <div>
             <Link 
               to="/lesson/$lessonId"
               params={{ lessonId }}
-              className="inline-flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors text-[13px] font-bold mb-4 uppercase tracking-widest"
+              className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold mb-4 uppercase tracking-widest"
             >
               <span className="material-symbols-outlined text-[16px]">arrow_back</span>
               Back to Lesson
             </Link>
-            <h1 className="font-headline-lg text-[28px] font-bold text-white">Lesson Quiz</h1>
+            <h1 className="font-headline-lg text-[28px] font-bold text-on-surface">Lesson Quiz</h1>
             <p className="text-on-surface-variant text-[14px] mt-1">Answer {questions.length} questions to complete this lesson.</p>
           </div>
           
@@ -115,6 +115,38 @@ const QuizPage = () => {
           )}
         </div>
 
+        {/* Current Lesson Dashboard */}
+        {lessonData && (
+          <div className="bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-lg">
+            <div className="p-4 bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
+              <span className="material-symbols-outlined text-4xl text-primary-fixed-dim">
+                play_lesson
+              </span>
+            </div>
+            <div className="flex-1">
+              <div className="text-[12px] font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">
+                Currently Learning
+              </div>
+              <h2 className="font-headline-md text-on-surface text-[20px] mb-2">
+                {lessonData.title || "Lesson"}
+              </h2>
+              <p className="text-on-surface-variant text-[14px] line-clamp-2">
+                {lessonData.description || "Review the concepts from this lesson before taking the quiz. Make sure you understand the core logic!"}
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
+              <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px] text-[#4ade80]">military_tech</span>
+                XP Reward: {lessonData.points || 100}
+              </div>
+              <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
+                <span className="material-symbols-outlined text-[18px] text-[#f87171]">local_fire_department</span>
+                Difficulty: {lessonData.difficulty || 'Normal'}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Questions List */}
         <div className="flex flex-col gap-8">
           {questions.map((q, index) => {
@@ -124,8 +156,8 @@ const QuizPage = () => {
             const getIsCorrect = (opt) => opt._id === q.correctOptionId || opt.id === q.correctOptionId || opt.isCorrect;
             
             return (
-              <div key={qId} className="bg-[#121c25] rounded-xl border border-white/5 p-6 shadow-lg">
-                <h3 className="font-headline-sm text-white text-[16px] mb-4">
+              <div key={qId} className="bg-surface-variant/20 rounded-xl border border-outline/10 p-6 shadow-lg">
+                <h3 className="font-headline-sm text-on-surface text-[16px] mb-4">
                   <span className="text-primary-fixed-dim mr-2">{index + 1}.</span> 
                   {q.question || q.text}
                 </h3>
@@ -136,10 +168,10 @@ const QuizPage = () => {
                     const isSelected = answers[qId] === optId;
                     const isCorrectOption = getIsCorrect(opt);
                     
-                    let optionStyle = "border-white/10 bg-surface/40 hover:bg-surface/80 text-on-surface-variant hover:text-white";
+                    let optionStyle = "border-outline/20 bg-surface/40 hover:bg-surface/80 text-on-surface-variant hover:text-on-surface";
                     
                     if (isSelected) {
-                      optionStyle = "border-primary-fixed-dim/50 bg-primary-fixed-dim/10 text-white";
+                      optionStyle = "border-primary-fixed-dim/50 bg-primary-fixed-dim/10 text-on-surface";
                     }
 
                     if (submitted) {
@@ -148,7 +180,7 @@ const QuizPage = () => {
                       } else if (isSelected && !isCorrectOption) {
                         optionStyle = "border-[#f87171]/50 bg-[#f87171]/10 text-[#f87171]";
                       } else {
-                        optionStyle = "border-white/5 bg-surface/20 text-on-surface-variant opacity-50";
+                        optionStyle = "border-outline/10 bg-surface/20 text-on-surface-variant opacity-50";
                       }
                     }
 
@@ -173,7 +205,7 @@ const QuizPage = () => {
 
                 {submitted && q.explanation && (
                   <div className="mt-4 p-4 rounded-lg bg-surface/40 border-l-4 border-primary-fixed-dim text-[14px] text-on-surface-variant">
-                    <span className="font-bold text-white block mb-1">Explanation:</span>
+                    <span className="font-bold text-on-surface block mb-1">Explanation:</span>
                     {q.explanation}
                   </div>
                 )}
@@ -199,7 +231,7 @@ const QuizPage = () => {
           <div className="mt-10 flex justify-center">
             <Link
               to="/course"
-              className="bg-surface-container text-white border border-white/20 font-bold px-10 py-3.5 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2"
+              className="bg-surface-container text-on-surface border border-outline/20 font-bold px-10 py-3.5 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2"
             >
               Back to Course Map
             </Link>

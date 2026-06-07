@@ -123,7 +123,7 @@ const LessonQuiz = ({ lessonId }) => {
           )}
         </div>
 
-        <h3 className="font-body-md text-white text-[16px] font-semibold mb-5 leading-relaxed">
+        <h3 className="font-body-md text-on-surface text-[16px] font-semibold mb-5 leading-relaxed">
           {q.question}
         </h3>
 
@@ -133,7 +133,7 @@ const LessonQuiz = ({ lessonId }) => {
               style={atomDark}
               language="python"
               PreTag="div"
-              className="rounded-xl border border-white/10 !bg-[#0b1118] !text-[14px]"
+              className="rounded-xl border border-outline/20 !bg-[#0b1118] !text-[14px]"
             >
               {q.codeSnippet}
             </SyntaxHighlighter>
@@ -147,11 +147,11 @@ const LessonQuiz = ({ lessonId }) => {
             const isCorrectOption = isReviewMode && qResult?.correctOptionIds?.includes(opt.id);
             const isWrongSelected = isReviewMode && isSelected && !isCorrectOption;
 
-            let style = 'border-white/10 bg-surface/40 hover:bg-white/5 text-on-surface-variant hover:text-white cursor-pointer';
+            let style = 'border-outline/20 bg-surface/40 hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface cursor-pointer';
 
             if (!isReviewMode) {
               if (isSelected) {
-                style = 'border-primary-fixed-dim/60 bg-primary-fixed-dim/10 text-white cursor-pointer shadow-[0_0_10px_rgba(0,218,248,0.15)]';
+                style = 'border-primary-fixed-dim/60 bg-primary-fixed-dim/10 text-on-surface cursor-pointer shadow-[0_0_10px_rgba(0,218,248,0.15)]';
               }
             } else {
               if (isCorrectOption) {
@@ -178,10 +178,10 @@ const LessonQuiz = ({ lessonId }) => {
                           ? 'border-[#4ade80] text-[#4ade80]'
                           : isWrongSelected
                           ? 'border-[#f87171] text-[#f87171]'
-                          : 'border-white/20 text-white/30'
+                          : 'border-outline/20 text-on-surface/30'
                         : isSelected
                         ? 'border-primary-fixed-dim text-primary-fixed-dim bg-primary-fixed-dim/10'
-                        : 'border-white/20 text-white/40'
+                        : 'border-outline/20 text-on-surface/40'
                     }`}
                   >
                     {opt.id}
@@ -222,7 +222,7 @@ const LessonQuiz = ({ lessonId }) => {
             </div>
 
             {qResult.explanation && (
-              <div className="p-6 rounded-xl bg-[#0b1118]/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-white shadow-inner">
+              <div className="p-6 rounded-xl bg-[#0b1118]/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
                 <span className="font-bold text-primary-fixed-dim block mb-2 text-[12px] uppercase tracking-widest">Explanation</span>
                 {qResult.explanation}
               </div>
@@ -240,7 +240,7 @@ const LessonQuiz = ({ lessonId }) => {
     return (
       <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <h3 className="font-headline-sm text-white mb-2">Ready to test your knowledge?</h3>
+          <h3 className="font-headline-sm text-on-surface mb-2">Ready to test your knowledge?</h3>
           <p className="text-[14px] text-on-surface-variant">Complete the quiz to earn XP and progress to the next lesson.</p>
         </div>
         <button
@@ -261,7 +261,7 @@ const LessonQuiz = ({ lessonId }) => {
     return (
       <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
-          <h3 className="font-headline-sm text-white mb-2">Ready to test your knowledge?</h3>
+          <h3 className="font-headline-sm text-on-surface mb-2">Ready to test your knowledge?</h3>
           <p className="text-[14px] text-on-surface-variant">Complete the quiz to earn XP and progress to the next lesson.</p>
         </div>
         <button
@@ -280,7 +280,7 @@ const LessonQuiz = ({ lessonId }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === 'not_found') {
     return (
-      <div className="bg-[#121c25] rounded-xl p-6 border border-white/10 text-center text-on-surface-variant text-[14px]">
+      <div className="bg-[#121c25] rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
         <span className="material-symbols-outlined text-3xl mb-2 block">quiz</span>
         No quiz is available for this lesson yet.
       </div>
@@ -318,7 +318,7 @@ const LessonQuiz = ({ lessonId }) => {
                 {result.passed ? 'Quiz Passed!' : 'Quiz Failed'}
               </h2>
               <p className="text-on-surface-variant text-[15px]">
-                You scored <span className="font-bold text-white">{result.percentage}%</span> ({result.correctCount}/{result.totalQuestions} correct)
+                You scored <span className="font-bold text-on-surface">{result.percentage}%</span> ({result.correctCount}/{result.totalQuestions} correct)
               </p>
               <p className="text-[13px] text-on-surface-variant mt-1">
                 {result.earnedPoints} / {result.totalPoints} XP points earned
@@ -343,7 +343,7 @@ const LessonQuiz = ({ lessonId }) => {
 
         {/* Review Questions */}
         <div className="flex flex-col gap-6">
-          <h3 className="font-headline-sm text-white text-[20px] mb-2 px-2 border-b border-white/10 pb-4">Quiz Review</h3>
+          <h3 className="font-headline-sm text-on-surface text-[20px] mb-2 px-2 border-b border-outline/20 pb-4">Quiz Review</h3>
           {questions.map((q, idx) => renderQuestionCard(q, idx, true))}
         </div>
       </div>
@@ -365,7 +365,7 @@ const LessonQuiz = ({ lessonId }) => {
       {/* ── Quiz Header (Progress) ── */}
       <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
         <div className="flex items-center justify-between mb-3">
-          <div className="font-headline-sm text-white">{quiz.title || 'Lesson Quiz'}</div>
+          <div className="font-headline-sm text-on-surface">{quiz.title || 'Lesson Quiz'}</div>
           <div className="text-[13px] text-on-surface-variant font-bold">
             Question {currentQuestionIdx + 1} of {questions.length}
           </div>
