@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
@@ -6,13 +6,24 @@ import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
 // ─── States ────────────────────────────────────────────────────────────────
 // idle | loading | active | submitting | finished | not_found
 
-const LessonQuiz = ({ lessonId }) => {
+const LessonQuiz = ({ lessonId, onQuizPassed }) => {
   const [phase, setPhase] = useState("idle");
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
   const [result, setResult] = useState(null);
   const [submitError, setSubmitError] = useState(null);
+  const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+
+  useEffect(() => {
+    setPhase("idle");
+    setQuiz(null);
+    setAnswers({});
+    setResult(null);
+    setSubmitError(null);
+    setReviewQuestionIdx(0);
+    setCurrentQuestionIdx(0);
+  }, [lessonId]);
 
   // ── Start Quiz ─────────────────────────────────────────────────────────
   const handleStart = async () => {
@@ -56,15 +67,21 @@ const LessonQuiz = ({ lessonId }) => {
       setSubmitError(null);
       setPhase("submitting");
 
-      const answersPayload = quiz.questions.map((q) => ({
-        questionIndex: q.index,
-        selectedOptionIds: answers[q.index] ? [answers[q.index]] : [],
+      const answersPayload = quiz.questions.map((q, index) => ({
+        questionIndex: q.index ?? index,
+        selectedOptionIds: answers[q.index ?? index]
+          ? [answers[q.index ?? index]]
+          : [],
         answerText: "",
       }));
 
       try {
         const res = await submitQuiz(quiz._id, answersPayload);
         setResult(res);
+        if (res?.passed) {
+          onQuizPassed?.();
+        }
+        setReviewQuestionIdx(0);
         setPhase("finished");
       } catch (err) {
         const status = err?.response?.status;
@@ -84,12 +101,20 @@ const LessonQuiz = ({ lessonId }) => {
     }
   };
 
+  // ── Previous Question ─────────────────────────────────────────────────────
+  const handlePrevious = () => {
+    if (currentQuestionIdx > 0 && phase === "active") {
+      setCurrentQuestionIdx((prev) => prev - 1);
+    }
+  };
+
   // ── Retake ─────────────────────────────────────────────────────────────
   const handleRetake = () => {
     setAnswers({});
     setResult(null);
     setSubmitError(null);
     setCurrentQuestionIdx(0);
+    setReviewQuestionIdx(0);
     setPhase("active");
   };
 
@@ -101,8 +126,9 @@ const LessonQuiz = ({ lessonId }) => {
   // RENDER HELPERS
   // ══════════════════════════════════════════════════════════════════════
   const renderQuestionCard = (q, index, isReviewMode) => {
-    const qResult = isReviewMode ? getQuestionResult(q.index) : null;
-    const selectedOptionId = answers[q.index];
+    const questionKey = q.index ?? index;
+    const qResult = isReviewMode ? getQuestionResult(questionKey) : null;
+    const selectedOptionId = answers[questionKey];
 
     return (
       <div
@@ -185,7 +211,7 @@ const LessonQuiz = ({ lessonId }) => {
             return (
               <button
                 key={opt.id}
-                onClick={() => handleSelect(q.index, opt.id)}
+                onClick={() => handleSelect(questionKey, opt.id)}
                 disabled={isReviewMode || phase === "submitting"}
                 className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 ${style}`}
               >
@@ -322,11 +348,17 @@ const LessonQuiz = ({ lessonId }) => {
 
   const questions = quiz?.questions || [];
   const isSubmitting = phase === "submitting";
-
   // ══════════════════════════════════════════════════════════════════════
   // PHASE: finished
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "finished" && result) {
+    const reviewQ = questions[reviewQuestionIdx];
+
+    if (!reviewQ) return null;
+
+    const isFirstReviewQuestion = reviewQuestionIdx === 0;
+    const isLastReviewQuestion = reviewQuestionIdx === questions.length - 1;
+
     return (
       <div className="flex flex-col gap-8">
         <div
@@ -350,6 +382,7 @@ const LessonQuiz = ({ lessonId }) => {
                 {result.passed ? "emoji_events" : "replay"}
               </span>
             </div>
+
             <div>
               <h2
                 className={`font-headline-sm text-[24px] font-bold mb-1 ${
@@ -358,6 +391,7 @@ const LessonQuiz = ({ lessonId }) => {
               >
                 {result.passed ? "Quiz Passed!" : "Quiz Failed"}
               </h2>
+
               <p className="text-on-surface-variant text-[15px]">
                 You scored{" "}
                 <span className="font-bold text-on-surface">
@@ -365,6 +399,7 @@ const LessonQuiz = ({ lessonId }) => {
                 </span>{" "}
                 ({result.correctCount}/{result.totalQuestions} correct)
               </p>
+
               <p className="text-[13px] text-on-surface-variant mt-1">
                 {result.earnedPoints} / {result.totalPoints} XP points earned
               </p>
@@ -372,6 +407,7 @@ const LessonQuiz = ({ lessonId }) => {
           </div>
 
           <button
+            type="button"
             onClick={handleRetake}
             className={`flex-shrink-0 font-bold px-8 py-3.5 rounded-xl transition-all flex items-center gap-2 ${
               result.passed
@@ -386,12 +422,85 @@ const LessonQuiz = ({ lessonId }) => {
           </button>
         </div>
 
-        {/* Review Questions */}
+        {/* Review Single Question */}
         <div className="flex flex-col gap-6">
-          <h3 className="font-headline-sm text-on-surface text-[20px] mb-2 px-2 border-b border-outline/20 pb-4">
-            Quiz Review
-          </h3>
-          {questions.map((q, idx) => renderQuestionCard(q, idx, true))}
+          <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-headline-sm text-on-surface text-[20px]">
+                  Quiz Review
+                </h3>
+                <p className="text-[13px] text-on-surface-variant mt-1">
+                  Review your answer, the correct answer, and the explanation.
+                </p>
+              </div>
+
+              <div className="text-[13px] text-on-surface-variant font-bold">
+                Question {reviewQuestionIdx + 1} of {questions.length}
+              </div>
+            </div>
+
+            <div className="w-full h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary-fixed-dim transition-all duration-300"
+                style={{
+                  width: `${((reviewQuestionIdx + 1) / questions.length) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {renderQuestionCard(reviewQ, reviewQuestionIdx, true)}
+
+          <div className="flex items-center justify-between mt-2 gap-4">
+            <button
+              type="button"
+              onClick={() =>
+                setReviewQuestionIdx((prev) => Math.max(prev - 1, 0))
+              }
+              disabled={isFirstReviewQuestion}
+              className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <span className="inline-flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">
+                  arrow_back
+                </span>
+                Previous
+              </span>
+            </button>
+
+            {!isLastReviewQuestion ? (
+              <button
+                type="button"
+                onClick={() => setReviewQuestionIdx((prev) => prev + 1)}
+                className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+              >
+                Next Review
+                <span className="material-symbols-outlined text-[18px]">
+                  arrow_forward
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setPhase("idle");
+                  setQuiz(null);
+                  setAnswers({});
+                  setResult(null);
+                  setSubmitError(null);
+                  setCurrentQuestionIdx(0);
+                  setReviewQuestionIdx(0);
+                }}
+                className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+              >
+                Finish Review
+                <span className="material-symbols-outlined text-[18px]">
+                  check_circle
+                </span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -404,7 +513,8 @@ const LessonQuiz = ({ lessonId }) => {
   if (!currentQ) return null;
 
   const isLastQuestion = currentQuestionIdx === questions.length - 1;
-  const selectedOptionId = answers[currentQ.index];
+  const currentQuestionKey = currentQ.index ?? currentQuestionIdx;
+  const selectedOptionId = answers[currentQuestionKey];
 
   return (
     <div className="flex flex-col gap-6">
@@ -423,7 +533,7 @@ const LessonQuiz = ({ lessonId }) => {
           <div
             className="h-full bg-primary-fixed-dim transition-all duration-300"
             style={{
-              width: `${(currentQuestionIdx / questions.length) * 100}%`,
+              width: `${((currentQuestionIdx + 1) / questions.length) * 100}%`,
             }}
           />
         </div>
@@ -452,8 +562,23 @@ const LessonQuiz = ({ lessonId }) => {
       )}
 
       {/* ── Action Buttons ── */}
-      <div className="flex justify-end mt-2">
+      <div className="flex items-center justify-between mt-2 gap-4">
         <button
+          type="button"
+          onClick={handlePrevious}
+          disabled={currentQuestionIdx === 0 || isSubmitting}
+          className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <span className="inline-flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">
+              arrow_back
+            </span>
+            Previous
+          </span>
+        </button>
+
+        <button
+          type="button"
           onClick={handleNextOrSubmit}
           disabled={!selectedOptionId || isSubmitting}
           className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none flex items-center gap-2"

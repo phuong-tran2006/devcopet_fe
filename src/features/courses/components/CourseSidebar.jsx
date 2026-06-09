@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
+import LessonProgressCircle from "./LessonProgressCircle";
 
-const CourseSidebarChapter = ({ chapter, index, currentLessonId }) => {
+const CourseSidebarChapter = ({
+  chapter,
+  index,
+  currentLessonId,
+  currentLessonProgress = 0,
+  currentLessonCompleted = false,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +39,7 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }) => {
             {index + 1}. {chapter.title}
           </h4>
           <span className="font-label-sm text-[11px] text-on-surface-variant mt-1 tracking-wider uppercase">
-            {lessons.length} Bài học
+            {lessons.length} Lesson
           </span>
         </div>
         <span
@@ -54,6 +61,19 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }) => {
           ) : lessons.length > 0 ? (
             lessons.map((lesson, idx) => {
               const isActive = lesson._id === currentLessonId;
+
+              const progress = isActive
+                ? currentLessonProgress
+                : lesson.progress || 0;
+
+              const isCompleted = isActive
+                ? currentLessonCompleted
+                : lesson.quizPassed || lesson.completed;
+
+              const displayProgress = isCompleted
+                ? 100
+                : Math.min(progress, 95);
+
               return (
                 <Link
                   key={lesson._id}
@@ -65,30 +85,24 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }) => {
                       : "hover:bg-[#121c25] border-l-2 border-transparent"
                   }`}
                 >
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                      isActive
-                        ? "bg-primary-fixed-dim/20 text-primary-fixed-dim"
-                        : "bg-transparent text-on-surface-variant/50 border border-on-surface-variant/30"
-                    }`}
-                  >
-                    {isActive ? (
-                      <span className="material-symbols-outlined text-[14px]">
-                        play_arrow
-                      </span>
-                    ) : (
-                      <span className="material-symbols-outlined text-[14px]">
-                        lock_open
-                      </span> // Mặc định giả lập unlocked
-                    )}
-                  </div>
+                  <LessonProgressCircle
+                    progress={progress}
+                    isActive={isActive}
+                    isCompleted={isCompleted}
+                  />
+
                   <div className="flex flex-col flex-1 min-w-0">
                     <h5
-                      className={`font-body-md text-[13.5px] truncate ${isActive ? "text-primary-fixed-dim font-bold" : "text-on-surface-variant/90"}`}
+                      className={`font-body-md text-[13.5px] truncate ${
+                        isActive
+                          ? "text-primary-fixed-dim font-bold"
+                          : "text-on-surface-variant/90"
+                      }`}
                     >
                       {index + 1}.{idx + 1} {lesson.title}
                     </h5>
                   </div>
+
                   {lesson.estimatedMinutes && (
                     <span className="font-mono text-[11px] text-on-surface-variant/50 shrink-0">
                       {lesson.estimatedMinutes}m
@@ -99,7 +113,7 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }) => {
             })
           ) : (
             <div className="text-on-surface-variant/40 font-body-md text-[13px] py-3 text-center">
-              Chưa có bài học nào
+              No lessons found.
             </div>
           )}
         </div>
@@ -108,7 +122,12 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }) => {
   );
 };
 
-const CourseSidebar = ({ courseId, currentLessonId }) => {
+const CourseSidebar = ({
+  courseId,
+  currentLessonId,
+  currentLessonProgress = 0,
+  currentLessonCompleted = false,
+}) => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -144,7 +163,7 @@ const CourseSidebar = ({ courseId, currentLessonId }) => {
         {/* Progress Bar (Demo) */}
         <div className="flex items-center justify-between mb-2">
           <span className="font-label-sm text-[11px] tracking-wider text-on-surface-variant/80 uppercase">
-            2 / {course ? course.totalLessons : "--"} bài học
+            2 / {course ? course.totalLessons : "--"} lesson
           </span>
           <span className="font-bold text-[12px] text-primary-fixed-dim">
             4%
@@ -169,6 +188,8 @@ const CourseSidebar = ({ courseId, currentLessonId }) => {
                 chapter={chapter}
                 index={index}
                 currentLessonId={currentLessonId}
+                currentLessonProgress={currentLessonProgress}
+                currentLessonCompleted={currentLessonCompleted}
               />
             ))
           )}

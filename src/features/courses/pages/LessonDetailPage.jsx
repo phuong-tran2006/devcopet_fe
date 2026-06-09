@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -14,9 +14,34 @@ const LessonDetailPage = () => {
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const contentScrollRef = useRef(null);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const lastScrollRef = useRef({
+    scrollTop: 0,
+
+    time: Date.now(),
+  });
 
   useEffect(() => {
     if (lessonId) {
+      setLoading(true);
+      setLesson(null);
+      setReadingProgress(0);
+      setQuizPassed(false);
+
+      if (contentScrollRef.current) {
+        contentScrollRef.current.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+      }
+
+      lastScrollRef.current = {
+        scrollTop: 0,
+        time: Date.now(),
+      };
+
       courseApi
         .getLessonDetail(lessonId)
         .then((data) => {
@@ -28,6 +53,70 @@ const LessonDetailPage = () => {
     }
   }, [lessonId]);
 
+  useEffect(() => {
+    if (!lesson?._id) return;
+
+    setReadingProgress(0);
+    setQuizPassed(false);
+
+    requestAnimationFrame(() => {
+      if (contentScrollRef.current) {
+        contentScrollRef.current.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+      }
+    });
+
+    lastScrollRef.current = {
+      scrollTop: 0,
+      time: Date.now(),
+    };
+  }, [lesson?._id]);
+
+  useEffect(() => {
+    const el = contentScrollRef.current;
+    if (!el || !lesson?._id) return;
+
+    setReadingProgress(0);
+
+    const handleScroll = () => {
+      const now = Date.now();
+      const currentScrollTop = el.scrollTop;
+
+      const deltaY = Math.abs(
+        currentScrollTop - lastScrollRef.current.scrollTop,
+      );
+      const deltaTime = Math.max(now - lastScrollRef.current.time, 1);
+      const speed = deltaY / deltaTime;
+
+      lastScrollRef.current = {
+        scrollTop: currentScrollTop,
+        time: now,
+      };
+
+      // Nếu scroll quá nhanh thì không tính progress
+      // Có thể chỉnh 2.2 thấp hơn/cao hơn tuỳ cảm giác
+      //if (speed > 2.2) return;
+
+      const maxScroll = el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) {
+        setReadingProgress(100);
+        return;
+      }
+
+      const nextProgress = Math.round((currentScrollTop / maxScroll) * 100);
+
+      setReadingProgress((prev) => Math.max(prev, nextProgress));
+    };
+
+    el.addEventListener("scroll", handleScroll);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+    };
+  }, [lesson?._id]);
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -75,6 +164,8 @@ const LessonDetailPage = () => {
             <CourseSidebar
               courseId={lesson.courseId}
               currentLessonId={lesson._id}
+              currentLessonProgress={readingProgress}
+              currentLessonCompleted={quizPassed}
             />
           </div>
         </aside>
@@ -101,7 +192,10 @@ const LessonDetailPage = () => {
         </button>
       )}
       {/* Cột phải: Nội dung bài học */}
-      <main className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar">
+      <main
+        ref={contentScrollRef}
+        className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar"
+      >
         {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
         <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-[#1e293b] pb-4">
           <button className="flex items-center gap-2 text-on-surface-variant hover:text-white">
@@ -224,7 +318,14 @@ const LessonDetailPage = () => {
           </article>
 
           {/* Quiz Section */}
-          <LessonQuiz lessonId={lesson._id} />
+          <LessonQuiz
+            key={lesson._id}
+            lessonId={lesson._id}
+            onQuizPassed={() => {
+              setQuizPassed(true);
+              setReadingProgress(100);
+            }}
+          />
         </div>
       </main>
     </div>
