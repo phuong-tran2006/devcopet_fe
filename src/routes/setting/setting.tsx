@@ -17,8 +17,7 @@ function SettingComponent() {
 
   return (
     <div
-      className={`min-h-screen w-full flex flex-col transition-colors duration-300 select-none ${theme === "dark" ? "bg-[#040d14]" : "bg-slate-50"
-        }`}
+      className={`min-h-screen w-full flex flex-col transition-colors duration-300 select-none bg-background`}
     >
       {/* 1. Thanh Dashboard Header */}
       <Header />
@@ -30,7 +29,7 @@ function SettingComponent() {
           <div className="lg:col-span-2 space-y-8">
             <div>
               <h1
-                className={`text-3xl font-bold tracking-wider ${theme === "dark" ? "text-white" : "text-slate-900"}`}
+                className={`text-3xl font-bold tracking-wider text-on-surface`}
               >
                 Command Center (Current: {theme})
               </h1>

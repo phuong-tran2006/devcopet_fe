@@ -44,7 +44,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
             onClick={toggleTheme}
             className={`w-full text-left border rounded-xl px-4 py-2.5 text-sm font-semibold transition-all flex items-center justify-between ${
               theme === "dark"
-                ? "bg-[#040d14] border-[#14232e] text-[#7fe3dd] hover:border-[#7fe3dd]"
+                ? "bg-background border-[#14232e] text-[#7fe3dd] hover:border-[#7fe3dd]"
                 : "bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-400"
             }`}
           >
@@ -70,7 +70,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
               onChange={(e) => setLanguage(e.target.value)}
               className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#76d6d5] appearance-none cursor-pointer ${
                 theme === "dark"
-                  ? "bg-[#040d14] border-[#14232e] text-slate-300"
+                  ? "bg-background border-[#14232e] text-slate-300"
                   : "bg-slate-50 border-slate-200 text-slate-800"
               }`}
             >
@@ -89,7 +89,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
             Haptic Feedback
           </label>
           <div
-            className={`grid grid-cols-2 p-1 border rounded-xl ${theme === "dark" ? "bg-[#040d14] border-[#14232e]" : "bg-slate-100 border-slate-200"}`}
+            className={`grid grid-cols-2 p-1 border rounded-xl bg-surface border-outline-variant`}
           >
             <button
               onClick={() => setHaptic(true)}
@@ -183,7 +183,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
       <div
         className={`p-4 border rounded-xl space-y-4 transition-colors ${
           theme === "dark"
-            ? "bg-[#040d14] border-[#14232e]"
+            ? "bg-background border-[#14232e]"
             : "bg-slate-50 border-slate-100"
         }`}
       >

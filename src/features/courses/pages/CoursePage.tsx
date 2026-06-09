@@ -12,7 +12,7 @@ const CoursePage = () => {
         {/* Top Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-3">
           <div>
-            <h1 className="font-headline-lg text-[24px] md:text-[28px] font-bold text-white tracking-wide uppercase mb-1">
+            <h1 className="font-headline-lg text-[24px] md:text-[28px] font-bold text-on-surface tracking-wide uppercase mb-1">
               ALL LESSON
             </h1>
             <p className="font-body-sm text-[13px] text-on-surface-variant">
@@ -20,7 +20,7 @@ const CoursePage = () => {
             </p>
           </div>
           {/* XP Badge */}
-          <div className="bg-[#1b2532] text-white px-4 py-2 rounded-lg flex items-center gap-2 border border-white/5">
+          <div className="bg-surface-container text-on-surface px-4 py-2 rounded-lg flex items-center gap-2 border border-on-surface/5">
             <span className="font-bold text-[14px]">14,200</span>
             <span className="text-[10px] text-on-surface-variant font-medium tracking-wider">
               TOTAL XP
@@ -49,12 +49,12 @@ const CoursePage = () => {
             <input
               type="text"
               placeholder="Search technologies..."
-              className="w-full bg-[#111a22] border border-[#1e293b] rounded-lg pl-10 pr-4 py-2 text-[13px] text-white placeholder:text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim transition-colors"
+              className="w-full bg-surface-container border border-[#1e293b] rounded-lg pl-10 pr-4 py-2 text-[13px] text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim transition-colors"
             />
           </div>
           <div className="flex gap-4">
             <div className="relative">
-              <select className="bg-[#111a22] border border-[#1e293b] rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-[#15202b] transition-colors h-full">
+              <select className="bg-surface-container border border-[#1e293b] rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-surface-container-high transition-colors h-full">
                 <option>Difficulty: All</option>
                 <option>Beginner</option>
                 <option>Intermediate</option>
@@ -78,7 +78,7 @@ const CoursePage = () => {
             </div>
 
             <div className="relative">
-              <select className="bg-[#111a22] border border-[#1e293b] rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-[#15202b] transition-colors h-full">
+              <select className="bg-surface-container border border-[#1e293b] rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-surface-container-high transition-colors h-full">
                 <option>Sort: Popular</option>
                 <option>Sort: Newest</option>
                 <option>Sort: XP Required</option>
@@ -105,7 +105,7 @@ const CoursePage = () => {
         {/* Course Grid */}
         <div className="flex flex-wrap gap-6 justify-center md:justify-start">
           {/* Python Architect Card */}
-          <div className="bg-[#121c25] rounded-xl overflow-hidden border border-[#1e293b] flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-[280px] flex-shrink-0">
+          <div className="bg-surface-container rounded-xl overflow-hidden border border-[#1e293b] flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-[280px] flex-shrink-0">
             {/* Top Banner section */}
             <div className="h-[90px] bg-[#052b4d] relative flex items-center justify-center">
               {/* Popular Badge */}
@@ -133,10 +133,10 @@ const CoursePage = () => {
             {/* Content section */}
             <div className="p-4 flex-1 flex flex-col">
               <div className="flex justify-between items-start mb-1">
-                <h3 className="font-headline-sm text-[16px] text-white">
+                <h3 className="font-headline-sm text-[16px] text-on-surface">
                   Python Architect
                 </h3>
-                <button className="bg-[#1b2532] text-on-surface-variant p-1.5 rounded-lg hover:bg-[#253243] hover:text-white transition-colors flex items-center justify-center">
+                <button className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg hover:bg-[#253243] hover:text-on-surface transition-colors flex items-center justify-center">
                   <span className="material-symbols-outlined text-[14px]">
                     terminal
                   </span>
@@ -149,19 +149,19 @@ const CoursePage = () => {
               </p>
 
               <div className="flex gap-2 mb-3">
-                <div className="bg-[#1b2532] rounded-lg p-2 flex-1">
+                <div className="bg-surface-container rounded-lg p-2 flex-1">
                   <div className="font-label-sm text-[8px] text-on-surface-variant tracking-widest mb-0.5 uppercase">
                     UNITS
                   </div>
-                  <div className="text-white text-[12px] font-semibold">
+                  <div className="text-on-surface text-[12px] font-semibold">
                     24 Units
                   </div>
                 </div>
-                <div className="bg-[#1b2532] rounded-lg p-2 flex-1">
+                <div className="bg-surface-container rounded-lg p-2 flex-1">
                   <div className="font-label-sm text-[8px] text-on-surface-variant tracking-widest mb-0.5 uppercase">
                     REWARD
                   </div>
-                  <div className="text-white text-[12px] font-semibold">
+                  <div className="text-on-surface text-[12px] font-semibold">
                     1,200 XP
                   </div>
                 </div>
@@ -169,10 +169,10 @@ const CoursePage = () => {
 
               <div className="mt-auto">
                 <div className="flex justify-between text-[10px] font-bold mb-1.5">
-                  <span className="text-white">Progress</span>
+                  <span className="text-on-surface">Progress</span>
                   <span className="text-primary-fixed-dim">65%</span>
                 </div>
-                <div className="h-1 bg-[#1b2532] rounded-full overflow-hidden mb-3">
+                <div className="h-1 bg-surface-container rounded-full overflow-hidden mb-3">
                   <div className="h-full bg-primary-fixed-dim w-[65%] rounded-full shadow-[0_0_10px_rgba(0,218,248,0.5)]"></div>
                 </div>
 

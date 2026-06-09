@@ -28,7 +28,7 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }: any) => {
         className="w-full flex items-center justify-between py-4 px-4 hover:bg-[#161B22] transition-colors"
       >
         <div className="flex flex-col items-start pr-4 text-left">
-          <h4 className="font-headline-sm text-[14px] font-bold text-white group-hover:text-primary-fixed transition-colors">
+          <h4 className="font-headline-sm text-[14px] font-bold text-on-surface group-hover:text-primary-fixed transition-colors">
             {index + 1}. {chapter.title}
           </h4>
           <span className="font-label-sm text-[11px] text-on-surface-variant mt-1 tracking-wider uppercase">
@@ -46,7 +46,7 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }: any) => {
       <div
         className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"}`}
       >
-        <div className="flex flex-col bg-[#0b1118] py-2">
+        <div className="flex flex-col bg-surface-container-lowest py-2">
           {loading ? (
             <div className="flex justify-center py-4">
               <div className="w-5 h-5 border-2 border-primary-fixed-dim/60 border-t-transparent rounded-full animate-spin" />
@@ -62,7 +62,7 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }: any) => {
                   className={`flex items-center gap-3 px-6 py-3 transition-colors ${
                     isActive
                       ? "bg-primary-fixed-dim/15 border-l-2 border-primary-fixed-dim"
-                      : "hover:bg-[#121c25] border-l-2 border-transparent"
+                      : "hover:bg-surface-container border-l-2 border-transparent"
                   }`}
                 >
                   <div
@@ -132,14 +132,14 @@ const CourseSidebar = ({ courseId, currentLessonId }: any) => {
   }, [courseId]);
 
   return (
-    <div className="hidden lg:flex w-[380px] shrink-0 bg-[#121c25] border-r border-[#1e293b] h-full flex-col z-20">
+    <div className="hidden lg:flex w-[380px] shrink-0 bg-surface-container border-r border-[#1e293b] h-full flex-col z-20">
       {/* Header Info */}
       <div className="p-5 border-b border-[#1e293b] bg-surface">
-        {/* <Link to="/course" className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-white font-label-sm tracking-widest uppercase text-[10px] mb-3 transition-colors">
+        {/* <Link to="/course" className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface font-label-sm tracking-widest uppercase text-[10px] mb-3 transition-colors">
           <span className="material-symbols-outlined text-[14px]">arrow_back</span>
           Trở về khoá học
         </Link> */}
-        <h2 className="font-headline-sm text-[18px] font-bold text-white mb-4 line-clamp-2">
+        <h2 className="font-headline-sm text-[18px] font-bold text-on-surface mb-4 line-clamp-2">
           {course ? course.title : "Đang tải..."}
         </h2>
 
@@ -152,7 +152,7 @@ const CourseSidebar = ({ courseId, currentLessonId }: any) => {
             4%
           </span>
         </div>
-        <div className="h-[4px] bg-[#1b2532] rounded-full overflow-hidden">
+        <div className="h-[4px] bg-surface-container rounded-full overflow-hidden">
           <div className="h-full bg-primary-fixed-dim w-[4%] rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]" />
         </div>
       </div>

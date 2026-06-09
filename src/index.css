@@ -108,13 +108,20 @@
   }
 
   html.light {
-    --color-background: #f8fafc;
-    --color-on-background: #0f172a;
+    --color-background: #f4f5f6;
+    --color-on-background: #1a202c;
     --color-surface: #ffffff;
-    --color-on-surface: #1e293b;
-    --color-on-surface-variant: #475569;
-    --color-outline: #cbd5e1;
-    --color-surface-variant: #f1f5f9;
+    --color-surface-dim: #f8fafc;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #fdfdfd;
+    --color-surface-container: #ffffff;
+    --color-surface-container-high: #f8fafc;
+    --color-surface-container-highest: #f1f5f9;
+    --color-on-surface: #2d3748;
+    --color-on-surface-variant: #4a5568;
+    --color-outline: #e2e8f0;
+    --color-surface-variant: #edf2f7;
   }
 }
 
@@ -185,8 +192,8 @@
     position: absolute;
     inset: 1px;
     border-radius: inherit;
-    background: #0c1013;
-    /* Dark background to hide the middle of the conic gradient */
+    background: var(--color-surface);
+    /* Surface background to hide the middle of the conic gradient */
     z-index: -1;
   }
 
@@ -263,17 +270,22 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, var(--color-on-surface) 15%, transparent);
     border-radius: 10px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: color-mix(in srgb, var(--color-on-surface) 25%, transparent);
   }
 
   /* For Firefox */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: color-mix(
+        in srgb,
+        var(--color-on-surface) 15%,
+        transparent
+      )
+      transparent;
   }
 }

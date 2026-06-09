@@ -107,12 +107,12 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
     return (
       <div
         key={q.index}
-        className={`bg-[#121c25] rounded-xl border p-6 shadow-lg transition-colors ${
+        className={`bg-surface-container rounded-xl border p-6 shadow-lg transition-colors ${
           isReviewMode && qResult
             ? qResult.isCorrect
               ? "border-[#4ade80]/30"
               : "border-[#f87171]/30"
-            : "border-white/5"
+            : "border-on-surface/5"
         }`}
       >
         <div className="flex items-center justify-between mb-4">
@@ -162,7 +162,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
               isReviewMode && isSelected && !isCorrectOption;
 
             let style =
-              "border-outline/20 bg-surface/40 hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface cursor-pointer";
+              "border-outline/20 bg-on-surface/5 hover:bg-on-surface/10 text-on-surface-variant hover:text-on-surface cursor-pointer";
 
             if (!isReviewMode) {
               if (isSelected) {
@@ -178,7 +178,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
                   "border-[#f87171]/50 bg-[#f87171]/15 text-[#f87171] cursor-default";
               } else {
                 style =
-                  "border-white/5 bg-surface/20 text-on-surface-variant/50 cursor-default opacity-60";
+                  "border-on-surface/5 bg-on-surface/5 text-on-surface-variant/50 cursor-default opacity-60";
               }
             }
 
@@ -241,7 +241,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
             </div>
 
             {qResult.explanation && (
-              <div className="p-6 rounded-xl bg-[#0b1118]/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
+              <div className="p-6 rounded-xl bg-surface-container-lowest/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
                 <span className="font-bold text-primary-fixed-dim block mb-2 text-[12px] uppercase tracking-widest">
                   Explanation
                 </span>
@@ -259,7 +259,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "idle") {
     return (
-      <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-surface-container rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <h3 className="font-headline-sm text-on-surface mb-2">
             Ready to test your knowledge?
@@ -286,7 +286,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "loading") {
     return (
-      <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-surface-container rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <h3 className="font-headline-sm text-on-surface mb-2">
             Ready to test your knowledge?
@@ -311,7 +311,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "not_found") {
     return (
-      <div className="bg-[#121c25] rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
+      <div className="bg-surface-container rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
         <span className="material-symbols-outlined text-3xl mb-2 block">
           quiz
         </span>
@@ -411,7 +411,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   return (
     <div className="flex flex-col gap-6">
       {/* ── Quiz Header (Progress) ── */}
-      <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
+      <div className="bg-surface-container rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
         <div className="flex items-center justify-between mb-3">
           <div className="font-headline-sm text-on-surface">
             {quiz?.title || "Lesson Quiz"}
@@ -421,7 +421,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
           </div>
         </div>
         {/* Progress Bar */}
-        <div className="w-full h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
           <div
             className="h-full bg-primary-fixed-dim transition-all duration-300"
             style={{
