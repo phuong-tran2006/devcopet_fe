@@ -213,7 +213,7 @@ const LessonDetailPage = () => {
                   return (
                     <code
                       {...props}
-                      className={`${className} bg-surface-container-high text-primary-fixed px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+                      className={`${className} bg-surface-container-high text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
                     >
                       {children}
                     </code>
