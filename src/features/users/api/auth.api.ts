@@ -61,12 +61,14 @@ export const authApi = {
       throw new Error("Invalid email or password");
     }
 
-    const token = `mock_token_${Date.now()}`;
+    const accessToken = `mock_access_token_${Date.now()}`;
+    const refreshToken = `mock_refresh_token_${Date.now()}`;
     delete (user as any).password;
     const userWithoutPassword = user;
 
     return {
-      token,
+      accessToken,
+      refreshToken,
       user: userWithoutPassword,
     };
   },
@@ -109,12 +111,14 @@ export const authApi = {
 
     mockUsers.push(newUser);
 
-    const token = `mock_token_${Date.now()}`;
+    const accessToken = `mock_access_token_${Date.now()}`;
+    const refreshToken = `mock_refresh_token_${Date.now()}`;
     delete (newUser as any).password;
     const userWithoutPassword = newUser;
 
     return {
-      token,
+      accessToken,
+      refreshToken,
       user: userWithoutPassword,
     };
   },
