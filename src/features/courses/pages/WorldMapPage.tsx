@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
+import NodeDetailsModal from "../../components/ui/NodeDetailsModal";
 
 // ─── Data per difficulty ─────────────────────────────────────────────────────
 
@@ -48,6 +49,12 @@ const EASY_CHAPTERS = [
     status: "locked",
     lessons: 6,
     xp: 130,
+    description: "Master the flow of execution and complex decision making.",
+    objectives: [
+      "Understand if/else/elif statements",
+      "Combine logical operators (and, or, not)",
+      "Avoid nested conditionals",
+    ],
   },
   {
     _id: "e7",
@@ -55,6 +62,12 @@ const EASY_CHAPTERS = [
     status: "locked",
     lessons: 6,
     xp: 140,
+    description: "Repeat actions without repeating code.",
+    objectives: [
+      "Understand while/for loops",
+      "Control loop execution with break/continue",
+      "Iterate over sequences efficiently",
+    ],
   },
 ];
 
@@ -224,6 +237,8 @@ interface Chapter {
   stars?: number;
   lessons?: number;
   xp?: number;
+  description?: string;
+  objectives?: string[];
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -251,6 +266,9 @@ const WorldMapPage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [selectedChapter, setSelectedChapter] = useState<
+    (Chapter & { difficulty?: "easy" | "medium" | "hard" }) | null
+  >(null);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const activeNodeRef = useRef<HTMLDivElement>(null);
@@ -301,6 +319,14 @@ const WorldMapPage = () => {
                 stars: idx === 0 ? 3 : idx === 1 ? 2 : undefined,
                 lessons: ch.lessons || 6,
                 xp: ch.xp || 100,
+                description:
+                  ch.description ||
+                  "Master the flow of execution and complex decision making.",
+                objectives: ch.objectives || [
+                  "Understand while/for loops",
+                  "Master if/else conditions",
+                  "Apply logical operators",
+                ],
               };
             });
             setApiChapters((prev) => ({ ...prev, easy: mapped }));
@@ -529,13 +555,7 @@ const WorldMapPage = () => {
                   key={chapter._id}
                   onClick={() => {
                     if (!isLocked) {
-                      const node = document.querySelector(
-                        `[data-chapter-id="${chapter._id}"]`,
-                      );
-                      node?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
+                      setSelectedChapter({ ...chapter, difficulty });
                     }
                   }}
                   disabled={isLocked}
@@ -867,6 +887,9 @@ const WorldMapPage = () => {
                   style={{ left: `${x}px`, top: `${y}px` }}
                   onMouseEnter={() => setHoveredNode(chapter._id)}
                   onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => {
+                    setSelectedChapter({ ...chapter, difficulty });
+                  }}
                 >
                   {/* Tooltip */}
                   {isHovered && (
@@ -1047,6 +1070,12 @@ const WorldMapPage = () => {
           </button>
         </div>
       </div>
+
+      <NodeDetailsModal
+        isOpen={!!selectedChapter}
+        onClose={() => setSelectedChapter(null)}
+        chapter={selectedChapter}
+      />
     </main>
   );
 };
