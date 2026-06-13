@@ -1030,16 +1030,16 @@ const WorldMapPage = () => {
         </button>
 
         <div
-          className={`transition-all duration-300 overflow-hidden ${
+          className={`transition-all duration-300 ${
             showScrollTop
-              ? "opacity-100 translate-y-0 max-h-14"
-              : "opacity-0 translate-y-4 max-h-0"
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-4 pointer-events-none"
           }`}
         >
           <button
             onClick={scrollToTop}
             title="Scroll to Top"
-            className="w-12 h-12 rounded-full bg-surface-container/90 backdrop-blur-md border border-on-surface/10 hover:border-on-surface/25 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg shadow-black/50"
+            className="w-12 h-12 rounded-full bg-surface-container/90 backdrop-blur-md border border-on-surface/10 hover:border-on-surface/25 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
           >
             <span className="material-symbols-outlined text-[20px]">
               arrow_upward
