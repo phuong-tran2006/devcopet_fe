@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="bg-surface-container-lowest border-t border-on-surface/5 w-full py-12">
+    <footer className="bg-surface-container-lowest border-t border-on-surface/5 w-full py-6">
       <div className="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter">
         <div className="flex flex-col items-center md:items-start gap-4">
           <span className="font-code-md text-code-md text-primary-fixed-dim font-bold">
@@ -10,7 +10,7 @@ const Footer = () => {
             © 2024 Gravity Code Terminal. All systems operational.
           </p>
         </div>
-        <div className="flex flex-wrap gap-8 justify-center">
+        <div className="flex flex-wrap gap-6 justify-center">
           <a
             className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors"
             href="#"

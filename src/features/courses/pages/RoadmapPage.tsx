@@ -28,10 +28,10 @@ const RoadmapPage = () => {
       <div className="relative z-10 w-full max-w-[1200px] flex flex-col items-stretch gap-8 mt-8">
         {/* Page Title Header */}
         <section className="flex flex-col gap-2 text-center md:text-left">
-          <h1 className="font-headline-lg text-[32px] md:text-[40px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-on-surface via-on-surface to-[#a0b2c6] tracking-tight">
+          <h1 className="font-headline-lg text-[32px] md:text-[40px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-on-surface via-on-surface to-on-surface-variant tracking-tight">
             Select Your Domain
           </h1>
-          <p className="text-sm md:text-base font-normal leading-relaxed text-[#bdc9c8] max-w-[800px]">
+          <p className="text-sm md:text-base font-normal leading-relaxed text-on-surface-variant max-w-[800px]">
             Embark on a specialized mastery path. Level up your pets while
             mastering high-performance technologies in a gamified command
             center.
@@ -44,7 +44,7 @@ const RoadmapPage = () => {
           <div className="bg-surface-container/80 backdrop-blur-xl rounded-2xl border border-on-surface/10 p-6 flex flex-col hover:border-[#8cecf5]/40 hover:shadow-[0_0_30px_rgba(140,236,245,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-[#8cecf5] bg-[#8cecf5]/10 border border-[#8cecf5]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[10px] text-primary bg-[#8cecf5]/10 border border-[#8cecf5]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
                 Lvl. 42 Master
               </span>
             </div>
@@ -69,10 +69,10 @@ const RoadmapPage = () => {
 
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
-              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-[#8cecf5] transition-colors">
+              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-primary transition-colors">
                 Python 1: Variables
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-[#bdc9c8] min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
                 The realm of Data Science, AI, and rapid prototyping. Master the
                 syntax of the gods and automate your destiny.
               </p>
@@ -81,8 +81,10 @@ const RoadmapPage = () => {
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
               <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider">
-                <span className="text-[#bdc9c8]">World Completion</span>
-                <span className="text-[#8cecf5]">78%</span>
+                <span className="text-on-surface-variant">
+                  World Completion
+                </span>
+                <span className="text-primary">78%</span>
               </div>
               <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
                 <div className="h-full bg-[#8cecf5] w-[78%] rounded-full shadow-[0_0_10px_rgba(140,236,245,0.4)]"></div>
@@ -91,10 +93,10 @@ const RoadmapPage = () => {
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 SYSTEM
               </span>
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 AI DRIVEN
               </span>
             </div>
@@ -174,7 +176,7 @@ const RoadmapPage = () => {
               <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-secondary transition-colors">
                 Java World
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-[#bdc9c8] min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
                 The titan of enterprise and Android development. Build robust,
                 scalable monoliths that stand the test of time.
               </p>
@@ -183,7 +185,9 @@ const RoadmapPage = () => {
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
               <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider">
-                <span className="text-[#bdc9c8]">World Completion</span>
+                <span className="text-on-surface-variant">
+                  World Completion
+                </span>
                 <span className="text-secondary">24%</span>
               </div>
               <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
@@ -193,10 +197,10 @@ const RoadmapPage = () => {
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 ENTERPRISE
               </span>
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 ANDROID
               </span>
             </div>
@@ -266,7 +270,7 @@ const RoadmapPage = () => {
               <h2 className="font-headline-sm text-[22px] font-bold text-on-surface/40 tracking-wide">
                 C++ World
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-[#bdc9c8]/40 min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant/40 min-h-[54px] line-clamp-3">
                 The foundation of gaming and high-performance systems. Forge
                 your skills at the hardware level for ultimate control.
               </p>
@@ -275,7 +279,9 @@ const RoadmapPage = () => {
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
               <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider opacity-40">
-                <span className="text-[#bdc9c8]">World Completion</span>
+                <span className="text-on-surface-variant">
+                  World Completion
+                </span>
                 <span>0%</span>
               </div>
               <div className="h-1.5 bg-surface-container/40 rounded-full overflow-hidden">
@@ -285,10 +291,10 @@ const RoadmapPage = () => {
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6 opacity-40">
-              <span className="text-[9px] font-bold text-[#bdc9c8]/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
                 HARDWARE
               </span>
-              <span className="text-[9px] font-bold text-[#bdc9c8]/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
                 GAMING
               </span>
             </div>
@@ -316,7 +322,7 @@ const RoadmapPage = () => {
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-[#bdc9c8] font-medium tracking-wide">
+              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
                 Global Players
               </span>
               <span className="text-xl font-extrabold text-on-surface">
@@ -333,7 +339,7 @@ const RoadmapPage = () => {
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-[#bdc9c8] font-medium tracking-wide">
+              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
                 Active Projects
               </span>
               <span className="text-xl font-extrabold text-on-surface">
@@ -350,7 +356,7 @@ const RoadmapPage = () => {
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-[#bdc9c8] font-medium tracking-wide">
+              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
                 XP Generated
               </span>
               <span className="text-xl font-extrabold text-on-surface">
