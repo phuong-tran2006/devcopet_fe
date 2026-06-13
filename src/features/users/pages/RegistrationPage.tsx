@@ -424,7 +424,7 @@ const RegistrationPage = () => {
                             <img
                               src={githubIcon}
                               alt=""
-                              className={socialIconClassName}
+                              className={`${socialIconClassName} dark:invert-0 invert`}
                             />
                           </button>
                           <button

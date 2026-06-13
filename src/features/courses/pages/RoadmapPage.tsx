@@ -50,7 +50,7 @@ const RoadmapPage = () => {
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-[#052b4d]/30 border border-[#8cecf5]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#052b4d]/50 transition-colors">
+            <div className="h-[100px] w-full bg-[#8cecf5]/10 border border-[#8cecf5]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#8cecf5]/20 transition-colors">
               <svg
                 viewBox="0 0 110 110"
                 className="w-[54px] h-[54px] group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -122,7 +122,7 @@ const RoadmapPage = () => {
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-[#2a202a]/30 border border-[#D8BFD8]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#2a202a]/50 transition-colors">
+            <div className="h-[100px] w-full bg-[#D8BFD8]/10 border border-[#D8BFD8]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#D8BFD8]/20 transition-colors">
               <svg
                 viewBox="0 0 80 80"
                 className="w-[52px] h-[52px] group-hover:scale-105 transition-transform duration-500 ease-out"
