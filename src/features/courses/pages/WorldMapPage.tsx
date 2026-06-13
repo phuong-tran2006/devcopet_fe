@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
-import NodeDetailsModal from "../../components/ui/NodeDetailsModal";
+import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
 
 // ─── Data per difficulty ─────────────────────────────────────────────────────
 
