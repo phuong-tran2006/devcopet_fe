@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
+import LessonProgressCircle from "./LessonProgressCircle";
 
 const CourseSidebarChapter = ({ chapter, index, currentLessonId }: any) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -65,23 +66,11 @@ const CourseSidebarChapter = ({ chapter, index, currentLessonId }: any) => {
                       : "hover:bg-surface-container border-l-2 border-transparent"
                   }`}
                 >
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${
-                      isActive
-                        ? "bg-primary-fixed-dim/20 text-primary-fixed-dim"
-                        : "bg-transparent text-on-surface-variant/50 border border-on-surface-variant/30"
-                    }`}
-                  >
-                    {isActive ? (
-                      <span className="material-symbols-outlined text-[14px]">
-                        play_arrow
-                      </span>
-                    ) : (
-                      <span className="material-symbols-outlined text-[14px]">
-                        lock_open
-                      </span> // Mặc định giả lập unlocked
-                    )}
-                  </div>
+                  <LessonProgressCircle
+                    isActive={isActive}
+                    isCompleted={false} // Tạm thời false, sau này có the tích hợp logic API
+                    progress={isActive ? 30 : 0} // Demo progress
+                  />
                   <div className="flex flex-col flex-1 min-w-0">
                     <h5
                       className={`font-body-md text-[13.5px] truncate ${isActive ? "text-primary-fixed-dim font-bold" : "text-on-surface-variant/90"}`}
