@@ -238,7 +238,7 @@ const Dropdown = ({
                   className={twMerge(
                     "px-4 py-3 cursor-pointer transition-colors duration-150 text-[#879392]",
                     "hover:bg-[#76d6d520] focus:bg-[#76d6d520] focus:outline-none",
-                    isSelected && "bg-[#d8bfd830] text-[#d8bfd8] font-medium",
+                    isSelected && "bg-[#d8bfd830] text-secondary font-medium",
                   )}
                 >
                   {optionLabel}

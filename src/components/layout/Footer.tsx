@@ -1,6 +1,6 @@
 const Footer = () => {
   return (
-    <footer className="bg-surface-container-lowest border-t border-white/5 w-full py-12">
+    <footer className="bg-surface-container-lowest border-t border-on-surface/5 w-full py-6">
       <div className="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-gutter">
         <div className="flex flex-col items-center md:items-start gap-4">
           <span className="font-code-md text-code-md text-primary-fixed-dim font-bold">
@@ -10,7 +10,7 @@ const Footer = () => {
             © 2024 Gravity Code Terminal. All systems operational.
           </p>
         </div>
-        <div className="flex flex-wrap gap-8 justify-center">
+        <div className="flex flex-wrap gap-6 justify-center">
           <a
             className="font-label-sm text-label-sm text-on-tertiary-fixed-variant hover:text-primary-fixed transition-colors"
             href="#"
@@ -43,12 +43,12 @@ const Footer = () => {
           </a>
         </div>
         <div className="flex gap-4">
-          <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-on-surface">
+          <button className="w-10 h-10 rounded-full border border-on-surface/10 flex items-center justify-center hover:bg-on-surface/10 transition-all text-on-surface">
             <span className="material-symbols-outlined text-[20px]">
               terminal
             </span>
           </button>
-          <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-on-surface">
+          <button className="w-10 h-10 rounded-full border border-on-surface/10 flex items-center justify-center hover:bg-on-surface/10 transition-all text-on-surface">
             <span className="material-symbols-outlined text-[20px]">hub</span>
           </button>
         </div>

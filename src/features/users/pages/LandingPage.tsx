@@ -123,7 +123,7 @@ const LandingPage = () => {
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#008080" } as any}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                 <span className="material-symbols-outlined text-3xl">
@@ -142,7 +142,7 @@ const LandingPage = () => {
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                 <span className="material-symbols-outlined text-3xl">
@@ -161,7 +161,7 @@ const LandingPage = () => {
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#87A96B" } as any}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                 <span className="material-symbols-outlined text-3xl">
@@ -190,7 +190,7 @@ const LandingPage = () => {
             {/* Card 1: Interactive Learning */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
@@ -206,7 +206,7 @@ const LandingPage = () => {
                 Hands-on exercises with instant feedback
               </p>
               <div className="space-y-2">
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-on-surface/10 rounded-full overflow-hidden">
                   <div className="h-full bg-primary-fixed-dim w-[37.5%]"></div>
                 </div>
                 <div className="flex justify-end">
@@ -221,7 +221,7 @@ const LandingPage = () => {
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
@@ -241,7 +241,7 @@ const LandingPage = () => {
             {/* Card 3: Community Support */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
@@ -261,7 +261,7 @@ const LandingPage = () => {
             {/* Card 4: AI Assistance */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
@@ -282,7 +282,7 @@ const LandingPage = () => {
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
@@ -302,7 +302,7 @@ const LandingPage = () => {
             {/* Card 6: Career Path (Full Width) */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card md:col-span-3 shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card md:col-span-3 shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
@@ -336,7 +336,7 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 <a
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all text-on-surface hover:text-primary transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-on-surface/10 bg-on-surface/5 backdrop-blur-md hover:bg-on-surface/10 transition-all text-on-surface hover:text-primary transition-colors"
                   href="https://discord.gg/devcopet"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -353,7 +353,7 @@ const LandingPage = () => {
                   </span>
                 </a>
                 <a
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all text-on-surface hover:text-primary transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-on-surface/10 bg-on-surface/5 backdrop-blur-md hover:bg-on-surface/10 transition-all text-on-surface hover:text-primary transition-colors"
                   href="https://github.com/phuong-tran2006/devcopet_fe"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -374,7 +374,7 @@ const LandingPage = () => {
                   </span>
                 </a>
                 <a
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all text-on-surface hover:text-primary transition-colors"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-on-surface/10 bg-on-surface/5 backdrop-blur-md hover:bg-on-surface/10 transition-all text-on-surface hover:text-primary transition-colors"
                   href="https://linkedin.com"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -395,7 +395,7 @@ const LandingPage = () => {
 
             <div
               ref={addToRefs}
-              className="bg-surface/40 backdrop-blur-xl border border-outline/20 rounded-xl p-8 spinning-border-card"
+              className="bg-on-surface/5 backdrop-blur-xl border border-outline/20 rounded-xl p-8 spinning-border-card"
             >
               <h3 className="font-headline-sm text-headline-sm text-on-surface mb-8">
                 Our Core Team
@@ -468,7 +468,7 @@ const LandingPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-12 pt-8 border-t border-white/5">
+              <div className="mt-12 pt-8 border-t border-on-surface/5">
                 <p className="text-on-surface-variant italic text-center">
                   "We're always looking for contributors! Help us build the
                   future of education."

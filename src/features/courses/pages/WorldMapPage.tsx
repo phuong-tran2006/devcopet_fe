@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
+import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
 
 // ─── Data per difficulty ─────────────────────────────────────────────────────
 
@@ -48,6 +49,12 @@ const EASY_CHAPTERS = [
     status: "locked",
     lessons: 6,
     xp: 130,
+    description: "Master the flow of execution and complex decision making.",
+    objectives: [
+      "Understand if/else/elif statements",
+      "Combine logical operators (and, or, not)",
+      "Avoid nested conditionals",
+    ],
   },
   {
     _id: "e7",
@@ -55,6 +62,12 @@ const EASY_CHAPTERS = [
     status: "locked",
     lessons: 6,
     xp: 140,
+    description: "Repeat actions without repeating code.",
+    objectives: [
+      "Understand while/for loops",
+      "Control loop execution with break/continue",
+      "Iterate over sequences efficiently",
+    ],
   },
 ];
 
@@ -224,6 +237,8 @@ interface Chapter {
   stars?: number;
   lessons?: number;
   xp?: number;
+  description?: string;
+  objectives?: string[];
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -251,6 +266,9 @@ const WorldMapPage = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [selectedChapter, setSelectedChapter] = useState<
+    (Chapter & { difficulty?: "easy" | "medium" | "hard" }) | null
+  >(null);
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const activeNodeRef = useRef<HTMLDivElement>(null);
@@ -301,6 +319,14 @@ const WorldMapPage = () => {
                 stars: idx === 0 ? 3 : idx === 1 ? 2 : undefined,
                 lessons: ch.lessons || 6,
                 xp: ch.xp || 100,
+                description:
+                  ch.description ||
+                  "Master the flow of execution and complex decision making.",
+                objectives: ch.objectives || [
+                  "Understand while/for loops",
+                  "Master if/else conditions",
+                  "Apply logical operators",
+                ],
               };
             });
             setApiChapters((prev) => ({ ...prev, easy: mapped }));
@@ -389,14 +415,14 @@ const WorldMapPage = () => {
   const DRAWER_W = 320;
 
   return (
-    <main className="relative min-h-[calc(100vh-80px)] w-full bg-[#0c1013] overflow-x-hidden">
+    <main className="relative min-h-[calc(100vh-80px)] w-full bg-background overflow-x-hidden">
       {/* =========================================
           LEFT FIXED DRAWER
       ========================================= */}
 
       {/* Drawer Panel — fixed so it never scrolls */}
       <aside
-        className="fixed top-[80px] left-0 h-[calc(100vh-80px)] z-30 flex flex-col bg-[#0d1117] border-r border-white/8 shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-transform duration-300 ease-out overflow-hidden"
+        className="fixed top-[80px] left-0 h-[calc(100vh-80px)] z-30 flex flex-col bg-surface border-r border-on-surface/8 shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-transform duration-300 ease-out overflow-hidden"
         style={{
           width: `${DRAWER_W}px`,
           transform: drawerOpen
@@ -406,7 +432,7 @@ const WorldMapPage = () => {
       >
         <div className="w-full flex flex-col h-full">
           {/* ── TOP: User Stats ── */}
-          <div className="px-5 pt-5 pb-4 border-b border-white/6 flex-shrink-0">
+          <div className="px-5 pt-5 pb-4 border-b border-on-surface/6 flex-shrink-0">
             {/* Profile row */}
             <div className="flex items-center gap-3 mb-4">
               <div
@@ -420,7 +446,7 @@ const WorldMapPage = () => {
                 🦖
               </div>
               <div className="flex flex-col">
-                <span className="font-extrabold text-[15px] text-white">
+                <span className="font-extrabold text-[15px] text-on-surface">
                   Level 12
                 </span>
                 <span className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">
@@ -431,7 +457,7 @@ const WorldMapPage = () => {
 
             {/* Stats grid */}
             <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="bg-[#121c25]/80 border border-white/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
+              <div className="bg-surface-container/80 border border-on-surface/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
                 <span
                   className="material-symbols-outlined text-[16px]"
                   style={{ color: cfg.accent }}
@@ -439,34 +465,36 @@ const WorldMapPage = () => {
                   monetization_on
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-[#bdc9c8]/70 font-medium uppercase tracking-wide">
+                  <span className="text-[9px] text-on-surface-variant/70 font-medium uppercase tracking-wide">
                     XP Earned
                   </span>
-                  <span className="text-[13px] font-bold text-white">
+                  <span className="text-[13px] font-bold text-on-surface">
                     2,450 XP
                   </span>
                 </div>
               </div>
-              <div className="bg-[#121c25]/80 border border-white/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
+              <div className="bg-surface-container/80 border border-on-surface/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
                 <span className="material-symbols-outlined text-[16px] text-[#FFE052]">
                   star
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-[#bdc9c8]/70 font-medium uppercase tracking-wide">
+                  <span className="text-[9px] text-on-surface-variant/70 font-medium uppercase tracking-wide">
                     Stars
                   </span>
-                  <span className="text-[13px] font-bold text-white">120</span>
+                  <span className="text-[13px] font-bold text-on-surface">
+                    120
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Level progress */}
             <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center text-[10px] font-bold tracking-wider text-[#bdc9c8]">
+              <div className="flex justify-between items-center text-[10px] font-bold tracking-wider text-on-surface-variant">
                 <span>LEVEL 12</span>
                 <span>72%</span>
               </div>
-              <div className="h-2 bg-[#1b2532] rounded-full overflow-hidden">
+              <div className="h-2 bg-surface-container rounded-full overflow-hidden">
                 <div
                   className="h-full w-[72%] rounded-full"
                   style={{
@@ -479,7 +507,7 @@ const WorldMapPage = () => {
           </div>
 
           {/* ── Chapter List Header ── */}
-          <div className="px-5 pt-4 pb-3 flex items-center gap-2 border-b border-white/5 flex-shrink-0">
+          <div className="px-5 pt-4 pb-3 flex items-center gap-2 border-b border-on-surface/5 flex-shrink-0">
             <span
               className="material-symbols-outlined text-[16px]"
               style={{ color: cfg.accent }}
@@ -491,7 +519,7 @@ const WorldMapPage = () => {
             </span>
             {/* Mini progress */}
             <div className="flex items-center gap-1.5">
-              <div className="w-16 h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+              <div className="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
@@ -527,21 +555,15 @@ const WorldMapPage = () => {
                   key={chapter._id}
                   onClick={() => {
                     if (!isLocked) {
-                      const node = document.querySelector(
-                        `[data-chapter-id="${chapter._id}"]`,
-                      );
-                      node?.scrollIntoView({
-                        behavior: "smooth",
-                        block: "center",
-                      });
+                      setSelectedChapter({ ...chapter, difficulty });
                     }
                   }}
                   disabled={isLocked}
                   className={`
                     w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200
-                    ${isCompleted ? "border-white/10 hover:border-white/20 bg-white/4 hover:bg-white/8 cursor-pointer" : ""}
+                    ${isCompleted ? "border-on-surface/10 hover:border-on-surface/20 bg-on-surface/4 hover:bg-on-surface/8 cursor-pointer" : ""}
                     ${isInProgress ? "ring-1 cursor-pointer" : ""}
-                    ${isLocked ? "bg-transparent border-white/5 opacity-35 cursor-not-allowed" : ""}
+                    ${isLocked ? "bg-transparent border-on-surface/5 opacity-35 cursor-not-allowed" : ""}
                   `}
                   style={
                     isInProgress
@@ -558,7 +580,7 @@ const WorldMapPage = () => {
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold
                       ${isCompleted ? cfg.nodeCompleted : ""}
-                      ${isLocked ? "bg-[#1b2532] text-white/20 border border-white/10" : ""}
+                      ${isLocked ? "bg-surface-container text-on-surface/20 border border-on-surface/10" : ""}
                     `}
                     style={
                       isInProgress
@@ -594,7 +616,9 @@ const WorldMapPage = () => {
                   <div className="flex flex-col flex-1 min-w-0">
                     <span
                       className={`text-[12px] font-semibold truncate leading-snug ${
-                        isLocked ? "text-[#bdc9c8]/40" : "text-[#bdc9c8]"
+                        isLocked
+                          ? "text-on-surface-variant/40"
+                          : "text-on-surface-variant"
                       }`}
                       style={isInProgress ? { color: "#fff" } : {}}
                     >
@@ -619,7 +643,7 @@ const WorldMapPage = () => {
                   </div>
 
                   {!isLocked && (
-                    <span className="material-symbols-outlined text-[15px] text-white/20 flex-shrink-0">
+                    <span className="material-symbols-outlined text-[15px] text-on-surface/20 flex-shrink-0">
                       chevron_right
                     </span>
                   )}
@@ -629,7 +653,7 @@ const WorldMapPage = () => {
           </div>
 
           {/* ── Bottom: Stars + Upgrade ── */}
-          <div className="px-4 py-4 border-t border-white/5 flex-shrink-0 flex flex-col gap-2">
+          <div className="px-4 py-4 border-t border-on-surface/5 flex-shrink-0 flex flex-col gap-2">
             <div
               className="border rounded-xl px-3 py-2.5 flex items-center gap-2.5"
               style={{
@@ -644,13 +668,13 @@ const WorldMapPage = () => {
                 <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
                   Stars Collected
                 </span>
-                <span className="text-[13px] font-extrabold text-white">
+                <span className="text-[13px] font-extrabold text-on-surface">
                   12 / 150
                 </span>
               </div>
             </div>
             <button
-              className="w-full text-white font-extrabold text-[11px] tracking-wider py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase"
+              className="w-full text-on-surface font-extrabold text-[11px] tracking-wider py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase"
               style={{
                 background: cfg.gradient,
                 boxShadow: `0 4px 20px ${cfg.glowWeak}`,
@@ -665,7 +689,7 @@ const WorldMapPage = () => {
       {/* Drawer Toggle Tab — follows the fixed sidebar */}
       <button
         onClick={() => setDrawerOpen(!drawerOpen)}
-        className="fixed top-1/2 -translate-y-1/2 z-40 w-7 h-16 rounded-r-xl border border-l-0 border-white/10 bg-[#121c25]/95 backdrop-blur-md flex items-center justify-center hover:bg-[#1b2532] transition-all duration-300 shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
+        className="fixed top-1/2 -translate-y-1/2 z-40 w-7 h-16 rounded-r-xl border border-l-0 border-on-surface/10 bg-surface-container/95 backdrop-blur-md flex items-center justify-center hover:bg-surface-container transition-all duration-300 shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
         style={{
           left: drawerOpen ? `${DRAWER_W}px` : "0px",
           transition: "left 0.3s ease-out, background 0.2s",
@@ -673,7 +697,7 @@ const WorldMapPage = () => {
         title={drawerOpen ? "Close panel" : "Open panel"}
       >
         <span
-          className={`material-symbols-outlined text-[18px] text-[#bdc9c8] transition-transform duration-300 ${
+          className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-300 ${
             drawerOpen ? "rotate-180" : "rotate-0"
           }`}
         >
@@ -693,7 +717,7 @@ const WorldMapPage = () => {
       >
         <div className="w-full max-w-[680px] flex flex-col">
           {/* ── Header ── */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-8 border-b border-white/8 pb-7">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-8 border-b border-on-surface/8 pb-7">
             <div className="flex items-center gap-4">
               <div
                 className="w-11 h-11 rounded-xl flex items-center justify-center border"
@@ -711,7 +735,7 @@ const WorldMapPage = () => {
                 </span>
               </div>
               <div>
-                <h1 className="text-[32px] md:text-[38px] font-extrabold text-white tracking-wide uppercase leading-none">
+                <h1 className="text-[32px] md:text-[38px] font-extrabold text-on-surface tracking-wide uppercase leading-none">
                   Python World
                 </h1>
                 <span
@@ -725,7 +749,7 @@ const WorldMapPage = () => {
             </div>
 
             {/* Difficulty Pills */}
-            <div className="flex bg-[#121c25]/90 p-1 rounded-xl border border-white/10 text-[12px] font-bold uppercase tracking-wider gap-0.5">
+            <div className="flex bg-surface-container/90 p-1 rounded-xl border border-on-surface/10 text-[12px] font-bold uppercase tracking-wider gap-0.5">
               {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
                 <button
                   key={d}
@@ -733,7 +757,7 @@ const WorldMapPage = () => {
                   className={`px-5 py-2 rounded-lg transition-all duration-200 ${
                     difficulty === d
                       ? "text-[#0d1117] shadow-md"
-                      : "text-on-surface-variant hover:bg-white/8 hover:text-white"
+                      : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
                   }`}
                   style={
                     difficulty === d
@@ -751,20 +775,14 @@ const WorldMapPage = () => {
           </div>
 
           {/* ── World Progress Bar ── */}
-          <div
-            className="flex flex-col gap-2 mb-8 border rounded-2xl px-5 py-4"
-            style={{
-              background: "rgba(18,28,37,0.6)",
-              borderColor: "rgba(255,255,255,0.07)",
-            }}
-          >
-            <div className="flex justify-between items-center text-[13px] font-bold tracking-wider text-[#bdc9c8]">
+          <div className="flex flex-col gap-2 mb-8 border border-on-surface/10 bg-surface-container/60 rounded-2xl px-5 py-4">
+            <div className="flex justify-between items-center text-[13px] font-bold tracking-wider text-on-surface-variant">
               <span>World Completion</span>
               <span className="text-[15px]" style={{ color: cfg.accent }}>
                 {completionPct}%
               </span>
             </div>
-            <div className="h-3 bg-[#1b2532] rounded-full overflow-hidden">
+            <div className="h-3 bg-surface-container rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full transition-all duration-700"
                 style={{
@@ -796,7 +814,7 @@ const WorldMapPage = () => {
                 {difficulty === "medium" ? "fitness_center" : "skull"}
               </span>
               <div>
-                <p className="text-[12px] font-bold text-white">
+                <p className="text-[12px] font-bold text-on-surface">
                   {difficulty === "medium"
                     ? "Challenger Mode — Unlock after completing Easy"
                     : "Expert Mode — Unlock after completing Medium"}
@@ -869,6 +887,9 @@ const WorldMapPage = () => {
                   style={{ left: `${x}px`, top: `${y}px` }}
                   onMouseEnter={() => setHoveredNode(chapter._id)}
                   onMouseLeave={() => setHoveredNode(null)}
+                  onClick={() => {
+                    setSelectedChapter({ ...chapter, difficulty });
+                  }}
                 >
                   {/* Tooltip */}
                   {isHovered && (
@@ -880,8 +901,8 @@ const WorldMapPage = () => {
                         transform: "translateX(-50%)",
                       }}
                     >
-                      <div className="bg-[#1b2532] border border-white/15 rounded-xl px-4 py-3 shadow-xl min-w-[180px] text-center">
-                        <p className="text-[13px] font-bold text-white whitespace-nowrap mb-1.5">
+                      <div className="bg-surface-container border border-on-surface/15 rounded-xl px-4 py-3 shadow-xl min-w-[180px] text-center">
+                        <p className="text-[13px] font-bold text-on-surface whitespace-nowrap mb-1.5">
                           {chapter.title}
                         </p>
                         <div className="flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
@@ -904,8 +925,8 @@ const WorldMapPage = () => {
                           </p>
                         )}
                         <div
-                          className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent"
-                          style={{ borderTopColor: "rgba(255,255,255,0.12)" }}
+                          className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent opacity-20"
+                          style={{ borderTopColor: "var(--color-on-surface)" }}
                         />
                       </div>
                     </div>
@@ -919,7 +940,7 @@ const WorldMapPage = () => {
                       }`}
                     >
                       <div
-                        className={`w-14 h-14 rounded-full flex items-center justify-center font-bold border-2 border-white/20 ${cfg.nodeCompleted}`}
+                        className={`w-14 h-14 rounded-full flex items-center justify-center font-bold border-2 border-on-surface/20 ${cfg.nodeCompleted}`}
                         style={{ boxShadow: `0 0 24px ${cfg.glow}` }}
                       >
                         <span className="material-symbols-outlined text-[26px] font-extrabold">
@@ -930,7 +951,7 @@ const WorldMapPage = () => {
                         <div
                           className="mt-1.5 px-2.5 py-1 rounded-full flex items-center gap-1.5 border"
                           style={{
-                            background: "#0c1013",
+                            background: "var(--color-background)",
                             borderColor: `${cfg.accent}28`,
                           }}
                         >
@@ -940,7 +961,7 @@ const WorldMapPage = () => {
                           </span>
                         </div>
                       )}
-                      <span className="mt-1 text-[11px] font-semibold text-[#bdc9c8]/80 max-w-[120px] text-center leading-tight">
+                      <span className="mt-1 text-[11px] font-semibold text-on-surface-variant/80 max-w-[120px] text-center leading-tight">
                         {chapter.title}
                       </span>
                     </div>
@@ -961,7 +982,7 @@ const WorldMapPage = () => {
                         }}
                       />
                       <div
-                        className="w-16 h-16 rounded-full flex flex-col items-center justify-center font-extrabold text-[18px] border-4 border-[#0c1013] relative z-10"
+                        className="w-16 h-16 rounded-full flex flex-col items-center justify-center font-extrabold text-[18px] border-4 border-background relative z-10"
                         style={{
                           background: cfg.gradient,
                           color: "#fff",
@@ -984,7 +1005,7 @@ const WorldMapPage = () => {
                           Active
                         </span>
                       </div>
-                      <span className="mt-1 text-[12px] font-bold text-white max-w-[130px] text-center leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                      <span className="mt-1 text-[12px] font-bold text-on-surface max-w-[130px] text-center leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
                         {chapter.title}
                       </span>
                     </div>
@@ -997,7 +1018,7 @@ const WorldMapPage = () => {
                         isHovered ? "scale-105" : "scale-100"
                       }`}
                     >
-                      <div className="w-11 h-11 rounded-full bg-[#1b2532] text-white/20 flex items-center justify-center border border-white/5 shadow-inner">
+                      <div className="w-11 h-11 rounded-full bg-surface-container text-on-surface/20 flex items-center justify-center border border-on-surface/5 shadow-inner">
                         <span className="material-symbols-outlined text-[17px]">
                           lock
                         </span>
@@ -1032,16 +1053,16 @@ const WorldMapPage = () => {
         </button>
 
         <div
-          className={`transition-all duration-300 overflow-hidden ${
+          className={`transition-all duration-300 ${
             showScrollTop
-              ? "opacity-100 translate-y-0 max-h-14"
-              : "opacity-0 translate-y-4 max-h-0"
+              ? "opacity-100 translate-y-0 pointer-events-auto"
+              : "opacity-0 translate-y-4 pointer-events-none"
           }`}
         >
           <button
             onClick={scrollToTop}
             title="Scroll to Top"
-            className="w-12 h-12 rounded-full bg-[#121c25]/90 backdrop-blur-md border border-white/10 hover:border-white/25 text-[#bdc9c8] hover:text-white hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg shadow-black/50"
+            className="w-12 h-12 rounded-full bg-surface-container/90 backdrop-blur-md border border-on-surface/10 hover:border-on-surface/25 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
           >
             <span className="material-symbols-outlined text-[20px]">
               arrow_upward
@@ -1049,6 +1070,12 @@ const WorldMapPage = () => {
           </button>
         </div>
       </div>
+
+      <NodeDetailsModal
+        isOpen={!!selectedChapter}
+        onClose={() => setSelectedChapter(null)}
+        chapter={selectedChapter}
+      />
     </main>
   );
 };

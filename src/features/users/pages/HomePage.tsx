@@ -127,7 +127,7 @@ const HomePage = () => {
 
   return (
     <>
-      <main className="relative min-h-screen w-full bg-[#041521] overflow-hidden">
+      <main className="relative min-h-screen w-full bg-background overflow-hidden">
         {/* Background decorative elements */}
         <div
           className="absolute inset-0 w-full h-full pointer-events-none"
@@ -139,7 +139,7 @@ const HomePage = () => {
 
         {/* Header */}
         <header
-          className="w-full bg-[#041521] border-b border-[#3e49496b]"
+          className="w-full bg-background border-b border-[#3e49496b]"
           style={{
             boxShadow: "0px 4px 20px #00808019",
           }}
@@ -155,7 +155,7 @@ const HomePage = () => {
                   loading="eager"
                 />
                 <span
-                  className="text-lg sm:text-xl md:text-2xl font-bold text-[#d8bfd8]"
+                  className="text-lg sm:text-xl md:text-2xl font-bold text-secondary"
                   style={{ fontFamily: "Montserrat" }}
                 >
                   Devcopet
@@ -188,7 +188,7 @@ const HomePage = () => {
                   onClick={() => {}}
                 >
                   <svg
-                    className="w-5 h-5 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors"
+                    className="w-5 h-5 text-secondary hover:text-[#76d6d5] transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -209,7 +209,7 @@ const HomePage = () => {
                   onClick={() => {}}
                 >
                   <svg
-                    className="w-5 h-5 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors"
+                    className="w-5 h-5 text-secondary hover:text-[#76d6d5] transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

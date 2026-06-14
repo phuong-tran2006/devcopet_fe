@@ -140,7 +140,7 @@ const CodeRunnerBlock = ({
           <span className="material-symbols-outlined text-[18px] text-primary-fixed-dim">
             code_blocks
           </span>
-          <span className="text-[12px] font-bold text-white tracking-widest uppercase">
+          <span className="text-[12px] font-bold text-[#F8FAFC] tracking-widest uppercase">
             {title}
           </span>
         </div>
@@ -149,7 +149,7 @@ const CodeRunnerBlock = ({
           <button
             onClick={handleReset}
             disabled={status === "running" || status === "loading"}
-            className="text-[12px] font-bold text-on-surface-variant hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1"
+            className="text-[12px] font-bold text-[#94A3B8] hover:text-[#F8FAFC] transition-colors disabled:opacity-50 flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[16px]">
               refresh
@@ -188,7 +188,7 @@ const CodeRunnerBlock = ({
 
       {/* Output Panel */}
       <div className="bg-[#121c25] p-4">
-        <div className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">
+        <div className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest mb-2">
           Output
         </div>
         <pre

@@ -102,7 +102,7 @@ const Login = () => {
               </h1>
 
               {/* Login form card */}
-              <div className="w-full bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl p-6 sm:p-8 shadow-[0_0_20px_rgba(0,128,128,0.1)]">
+              <div className="w-full bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl p-6 sm:p-8 shadow-[0_0_20px_rgba(0,128,128,0.1)]">
                 <form
                   onSubmit={handleLogin}
                   className="flex flex-col gap-6 sm:gap-7"
@@ -111,7 +111,7 @@ const Login = () => {
                   <div className="flex flex-col gap-1.5">
                     <label
                       htmlFor="email"
-                      className="text-sm font-normal text-white pl-1"
+                      className="text-sm font-normal text-on-surface pl-1"
                       style={{
                         fontFamily: "Open Sans",
                         fontSize: "14px",
@@ -132,7 +132,7 @@ const Login = () => {
                         onChange={handleInputChange(setEmail)}
                         placeholder="admin@devcopet.io"
                         required
-                        className="w-full pl-11 pr-3 py-2.5 bg-surface/50 border border-white/10 rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-colors"
+                        className="w-full pl-11 pr-3 py-2.5 bg-surface/50 border border-on-surface/10 rounded-lg text-base text-on-surface placeholder:text-on-surface/40 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-colors"
                         disabled={loading}
                       />
                     </div>
@@ -143,7 +143,7 @@ const Login = () => {
                     <div className="flex flex-row justify-between items-center">
                       <label
                         htmlFor="password"
-                        className="text-sm font-normal text-white pl-1"
+                        className="text-sm font-normal text-on-surface pl-1"
                         style={{
                           fontFamily: "Open Sans",
                           fontSize: "14px",
@@ -154,7 +154,7 @@ const Login = () => {
                       </label>
                       <a
                         href="/forgot-password"
-                        className="text-sm text-white hover:underline hover:text-[#d8bfd8] transition-colors"
+                        className="text-sm text-on-surface hover:underline hover:text-secondary transition-colors"
                         style={{
                           fontFamily: "Open Sans",
                           fontSize: "14px",
@@ -176,13 +176,13 @@ const Login = () => {
                         onChange={handleInputChange(setPassword)}
                         placeholder="••••••••"
                         required
-                        className="w-full pl-11 pr-11 py-2.5 bg-surface/50 border border-white/10 rounded-lg text-base text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-colors"
+                        className="w-full pl-11 pr-11 py-2.5 bg-surface/50 border border-on-surface/10 rounded-lg text-base text-on-surface placeholder:text-on-surface/40 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim transition-colors"
                         disabled={loading}
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-fixed-dim hover:text-white focus:outline-none transition-colors"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-primary-fixed-dim hover:text-on-surface focus:outline-none transition-colors"
                         aria-label={
                           showPassword ? "Hide password" : "Show password"
                         }
@@ -229,7 +229,7 @@ const Login = () => {
                     <div className="flex flex-row items-center gap-4">
                       <div className="flex-1 h-px bg-[#3e49494c]" />
                       <span
-                        className="text-xs text-white"
+                        className="text-xs text-on-surface"
                         style={{
                           fontFamily: "Open Sans",
                           fontSize: "12px",
@@ -247,7 +247,7 @@ const Login = () => {
                         type="button"
                         onClick={() => handleSocialLogin("google")}
                         disabled={loading}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with Google"
                       >
                         <img
@@ -260,20 +260,20 @@ const Login = () => {
                         type="button"
                         onClick={() => handleSocialLogin("github")}
                         disabled={loading}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with GitHub"
                       >
                         <img
                           src={githubIcon}
                           alt=""
-                          className={socialIconClassName}
+                          className={`${socialIconClassName} dark:invert-0 invert`}
                         />
                       </button>
                       <button
                         type="button"
                         onClick={() => handleSocialLogin("facebook")}
                         disabled={loading}
-                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                         aria-label="Continue with Facebook"
                       >
                         <img
@@ -292,7 +292,7 @@ const Login = () => {
                         onClick={() => {}}
                       >
                         <span
-                          className="text-sm font-medium text-white hover:text-[#d8bfd8] transition-colors"
+                          className="text-sm font-medium text-on-surface hover:text-secondary transition-colors"
                           style={{
                             fontFamily: "Roboto",
                             fontSize: "13px",
@@ -302,7 +302,7 @@ const Login = () => {
                           Create an Account
                         </span>
                         <svg
-                          className="w-3 h-3 text-white"
+                          className="w-3 h-3 text-on-surface"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -322,7 +322,7 @@ const Login = () => {
 
               {/* Terms and privacy */}
               <p
-                className="text-center text-sm text-white opacity-60 max-w-md px-4"
+                className="text-center text-sm text-on-surface opacity-60 max-w-md px-4"
                 style={{
                   fontFamily: "Open Sans",
                   fontSize: "14px",
@@ -332,7 +332,7 @@ const Login = () => {
                 <span>By continuing, you agree to Devcopet&apos;s </span>
                 <a
                   href="/terms"
-                  className="text-white opacity-70 hover:underline"
+                  className="text-on-surface opacity-70 hover:underline"
                   onClick={() => {}}
                 >
                   Terms of Service
@@ -340,7 +340,7 @@ const Login = () => {
                 <span> and </span>
                 <a
                   href="/privacy"
-                  className="text-white opacity-70 hover:underline"
+                  className="text-on-surface opacity-70 hover:underline"
                   onClick={() => {}}
                 >
                   Privacy Policy.

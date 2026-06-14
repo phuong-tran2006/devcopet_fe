@@ -24,7 +24,7 @@ const Logo = ({
         className="h-8 w-8 shrink-0 rounded-full object-cover object-top sm:h-9 sm:w-9"
       />
       <span
-        className="text-lg font-bold text-white sm:text-xl"
+        className="text-lg font-bold text-on-surface sm:text-xl"
         style={{ fontFamily: "Montserrat" }}
       >
         Devcopet

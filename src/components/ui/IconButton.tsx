@@ -7,12 +7,13 @@ const iconButtonClasses = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary-teal text-white hover:bg-opacity-90 focus:ring-primary-teal",
+          "bg-primary-teal text-on-surface hover:bg-opacity-90 focus:ring-primary-teal",
         secondary:
           "bg-background-card text-text-primary border border-border-primary hover:bg-background-secondary focus:ring-primary-teal-light",
         ghost:
           "bg-transparent text-text-primary hover:bg-background-card focus:ring-primary-teal-light",
-        danger: "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500",
+        danger:
+          "bg-red-500 text-on-surface hover:bg-red-600 focus:ring-red-500",
       },
       size: {
         small: "w-8 h-8 p-1.5",

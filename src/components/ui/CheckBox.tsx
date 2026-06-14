@@ -161,7 +161,7 @@ const CheckBox = ({
         >
           {isChecked && (
             <svg
-              className="w-3 h-3 text-white"
+              className="w-3 h-3 text-on-surface"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

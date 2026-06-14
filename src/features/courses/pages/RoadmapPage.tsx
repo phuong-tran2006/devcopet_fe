@@ -28,10 +28,10 @@ const RoadmapPage = () => {
       <div className="relative z-10 w-full max-w-[1200px] flex flex-col items-stretch gap-8 mt-8">
         {/* Page Title Header */}
         <section className="flex flex-col gap-2 text-center md:text-left">
-          <h1 className="font-headline-lg text-[32px] md:text-[40px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-on-surface via-on-surface to-[#a0b2c6] tracking-tight">
+          <h1 className="font-headline-lg text-[32px] md:text-[40px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-on-surface via-on-surface to-on-surface-variant tracking-tight">
             Select Your Domain
           </h1>
-          <p className="text-sm md:text-base font-normal leading-relaxed text-[#bdc9c8] max-w-[800px]">
+          <p className="text-sm md:text-base font-normal leading-relaxed text-on-surface-variant max-w-[800px]">
             Embark on a specialized mastery path. Level up your pets while
             mastering high-performance technologies in a gamified command
             center.
@@ -41,16 +41,16 @@ const RoadmapPage = () => {
         {/* Map Grid */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-4">
           {/* Card 1: Python */}
-          <div className="bg-[#121c25]/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 flex flex-col hover:border-[#8cecf5]/40 hover:shadow-[0_0_30px_rgba(140,236,245,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
+          <div className="bg-surface-container/80 backdrop-blur-xl rounded-2xl border border-on-surface/10 p-6 flex flex-col hover:border-[#8cecf5]/40 hover:shadow-[0_0_30px_rgba(140,236,245,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-[#8cecf5] bg-[#8cecf5]/10 border border-[#8cecf5]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[10px] text-primary bg-[#8cecf5]/10 border border-[#8cecf5]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
                 Lvl. 42 Master
               </span>
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-[#052b4d]/30 border border-[#8cecf5]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#052b4d]/50 transition-colors">
+            <div className="h-[100px] w-full bg-[#8cecf5]/10 border border-[#8cecf5]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#8cecf5]/20 transition-colors">
               <svg
                 viewBox="0 0 110 110"
                 className="w-[54px] h-[54px] group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -69,10 +69,10 @@ const RoadmapPage = () => {
 
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
-              <h2 className="font-headline-sm text-[22px] font-bold text-white tracking-wide group-hover:text-[#8cecf5] transition-colors">
+              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-primary transition-colors">
                 Python 1: Variables
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-[#bdc9c8] min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
                 The realm of Data Science, AI, and rapid prototyping. Master the
                 syntax of the gods and automate your destiny.
               </p>
@@ -81,20 +81,22 @@ const RoadmapPage = () => {
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
               <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider">
-                <span className="text-[#bdc9c8]">World Completion</span>
-                <span className="text-[#8cecf5]">78%</span>
+                <span className="text-on-surface-variant">
+                  World Completion
+                </span>
+                <span className="text-primary">78%</span>
               </div>
-              <div className="h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+              <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
                 <div className="h-full bg-[#8cecf5] w-[78%] rounded-full shadow-[0_0_10px_rgba(140,236,245,0.4)]"></div>
               </div>
             </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-white/5 border border-white/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 SYSTEM
               </span>
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-white/5 border border-white/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 AI DRIVEN
               </span>
             </div>
@@ -113,16 +115,16 @@ const RoadmapPage = () => {
           </div>
 
           {/* Card 2: Java */}
-          <div className="bg-[#121c25]/80 backdrop-blur-xl rounded-2xl border border-white/10 p-6 flex flex-col hover:border-[#D8BFD8]/40 hover:shadow-[0_0_30px_rgba(216,191,216,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
+          <div className="bg-surface-container/80 backdrop-blur-xl rounded-2xl border border-on-surface/10 p-6 flex flex-col hover:border-[#D8BFD8]/40 hover:shadow-[0_0_30px_rgba(216,191,216,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-[#D8BFD8] bg-[#D8BFD8]/10 border border-[#D8BFD8]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[10px] text-secondary bg-[#D8BFD8]/10 border border-[#D8BFD8]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
                 Lvl. 12 Initiate
               </span>
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-[#2a202a]/30 border border-[#D8BFD8]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#2a202a]/50 transition-colors">
+            <div className="h-[100px] w-full bg-[#D8BFD8]/10 border border-[#D8BFD8]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#D8BFD8]/20 transition-colors">
               <svg
                 viewBox="0 0 80 80"
                 className="w-[52px] h-[52px] group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -171,10 +173,10 @@ const RoadmapPage = () => {
 
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
-              <h2 className="font-headline-sm text-[22px] font-bold text-white tracking-wide group-hover:text-[#D8BFD8] transition-colors">
+              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-secondary transition-colors">
                 Java World
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-[#bdc9c8] min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
                 The titan of enterprise and Android development. Build robust,
                 scalable monoliths that stand the test of time.
               </p>
@@ -183,20 +185,22 @@ const RoadmapPage = () => {
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
               <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider">
-                <span className="text-[#bdc9c8]">World Completion</span>
-                <span className="text-[#D8BFD8]">24%</span>
+                <span className="text-on-surface-variant">
+                  World Completion
+                </span>
+                <span className="text-secondary">24%</span>
               </div>
-              <div className="h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+              <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
                 <div className="h-full bg-[#D8BFD8] w-[24%] rounded-full shadow-[0_0_10px_rgba(216,191,216,0.4)]"></div>
               </div>
             </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-white/5 border border-white/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 ENTERPRISE
               </span>
-              <span className="text-[9px] font-bold text-[#bdc9c8] bg-white/5 border border-white/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
                 ANDROID
               </span>
             </div>
@@ -215,16 +219,16 @@ const RoadmapPage = () => {
           </div>
 
           {/* Card 3: C++ */}
-          <div className="bg-[#121c25]/40 backdrop-blur-xl rounded-2xl border border-white/5 p-6 flex flex-col relative overflow-hidden select-none">
+          <div className="bg-surface-container/40 backdrop-blur-xl rounded-2xl border border-on-surface/5 p-6 flex flex-col relative overflow-hidden select-none">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-white/40 bg-white/5 border border-white/10 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[10px] text-on-surface/40 bg-on-surface/5 border border-on-surface/10 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
                 Lvl. 0 Locked
               </span>
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-white/5 border border-white/5 rounded-xl flex items-center justify-center mb-6 opacity-40">
+            <div className="h-[100px] w-full bg-on-surface/5 border border-on-surface/5 rounded-xl flex items-center justify-center mb-6 opacity-40">
               <svg
                 viewBox="0 0 100 100"
                 className="w-[54px] h-[54px]"
@@ -263,10 +267,10 @@ const RoadmapPage = () => {
 
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
-              <h2 className="font-headline-sm text-[22px] font-bold text-white/40 tracking-wide">
+              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface/40 tracking-wide">
                 C++ World
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-[#bdc9c8]/40 min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant/40 min-h-[54px] line-clamp-3">
                 The foundation of gaming and high-performance systems. Forge
                 your skills at the hardware level for ultimate control.
               </p>
@@ -275,20 +279,22 @@ const RoadmapPage = () => {
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
               <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider opacity-40">
-                <span className="text-[#bdc9c8]">World Completion</span>
+                <span className="text-on-surface-variant">
+                  World Completion
+                </span>
                 <span>0%</span>
               </div>
-              <div className="h-1.5 bg-[#1b2532]/40 rounded-full overflow-hidden">
-                <div className="h-full bg-white/10 w-[0%] rounded-full"></div>
+              <div className="h-1.5 bg-surface-container/40 rounded-full overflow-hidden">
+                <div className="h-full bg-on-surface/10 w-[0%] rounded-full"></div>
               </div>
             </div>
 
             {/* Tags */}
             <div className="flex flex-wrap gap-2 mb-6 opacity-40">
-              <span className="text-[9px] font-bold text-[#bdc9c8]/60 bg-white/5 border border-white/5 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
                 HARDWARE
               </span>
-              <span className="text-[9px] font-bold text-[#bdc9c8]/60 bg-white/5 border border-white/5 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
                 GAMING
               </span>
             </div>
@@ -296,7 +302,7 @@ const RoadmapPage = () => {
             {/* Action Button */}
             <button
               disabled
-              className="mt-auto w-full bg-white/5 text-white/30 font-bold text-[12px] py-2.5 rounded-xl border border-white/10 flex items-center justify-center gap-2 cursor-not-allowed"
+              className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
               <span className="material-symbols-outlined text-[15px]">
                 lock
@@ -309,47 +315,53 @@ const RoadmapPage = () => {
         {/* Bottom Stats Footer Bar */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-6">
           {/* Stat 1: Global Players */}
-          <div className="bg-[#121c25]/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#008080]/30 transition-colors">
+          <div className="bg-surface-container/60 backdrop-blur-md border border-on-surface/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#008080]/30 transition-colors">
             <div className="w-12 h-12 rounded-xl bg-[#008080]/15 flex items-center justify-center border border-[#008080]/30 shadow-[0_0_15px_rgba(0,128,128,0.15)] text-[#008080]">
               <span className="material-symbols-outlined text-[24px]">
                 groups
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-[#bdc9c8] font-medium tracking-wide">
+              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
                 Global Players
               </span>
-              <span className="text-xl font-extrabold text-white">1.2M+</span>
+              <span className="text-xl font-extrabold text-on-surface">
+                1.2M+
+              </span>
             </div>
           </div>
 
           {/* Stat 2: Active Projects */}
-          <div className="bg-[#121c25]/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#D8BFD8]/30 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-[#D8BFD8]/10 flex items-center justify-center border border-[#D8BFD8]/30 shadow-[0_0_15px_rgba(216,191,216,0.15)] text-[#D8BFD8]">
+          <div className="bg-surface-container/60 backdrop-blur-md border border-on-surface/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#D8BFD8]/30 transition-colors">
+            <div className="w-12 h-12 rounded-xl bg-[#D8BFD8]/10 flex items-center justify-center border border-[#D8BFD8]/30 shadow-[0_0_15px_rgba(216,191,216,0.15)] text-secondary">
               <span className="material-symbols-outlined text-[24px]">
                 database
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-[#bdc9c8] font-medium tracking-wide">
+              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
                 Active Projects
               </span>
-              <span className="text-xl font-extrabold text-white">45.8K</span>
+              <span className="text-xl font-extrabold text-on-surface">
+                45.8K
+              </span>
             </div>
           </div>
 
           {/* Stat 3: XP Generated */}
-          <div className="bg-[#121c25]/60 backdrop-blur-md border border-white/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#87A96B]/30 transition-colors">
+          <div className="bg-surface-container/60 backdrop-blur-md border border-on-surface/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#87A96B]/30 transition-colors">
             <div className="w-12 h-12 rounded-xl bg-[#87A96B]/10 flex items-center justify-center border border-[#87A96B]/30 shadow-[0_0_15px_rgba(135,169,107,0.15)] text-[#87A96B]">
               <span className="material-symbols-outlined text-[24px]">
                 bolt
               </span>
             </div>
             <div className="flex flex-col">
-              <span className="text-xs text-[#bdc9c8] font-medium tracking-wide">
+              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
                 XP Generated
               </span>
-              <span className="text-xl font-extrabold text-white">900B+</span>
+              <span className="text-xl font-extrabold text-on-surface">
+                900B+
+              </span>
             </div>
           </div>
         </section>

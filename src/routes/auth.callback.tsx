@@ -41,7 +41,7 @@ function AuthCallbackPage() {
   }, [search, navigate, setAuth]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#041521] text-white">
+    <div className="min-h-screen flex items-center justify-center bg-background text-on-surface">
       <div className="flex flex-col items-center gap-4">
         <div className="w-12 h-12 border-4 border-[#008080] border-t-transparent rounded-full animate-spin"></div>
         <p className="font-['Montserrat'] text-xl">Authenticating...</p>

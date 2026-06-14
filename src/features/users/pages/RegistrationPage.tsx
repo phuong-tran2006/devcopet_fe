@@ -199,7 +199,7 @@ const RegistrationPage = () => {
 
             {/* Right Section - Registration Form */}
             <section className="w-full lg:w-[52%] flex items-center justify-center">
-              <div className="w-full max-w-[570px] bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl shadow-[0_0_20px_rgba(0,128,128,0.1)] overflow-hidden">
+              <div className="w-full max-w-[570px] bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl shadow-[0_0_20px_rgba(0,128,128,0.1)] overflow-hidden">
                 {/* Form Content */}
                 <div className="px-6 sm:px-8 lg:px-10 py-6 sm:py-8 lg:py-10">
                   <form onSubmit={handleSubmit} className="flex flex-col gap-8">
@@ -396,7 +396,7 @@ const RegistrationPage = () => {
                       </div>
 
                       {/* Social Login Section */}
-                      <div className="flex flex-col gap-6 pt-6 border-t border-white/10">
+                      <div className="flex flex-col gap-6 pt-6 border-t border-on-surface/10">
                         <p className="text-base font-normal font-['Roboto'] leading-[19px] text-center text-[#bdc9c8b2]">
                           OR SYNC WITH IDENTITY PROVIDER
                         </p>
@@ -405,7 +405,7 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => handleSocialLogin("google")}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Google"
                           >
                             <img
@@ -418,20 +418,20 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => handleSocialLogin("github")}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with GitHub"
                           >
                             <img
                               src={githubIcon}
                               alt=""
-                              className={socialIconClassName}
+                              className={`${socialIconClassName} dark:invert-0 invert`}
                             />
                           </button>
                           <button
                             type="button"
                             onClick={() => handleSocialLogin("facebook")}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Facebook"
                           >
                             <img
@@ -444,7 +444,7 @@ const RegistrationPage = () => {
                             type="button"
                             onClick={() => navigate({ to: "/login" })}
                             disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-white/10 bg-transparent p-3 text-white transition-all duration-200 hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 text-on-surface transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
                             aria-label="Sign up with Email"
                           >
                             <EmailProviderIcon
@@ -480,7 +480,7 @@ const RegistrationPage = () => {
           aria-label="Need assistance"
         >
           <svg
-            className="w-5 h-5 text-[#d8bfd8]"
+            className="w-5 h-5 text-secondary"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -492,7 +492,7 @@ const RegistrationPage = () => {
               d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
             />
           </svg>
-          <span className="text-base font-normal font-['Roboto'] leading-[19px] text-[#d8bfd8]">
+          <span className="text-base font-normal font-['Roboto'] leading-[19px] text-secondary">
             Need assistance?
           </span>
         </button>

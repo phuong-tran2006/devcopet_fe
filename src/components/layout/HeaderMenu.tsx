@@ -19,7 +19,7 @@ const HeaderMenu = ({ mobile = false }: { mobile?: boolean }) => {
   const baseItemClasses =
     "transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-teal-light rounded px-3 py-2";
   const activeItemClasses = "text-[#76d6d5] font-medium";
-  const inactiveItemClasses = "text-white/80 hover:text-white";
+  const inactiveItemClasses = "text-on-surface/80 hover:text-on-surface";
 
   return (
     <nav

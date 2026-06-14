@@ -202,7 +202,7 @@ const QuizPage = () => {
                     const isCorrectOption = getIsCorrect(opt);
 
                     let optionStyle =
-                      "border-outline/20 bg-surface/40 hover:bg-surface/80 text-on-surface-variant hover:text-on-surface";
+                      "border-outline/20 bg-on-surface/5 hover:bg-surface/80 text-on-surface-variant hover:text-on-surface";
 
                     if (isSelected) {
                       optionStyle =
@@ -218,7 +218,7 @@ const QuizPage = () => {
                           "border-[#f87171]/50 bg-[#f87171]/10 text-[#f87171]";
                       } else {
                         optionStyle =
-                          "border-outline/10 bg-surface/20 text-on-surface-variant opacity-50";
+                          "border-outline/10 bg-on-surface/5 text-on-surface-variant opacity-50";
                       }
                     }
 
@@ -248,7 +248,7 @@ const QuizPage = () => {
                 </div>
 
                 {submitted && q.explanation && (
-                  <div className="mt-4 p-4 rounded-lg bg-surface/40 border-l-4 border-primary-fixed-dim text-[14px] text-on-surface-variant">
+                  <div className="mt-4 p-4 rounded-lg bg-on-surface/5 border-l-4 border-primary-fixed-dim text-[14px] text-on-surface-variant">
                     <span className="font-bold text-on-surface block mb-1">
                       Explanation:
                     </span>
@@ -277,7 +277,7 @@ const QuizPage = () => {
           <div className="mt-10 flex justify-center">
             <Link
               to="/course"
-              className="bg-surface-container text-on-surface border border-outline/20 font-bold px-10 py-3.5 rounded-xl hover:bg-white/10 transition-all flex items-center gap-2"
+              className="bg-surface-container text-on-surface border border-outline/20 font-bold px-10 py-3.5 rounded-xl hover:bg-on-surface/10 transition-all flex items-center gap-2"
             >
               Back to Course Map
             </Link>
