@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 import MouseTrail from "../../../components/ui/MouseTrail";
-import heroMascotVideo from "../../../assets/videos/hero-mascot.mp4";
+import heroMascotVideo from "../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../components/ui/TransparentVideo";
 
 const LandingPage = () => {
@@ -100,7 +100,7 @@ const LandingPage = () => {
                 </div>
               </div>
 
-              {/* Right: Video Mascot — transparent bg blends with dark page */}
+              {/* Right: Video Mascot — green screen removed */}
               <div className="flex-1 flex items-center justify-center lg:justify-end">
                 <div className="relative w-full max-w-[560px]">
                   {/* Soft glow behind mascot */}
@@ -108,8 +108,8 @@ const LandingPage = () => {
                   <TransparentVideo
                     src={heroMascotVideo}
                     className="w-full"
-                    keyColor={[0, 80, 90]}
-                    tolerance={60}
+                    keyColor={[0, 200, 0]}
+                    tolerance={80}
                   />
                 </div>
               </div>

@@ -112,11 +112,6 @@ const Login = () => {
                     <label
                       htmlFor="email"
                       className="text-sm font-normal text-on-surface pl-1"
-                      style={{
-                        fontFamily: "Open Sans",
-                        fontSize: "14px",
-                        lineHeight: "20px",
-                      }}
                     >
                       Email Address
                     </label>
@@ -144,22 +139,12 @@ const Login = () => {
                       <label
                         htmlFor="password"
                         className="text-sm font-normal text-on-surface pl-1"
-                        style={{
-                          fontFamily: "Open Sans",
-                          fontSize: "14px",
-                          lineHeight: "20px",
-                        }}
                       >
                         Password
                       </label>
                       <a
                         href="/forgot-password"
-                        className="text-sm text-on-surface hover:underline hover:text-secondary transition-colors"
-                        style={{
-                          fontFamily: "Open Sans",
-                          fontSize: "14px",
-                          lineHeight: "20px",
-                        }}
+                        className="text-sm text-on-surface-variant hover:underline hover:text-primary-fixed-dim transition-colors"
                       >
                         Forgot Password?
                       </a>
@@ -215,12 +200,7 @@ const Login = () => {
                   />
 
                   {error ? (
-                    <p
-                      className="text-sm text-red-400"
-                      style={{ fontFamily: "Open Sans" }}
-                    >
-                      {error}
-                    </p>
+                    <p className="text-sm text-red-400">{error}</p>
                   ) : null}
 
                   {/* Social login section */}
@@ -228,14 +208,7 @@ const Login = () => {
                     {/* Divider with text */}
                     <div className="flex flex-row items-center gap-4">
                       <div className="flex-1 h-px bg-[#3e49494c]" />
-                      <span
-                        className="text-xs text-on-surface"
-                        style={{
-                          fontFamily: "Open Sans",
-                          fontSize: "12px",
-                          lineHeight: "17px",
-                        }}
-                      >
+                      <span className="text-xs text-on-surface-variant">
                         or continue with
                       </span>
                       <div className="flex-1 h-px bg-[#3e49494c]" />
@@ -291,14 +264,7 @@ const Login = () => {
                         className="flex flex-row items-center gap-1 hover:opacity-80 transition-opacity duration-200"
                         onClick={() => {}}
                       >
-                        <span
-                          className="text-sm font-medium text-on-surface hover:text-secondary transition-colors"
-                          style={{
-                            fontFamily: "Roboto",
-                            fontSize: "13px",
-                            lineHeight: "16px",
-                          }}
-                        >
+                        <span className="text-sm font-medium text-on-surface-variant hover:text-primary-fixed-dim transition-colors">
                           Create an Account
                         </span>
                         <svg
@@ -321,14 +287,7 @@ const Login = () => {
               </div>
 
               {/* Terms and privacy */}
-              <p
-                className="text-center text-sm text-on-surface opacity-60 max-w-md px-4"
-                style={{
-                  fontFamily: "Open Sans",
-                  fontSize: "14px",
-                  lineHeight: "21px",
-                }}
-              >
+              <p className="text-center text-sm text-on-surface-variant max-w-md px-4">
                 <span>By continuing, you agree to Devcopet&apos;s </span>
                 <a
                   href="/terms"

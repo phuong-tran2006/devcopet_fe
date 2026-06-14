@@ -10,70 +10,100 @@ interface TransparentVideoProps {
 const TransparentVideo = ({
   src,
   className = "",
-  keyColor = [12, 15, 18], // Default background color of the mascot video
+  keyColor = [12, 15, 18],
   tolerance = 35,
 }: TransparentVideoProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animationFrameRef = useRef<number>(0);
 
   useEffect(() => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (!video || !canvas) return;
 
-    let animationFrameId: number;
-    const ctx = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
-    const render = () => {
-      if (video.paused || video.ended) {
-        animationFrameId = requestAnimationFrame(render);
-        return;
-      }
+    const [kr, kg, kb] = keyColor;
+    const isGreenScreen = kg > kr && kg > kb;
 
-      if (canvas.width !== video.videoWidth && video.videoWidth > 0) {
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-      }
+    const processFrame = () => {
+      if (!video.paused && !video.ended && video.videoWidth > 0) {
+        // Asymmetric crop: wider on left/right to remove black bars, no crop on top/bottom
+        const insetX = 16; // left/right crop
+        const insetY = 0; // no top/bottom crop — keep full height
+        const srcW = video.videoWidth - insetX * 2;
+        const srcH = video.videoHeight - insetY * 2;
 
-      if (canvas.width > 0) {
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imgData.data;
-        const [kr, kg, kb] = keyColor;
-
-        for (let i = 0; i < data.length; i += 4) {
-          const r = data[i];
-          const g = data[i + 1];
-          const b = data[i + 2];
-
-          // Calculate color difference (Manhattan distance)
-          const diff = Math.abs(r - kr) + Math.abs(g - kg) + Math.abs(b - kb);
-
-          if (diff < tolerance) {
-            data[i + 3] = 0; // Make alpha transparent
-          }
+        // Sync canvas dimensions to cropped size
+        if (canvas.width !== srcW || canvas.height !== srcH) {
+          canvas.width = srcW;
+          canvas.height = srcH;
         }
 
-        ctx.putImageData(imgData, 0, 0);
+        // Draw cropped region of video onto canvas
+        ctx.drawImage(video, insetX, insetY, srcW, srcH, 0, 0, srcW, srcH);
+
+        try {
+          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const data = imgData.data;
+          for (let i = 0; i < data.length; i += 4) {
+            const r = data[i];
+            const g = data[i + 1];
+            const b = data[i + 2];
+
+            if (isGreenScreen) {
+              const greenOverRed = g - r;
+              const greenOverBlue = g - b;
+              const minDominance = Math.min(greenOverRed, greenOverBlue);
+
+              if (minDominance > tolerance) {
+                data[i + 3] = 0;
+              } else if (minDominance > tolerance * 0.4) {
+                const factor =
+                  (minDominance - tolerance * 0.4) / (tolerance * 0.6);
+                data[i + 3] = Math.round(255 * (1 - factor));
+              }
+            } else {
+              const diff =
+                Math.abs(r - kr) + Math.abs(g - kg) + Math.abs(b - kb);
+              if (diff < tolerance) {
+                data[i + 3] = 0;
+              }
+            }
+          }
+
+          ctx.putImageData(imgData, 0, 0);
+        } catch {
+          // Canvas tainted — just draw without chroma key
+        }
       }
 
-      animationFrameId = requestAnimationFrame(render);
+      animationFrameRef.current = requestAnimationFrame(processFrame);
     };
 
-    video.addEventListener("play", render);
-    if (!video.paused) {
-      render();
+    // Start rendering as soon as video can play
+    const startRender = () => {
+      video.play().catch(() => {});
+      processFrame();
+    };
+
+    if (video.readyState >= 2) {
+      startRender();
+    } else {
+      video.addEventListener("canplay", startRender, { once: true });
     }
 
     return () => {
-      cancelAnimationFrame(animationFrameId);
-      video.removeEventListener("play", render);
+      cancelAnimationFrame(animationFrameRef.current);
+      video.removeEventListener("canplay", startRender);
     };
   }, [keyColor, tolerance]);
 
   return (
     <div className={`relative ${className}`}>
+      {/* Video is visually hidden but still needs to be in the layout flow for decoding */}
       <video
         ref={videoRef}
         src={src}
@@ -81,11 +111,23 @@ const TransparentVideo = ({
         loop
         muted
         playsInline
-        crossOrigin="anonymous"
-        className="hidden"
-        style={{ display: "none" }}
+        style={{
+          position: "absolute",
+          width: "1px",
+          height: "1px",
+          opacity: 0,
+          pointerEvents: "none",
+        }}
       />
-      <canvas ref={canvasRef} className="w-full h-auto object-contain" />
+      <canvas
+        ref={canvasRef}
+        className="w-full h-auto object-contain"
+        style={{
+          maskImage: "linear-gradient(to bottom, black 85%, transparent 100%)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, black 85%, transparent 100%)",
+        }}
+      />
     </div>
   );
 };

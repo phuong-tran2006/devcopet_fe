@@ -15,7 +15,7 @@ import {
   facebookIcon,
   socialIconClassName,
 } from "../constants/authImages";
-import mascotVideo from "../../../assets/videos/mascot-axolotl.mp4";
+import mascotVideo from "../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../components/ui/TransparentVideo";
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
@@ -150,16 +150,16 @@ const RegistrationPage = () => {
         <div className="absolute inset-0 pointer-events-none z-0">
           <div className="absolute inset-0 overflow-hidden">
             <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
+            <div className="absolute w-1.5 h-1.5 bg-primary-fixed-dim rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
             <div className="absolute w-1 h-1 bg-[#D8BFD8] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
             <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
 
-            <div className="absolute w-1 h-1 bg-[#008080] rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
+            <div className="absolute w-1 h-1 bg-primary-fixed-dim rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
             <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
+            <div className="absolute w-1.5 h-1.5 bg-primary-fixed-dim rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
             <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
 
-            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-[#008080] to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
+            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-primary/30 to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
             <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#D8BFD8] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
           </div>
           <div className="absolute inset-0 digital-grid opacity-20"></div>
@@ -176,8 +176,8 @@ const RegistrationPage = () => {
                   <TransparentVideo
                     src={mascotVideo}
                     className="h-auto w-48 object-contain sm:w-56 md:w-64 lg:w-72"
-                    keyColor={[0, 80, 90]}
-                    tolerance={60}
+                    keyColor={[0, 200, 0]}
+                    tolerance={80}
                   />
                 </div>
 
@@ -188,7 +188,7 @@ const RegistrationPage = () => {
                     <br />
                     Adventure
                   </h1>
-                  <p className="text-sm sm:text-base font-normal font-['Open_Sans'] leading-6 text-[#bdc9c8]">
+                  <p className="text-sm sm:text-base font-normal leading-6 text-on-surface-variant">
                     Begin your evolution from a fledgling script-kiddie to a
                     <br className="hidden sm:inline" />
                     legendary architect in the Devcopet ecosystem.
@@ -208,7 +208,7 @@ const RegistrationPage = () => {
                       {/* Full Name & Username Row */}
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal text-on-surface pl-1">
                             Full Name
                           </label>
                           <EditText
@@ -222,7 +222,7 @@ const RegistrationPage = () => {
                           />
                         </div>
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal text-on-surface pl-1">
                             Username
                           </label>
                           <EditText
@@ -240,7 +240,7 @@ const RegistrationPage = () => {
                       {/* Date of Birth & Coding Experience Row */}
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal text-on-surface pl-1">
                             Date of Birth
                           </label>
                           <EditText
@@ -254,7 +254,7 @@ const RegistrationPage = () => {
                           />
                         </div>
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal text-on-surface pl-1">
                             Experience Level
                           </label>
                           <Dropdown
@@ -272,7 +272,7 @@ const RegistrationPage = () => {
 
                       {/* Email Address */}
                       <div className="flex flex-col gap-1">
-                        <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                        <label className="text-sm font-normal text-on-surface pl-1">
                           Email Address
                         </label>
                         <div className="relative">
@@ -296,9 +296,9 @@ const RegistrationPage = () => {
                       {/* Password & Confirm Password Row */}
                       <div className="flex flex-col sm:flex-row gap-4">
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1 flex justify-between">
+                          <label className="text-sm font-normal text-on-surface pl-1 flex justify-between">
                             <span>Password</span>
-                            <span className="text-xs text-[#bdc9c87f]">
+                            <span className="text-xs text-on-surface-variant">
                               Min 6 chars
                             </span>
                           </label>
@@ -320,7 +320,7 @@ const RegistrationPage = () => {
                           </div>
                         </div>
                         <div className="w-full flex flex-col gap-1">
-                          <label className="text-sm font-normal font-['Roboto'] text-[#bdc9c8] pl-1">
+                          <label className="text-sm font-normal text-on-surface pl-1">
                             Confirm Password
                           </label>
                           <div className="relative">
@@ -358,18 +358,12 @@ const RegistrationPage = () => {
                       {/* Submit Button */}
                       <div className="mt-8">
                         {successMessage && (
-                          <div
-                            className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-center"
-                            style={{ fontFamily: "Roboto" }}
-                          >
+                          <div className="mb-4 p-3 bg-green-500/20 border border-green-500/50 rounded-lg text-green-400 text-center">
                             {successMessage}
                           </div>
                         )}
                         {errors.submit && (
-                          <div
-                            className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-center"
-                            style={{ fontFamily: "Roboto" }}
-                          >
+                          <div className="mb-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-center">
                             {errors.submit}
                           </div>
                         )}
@@ -397,7 +391,7 @@ const RegistrationPage = () => {
 
                       {/* Social Login Section */}
                       <div className="flex flex-col gap-6 pt-6 border-t border-on-surface/10">
-                        <p className="text-base font-normal font-['Roboto'] leading-[19px] text-center text-[#bdc9c8b2]">
+                        <p className="text-base font-normal leading-[19px] text-center text-on-surface-variant">
                           OR SYNC WITH IDENTITY PROVIDER
                         </p>
                         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 md:gap-[26px]">
@@ -456,12 +450,12 @@ const RegistrationPage = () => {
 
                       {/* Login Link */}
                       <div className="flex flex-wrap items-center justify-center gap-1.5 mt-6 px-8 sm:px-14">
-                        <span className="text-base font-normal font-['Open_Sans'] leading-[22px] text-center text-[#bdc9c8]">
+                        <span className="text-base font-normal leading-[22px] text-center text-on-surface-variant">
                           Already an explorer?
                         </span>
                         <Link
                           to="/login"
-                          className="text-base font-bold font-['Open_Sans'] leading-[22px] text-center text-[#008080] hover:underline focus:outline-none focus:ring-2 focus:ring-[#008080] focus:ring-offset-2 rounded"
+                          className="text-base font-bold leading-[22px] text-center text-primary-fixed-dim hover:underline focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:ring-offset-2 rounded"
                         >
                           Log in here
                         </Link>
@@ -492,7 +486,7 @@ const RegistrationPage = () => {
               d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
             />
           </svg>
-          <span className="text-base font-normal font-['Roboto'] leading-[19px] text-secondary">
+          <span className="text-base font-normal leading-[19px] text-on-surface-variant">
             Need assistance?
           </span>
         </button>

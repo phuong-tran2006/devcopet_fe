@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useNavigate } from "@tanstack/react-router";
 
 export interface NodeDetailsProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export interface NodeDetailsProps {
 
 const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // Close on outside click
   useEffect(() => {
@@ -49,9 +51,36 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
   // Determine difficulty styling
   const diff = chapter.difficulty || "medium";
   const difficultyMap = {
-    easy: { label: "EASY DIFFICULTY", icon: "🌱", color: "#97CADB" },
-    medium: { label: "MEDIUM DIFFICULTY", icon: "⚡", color: "#b3a6d9" },
-    hard: { label: "EXPERT DIFFICULTY", icon: "☠️", color: "#ef4444" },
+    easy: {
+      label: "EASY DIFFICULTY",
+      icon: "🌱",
+      colorText: "text-primary-fixed-dim",
+      colorBg: "bg-primary-fixed-dim",
+      colorHoverBg: "hover:bg-[#009999]",
+      shadow: "shadow-[0_8px_30px_rgba(0,128,128,0.3)]",
+      gradientLine: "from-primary-fixed-dim via-primary to-[#003333]",
+      btnText: "text-[#002020]",
+    },
+    medium: {
+      label: "MEDIUM DIFFICULTY",
+      icon: "⚡",
+      colorText: "text-[#D8BFD8]",
+      colorBg: "bg-[#D8BFD8]",
+      colorHoverBg: "hover:bg-[#e6cce6]",
+      shadow: "shadow-[0_8px_30px_rgba(216,191,216,0.3)]",
+      gradientLine: "from-[#D8BFD8] via-[#a380a3] to-[#4d334d]",
+      btnText: "text-[#3c2a3c]",
+    },
+    hard: {
+      label: "EXPERT DIFFICULTY",
+      icon: "☠️",
+      colorText: "text-[#22c55e]",
+      colorBg: "bg-[#22c55e]",
+      colorHoverBg: "hover:bg-[#16a34a]",
+      shadow: "shadow-[0_8px_30px_rgba(34,197,94,0.3)]",
+      gradientLine: "from-[#22c55e] via-[#15803d] to-[#14532d]",
+      btnText: "text-[#052e16]",
+    },
   };
   const dCfg = difficultyMap[diff];
 
@@ -59,18 +88,18 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
       <div
         ref={modalRef}
-        className="relative w-full max-w-[420px] bg-[#222731] dark:bg-surface-container-high rounded-[1.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col items-center p-8 animate-in fade-in zoom-in-95 duration-300"
+        className="relative w-full max-w-[420px] bg-surface-container-high border border-outline/20 rounded-[1.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col items-center p-8 animate-in fade-in zoom-in-95 duration-300"
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors"
         >
           <span className="material-symbols-outlined text-[20px]">close</span>
         </button>
 
         {/* Difficulty Tag */}
-        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-on-surface/20 bg-on-surface/5 mb-6">
+        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full border border-outline/30 bg-surface-container mb-6">
           <span className="text-[12px] leading-none">{dCfg.icon}</span>
           <span className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
             {dCfg.label}
@@ -78,7 +107,7 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
         </div>
 
         {/* Title & Description */}
-        <h2 className="text-[32px] font-extrabold text-white text-center leading-tight mb-3">
+        <h2 className="text-[32px] font-extrabold text-on-surface text-center leading-tight mb-3">
           {chapter.title.includes(":")
             ? chapter.title.split(":")[1].trim()
             : chapter.title}
@@ -89,8 +118,8 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
         </p>
 
         {/* Learning Objectives */}
-        <div className="w-full bg-[#1b2028] dark:bg-surface-container border border-on-surface/10 rounded-2xl p-5 mb-6">
-          <h3 className="text-[10px] font-bold tracking-widest text-[#8a8e94] uppercase mb-4">
+        <div className="w-full bg-surface-container border border-outline/10 rounded-2xl p-5 mb-6">
+          <h3 className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-4">
             LEARNING OBJECTIVES
           </h3>
           <div className="flex flex-col gap-3">
@@ -102,10 +131,12 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
               ]
             ).map((obj, i) => (
               <div key={i} className="flex items-start gap-3">
-                <span className="material-symbols-outlined text-[16px] text-[#4ade80] mt-[2px]">
+                <span
+                  className={`material-symbols-outlined text-[16px] ${dCfg.colorText} mt-[2px]`}
+                >
                   check_circle
                 </span>
-                <span className="text-[13px] text-[#d1d5db] font-medium leading-snug">
+                <span className="text-[13px] text-on-surface font-medium leading-snug">
                   {obj}
                 </span>
               </div>
@@ -115,23 +146,25 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
 
         {/* Rewards */}
         <div className="w-full grid grid-cols-2 gap-3 mb-8">
-          <div className="bg-[#1b2028] dark:bg-surface-container border border-on-surface/10 rounded-xl px-4 py-3 flex justify-between items-center">
-            <span className="text-[10px] font-bold tracking-widest text-[#8a8e94] uppercase">
+          <div className="bg-surface-container border border-outline/10 rounded-xl px-4 py-3 flex justify-between items-center">
+            <span className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
               REWARD XP
             </span>
-            <span className="text-[14px] font-bold text-[#c084fc]">
+            <span className="text-[14px] font-bold text-secondary-fixed-dim">
               {chapter.xp || 50}
             </span>
           </div>
-          <div className="bg-[#1b2028] dark:bg-surface-container border border-on-surface/10 rounded-xl px-4 py-3 flex justify-between items-center">
-            <span className="text-[10px] font-bold tracking-widest text-[#8a8e94] uppercase">
+          <div className="bg-surface-container border border-outline/10 rounded-xl px-4 py-3 flex justify-between items-center">
+            <span className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
               STARS
             </span>
             <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[14px] text-[#4ade80]">
+              <span
+                className={`material-symbols-outlined text-[14px] ${dCfg.colorText}`}
+              >
                 star
               </span>
-              <span className="text-[14px] font-bold text-[#4ade80]">
+              <span className={`text-[14px] font-bold ${dCfg.colorText}`}>
                 {chapter.stars !== undefined ? chapter.stars * 10 : 100}
               </span>
             </div>
@@ -140,17 +173,22 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
 
         {/* Action Button */}
         <button
-          onClick={onClose}
-          className="w-full text-white font-extrabold text-[15px] tracking-wider py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase shadow-[0_8px_30px_rgba(234,88,12,0.4)]"
-          style={{
-            background: "linear-gradient(to bottom, #f97316, #ea580c)",
+          onClick={() => {
+            onClose();
+            navigate({
+              to: "/lesson/$lessonId/quiz",
+              params: { lessonId: chapter._id },
+            });
           }}
+          className={`w-full ${dCfg.colorBg} ${dCfg.btnText} font-extrabold text-[15px] tracking-wider py-4 rounded-xl ${dCfg.colorHoverBg} hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase ${dCfg.shadow}`}
         >
           START LESSON
         </button>
 
         {/* Bottom decorative gradient line */}
-        <div className="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#f59e0b] via-[#2dd4bf] to-[#0ea5e9]"></div>
+        <div
+          className={`absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r ${dCfg.gradientLine}`}
+        ></div>
       </div>
     </div>
   );

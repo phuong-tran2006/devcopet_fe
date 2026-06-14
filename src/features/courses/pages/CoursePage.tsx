@@ -13,7 +13,7 @@ const CoursePage = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-4 gap-3">
           <div>
             <h1 className="font-headline-lg text-[24px] md:text-[28px] font-bold text-on-surface tracking-wide uppercase mb-1">
-              ALL LESSON
+              ALL LESSONS
             </h1>
             <p className="font-body-sm text-[13px] text-on-surface-variant">
               Choose a stack to master and evolve your familiar.
@@ -49,12 +49,12 @@ const CoursePage = () => {
             <input
               type="text"
               placeholder="Search technologies..."
-              className="w-full bg-surface-container border border-[#1e293b] rounded-lg pl-10 pr-4 py-2 text-[13px] text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim transition-colors"
+              className="w-full bg-surface-container border border-on-surface/10 rounded-lg pl-10 pr-4 py-2 text-[13px] text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim transition-colors"
             />
           </div>
           <div className="flex gap-4">
             <div className="relative">
-              <select className="bg-surface-container border border-[#1e293b] rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-surface-container-high transition-colors h-full">
+              <select className="bg-surface-container border border-on-surface/10 rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-surface-container-high transition-colors h-full">
                 <option>Difficulty: All</option>
                 <option>Beginner</option>
                 <option>Intermediate</option>
@@ -78,7 +78,7 @@ const CoursePage = () => {
             </div>
 
             <div className="relative">
-              <select className="bg-surface-container border border-[#1e293b] rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-surface-container-high transition-colors h-full">
+              <select className="bg-surface-container border border-on-surface/10 rounded-lg pl-4 pr-10 py-2 text-[13px] text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim appearance-none cursor-pointer hover:bg-surface-container-high transition-colors h-full">
                 <option>Sort: Popular</option>
                 <option>Sort: Newest</option>
                 <option>Sort: XP Required</option>
@@ -105,9 +105,9 @@ const CoursePage = () => {
         {/* Course Grid */}
         <div className="flex flex-wrap gap-6 justify-center md:justify-start">
           {/* Python Architect Card */}
-          <div className="bg-surface-container rounded-xl overflow-hidden border border-[#1e293b] flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-[280px] flex-shrink-0">
+          <div className="bg-surface-container rounded-xl overflow-hidden border border-on-surface/10 flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-[280px] flex-shrink-0">
             {/* Top Banner section */}
-            <div className="h-[90px] bg-[#052b4d] relative flex items-center justify-center">
+            <div className="h-[90px] bg-primary-container relative flex items-center justify-center">
               {/* Popular Badge */}
               <div className="absolute top-2 left-2 bg-primary-fixed-dim/20 border border-primary-fixed-dim/40 text-primary-fixed-dim text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase backdrop-blur-sm shadow-[0_0_10px_rgba(0,218,248,0.2)]">
                 POPULAR
@@ -136,7 +136,7 @@ const CoursePage = () => {
                 <h3 className="font-headline-sm text-[16px] text-on-surface">
                   Python Architect
                 </h3>
-                <button className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg hover:bg-[#253243] hover:text-on-surface transition-colors flex items-center justify-center">
+                <button className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg hover:bg-surface-container-high hover:text-on-surface transition-colors flex items-center justify-center">
                   <span className="material-symbols-outlined text-[14px]">
                     terminal
                   </span>
@@ -179,7 +179,7 @@ const CoursePage = () => {
                 <Link
                   to="/courses/$courseId"
                   params={{ courseId: "python-basic" }}
-                  className="w-full bg-[#8cecf5] text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:bg-primary-fixed hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(140,236,245,0.3)]"
+                  className="w-full bg-primary-fixed-dim text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)]"
                 >
                   Continue{" "}
                   <span className="material-symbols-outlined text-[14px]">
