@@ -51,7 +51,7 @@ const Button = ({
   leftIcon,
   rightIcon,
   ...props
-}) => {
+}: any) => {
   // Safe validation for optional parameters
   const hasValidWidth =
     layout_width &&

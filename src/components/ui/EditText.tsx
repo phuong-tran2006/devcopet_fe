@@ -59,7 +59,7 @@ const EditText = ({
   helperText,
   className,
   ...props
-}) => {
+}: any) => {
   const [isFocused, setIsFocused] = useState(false);
 
   // Safe validation for optional parameters

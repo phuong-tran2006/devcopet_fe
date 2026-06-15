@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 
-import MouseTrail from "../../../components/ui/MouseTrail";
-import heroMascotVideo from "../../../assets/videos/7936438193787.mp4";
-import TransparentVideo from "../../../components/ui/TransparentVideo";
+import MouseTrail from "../../../../components/ui/MouseTrail";
+import heroMascotVideo from "../../../../assets/videos/7936438193787.mp4";
+import TransparentVideo from "../../../../components/ui/TransparentVideo";
 
 const LandingPage = () => {
   const glowCardsRef = useRef<any[]>([]);

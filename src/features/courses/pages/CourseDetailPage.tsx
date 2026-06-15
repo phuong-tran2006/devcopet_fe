@@ -207,7 +207,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
           <h2
             className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? "text-white" : "text-on-surface-variant/60"}`}
           >
-            Module {index + 1}: {chapter.title}
+            {chapter.title}
           </h2>
           <div className="flex items-center gap-2 mt-1.5">
             {isActive ? (

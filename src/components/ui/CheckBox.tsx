@@ -54,7 +54,7 @@ const CheckBox = ({
   error,
   className,
   ...props
-}) => {
+}: any) => {
   const [isChecked, setIsChecked] = useState(
     checked !== undefined ? checked : defaultChecked,
   );

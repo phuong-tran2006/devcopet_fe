@@ -1,22 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import Button from "../../../components/ui/Button";
-import EditText from "../../../components/ui/EditText";
-import Dropdown from "../../../components/ui/Dropdown";
-import CheckBox from "../../../components/ui/CheckBox";
-import EmailProviderIcon from "../../../components/ui/EmailProviderIcon";
-import MouseTrail from "../../../components/ui/MouseTrail";
-import { EmailIcon, LockIcon } from "../../../components/ui/icons";
-import { useAuthStore } from "../store/auth.store";
-import { authApi } from "../api/auth.api";
+import Button from "../../../../components/ui/Button";
+import EditText from "../../../../components/ui/EditText";
+import Dropdown from "../../../../components/ui/Dropdown";
+import CheckBox from "../../../../components/ui/CheckBox";
+import EmailProviderIcon from "../../../../components/ui/EmailProviderIcon";
+import MouseTrail from "../../../../components/ui/MouseTrail";
+import { EmailIcon, LockIcon } from "../../../../components/ui/icons";
+import { useAuthStore } from "../../store/auth.store";
+import { authApi } from "../../api/auth.api";
 import {
   googleIcon,
   githubIcon,
   facebookIcon,
   socialIconClassName,
-} from "../constants/authImages";
-import mascotVideo from "../../../assets/videos/7936438193787.mp4";
-import TransparentVideo from "../../../components/ui/TransparentVideo";
+} from "../../constants/authImages";
+import mascotVideo from "../../../../assets/videos/7936438193787.mp4";
+import TransparentVideo from "../../../../components/ui/TransparentVideo";
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -113,12 +113,9 @@ const RegistrationPage = () => {
     setLoading(true);
     try {
       const response = await authApi.register({
-        username: formData.username,
         email: formData.email,
         password: formData.password,
-        fullName: formData.fullName,
-        codingExperience: formData.codingExperience,
-        dateOfBirth: formData.dateOfBirth,
+        name: formData.fullName,
       });
 
       setSuccessMessage("Account created successfully! Redirecting...");

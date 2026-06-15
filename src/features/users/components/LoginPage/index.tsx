@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
-import Button from "../../../components/ui/Button";
-import MouseTrail from "../../../components/ui/MouseTrail";
+import Button from "../../../../components/ui/Button";
+import MouseTrail from "../../../../components/ui/MouseTrail";
 import {
   EmailIcon,
   LockIcon,
   EyeIcon,
   EyeOffIcon,
-} from "../../../components/ui/icons";
-import { useAuthStore } from "../store/auth.store";
-import { authApi } from "../api/auth.api";
+} from "../../../../components/ui/icons";
+import { useAuthStore } from "../../store/auth.store";
+import { authApi } from "../../api/auth.api";
 import {
   googleIcon,
   githubIcon,
   facebookIcon,
   socialIconClassName,
-} from "../constants/authImages";
+} from "../../constants/authImages";
 
 const Login = () => {
   const [email, setEmail] = useState("");
