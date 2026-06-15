@@ -15,8 +15,7 @@ import {
   facebookIcon,
   socialIconClassName,
 } from "../constants/authImages";
-import mascotVideo from "../../../assets/videos/mascot-axolotl.mp4";
-import TransparentVideo from "../../../components/ui/TransparentVideo";
+
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -169,26 +168,16 @@ const RegistrationPage = () => {
         <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16">
           <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12">
             {/* Left Section - Hero Content */}
-            <section className="w-full lg:w-[26%] flex flex-col items-center lg:items-start gap-6 sm:gap-8 lg:gap-12">
-              {/* Mascot & Welcome Message */}
-              <div className="w-full flex flex-col items-center lg:items-start gap-6 sm:gap-8 lg:gap-12 px-4 sm:px-6 lg:px-0">
-                <div className="relative w-full max-w-[352px] flex items-end justify-center lg:justify-start">
-                  <TransparentVideo
-                    src={mascotVideo}
-                    className="h-auto w-48 object-contain sm:w-56 md:w-64 lg:w-72"
-                    keyColor={[0, 80, 90]}
-                    tolerance={60}
-                  />
-                </div>
-
-                {/* Hero Text */}
-                <div className="flex flex-col gap-3 text-center lg:text-left px-4 sm:px-6">
-                  <h1 className="font-headline-lg text-headline-lg md:text-[48px] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim to-secondary-fixed-dim">
+            <section className="w-full lg:w-[35%] flex flex-col items-center justify-center gap-6 sm:gap-8 lg:gap-12 mt-4 lg:mt-24">
+              {/* Hero Text & Welcome Message */}
+              <div className="w-full flex flex-col items-center justify-center gap-6 sm:gap-8 lg:gap-12 px-4 sm:px-6 lg:px-0">
+                <div className="flex flex-col gap-6 text-center px-4 sm:px-6">
+                  <h1 className="font-headline-lg text-[40px] md:text-[52px] lg:text-[60px] font-extrabold leading-tight text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim to-secondary-fixed-dim">
                     Start Your
                     <br />
                     Adventure
                   </h1>
-                  <p className="text-sm sm:text-base font-normal font-['Open_Sans'] leading-6 text-[#bdc9c8]">
+                  <p className="text-base sm:text-lg lg:text-xl font-normal font-['Open_Sans'] leading-relaxed text-[#bdc9c8] max-w-[400px] mx-auto">
                     Begin your evolution from a fledgling script-kiddie to a
                     <br className="hidden sm:inline" />
                     legendary architect in the Devcopet ecosystem.

@@ -64,6 +64,11 @@ const TransparentVideo = ({
     video.addEventListener("play", render);
     if (!video.paused) {
       render();
+    } else {
+      // Explicitly try to play
+      video
+        .play()
+        .catch((err) => console.warn("TransparentVideo play failed:", err));
     }
 
     return () => {

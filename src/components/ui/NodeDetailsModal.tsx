@@ -59,12 +59,12 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm px-4">
       <div
         ref={modalRef}
-        className="relative w-full max-w-[420px] bg-[#222731] dark:bg-surface-container-high rounded-[1.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col items-center p-8 animate-in fade-in zoom-in-95 duration-300"
+        className="relative w-full max-w-[420px] bg-surface dark:bg-surface-container-high rounded-[1.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.2)] dark:shadow-[0_20px_60px_rgba(0,0,0,0.6)] overflow-hidden flex flex-col items-center p-8 animate-in fade-in zoom-in-95 duration-300"
       >
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-white transition-colors"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"
         >
           <span className="material-symbols-outlined text-[20px]">close</span>
         </button>
@@ -78,7 +78,7 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
         </div>
 
         {/* Title & Description */}
-        <h2 className="text-[32px] font-extrabold text-white text-center leading-tight mb-3">
+        <h2 className="text-[32px] font-extrabold text-on-surface text-center leading-tight mb-3">
           {chapter.title.includes(":")
             ? chapter.title.split(":")[1].trim()
             : chapter.title}
@@ -89,8 +89,8 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
         </p>
 
         {/* Learning Objectives */}
-        <div className="w-full bg-[#1b2028] dark:bg-surface-container border border-on-surface/10 rounded-2xl p-5 mb-6">
-          <h3 className="text-[10px] font-bold tracking-widest text-[#8a8e94] uppercase mb-4">
+        <div className="w-full bg-surface-container-low dark:bg-surface-container border border-on-surface/10 rounded-2xl p-5 mb-6">
+          <h3 className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-4">
             LEARNING OBJECTIVES
           </h3>
           <div className="flex flex-col gap-3">
@@ -105,7 +105,7 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
                 <span className="material-symbols-outlined text-[16px] text-[#4ade80] mt-[2px]">
                   check_circle
                 </span>
-                <span className="text-[13px] text-[#d1d5db] font-medium leading-snug">
+                <span className="text-[13px] text-on-surface font-medium leading-snug">
                   {obj}
                 </span>
               </div>
@@ -115,16 +115,16 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
 
         {/* Rewards */}
         <div className="w-full grid grid-cols-2 gap-3 mb-8">
-          <div className="bg-[#1b2028] dark:bg-surface-container border border-on-surface/10 rounded-xl px-4 py-3 flex justify-between items-center">
-            <span className="text-[10px] font-bold tracking-widest text-[#8a8e94] uppercase">
+          <div className="bg-surface-container-low dark:bg-surface-container border border-on-surface/10 rounded-xl px-4 py-3 flex justify-between items-center">
+            <span className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
               REWARD XP
             </span>
             <span className="text-[14px] font-bold text-[#c084fc]">
               {chapter.xp || 50}
             </span>
           </div>
-          <div className="bg-[#1b2028] dark:bg-surface-container border border-on-surface/10 rounded-xl px-4 py-3 flex justify-between items-center">
-            <span className="text-[10px] font-bold tracking-widest text-[#8a8e94] uppercase">
+          <div className="bg-surface-container-low dark:bg-surface-container border border-on-surface/10 rounded-xl px-4 py-3 flex justify-between items-center">
+            <span className="text-[10px] font-bold tracking-widest text-on-surface-variant uppercase">
               STARS
             </span>
             <div className="flex items-center gap-1.5">
@@ -141,16 +141,13 @@ const NodeDetailsModal = ({ isOpen, onClose, chapter }: NodeDetailsProps) => {
         {/* Action Button */}
         <button
           onClick={onClose}
-          className="w-full text-white font-extrabold text-[15px] tracking-wider py-4 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase shadow-[0_8px_30px_rgba(234,88,12,0.4)]"
-          style={{
-            background: "linear-gradient(to bottom, #f97316, #ea580c)",
-          }}
+          className="w-full bg-primary-fixed-dim text-on-primary-fixed font-extrabold text-[15px] tracking-wider py-4 rounded-xl hover:bg-primary-fixed hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase shadow-[0_8px_30px_rgba(0,218,248,0.4)]"
         >
           START LESSON
         </button>
 
         {/* Bottom decorative gradient line */}
-        <div className="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-[#f59e0b] via-[#2dd4bf] to-[#0ea5e9]"></div>
+        <div className="absolute bottom-0 left-0 w-full h-[4px] bg-gradient-to-r from-primary-fixed-dim via-[#2dd4bf] to-[#0ea5e9]"></div>
       </div>
     </div>
   );
