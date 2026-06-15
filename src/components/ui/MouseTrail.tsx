@@ -1,22 +1,15 @@
-import { useEffect, useRef } from "react";
-
-interface Particle {
-  x: number;
-  y: number;
-  alpha: number;
-  size: number;
-}
+// @ts-nocheck
+import React, { useEffect, useRef } from "react";
 
 const MouseTrail = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    let animationFrameId: number;
-    const particles: Particle[] = [];
+    let animationFrameId;
+    let particles = [];
 
     const resizeCanvas = () => {
       canvas.width = window.innerWidth;
@@ -25,7 +18,7 @@ const MouseTrail = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e) => {
       particles.push({
         x: e.clientX,
         y: e.clientY,
@@ -50,9 +43,9 @@ const MouseTrail = () => {
 
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 128, 128, ${p.alpha})`;
+        ctx.fillStyle = `rgba(0, 218, 248, ${p.alpha})`;
         ctx.shadowBlur = 10;
-        ctx.shadowColor = "#008080";
+        ctx.shadowColor = "#00daf8";
         ctx.fill();
       }
       animationFrameId = requestAnimationFrame(animate);

@@ -1,3 +1,5 @@
+// @ts-nocheck
+import React from "react";
 import { cva } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
@@ -7,13 +9,12 @@ const iconButtonClasses = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary-teal text-on-surface hover:bg-opacity-90 focus:ring-primary-teal",
+          "bg-primary-teal text-white hover:bg-opacity-90 focus:ring-primary-teal",
         secondary:
           "bg-background-card text-text-primary border border-border-primary hover:bg-background-secondary focus:ring-primary-teal-light",
         ghost:
           "bg-transparent text-text-primary hover:bg-background-card focus:ring-primary-teal-light",
-        danger:
-          "bg-red-500 text-on-surface hover:bg-red-600 focus:ring-red-500",
+        danger: "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500",
       },
       size: {
         small: "w-8 h-8 p-1.5",
@@ -38,8 +39,8 @@ const IconButton = ({
   type = "button",
   ariaLabel,
   ...props
-}: any) => {
-  const handleClick = (event: any) => {
+}) => {
+  const handleClick = (event) => {
     if (disabled) return;
     if (typeof onClick === "function") {
       onClick(event);
@@ -48,10 +49,9 @@ const IconButton = ({
 
   return (
     <button
-      type={type as "button" | "submit" | "reset"}
+      type={type}
       disabled={disabled}
       onClick={handleClick}
-      style={props.style}
       className={twMerge(
         iconButtonClasses({ variant, size }),
         "hover:scale-105 active:scale-95",

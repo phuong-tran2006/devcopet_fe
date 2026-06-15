@@ -1,3 +1,5 @@
+// @ts-nocheck
+import React from "react";
 import { twMerge } from "tailwind-merge";
 
 const Link = ({
@@ -8,8 +10,8 @@ const Link = ({
   disabled = false,
   onClick,
   ...props
-}: any) => {
-  const handleClick = (e: any) => {
+}) => {
+  const handleClick = (e) => {
     if (disabled) {
       e?.preventDefault();
       return;

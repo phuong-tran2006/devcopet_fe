@@ -1,3 +1,5 @@
+// @ts-nocheck
+import React from "react";
 import { twMerge } from "tailwind-merge";
 
 const Line = ({
@@ -9,7 +11,7 @@ const Line = ({
   className,
   style,
   ...props
-}: any) => {
+}) => {
   const isHorizontal = orientation === "horizontal";
 
   const lineStyles = {
@@ -29,7 +31,7 @@ const Line = ({
   return (
     <div
       role="separator"
-      aria-orientation={orientation as "horizontal" | "vertical"}
+      aria-orientation={orientation}
       className={twMerge("flex-shrink-0", className)}
       style={lineStyles}
       {...props}

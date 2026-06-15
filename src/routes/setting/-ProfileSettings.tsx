@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { mascotAxolotl } from "../../../features/users/constants/authImages";
+import { mascotAxolotl } from "../../features/users/constants/authImages";
 
 interface ProfileSettingsProps {
   theme: "light" | "dark";
@@ -36,7 +36,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
             <div
               className={`w-[74px] h-[84px] rounded-[28px] border-2 p-2 flex items-center justify-center transition-colors ${
                 theme === "dark"
-                  ? "border-[#1c3242] bg-background"
+                  ? "border-[#1c3242] bg-[#040d14]"
                   : "border-slate-300 bg-slate-100"
               }`}
             >
@@ -70,7 +70,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
             onChange={(e) => setBio(e.target.value)}
             className={`w-full h-[84px] border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#76d6d5] resize-none transition-all ${
               theme === "dark"
-                ? "bg-background border-[#14232e] text-slate-300"
+                ? "bg-[#040d14] border-[#14232e] text-slate-300"
                 : "bg-slate-50 border-slate-200 text-slate-800"
             }`}
           />
@@ -89,7 +89,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
             onChange={(e) => setSystemName(e.target.value)}
             className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#76d6d5] transition-all ${
               theme === "dark"
-                ? "bg-background border-[#14232e] text-slate-300"
+                ? "bg-[#040d14] border-[#14232e] text-slate-300"
                 : "bg-slate-50 border-slate-200 text-slate-800"
             }`}
           />

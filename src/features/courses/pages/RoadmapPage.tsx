@@ -41,16 +41,16 @@ const RoadmapPage = () => {
         {/* Map Grid */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-4">
           {/* Card 1: Python */}
-          <div className="bg-surface-container/80 backdrop-blur-xl rounded-2xl border border-on-surface/10 p-6 flex flex-col hover:border-[#8cecf5]/40 hover:shadow-[0_0_30px_rgba(140,236,245,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-outline/30 p-6 flex flex-col hover:border-primary-fixed-dim/50 hover:shadow-[0_8px_30px_rgba(0,128,128,0.2)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-primary bg-[#8cecf5]/10 border border-[#8cecf5]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[10px] text-primary bg-primary-fixed-dim/10 border border-primary-fixed-dim/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
                 Lvl. 42 Master
               </span>
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-[#8cecf5]/10 border border-[#8cecf5]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#8cecf5]/20 transition-colors">
+            <div className="h-[100px] w-full bg-primary-fixed-dim/10 border border-primary-fixed-dim/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-primary-fixed-dim/20 transition-colors">
               <svg
                 viewBox="0 0 110 110"
                 className="w-[54px] h-[54px] group-hover:scale-105 transition-transform duration-500 ease-out"
@@ -87,7 +87,7 @@ const RoadmapPage = () => {
                 <span className="text-primary">78%</span>
               </div>
               <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-[#8cecf5] w-[78%] rounded-full shadow-[0_0_10px_rgba(140,236,245,0.4)]"></div>
+                <div className="h-full bg-primary-fixed-dim w-[78%] rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]"></div>
               </div>
             </div>
 
@@ -105,7 +105,7 @@ const RoadmapPage = () => {
             <Link
               to="/roadmap/$worldId"
               params={{ worldId: "python-basic" }}
-              className="mt-auto w-full bg-[#8cecf5] text-[#001f25] font-extrabold text-[12px] py-2.5 rounded-xl hover:bg-[#a6f2f8] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(140,236,245,0.3)] hover:scale-[1.02] active:scale-[0.98]"
+              className="mt-auto w-full bg-primary-fixed-dim text-on-primary-fixed font-extrabold text-[12px] py-2.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
               Enter World{" "}
               <span className="material-symbols-outlined text-[15px]">
@@ -115,7 +115,7 @@ const RoadmapPage = () => {
           </div>
 
           {/* Card 2: Java */}
-          <div className="bg-surface-container/80 backdrop-blur-xl rounded-2xl border border-on-surface/10 p-6 flex flex-col hover:border-[#D8BFD8]/40 hover:shadow-[0_0_30px_rgba(216,191,216,0.15)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
+          <div className="bg-surface rounded-2xl border border-outline/30 p-6 flex flex-col hover:border-water/50 hover:shadow-[0_8px_30px_rgba(59,130,246,0.2)] transition-all duration-500 ease-out-cubic group relative overflow-hidden opacity-90 hover:opacity-100">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
               <span className="text-[10px] text-secondary bg-[#D8BFD8]/10 border border-[#D8BFD8]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
@@ -219,7 +219,7 @@ const RoadmapPage = () => {
           </div>
 
           {/* Card 3: C++ */}
-          <div className="bg-surface-container/40 backdrop-blur-xl rounded-2xl border border-on-surface/5 p-6 flex flex-col relative overflow-hidden select-none">
+          <div className="bg-surface rounded-2xl border border-outline/20 p-6 flex flex-col relative overflow-hidden select-none opacity-70">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
               <span className="text-[10px] text-on-surface/40 bg-on-surface/5 border border-on-surface/10 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">

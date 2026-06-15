@@ -412,25 +412,21 @@ const WorldMapPage = () => {
     hard: { totalXP: 2180, chapters: 7, badge: "☠️ Expert" },
   };
 
-  const DRAWER_W = 320;
-
   return (
-    <main className="relative min-h-[calc(100vh-80px)] w-full bg-background overflow-x-hidden">
+    <div className="flex w-full h-[calc(100vh-80px)] bg-background overflow-hidden relative">
       {/* =========================================
-          LEFT FIXED DRAWER
+          LEFT DRAWER
       ========================================= */}
-
-      {/* Drawer Panel — fixed so it never scrolls */}
       <aside
-        className="fixed top-[80px] left-0 h-[calc(100vh-80px)] z-30 flex flex-col bg-surface border-r border-on-surface/8 shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-transform duration-300 ease-out overflow-hidden"
-        style={{
-          width: `${DRAWER_W}px`,
-          transform: drawerOpen
-            ? "translateX(0)"
-            : `translateX(-${DRAWER_W}px)`,
-        }}
+        className={`shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${
+          drawerOpen ? "w-[320px]" : "w-0"
+        }`}
       >
-        <div className="w-full flex flex-col h-full">
+        <div
+          className={`h-full w-[320px] flex flex-col bg-surface border-r border-on-surface/8 shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
+            drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
+        >
           {/* ── TOP: User Stats ── */}
           <div className="px-5 pt-5 pb-4 border-b border-on-surface/6 flex-shrink-0">
             {/* Profile row */}
@@ -571,7 +567,7 @@ const WorldMapPage = () => {
                           background: `${cfg.glowWeak}`,
                           borderColor: `${cfg.accent}50`,
                           boxShadow: `0 0 12px ${cfg.glowWeak}`,
-                          ringColor: cfg.accent,
+                          ["--tw-ring-color" as string]: cfg.accent,
                         }
                       : {}
                   }
@@ -686,397 +682,396 @@ const WorldMapPage = () => {
         </div>
       </aside>
 
-      {/* Drawer Toggle Tab — follows the fixed sidebar */}
+      {/* Drawer Toggle Tab */}
       <button
         onClick={() => setDrawerOpen(!drawerOpen)}
-        className="fixed top-1/2 -translate-y-1/2 z-40 w-7 h-16 rounded-r-xl border border-l-0 border-on-surface/10 bg-surface-container/95 backdrop-blur-md flex items-center justify-center hover:bg-surface-container transition-all duration-300 shadow-[4px_0_20px_rgba(0,0,0,0.4)]"
-        style={{
-          left: drawerOpen ? `${DRAWER_W}px` : "0px",
-          transition: "left 0.3s ease-out, background 0.2s",
-        }}
-        title={drawerOpen ? "Close panel" : "Open panel"}
+        className={`
+          hidden lg:flex fixed top-[96px] z-50 h-10 w-10 items-center justify-center
+          rounded-full border border-outline/30 bg-surface-container text-on-surface-variant
+          shadow-lg transition-all duration-300
+          hover:border-primary-fixed-dim hover:text-primary-fixed-dim hover:bg-[#17212d]
+          ${drawerOpen ? "left-[335px]" : "left-4"}
+        `}
+        aria-label={drawerOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
-        <span
-          className={`material-symbols-outlined text-[18px] text-on-surface-variant transition-transform duration-300 ${
-            drawerOpen ? "rotate-180" : "rotate-0"
-          }`}
-        >
-          chevron_right
+        <span className="material-symbols-outlined text-[22px]">
+          {drawerOpen ? "chevron_left" : "menu"}
         </span>
       </button>
 
       {/* =========================================
-          MAIN MAP AREA — margin-left mirrors drawer width
+          MAIN MAP AREA
       ========================================= */}
-      <section
-        className="flex flex-col items-center justify-start py-10 px-4 z-10 min-h-[calc(100vh-80px)]"
-        style={{
-          marginLeft: drawerOpen ? `${DRAWER_W}px` : "0px",
-          transition: "margin-left 0.3s ease-out",
-        }}
-      >
-        <div className="w-full max-w-[680px] flex flex-col">
-          {/* ── Header ── */}
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-8 border-b border-on-surface/8 pb-7">
-            <div className="flex items-center gap-4">
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center border"
-                style={{
-                  background: `${cfg.glowWeak}`,
-                  borderColor: `${cfg.accent}50`,
-                  boxShadow: `0 0 20px ${cfg.glowWeak}`,
-                }}
-              >
-                <span
-                  className="material-symbols-outlined text-[26px]"
-                  style={{ color: cfg.accent }}
-                >
-                  terminal
-                </span>
-              </div>
-              <div>
-                <h1 className="text-[32px] md:text-[38px] font-extrabold text-on-surface tracking-wide uppercase leading-none">
-                  Python World
-                </h1>
-                <span
-                  className="text-[11px] font-bold tracking-widest uppercase"
-                  style={{ color: cfg.accent }}
-                >
-                  {diffMeta[difficulty].badge} · {diffMeta[difficulty].chapters}{" "}
-                  Chapters · {diffMeta[difficulty].totalXP} XP
-                </span>
-              </div>
-            </div>
-
-            {/* Difficulty Pills */}
-            <div className="flex bg-surface-container/90 p-1 rounded-xl border border-on-surface/10 text-[12px] font-bold uppercase tracking-wider gap-0.5">
-              {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDifficulty(d)}
-                  className={`px-5 py-2 rounded-lg transition-all duration-200 ${
-                    difficulty === d
-                      ? "text-[#0d1117] shadow-md"
-                      : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
-                  }`}
-                  style={
-                    difficulty === d
-                      ? {
-                          background: DIFF_CONFIG[d].gradient,
-                          boxShadow: `0 2px 12px ${DIFF_CONFIG[d].glowWeak}`,
-                        }
-                      : {}
-                  }
-                >
-                  {DIFF_CONFIG[d].label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* ── World Progress Bar ── */}
-          <div className="flex flex-col gap-2 mb-8 border border-on-surface/10 bg-surface-container/60 rounded-2xl px-5 py-4">
-            <div className="flex justify-between items-center text-[13px] font-bold tracking-wider text-on-surface-variant">
-              <span>World Completion</span>
-              <span className="text-[15px]" style={{ color: cfg.accent }}>
-                {completionPct}%
-              </span>
-            </div>
-            <div className="h-3 bg-surface-container rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: `${completionPct}%`,
-                  background: cfg.gradient,
-                  boxShadow: `0 0 14px ${cfg.glow}`,
-                }}
-              />
-            </div>
-            <div className="flex justify-between text-[11px] text-on-surface-variant/60 font-medium mt-0.5">
-              <span>{completedCount} chapters done</span>
-              <span>{chapters.length} total</span>
-            </div>
-          </div>
-
-          {/* ── Difficulty banner for Medium / Hard ── */}
-          {difficulty !== "easy" && (
-            <div
-              className="flex items-center gap-3 px-4 py-3 rounded-xl border mb-6"
-              style={{
-                background: `${cfg.glowWeak}`,
-                borderColor: `${cfg.accent}35`,
-              }}
-            >
-              <span
-                className="material-symbols-outlined text-[22px]"
-                style={{ color: cfg.accent }}
-              >
-                {difficulty === "medium" ? "fitness_center" : "skull"}
-              </span>
-              <div>
-                <p className="text-[12px] font-bold text-on-surface">
-                  {difficulty === "medium"
-                    ? "Challenger Mode — Unlock after completing Easy"
-                    : "Expert Mode — Unlock after completing Medium"}
-                </p>
-                <p className="text-[10px] text-on-surface-variant/70 mt-0.5">
-                  {difficulty === "medium"
-                    ? "Deeper concepts, more complex exercises. +50% XP multiplier."
-                    : "No guardrails. Raw difficulty. +100% XP multiplier."}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* ── Interactive Road Map ── */}
-          <div
-            ref={mapContainerRef}
-            className="relative w-full overflow-visible select-none"
-            style={{ height: `${mapHeight}px` }}
-          >
-            <svg
-              className="absolute inset-0 pointer-events-none w-full h-full"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <defs>
-                <filter id={`glow-${difficulty}`}>
-                  <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                  <feMerge>
-                    <feMergeNode in="coloredBlur" />
-                    <feMergeNode in="SourceGraphic" />
-                  </feMerge>
-                </filter>
-              </defs>
-
-              {completedD && (
-                <path
-                  d={completedD}
-                  fill="none"
-                  stroke={cfg.pathColor}
-                  strokeWidth="6"
-                  strokeLinecap="round"
-                  filter={`url(#glow-${difficulty})`}
-                />
-              )}
-              {lockedD && (
-                <path
-                  d={lockedD}
-                  fill="none"
-                  stroke="#2a3641"
-                  strokeWidth="5"
-                  strokeLinecap="round"
-                  strokeDasharray="8,10"
-                />
-              )}
-            </svg>
-
-            {/* Chapter Nodes */}
-            {chapters.map((chapter, idx) => {
-              const { x, y } = getNodeCoords(idx);
-              const isCompleted = chapter.status === "completed";
-              const isInProgress = chapter.status === "in_progress";
-              const isLocked = chapter.status === "locked";
-              const isHovered = hoveredNode === chapter._id;
-
-              return (
+      <main className="flex-1 w-full relative overflow-y-auto custom-scrollbar">
+        <section className="flex flex-col items-center justify-start py-10 px-4 z-10 min-h-full">
+          <div className="w-full max-w-[680px] flex flex-col">
+            {/* ── Header ── */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-8 border-b border-on-surface/8 pb-7">
+              <div className="flex items-center gap-4">
                 <div
-                  key={chapter._id}
-                  ref={isInProgress ? activeNodeRef : null}
-                  data-chapter-id={chapter._id}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-10 cursor-pointer"
-                  style={{ left: `${x}px`, top: `${y}px` }}
-                  onMouseEnter={() => setHoveredNode(chapter._id)}
-                  onMouseLeave={() => setHoveredNode(null)}
-                  onClick={() => {
-                    setSelectedChapter({ ...chapter, difficulty });
+                  className="w-11 h-11 rounded-xl flex items-center justify-center border"
+                  style={{
+                    background: `${cfg.glowWeak}`,
+                    borderColor: `${cfg.accent}50`,
+                    boxShadow: `0 0 20px ${cfg.glowWeak}`,
                   }}
                 >
-                  {/* Tooltip */}
-                  {isHovered && (
-                    <div
-                      className="absolute z-30 pointer-events-none"
-                      style={{
-                        bottom: "calc(100% + 14px)",
-                        left: "50%",
-                        transform: "translateX(-50%)",
-                      }}
-                    >
-                      <div className="bg-surface-container border border-on-surface/15 rounded-xl px-4 py-3 shadow-xl min-w-[180px] text-center">
-                        <p className="text-[13px] font-bold text-on-surface whitespace-nowrap mb-1.5">
-                          {chapter.title}
-                        </p>
-                        <div className="flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
-                          <span className="flex items-center gap-1">
-                            <span className="material-symbols-outlined text-[12px]">
-                              book
+                  <span
+                    className="material-symbols-outlined text-[26px]"
+                    style={{ color: cfg.accent }}
+                  >
+                    terminal
+                  </span>
+                </div>
+                <div>
+                  <h1 className="text-[32px] md:text-[38px] font-extrabold text-on-surface tracking-wide uppercase leading-none">
+                    Python World
+                  </h1>
+                  <span
+                    className="text-[11px] font-bold tracking-widest uppercase"
+                    style={{ color: cfg.accent }}
+                  >
+                    {diffMeta[difficulty].badge} ·{" "}
+                    {diffMeta[difficulty].chapters} Chapters ·{" "}
+                    {diffMeta[difficulty].totalXP} XP
+                  </span>
+                </div>
+              </div>
+
+              {/* Difficulty Pills */}
+              <div className="flex bg-surface-container/90 p-1 rounded-xl border border-on-surface/10 text-[12px] font-bold uppercase tracking-wider gap-0.5">
+                {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setDifficulty(d)}
+                    className={`px-5 py-2 rounded-lg transition-all duration-200 ${
+                      difficulty === d
+                        ? "text-[#0d1117] shadow-md"
+                        : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
+                    }`}
+                    style={
+                      difficulty === d
+                        ? {
+                            background: DIFF_CONFIG[d].gradient,
+                            boxShadow: `0 2px 12px ${DIFF_CONFIG[d].glowWeak}`,
+                          }
+                        : {}
+                    }
+                  >
+                    {DIFF_CONFIG[d].label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* ── World Progress Bar ── */}
+            <div className="flex flex-col gap-2 mb-8 border border-on-surface/10 bg-surface-container/60 rounded-2xl px-5 py-4">
+              <div className="flex justify-between items-center text-[13px] font-bold tracking-wider text-on-surface-variant">
+                <span>World Completion</span>
+                <span className="text-[15px]" style={{ color: cfg.accent }}>
+                  {completionPct}%
+                </span>
+              </div>
+              <div className="h-3 bg-surface-container rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${completionPct}%`,
+                    background: cfg.gradient,
+                    boxShadow: `0 0 14px ${cfg.glow}`,
+                  }}
+                />
+              </div>
+              <div className="flex justify-between text-[11px] text-on-surface-variant/60 font-medium mt-0.5">
+                <span>{completedCount} chapters done</span>
+                <span>{chapters.length} total</span>
+              </div>
+            </div>
+
+            {/* ── Difficulty banner for Medium / Hard ── */}
+            {difficulty !== "easy" && (
+              <div
+                className="flex items-center gap-3 px-4 py-3 rounded-xl border mb-6"
+                style={{
+                  background: `${cfg.glowWeak}`,
+                  borderColor: `${cfg.accent}35`,
+                }}
+              >
+                <span
+                  className="material-symbols-outlined text-[22px]"
+                  style={{ color: cfg.accent }}
+                >
+                  {difficulty === "medium" ? "fitness_center" : "skull"}
+                </span>
+                <div>
+                  <p className="text-[12px] font-bold text-on-surface">
+                    {difficulty === "medium"
+                      ? "Challenger Mode — Unlock after completing Easy"
+                      : "Expert Mode — Unlock after completing Medium"}
+                  </p>
+                  <p className="text-[10px] text-on-surface-variant/70 mt-0.5">
+                    {difficulty === "medium"
+                      ? "Deeper concepts, more complex exercises. +50% XP multiplier."
+                      : "No guardrails. Raw difficulty. +100% XP multiplier."}
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* ── Interactive Road Map ── */}
+            <div
+              ref={mapContainerRef}
+              className="relative w-full overflow-visible select-none"
+              style={{ height: `${mapHeight}px` }}
+            >
+              <svg
+                className="absolute inset-0 pointer-events-none w-full h-full"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <defs>
+                  <filter id={`glow-${difficulty}`}>
+                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                    <feMerge>
+                      <feMergeNode in="coloredBlur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                {completedD && (
+                  <path
+                    d={completedD}
+                    fill="none"
+                    stroke={cfg.pathColor}
+                    strokeWidth="6"
+                    strokeLinecap="round"
+                    filter={`url(#glow-${difficulty})`}
+                  />
+                )}
+                {lockedD && (
+                  <path
+                    d={lockedD}
+                    fill="none"
+                    stroke="var(--color-outline)"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                    strokeDasharray="8,10"
+                    opacity="0.5"
+                  />
+                )}
+              </svg>
+
+              {/* Chapter Nodes */}
+              {chapters.map((chapter, idx) => {
+                const { x, y } = getNodeCoords(idx);
+                const isCompleted = chapter.status === "completed";
+                const isInProgress = chapter.status === "in_progress";
+                const isLocked = chapter.status === "locked";
+                const isHovered = hoveredNode === chapter._id;
+
+                return (
+                  <div
+                    key={chapter._id}
+                    ref={isInProgress ? activeNodeRef : null}
+                    data-chapter-id={chapter._id}
+                    className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-10 cursor-pointer"
+                    style={{ left: `${x}px`, top: `${y}px` }}
+                    onMouseEnter={() => setHoveredNode(chapter._id)}
+                    onMouseLeave={() => setHoveredNode(null)}
+                    onClick={() => {
+                      setSelectedChapter({ ...chapter, difficulty });
+                    }}
+                  >
+                    {/* Tooltip */}
+                    {isHovered && (
+                      <div
+                        className="absolute z-30 pointer-events-none"
+                        style={{
+                          bottom: "calc(100% + 14px)",
+                          left: "50%",
+                          transform: "translateX(-50%)",
+                        }}
+                      >
+                        <div className="bg-surface-container border border-on-surface/15 rounded-xl px-4 py-3 shadow-xl min-w-[180px] text-center">
+                          <p className="text-[13px] font-bold text-on-surface whitespace-nowrap mb-1.5">
+                            {chapter.title}
+                          </p>
+                          <div className="flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
+                            <span className="flex items-center gap-1">
+                              <span className="material-symbols-outlined text-[12px]">
+                                book
+                              </span>
+                              {chapter.lessons || "?"} lessons
                             </span>
-                            {chapter.lessons || "?"} lessons
-                          </span>
-                          <span className="flex items-center gap-1 text-[#FFE052]">
-                            <span className="material-symbols-outlined text-[12px]">
-                              bolt
+                            <span className="flex items-center gap-1 text-[#FFE052]">
+                              <span className="material-symbols-outlined text-[12px]">
+                                bolt
+                              </span>
+                              {chapter.xp || "?"}xp
                             </span>
-                            {chapter.xp || "?"}xp
+                          </div>
+                          {isLocked && (
+                            <p className="text-[10px] text-on-surface-variant/50 mt-1.5">
+                              Complete previous to unlock
+                            </p>
+                          )}
+                          <div
+                            className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent opacity-20"
+                            style={{
+                              borderTopColor: "var(--color-on-surface)",
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ── Completed Node ── */}
+                    {isCompleted && (
+                      <div
+                        className={`flex flex-col items-center transition-transform duration-300 ${
+                          isHovered ? "scale-110" : "scale-100"
+                        }`}
+                      >
+                        <div
+                          className={`w-14 h-14 rounded-full flex items-center justify-center font-bold border-2 border-on-surface/20 ${cfg.nodeCompleted}`}
+                          style={{ boxShadow: `0 0 24px ${cfg.glow}` }}
+                        >
+                          <span className="material-symbols-outlined text-[26px] font-extrabold">
+                            done
                           </span>
                         </div>
-                        {isLocked && (
-                          <p className="text-[10px] text-on-surface-variant/50 mt-1.5">
-                            Complete previous to unlock
-                          </p>
+                        {chapter.stars !== undefined && (
+                          <div
+                            className="mt-1.5 px-2.5 py-1 rounded-full flex items-center gap-1.5 border"
+                            style={{
+                              background: "var(--color-background)",
+                              borderColor: `${cfg.accent}28`,
+                            }}
+                          >
+                            <StarPips stars={chapter.stars} />
+                            <span className="text-[9px] font-bold text-[#FFE052]">
+                              {chapter.stars}/3
+                            </span>
+                          </div>
                         )}
-                        <div
-                          className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent opacity-20"
-                          style={{ borderTopColor: "var(--color-on-surface)" }}
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ── Completed Node ── */}
-                  {isCompleted && (
-                    <div
-                      className={`flex flex-col items-center transition-transform duration-300 ${
-                        isHovered ? "scale-110" : "scale-100"
-                      }`}
-                    >
-                      <div
-                        className={`w-14 h-14 rounded-full flex items-center justify-center font-bold border-2 border-on-surface/20 ${cfg.nodeCompleted}`}
-                        style={{ boxShadow: `0 0 24px ${cfg.glow}` }}
-                      >
-                        <span className="material-symbols-outlined text-[26px] font-extrabold">
-                          done
+                        <span className="mt-1 text-[11px] font-semibold text-on-surface-variant/80 max-w-[120px] text-center leading-tight">
+                          {chapter.title}
                         </span>
                       </div>
-                      {chapter.stars !== undefined && (
+                    )}
+
+                    {/* ── In Progress Node ── */}
+                    {isInProgress && (
+                      <div
+                        className={`flex flex-col items-center relative transition-transform duration-300 ${
+                          isHovered ? "scale-110" : "scale-100"
+                        }`}
+                      >
                         <div
-                          className="mt-1.5 px-2.5 py-1 rounded-full flex items-center gap-1.5 border"
+                          className="absolute rounded-full animate-ping opacity-20 scale-150"
                           style={{
-                            background: "var(--color-background)",
-                            borderColor: `${cfg.accent}28`,
+                            inset: 0,
+                            background: cfg.accent,
+                          }}
+                        />
+                        <div
+                          className="w-16 h-16 rounded-full flex flex-col items-center justify-center font-extrabold text-[18px] border-4 border-background relative z-10"
+                          style={{
+                            background: cfg.gradient,
+                            color: "#fff",
+                            boxShadow: `0 0 32px ${cfg.glow}`,
                           }}
                         >
-                          <StarPips stars={chapter.stars} />
-                          <span className="text-[9px] font-bold text-[#FFE052]">
-                            {chapter.stars}/3
+                          {idx + 1}
+                        </div>
+                        <div
+                          className="mt-2 px-3 py-1 rounded-full border"
+                          style={{
+                            background: `${cfg.glowWeak}`,
+                            borderColor: `${cfg.accent}40`,
+                          }}
+                        >
+                          <span
+                            className="text-[10px] font-extrabold tracking-wide uppercase"
+                            style={{ color: cfg.accent }}
+                          >
+                            Active
                           </span>
                         </div>
-                      )}
-                      <span className="mt-1 text-[11px] font-semibold text-on-surface-variant/80 max-w-[120px] text-center leading-tight">
-                        {chapter.title}
-                      </span>
-                    </div>
-                  )}
-
-                  {/* ── In Progress Node ── */}
-                  {isInProgress && (
-                    <div
-                      className={`flex flex-col items-center relative transition-transform duration-300 ${
-                        isHovered ? "scale-110" : "scale-100"
-                      }`}
-                    >
-                      <div
-                        className="absolute rounded-full animate-ping opacity-20 scale-150"
-                        style={{
-                          inset: 0,
-                          background: cfg.accent,
-                        }}
-                      />
-                      <div
-                        className="w-16 h-16 rounded-full flex flex-col items-center justify-center font-extrabold text-[18px] border-4 border-background relative z-10"
-                        style={{
-                          background: cfg.gradient,
-                          color: "#fff",
-                          boxShadow: `0 0 32px ${cfg.glow}`,
-                        }}
-                      >
-                        {idx + 1}
-                      </div>
-                      <div
-                        className="mt-2 px-3 py-1 rounded-full border"
-                        style={{
-                          background: `${cfg.glowWeak}`,
-                          borderColor: `${cfg.accent}40`,
-                        }}
-                      >
-                        <span
-                          className="text-[10px] font-extrabold tracking-wide uppercase"
-                          style={{ color: cfg.accent }}
-                        >
-                          Active
+                        <span className="mt-1 text-[12px] font-bold text-on-surface max-w-[130px] text-center leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                          {chapter.title}
                         </span>
                       </div>
-                      <span className="mt-1 text-[12px] font-bold text-on-surface max-w-[130px] text-center leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                        {chapter.title}
-                      </span>
-                    </div>
-                  )}
+                    )}
 
-                  {/* ── Locked Node ── */}
-                  {isLocked && (
-                    <div
-                      className={`flex flex-col items-center transition-transform duration-300 ${
-                        isHovered ? "scale-105" : "scale-100"
-                      }`}
-                    >
-                      <div className="w-11 h-11 rounded-full bg-surface-container text-on-surface/20 flex items-center justify-center border border-on-surface/5 shadow-inner">
-                        <span className="material-symbols-outlined text-[17px]">
-                          lock
+                    {/* ── Locked Node ── */}
+                    {isLocked && (
+                      <div
+                        className={`flex flex-col items-center transition-transform duration-300 ${
+                          isHovered ? "scale-105" : "scale-100"
+                        }`}
+                      >
+                        <div className="w-11 h-11 rounded-full bg-surface-container text-on-surface/20 flex items-center justify-center border border-on-surface/5 shadow-inner">
+                          <span className="material-symbols-outlined text-[17px]">
+                            lock
+                          </span>
+                        </div>
+                        <span className="mt-1.5 text-[10px] font-medium text-on-surface-variant/40 max-w-[100px] text-center leading-tight">
+                          {chapter.title}
                         </span>
                       </div>
-                      <span className="mt-1.5 text-[10px] font-medium text-on-surface-variant/40 max-w-[100px] text-center leading-tight">
-                        {chapter.title}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── FLOATING BUTTONS ── */}
-      <div className="fixed bottom-8 right-8 flex flex-col gap-3 z-50">
-        <button
-          onClick={scrollToActiveNode}
-          title="Jump to In-Progress Node"
-          className="group w-12 h-12 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300"
-          style={{
-            background: cfg.gradient,
-            boxShadow: `0 4px 20px ${cfg.glowWeak}`,
-            color: "#fff",
-          }}
-        >
-          <span className="material-symbols-outlined text-[20px] group-hover:rotate-12 transition-transform duration-300">
-            my_location
-          </span>
-        </button>
-
-        <div
-          className={`transition-all duration-300 ${
-            showScrollTop
-              ? "opacity-100 translate-y-0 pointer-events-auto"
-              : "opacity-0 translate-y-4 pointer-events-none"
-          }`}
-        >
+        {/* ── FLOATING BUTTONS ── */}
+        <div className="fixed bottom-8 right-8 flex flex-col gap-3 z-50">
           <button
-            onClick={scrollToTop}
-            title="Scroll to Top"
-            className="w-12 h-12 rounded-full bg-surface-container/90 backdrop-blur-md border border-on-surface/10 hover:border-on-surface/25 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+            onClick={scrollToActiveNode}
+            title="Jump to In-Progress Node"
+            className="group w-12 h-12 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300"
+            style={{
+              background: cfg.gradient,
+              boxShadow: `0 4px 20px ${cfg.glowWeak}`,
+              color: "#fff",
+            }}
           >
-            <span className="material-symbols-outlined text-[20px]">
-              arrow_upward
+            <span className="material-symbols-outlined text-[20px] group-hover:rotate-12 transition-transform duration-300">
+              my_location
             </span>
           </button>
-        </div>
-      </div>
 
+          <div
+            className={`transition-all duration-300 ${
+              showScrollTop
+                ? "opacity-100 translate-y-0 pointer-events-auto"
+                : "opacity-0 translate-y-4 pointer-events-none"
+            }`}
+          >
+            <button
+              onClick={scrollToTop}
+              title="Scroll to Top"
+              className="w-12 h-12 rounded-full bg-surface-container/90 backdrop-blur-md border border-on-surface/10 hover:border-on-surface/25 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+            >
+              <span className="material-symbols-outlined text-[20px]">
+                arrow_upward
+              </span>
+            </button>
+          </div>
+        </div>
+      </main>
+
+      {/* Node Details Modal */}
       <NodeDetailsModal
         isOpen={!!selectedChapter}
         onClose={() => setSelectedChapter(null)}
         chapter={selectedChapter}
       />
-    </main>
+    </div>
   );
 };
 

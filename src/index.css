@@ -63,11 +63,11 @@
 
   --font-code-md: "JetBrains Mono";
   --font-label-sm: "JetBrains Mono";
-  --font-headline-md: "Geist";
-  --font-headline-lg: "Geist";
-  --font-body-md: "Geist";
-  --font-headline-sm: "Geist";
-  --font-body-lg: "Geist";
+  --font-headline-md: sans-serif;
+  --font-headline-lg: sans-serif;
+  --font-body-md: "Quicksand", sans-serif;
+  --font-headline-sm: sans-serif;
+  --font-body-lg: "Quicksand", sans-serif;
 
   --text-code-md: 14px;
   --text-code-md--line-height: 1.5;
@@ -104,30 +104,41 @@
   html,
   body,
   #root {
+    font-family: "Quicksand", sans-serif;
     @apply m-0 p-0 min-h-screen bg-background text-on-surface overflow-x-hidden transition-colors duration-300;
   }
 
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: sans-serif;
+    font-weight: 700;
+  }
+
   html.light {
-    --color-background: #f4f5f6;
-    --color-on-background: #1a202c;
+    --color-background: #f0f2f5;
+    --color-on-background: #334155;
     --color-surface: #ffffff;
-    --color-surface-dim: #f8fafc;
+    --color-surface-dim: #e2e8f0;
     --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #fdfdfd;
-    --color-surface-container: #ffffff;
-    --color-surface-container-high: #f8fafc;
-    --color-surface-container-highest: #f1f5f9;
-    --color-on-surface: #2d3748;
-    --color-on-surface-variant: #4a5568;
-    --color-outline: #e2e8f0;
-    --color-surface-variant: #edf2f7;
+    --color-surface-container-low: #f8fafc;
+    --color-surface-container: #f1f5f9;
+    --color-surface-container-high: #e2e8f0;
+    --color-surface-container-highest: #cbd5e1;
+    --color-on-surface: #334155;
+    --color-on-surface-variant: #475569;
+    --color-outline: #cbd5e1;
+    --color-surface-variant: #e2e8f0;
   }
 }
 
 @layer components {
   .companion-container {
-    @apply min-h-screen w-full bg-white flex flex-col items-center pt-20 px-5 box-border font-sans;
+    @apply min-h-screen w-full bg-background flex flex-col items-center pt-20 px-5 box-border font-sans;
   }
 
   .egg-grid-layout {
@@ -136,7 +147,7 @@
 
   .egg-card-custom {
     /* Bây giờ rounded-card sẽ hoạt động vì đã có --radius-card ở trên */
-    @apply bg-white rounded-card p-[30px] text-center border border-gray-100 transition-all duration-300 cursor-pointer shadow-sm;
+    @apply bg-surface rounded-card p-[30px] text-center border border-outline/30 transition-all duration-300 cursor-pointer shadow-sm;
   }
 
   .egg-card-active {

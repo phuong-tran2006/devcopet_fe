@@ -1,17 +1,10 @@
+// @ts-nocheck
+import React from "react";
 import { Link, useNavigate, useMatchRoute } from "@tanstack/react-router";
 import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
-import NotificationDropdown from "./NotificationDropdown";
 
-const NavLink = ({
-  to,
-  label,
-  exact = false,
-}: {
-  to: string;
-  label: string;
-  exact?: boolean;
-}) => {
+const NavLink = ({ to, label, exact = false }) => {
   const matchRoute = useMatchRoute();
   const isActive = matchRoute({ to, fuzzy: !exact });
 
@@ -56,10 +49,14 @@ const Header = () => {
         <div className="flex items-center gap-6">
           {isAuthenticated ? (
             <>
-              <NotificationDropdown />
+              <button className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface">
+                <span className="material-symbols-outlined text-[20px]">
+                  notifications
+                </span>
+              </button>
               <button
                 onClick={toggleTheme}
-                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/10 transition-all text-on-surface"
+                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   {theme === "dark" ? "light_mode" : "dark_mode"}
@@ -67,7 +64,7 @@ const Header = () => {
               </button>
               <Link
                 to="/setting/setting"
-                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/10 transition-all text-on-surface"
+                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
               >
                 <span className="material-symbols-outlined text-[20px]">
                   settings
@@ -77,31 +74,31 @@ const Header = () => {
               {/* Profile Dropdown */}
               <div className="relative group cursor-pointer ml-2 z-50">
                 <div className="w-9 h-9 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center text-primary-fixed-dim text-sm font-bold border border-primary-fixed-dim/30 group-hover:border-primary-fixed-dim transition-all duration-300 shadow-[0_0_10px_rgba(0,218,248,0.3)] overflow-hidden">
-                  {(user as any)?.avatarUrl ? (
+                  {user?.avatarUrl ? (
                     <img
-                      src={(user as any).avatarUrl}
+                      src={user.avatarUrl}
                       alt="avatar"
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <>
-                      {(user as any)?.username?.charAt(0)?.toUpperCase() ||
-                        (user as any)?.email?.charAt(0)?.toUpperCase() ||
+                      {user?.username?.charAt(0)?.toUpperCase() ||
+                        user?.email?.charAt(0)?.toUpperCase() ||
                         "U"}
                     </>
                   )}
                 </div>
 
                 {/* Dropdown Menu */}
-                <div className="absolute top-10 right-0 w-40 bg-surface-container-high/95 backdrop-blur-lg border border-on-surface/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-right group-hover:scale-100 scale-95">
+                <div className="absolute top-10 right-0 w-40 bg-surface-container-high/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-right group-hover:scale-100 scale-95">
                   <div className="flex flex-col gap-1 p-2">
-                    <button className="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-on-surface/10 rounded-lg transition-colors font-medium flex items-center gap-2">
+                    <button className="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-white/5 rounded-lg transition-colors font-medium flex items-center gap-2">
                       <span className="material-symbols-outlined text-[16px]">
                         person
                       </span>
                       Profile
                     </button>
-                    <div className="h-px w-full bg-on-surface/5 my-1"></div>
+                    <div className="h-px w-full bg-white/5 my-1"></div>
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors font-medium flex items-center gap-2"

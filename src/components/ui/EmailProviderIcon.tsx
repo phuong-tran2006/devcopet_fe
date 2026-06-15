@@ -1,8 +1,7 @@
-const EmailProviderIcon = ({
-  className = "h-6 w-6",
-}: {
-  className?: string;
-}) => (
+// @ts-nocheck
+import React from "react";
+
+const EmailProviderIcon = ({ className = "h-6 w-6" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"

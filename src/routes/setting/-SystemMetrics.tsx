@@ -14,7 +14,9 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ theme }) => {
       }`}
     >
       {/* Tiêu đề phân hệ */}
-      <h3 className={`text-base font-bold tracking-wide text-on-surface`}>
+      <h3
+        className={`text-base font-bold tracking-wide ${theme === "dark" ? "text-white" : "text-slate-900"}`}
+      >
         System Metrics
       </h3>
 
@@ -23,7 +25,7 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ theme }) => {
         <div
           className={`flex items-center gap-4 p-4 border rounded-2xl transition-colors ${
             theme === "dark"
-              ? "bg-background border-[#14232e]"
+              ? "bg-[#040d14] border-[#14232e]"
               : "bg-slate-50 border-slate-100"
           }`}
         >
@@ -49,7 +51,7 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ theme }) => {
             </p>
             <p
               className={`text-2xl font-bold font-mono tracking-wide mt-0.5 ${
-                theme === "dark" ? "text-on-surface" : "text-slate-800"
+                theme === "dark" ? "text-white" : "text-slate-800"
               }`}
             >
               42,890
@@ -61,12 +63,12 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ theme }) => {
         <div
           className={`flex items-center gap-4 p-4 border rounded-2xl transition-colors ${
             theme === "dark"
-              ? "bg-background border-[#14232e]"
+              ? "bg-[#040d14] border-[#14232e]"
               : "bg-slate-50 border-slate-100"
           }`}
         >
           {/* Box chứa Icon Tích xanh đạt thử thách màu hồng */}
-          <div className="p-3 bg-[#241b2c] text-secondary rounded-xl flex items-center justify-center shrink-0">
+          <div className="p-3 bg-[#241b2c] text-[#d8bfd8] rounded-xl flex items-center justify-center shrink-0">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -87,7 +89,7 @@ export const SystemMetrics: React.FC<SystemMetricsProps> = ({ theme }) => {
             </p>
             <p
               className={`text-2xl font-bold font-mono tracking-wide mt-0.5 ${
-                theme === "dark" ? "text-on-surface" : "text-slate-800"
+                theme === "dark" ? "text-white" : "text-slate-800"
               }`}
             >
               156

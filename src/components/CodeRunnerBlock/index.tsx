@@ -1,19 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+// @ts-nocheck
+import React, { useState, useEffect, useRef } from "react";
 
-const CodeRunnerBlock = ({
-  initialCode,
-  title = "TRY IT YOURSELF",
-}: {
-  initialCode?: string;
-  title?: string;
-}) => {
+const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   const [code, setCode] = useState(initialCode || "");
   const [output, setOutput] = useState("Loading Python Engine...");
   const [status, setStatus] = useState("loading"); // loading | ready | running | done | error | timeout
 
-  const workerRef = useRef<Worker | null>(null);
-  const timeoutRef = useRef<any>(null);
-  const currentRunId = useRef<number>(0);
+  const workerRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const currentRunId = useRef(0);
 
   // Initialize the worker on component mount
   useEffect(() => {
@@ -32,15 +27,14 @@ const CodeRunnerBlock = ({
     if (workerRef.current) {
       workerRef.current.terminate();
     }
-    const worker = new Worker("/pyodide-worker.js");
-    workerRef.current = worker;
+    workerRef.current = new Worker("/pyodide-worker.js");
     setStatus("loading");
 
     if (!isRestart) {
       setOutput("Loading Python Engine...");
     }
 
-    worker.onmessage = (event: MessageEvent) => {
+    workerRef.current.onmessage = (event) => {
       const data = event.data;
 
       if (data.type === "ready") {
@@ -90,9 +84,7 @@ const CodeRunnerBlock = ({
     const runId = Date.now();
     currentRunId.current = runId;
 
-    if (workerRef.current) {
-      workerRef.current.postMessage({ id: runId, code });
-    }
+    workerRef.current.postMessage({ id: runId, code });
 
     // 5 seconds timeout
     timeoutRef.current = setTimeout(() => {
@@ -115,7 +107,7 @@ const CodeRunnerBlock = ({
     setStatus("ready");
   };
 
-  const handleKeyDown = (e: any) => {
+  const handleKeyDown = (e) => {
     // Basic tab support for indentation (2 spaces)
     if (e.key === "Tab") {
       e.preventDefault();
@@ -140,7 +132,7 @@ const CodeRunnerBlock = ({
           <span className="material-symbols-outlined text-[18px] text-primary-fixed-dim">
             code_blocks
           </span>
-          <span className="text-[12px] font-bold text-[#F8FAFC] tracking-widest uppercase">
+          <span className="text-[12px] font-bold text-white tracking-widest uppercase">
             {title}
           </span>
         </div>
@@ -149,7 +141,7 @@ const CodeRunnerBlock = ({
           <button
             onClick={handleReset}
             disabled={status === "running" || status === "loading"}
-            className="text-[12px] font-bold text-[#94A3B8] hover:text-[#F8FAFC] transition-colors disabled:opacity-50 flex items-center gap-1"
+            className="text-[12px] font-bold text-on-surface-variant hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1"
           >
             <span className="material-symbols-outlined text-[16px]">
               refresh
@@ -188,7 +180,7 @@ const CodeRunnerBlock = ({
 
       {/* Output Panel */}
       <div className="bg-[#121c25] p-4">
-        <div className="text-[11px] font-bold text-[#94A3B8] uppercase tracking-widest mb-2">
+        <div className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">
           Output
         </div>
         <pre

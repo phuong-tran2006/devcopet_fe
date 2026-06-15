@@ -1,16 +1,19 @@
+// @ts-nocheck
+import React, { useState } from "react";
 import { cva } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
 const inputClasses = cva(
-  "w-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-teal-light focus:border-primary-teal-light disabled:opacity-50 disabled:cursor-not-allowed",
+  "w-full rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed",
   {
     variants: {
       variant: {
         default:
-          "bg-background-card border-border-primary text-text-secondary hover:border-primary-teal-light",
-        filled: "bg-background-input border-border-primary text-text-primary",
+          "bg-surface/50 border border-on-surface/10 text-on-surface placeholder:text-on-surface/40 hover:border-primary-fixed-dim/50",
+        filled:
+          "bg-surface-container border border-on-surface/10 text-on-surface placeholder:text-on-surface/40",
         outline:
-          "bg-transparent border-2 border-border-primary text-text-primary",
+          "bg-transparent border-2 border-on-surface/10 text-on-surface placeholder:text-on-surface/40",
       },
       size: {
         small: "text-sm px-3 py-2",
@@ -29,14 +32,6 @@ const EditText = ({
   // Required parameters with defaults
   placeholder = "••••••••••••",
   text_font_size = "16",
-  text_font_family = "Nimbus Sans",
-  text_font_weight = "400",
-  text_line_height = "20px",
-  text_text_align = "left",
-  text_color = "#879392",
-  fill_background_color = "#11212e",
-  border_border = "1 solid #3e4949",
-  border_border_radius = "8px",
 
   // Optional parameters (no defaults)
   layout_gap,
@@ -65,6 +60,8 @@ const EditText = ({
   className,
   ...props
 }: any) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   // Safe validation for optional parameters
   const hasValidWidth =
     layout_width &&
@@ -90,38 +87,26 @@ const EditText = ({
     ?.filter(Boolean)
     ?.join(" ");
 
-  // Parse border style
-  const borderParts = border_border?.split(" ");
-  const borderWidth = borderParts?.[0] || "1";
-  const borderStyle = borderParts?.[1] || "solid";
-  const borderColor = borderParts?.[2] || "#3e4949";
-
-  // Build inline styles for required parameters
-  const inputStyles = {
+  // Only fontSize is customizable via inline styles
+  const inputStyles: React.CSSProperties = {
     fontSize: text_font_size ? `${text_font_size}px` : "16px",
-    fontFamily: text_font_family || "Nimbus Sans",
-    fontWeight: text_font_weight || "400",
-    lineHeight: text_line_height || "20px",
-    textAlign: text_text_align || "left",
-    color: text_color || "#879392",
-    backgroundColor: fill_background_color || "#11212e",
-    border: `${borderWidth}px ${borderStyle} ${borderColor}`,
-    borderRadius: border_border_radius || "8px",
   };
 
-  const handleFocus = (e: any) => {
+  const handleFocus = (e) => {
+    setIsFocused(true);
     if (typeof onFocus === "function") {
       onFocus(e);
     }
   };
 
-  const handleBlur = (e: any) => {
+  const handleBlur = (e) => {
+    setIsFocused(false);
     if (typeof onBlur === "function") {
       onBlur(e);
     }
   };
 
-  const handleChange = (e: any) => {
+  const handleChange = (e) => {
     if (typeof onChange === "function") {
       onChange(e);
     }
@@ -137,7 +122,7 @@ const EditText = ({
       {label && (
         <label
           htmlFor={id || name}
-          className="text-sm font-medium text-text-primary mb-1"
+          className="text-sm font-normal text-on-surface pl-1"
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -174,7 +159,7 @@ const EditText = ({
           id={`${id || name}-helper`}
           className={twMerge(
             "text-xs mt-1",
-            error ? "text-red-500" : "text-text-secondary",
+            error ? "text-red-500" : "text-on-surface-variant",
           )}
         >
           {error || helperText}

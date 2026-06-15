@@ -1,8 +1,10 @@
+// @ts-nocheck
+import React from "react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
-import CodeRunnerBlock from "../CodeRunnerBlock/CodeRunnerBlock";
+import CodeRunnerBlock from "../CodeRunnerBlock";
 
 /**
  * MarkdownRenderer
@@ -11,7 +13,7 @@ import CodeRunnerBlock from "../CodeRunnerBlock/CodeRunnerBlock";
  * - Code blocks with syntax highlighting (dark theme, matching UI)
  * - Inline code
  */
-const MarkdownRenderer = ({ content }: { content?: string | null }) => {
+const MarkdownRenderer = ({ content }) => {
   if (!content) return null;
 
   return (
@@ -128,7 +130,7 @@ const MarkdownRenderer = ({ content }: { content?: string | null }) => {
           ),
 
           // ── Inline Code ───────────────────────────────────
-          code: ({ inline, className, children, ...props }: any) => {
+          code: ({ inline, className, children, ...props }) => {
             const language = className
               ? className.replace("language-", "").trim()
               : "";

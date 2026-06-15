@@ -26,7 +26,7 @@ export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
         <div
           className={`flex items-center justify-between p-4 border rounded-xl transition-colors ${
             theme === "dark"
-              ? "bg-background border-[#14232e]"
+              ? "bg-[#040d14] border-[#14232e]"
               : "bg-slate-50 border-slate-100"
           }`}
         >
@@ -34,7 +34,9 @@ export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
             <p className="text-xs text-on-surface-variant font-semibold">
               Primary Email
             </p>
-            <p className={`text-sm mt-0.5 text-on-surface`}>
+            <p
+              className={`text-sm mt-0.5 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}
+            >
               admin@devcopet.io
             </p>
           </div>
@@ -53,7 +55,7 @@ export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
         <div
           className={`flex items-center justify-between p-4 border rounded-xl transition-colors ${
             theme === "dark"
-              ? "bg-background border-[#14232e]"
+              ? "bg-[#040d14] border-[#14232e]"
               : "bg-slate-50 border-slate-100"
           }`}
         >
@@ -80,12 +82,14 @@ export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
         <div
           className={`flex items-center justify-between p-4 border rounded-xl transition-colors ${
             theme === "dark"
-              ? "bg-background/50 border-[#14232e]"
+              ? "bg-[#040d14]/50 border-[#14232e]"
               : "bg-slate-50 border-slate-100"
           }`}
         >
           <div>
-            <p className={`text-sm font-semibold text-on-surface`}>
+            <p
+              className={`text-sm font-semibold ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}
+            >
               Two-Factor Authentication
             </p>
             <p className="text-xs text-on-surface-variant mt-0.5">

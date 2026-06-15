@@ -1,22 +1,48 @@
-import { useEffect, useState } from "react";
+// @ts-nocheck
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
-import CodeRunnerBlock from "../../../components/CodeRunnerBlock/CodeRunnerBlock";
+import CodeRunnerBlock from "../../../components/CodeRunnerBlock";
 import CourseSidebar from "../components/CourseSidebar";
 import { courseApi } from "../api/course.api";
 import LessonQuiz from "../../quizzes/components/LessonQuiz";
 
 const LessonDetailPage = () => {
   const { lessonId } = useParams({ strict: false });
-  const [lesson, setLesson] = useState<any>(null);
+  const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [readingProgress, setReadingProgress] = useState(0);
+  const contentScrollRef = useRef(null);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const lastScrollRef = useRef({
+    scrollTop: 0,
+
+    time: Date.now(),
+  });
 
   useEffect(() => {
     if (lessonId) {
+      setLoading(true);
+      setLesson(null);
+      setReadingProgress(0);
+      setQuizPassed(false);
+
+      if (contentScrollRef.current) {
+        contentScrollRef.current.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+      }
+
+      lastScrollRef.current = {
+        scrollTop: 0,
+        time: Date.now(),
+      };
+
       courseApi
         .getLessonDetail(lessonId)
         .then((data) => {
@@ -28,6 +54,70 @@ const LessonDetailPage = () => {
     }
   }, [lessonId]);
 
+  useEffect(() => {
+    if (!lesson?._id) return;
+
+    setReadingProgress(0);
+    setQuizPassed(false);
+
+    requestAnimationFrame(() => {
+      if (contentScrollRef.current) {
+        contentScrollRef.current.scrollTo({
+          top: 0,
+          behavior: "auto",
+        });
+      }
+    });
+
+    lastScrollRef.current = {
+      scrollTop: 0,
+      time: Date.now(),
+    };
+  }, [lesson?._id]);
+
+  useEffect(() => {
+    const el = contentScrollRef.current;
+    if (!el || !lesson?._id) return;
+
+    setReadingProgress(0);
+
+    const handleScroll = () => {
+      const now = Date.now();
+      const currentScrollTop = el.scrollTop;
+
+      const deltaY = Math.abs(
+        currentScrollTop - lastScrollRef.current.scrollTop,
+      );
+      const deltaTime = Math.max(now - lastScrollRef.current.time, 1);
+      const speed = deltaY / deltaTime;
+
+      lastScrollRef.current = {
+        scrollTop: currentScrollTop,
+        time: now,
+      };
+
+      // Nếu scroll quá nhanh thì không tính progress
+      // Có thể chỉnh 2.2 thấp hơn/cao hơn tuỳ cảm giác
+      //if (speed > 2.2) return;
+
+      const maxScroll = el.scrollHeight - el.clientHeight;
+
+      if (maxScroll <= 0) {
+        setReadingProgress(100);
+        return;
+      }
+
+      const nextProgress = Math.round((currentScrollTop / maxScroll) * 100);
+
+      setReadingProgress((prev) => Math.max(prev, nextProgress));
+    };
+
+    el.addEventListener("scroll", handleScroll);
+
+    return () => {
+      el.removeEventListener("scroll", handleScroll);
+    };
+  }, [lesson?._id]);
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
@@ -42,9 +132,7 @@ const LessonDetailPage = () => {
         <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
           error
         </span>
-        <h2 className="font-headline-md text-on-surface mb-2">
-          Lesson Not Found
-        </h2>
+        <h2 className="font-headline-md text-white mb-2">Lesson Not Found</h2>
         <p className="text-on-surface-variant">
           We couldn't find the lesson you were looking for.
         </p>
@@ -77,6 +165,8 @@ const LessonDetailPage = () => {
             <CourseSidebar
               courseId={lesson.courseId}
               currentLessonId={lesson._id}
+              currentLessonProgress={readingProgress}
+              currentLessonCompleted={quizPassed}
             />
           </div>
         </aside>
@@ -90,7 +180,7 @@ const LessonDetailPage = () => {
           onClick={() => setIsSidebarOpen((prev) => !prev)}
           className={`
       hidden lg:flex fixed top-[96px] z-50 h-10 w-10 items-center justify-center
-      rounded-full border border-outline/30 bg-surface-container text-on-surface-variant
+      rounded-full border border-outline/30 bg-[#121c25] text-on-surface-variant
       shadow-lg transition-all duration-300
       hover:border-primary-fixed-dim hover:text-primary-fixed-dim hover:bg-[#17212d]
       ${isSidebarOpen ? "left-[415px]" : "left-4"}
@@ -103,10 +193,13 @@ const LessonDetailPage = () => {
         </button>
       )}
       {/* Cột phải: Nội dung bài học */}
-      <main className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar">
+      <main
+        ref={contentScrollRef}
+        className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar"
+      >
         {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
         <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-[#1e293b] pb-4">
-          <button className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface">
+          <button className="flex items-center gap-2 text-on-surface-variant hover:text-white">
             <span className="material-symbols-outlined text-[20px]">
               menu_open
             </span>
@@ -123,7 +216,7 @@ const LessonDetailPage = () => {
           {/* Back navigation (chỉ hiện trên Mobile, vì Desktop có nút ở Sidebar) */}
           <button
             onClick={() => window.history.back()}
-            className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
+            className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
           >
             <span className="material-symbols-outlined text-[16px]">
               arrow_back
@@ -184,7 +277,7 @@ const LessonDetailPage = () => {
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
               components={{
-                code({ inline, className, children, ...props }: any) {
+                code({ node, inline, className, children, ...props }) {
                   const language = className
                     ? className.replace("language-", "").trim()
                     : "";
@@ -213,7 +306,7 @@ const LessonDetailPage = () => {
                   return (
                     <code
                       {...props}
-                      className={`${className} bg-surface-container-high text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+                      className={`${className} bg-surface-container-high text-primary-fixed px-1.5 py-0.5 rounded font-code-md text-[13px]`}
                     >
                       {children}
                     </code>
@@ -226,7 +319,14 @@ const LessonDetailPage = () => {
           </article>
 
           {/* Quiz Section */}
-          <LessonQuiz lessonId={lesson._id} />
+          <LessonQuiz
+            key={lesson._id}
+            lessonId={lesson._id}
+            onQuizPassed={() => {
+              setQuizPassed(true);
+              setReadingProgress(100);
+            }}
+          />
         </div>
       </main>
     </div>

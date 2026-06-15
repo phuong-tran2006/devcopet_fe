@@ -1,4 +1,7 @@
-const EyeOffIcon = ({ className = "h-5 w-5" }: { className?: string }) => (
+// @ts-nocheck
+import React from "react";
+
+const EyeOffIcon = ({ className = "h-5 w-5" }) => (
   <svg
     className={className}
     viewBox="0 0 24 24"

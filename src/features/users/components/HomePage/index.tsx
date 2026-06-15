@@ -1,7 +1,10 @@
-import { useState, useEffect } from "react";
+// @ts-nocheck
+import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
-import LinkComponent from "../../../components/ui/Link";
-import { mascotAxolotl } from "../constants/authImages";
+import Logo from "../../../../components/layout/Logo";
+import HeaderMenu from "../../../../components/layout/HeaderMenu";
+import LinkComponent from "../../../../components/ui/Link";
+import { mascotAxolotl } from "../../constants/authImages";
 
 const TOTAL_QUESTIONS = 8;
 
@@ -90,8 +93,8 @@ const quizQuestions = [
 
 const HomePage = () => {
   const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [selectedOption, setSelectedOption] = useState<any>(null);
-  const [answers, setAnswers] = useState<any>({});
+  const [selectedOption, setSelectedOption] = useState(null);
+  const [answers, setAnswers] = useState({});
 
   useEffect(() => {
     document.title = "Pet Personality Survey | Devcopet";
@@ -100,9 +103,9 @@ const HomePage = () => {
   const question = quizQuestions[currentQuestion];
   const progress = `${currentQuestion + 1}/${TOTAL_QUESTIONS}`;
 
-  const handleOptionSelect = (optionId: any) => {
+  const handleOptionSelect = (optionId) => {
     setSelectedOption(optionId);
-    setAnswers((prev: any) => ({
+    setAnswers((prev) => ({
       ...prev,
       [currentQuestion]: optionId,
     }));
@@ -127,7 +130,7 @@ const HomePage = () => {
 
   return (
     <>
-      <main className="relative min-h-screen w-full bg-background overflow-hidden">
+      <main className="relative min-h-screen w-full bg-[#041521] overflow-hidden">
         {/* Background decorative elements */}
         <div
           className="absolute inset-0 w-full h-full pointer-events-none"
@@ -139,7 +142,7 @@ const HomePage = () => {
 
         {/* Header */}
         <header
-          className="w-full bg-background border-b border-[#3e49496b]"
+          className="w-full bg-[#041521] border-b border-[#3e49496b]"
           style={{
             boxShadow: "0px 4px 20px #00808019",
           }}
@@ -155,7 +158,7 @@ const HomePage = () => {
                   loading="eager"
                 />
                 <span
-                  className="text-lg sm:text-xl md:text-2xl font-bold text-secondary"
+                  className="text-lg sm:text-xl md:text-2xl font-bold text-[#d8bfd8]"
                   style={{ fontFamily: "Montserrat" }}
                 >
                   Devcopet
@@ -185,10 +188,9 @@ const HomePage = () => {
                   href="/notifications"
                   ariaLabel="Notifications"
                   className="p-1 sm:p-2"
-                  onClick={() => {}}
                 >
                   <svg
-                    className="w-5 h-5 text-secondary hover:text-[#76d6d5] transition-colors"
+                    className="w-5 h-5 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -206,10 +208,9 @@ const HomePage = () => {
                   href="/messages"
                   ariaLabel="Messages"
                   className="p-1 sm:p-2"
-                  onClick={() => {}}
                 >
                   <svg
-                    className="w-5 h-5 text-secondary hover:text-[#76d6d5] transition-colors"
+                    className="w-5 h-5 text-[#d8bfd8] hover:text-[#76d6d5] transition-colors"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

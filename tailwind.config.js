@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#008080",
+        primary: "#a855f7",
       },
       borderRadius: {
         card: "20px",

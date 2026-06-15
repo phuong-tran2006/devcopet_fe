@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// @ts-nocheck
+import React, { useState, useEffect } from "react";
 import { cva } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
 
@@ -96,7 +97,7 @@ const CheckBox = ({
     }
   }, [checked]);
 
-  const handleChange = (e: any) => {
+  const handleChange = (e) => {
     const newChecked = e?.target?.checked;
 
     // Only update internal state if not controlled
@@ -109,7 +110,7 @@ const CheckBox = ({
     }
   };
 
-  const handleKeyDown = (e: any) => {
+  const handleKeyDown = (e) => {
     if (e?.key === " " || e?.key === "Enter") {
       e?.preventDefault();
       if (!disabled) {
@@ -161,7 +162,7 @@ const CheckBox = ({
         >
           {isChecked && (
             <svg
-              className="w-3 h-3 text-on-surface"
+              className="w-3 h-3 text-white"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

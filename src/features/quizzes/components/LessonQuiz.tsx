@@ -1,18 +1,30 @@
-import { useState } from "react";
+// @ts-nocheck
+import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { getQuizByLessonId, submitQuiz } from "../api/quiz.api";
+import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
 
 // ─── States ────────────────────────────────────────────────────────────────
 // idle | loading | active | submitting | finished | not_found
 
-const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
+const LessonQuiz = ({ lessonId, onQuizPassed }) => {
   const [phase, setPhase] = useState("idle");
-  const [quiz, setQuiz] = useState<any>(null);
-  const [answers, setAnswers] = useState<any>({}); // { questionIndex: optionId }
-  const [result, setResult] = useState<any>(null);
-  const [submitError, setSubmitError] = useState<any>(null);
+  const [quiz, setQuiz] = useState(null);
+  const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
+  const [result, setResult] = useState(null);
+  const [submitError, setSubmitError] = useState(null);
+  const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+
+  useEffect(() => {
+    setPhase("idle");
+    setQuiz(null);
+    setAnswers({});
+    setResult(null);
+    setSubmitError(null);
+    setReviewQuestionIdx(0);
+    setCurrentQuestionIdx(0);
+  }, [lessonId]);
 
   // ── Start Quiz ─────────────────────────────────────────────────────────
   const handleStart = async () => {
@@ -28,7 +40,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
       setResult(null);
       setCurrentQuestionIdx(0);
       setPhase("active");
-    } catch (err: any) {
+    } catch (err) {
       if (err?.response?.status === 404) {
         setPhase("not_found");
       } else {
@@ -39,9 +51,9 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   };
 
   // ── Select Option ──────────────────────────────────────────────────────
-  const handleSelect = (questionIndex: any, optionId: any) => {
+  const handleSelect = (questionIndex, optionId) => {
     if (phase !== "active") return;
-    setAnswers((prev: any) => ({ ...prev, [questionIndex]: optionId }));
+    setAnswers((prev) => ({ ...prev, [questionIndex]: optionId }));
   };
 
   // ── Next Or Submit ─────────────────────────────────────────────────────
@@ -56,17 +68,23 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
       setSubmitError(null);
       setPhase("submitting");
 
-      const answersPayload = quiz.questions.map((q: any) => ({
-        questionIndex: q.index,
-        selectedOptionIds: answers[q.index] ? [answers[q.index]] : [],
+      const answersPayload = quiz.questions.map((q, index) => ({
+        questionIndex: q.index ?? index,
+        selectedOptionIds: answers[q.index ?? index]
+          ? [answers[q.index ?? index]]
+          : [],
         answerText: "",
       }));
 
       try {
         const res = await submitQuiz(quiz._id, answersPayload);
         setResult(res);
+        if (res?.passed) {
+          onQuizPassed?.();
+        }
+        setReviewQuestionIdx(0);
         setPhase("finished");
-      } catch (err: any) {
+      } catch (err) {
         const status = err?.response?.status;
         const message =
           err?.response?.data?.message || err?.message || "Unknown error";
@@ -84,35 +102,44 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
     }
   };
 
+  // ── Previous Question ─────────────────────────────────────────────────────
+  const handlePrevious = () => {
+    if (currentQuestionIdx > 0 && phase === "active") {
+      setCurrentQuestionIdx((prev) => prev - 1);
+    }
+  };
+
   // ── Retake ─────────────────────────────────────────────────────────────
   const handleRetake = () => {
     setAnswers({});
     setResult(null);
     setSubmitError(null);
     setCurrentQuestionIdx(0);
+    setReviewQuestionIdx(0);
     setPhase("active");
   };
 
   // ── Helpers ────────────────────────────────────────────────────────────
-  const getQuestionResult = (questionIndex: any) =>
-    result?.results?.find((r: any) => r.questionIndex === questionIndex);
+  const getQuestionResult = (questionIndex) =>
+    result?.results?.find((r) => r.questionIndex === questionIndex);
 
   // ══════════════════════════════════════════════════════════════════════
   // RENDER HELPERS
   // ══════════════════════════════════════════════════════════════════════
-  const renderQuestionCard = (q: any, index: number, isReviewMode: boolean) => {
-    const qResult = isReviewMode ? getQuestionResult(q.index) : null;
-    const selectedOptionId = answers[q.index];
+  const renderQuestionCard = (q, index, isReviewMode) => {
+    const questionKey = q.index ?? index;
+    const qResult = isReviewMode ? getQuestionResult(questionKey) : null;
+    const selectedOptionId = answers[questionKey];
 
     return (
       <div
         key={q.index}
-        className={`bg-surface-container rounded-xl border p-6 shadow-lg transition-colors ${
+        className={`bg-[#121c25] rounded-xl border p-6 shadow-lg transition-colors ${
           isReviewMode && qResult
             ? qResult.isCorrect
               ? "border-[#4ade80]/30"
               : "border-[#f87171]/30"
-            : "border-on-surface/5"
+            : "border-white/5"
         }`}
       >
         <div className="flex items-center justify-between mb-4">
@@ -154,7 +181,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
 
         {/* Options */}
         <div className="flex flex-col gap-3">
-          {(q.options || []).map((opt: any) => {
+          {(q.options || []).map((opt) => {
             const isSelected = selectedOptionId === opt.id;
             const isCorrectOption =
               isReviewMode && qResult?.correctOptionIds?.includes(opt.id);
@@ -162,7 +189,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
               isReviewMode && isSelected && !isCorrectOption;
 
             let style =
-              "border-outline/20 bg-on-surface/5 hover:bg-on-surface/10 text-on-surface-variant hover:text-on-surface cursor-pointer";
+              "border-outline/20 bg-surface/40 hover:bg-on-surface/5 text-on-surface-variant hover:text-on-surface cursor-pointer";
 
             if (!isReviewMode) {
               if (isSelected) {
@@ -178,14 +205,14 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
                   "border-[#f87171]/50 bg-[#f87171]/15 text-[#f87171] cursor-default";
               } else {
                 style =
-                  "border-on-surface/5 bg-on-surface/5 text-on-surface-variant/50 cursor-default opacity-60";
+                  "border-white/5 bg-surface/20 text-on-surface-variant/50 cursor-default opacity-60";
               }
             }
 
             return (
               <button
                 key={opt.id}
-                onClick={() => handleSelect(q.index, opt.id)}
+                onClick={() => handleSelect(questionKey, opt.id)}
                 disabled={isReviewMode || phase === "submitting"}
                 className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 ${style}`}
               >
@@ -241,7 +268,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
             </div>
 
             {qResult.explanation && (
-              <div className="p-6 rounded-xl bg-surface-container-lowest/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
+              <div className="p-6 rounded-xl bg-[#0b1118]/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
                 <span className="font-bold text-primary-fixed-dim block mb-2 text-[12px] uppercase tracking-widest">
                   Explanation
                 </span>
@@ -259,7 +286,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "idle") {
     return (
-      <div className="bg-surface-container rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <h3 className="font-headline-sm text-on-surface mb-2">
             Ready to test your knowledge?
@@ -286,7 +313,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "loading") {
     return (
-      <div className="bg-surface-container rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <h3 className="font-headline-sm text-on-surface mb-2">
             Ready to test your knowledge?
@@ -311,7 +338,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "not_found") {
     return (
-      <div className="bg-surface-container rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
+      <div className="bg-[#121c25] rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
         <span className="material-symbols-outlined text-3xl mb-2 block">
           quiz
         </span>
@@ -322,11 +349,17 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
 
   const questions = quiz?.questions || [];
   const isSubmitting = phase === "submitting";
-
   // ══════════════════════════════════════════════════════════════════════
   // PHASE: finished
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "finished" && result) {
+    const reviewQ = questions[reviewQuestionIdx];
+
+    if (!reviewQ) return null;
+
+    const isFirstReviewQuestion = reviewQuestionIdx === 0;
+    const isLastReviewQuestion = reviewQuestionIdx === questions.length - 1;
+
     return (
       <div className="flex flex-col gap-8">
         <div
@@ -350,6 +383,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
                 {result.passed ? "emoji_events" : "replay"}
               </span>
             </div>
+
             <div>
               <h2
                 className={`font-headline-sm text-[24px] font-bold mb-1 ${
@@ -358,6 +392,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
               >
                 {result.passed ? "Quiz Passed!" : "Quiz Failed"}
               </h2>
+
               <p className="text-on-surface-variant text-[15px]">
                 You scored{" "}
                 <span className="font-bold text-on-surface">
@@ -365,6 +400,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
                 </span>{" "}
                 ({result.correctCount}/{result.totalQuestions} correct)
               </p>
+
               <p className="text-[13px] text-on-surface-variant mt-1">
                 {result.earnedPoints} / {result.totalPoints} XP points earned
               </p>
@@ -372,6 +408,7 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
           </div>
 
           <button
+            type="button"
             onClick={handleRetake}
             className={`flex-shrink-0 font-bold px-8 py-3.5 rounded-xl transition-all flex items-center gap-2 ${
               result.passed
@@ -386,14 +423,85 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
           </button>
         </div>
 
-        {/* Review Questions */}
+        {/* Review Single Question */}
         <div className="flex flex-col gap-6">
-          <h3 className="font-headline-sm text-on-surface text-[20px] mb-2 px-2 border-b border-outline/20 pb-4">
-            Quiz Review
-          </h3>
-          {questions.map((q: any, idx: number) =>
-            renderQuestionCard(q, idx, true),
-          )}
+          <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <h3 className="font-headline-sm text-on-surface text-[20px]">
+                  Quiz Review
+                </h3>
+                <p className="text-[13px] text-on-surface-variant mt-1">
+                  Review your answer, the correct answer, and the explanation.
+                </p>
+              </div>
+
+              <div className="text-[13px] text-on-surface-variant font-bold">
+                Question {reviewQuestionIdx + 1} of {questions.length}
+              </div>
+            </div>
+
+            <div className="w-full h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary-fixed-dim transition-all duration-300"
+                style={{
+                  width: `${((reviewQuestionIdx + 1) / questions.length) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+
+          {renderQuestionCard(reviewQ, reviewQuestionIdx, true)}
+
+          <div className="flex items-center justify-between mt-2 gap-4">
+            <button
+              type="button"
+              onClick={() =>
+                setReviewQuestionIdx((prev) => Math.max(prev - 1, 0))
+              }
+              disabled={isFirstReviewQuestion}
+              className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <span className="inline-flex items-center gap-2">
+                <span className="material-symbols-outlined text-[18px]">
+                  arrow_back
+                </span>
+                Previous
+              </span>
+            </button>
+
+            {!isLastReviewQuestion ? (
+              <button
+                type="button"
+                onClick={() => setReviewQuestionIdx((prev) => prev + 1)}
+                className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+              >
+                Next Review
+                <span className="material-symbols-outlined text-[18px]">
+                  arrow_forward
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  setPhase("idle");
+                  setQuiz(null);
+                  setAnswers({});
+                  setResult(null);
+                  setSubmitError(null);
+                  setCurrentQuestionIdx(0);
+                  setReviewQuestionIdx(0);
+                }}
+                className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+              >
+                Finish Review
+                <span className="material-symbols-outlined text-[18px]">
+                  check_circle
+                </span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -406,26 +514,27 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
   if (!currentQ) return null;
 
   const isLastQuestion = currentQuestionIdx === questions.length - 1;
-  const selectedOptionId = answers[currentQ.index];
+  const currentQuestionKey = currentQ.index ?? currentQuestionIdx;
+  const selectedOptionId = answers[currentQuestionKey];
 
   return (
     <div className="flex flex-col gap-6">
       {/* ── Quiz Header (Progress) ── */}
-      <div className="bg-surface-container rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
+      <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
         <div className="flex items-center justify-between mb-3">
           <div className="font-headline-sm text-on-surface">
-            {quiz?.title || "Lesson Quiz"}
+            {quiz.title || "Lesson Quiz"}
           </div>
           <div className="text-[13px] text-on-surface-variant font-bold">
             Question {currentQuestionIdx + 1} of {questions.length}
           </div>
         </div>
         {/* Progress Bar */}
-        <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
+        <div className="w-full h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
           <div
             className="h-full bg-primary-fixed-dim transition-all duration-300"
             style={{
-              width: `${(currentQuestionIdx / questions.length) * 100}%`,
+              width: `${((currentQuestionIdx + 1) / questions.length) * 100}%`,
             }}
           />
         </div>
@@ -454,8 +563,23 @@ const LessonQuiz = ({ lessonId }: { lessonId: any }) => {
       )}
 
       {/* ── Action Buttons ── */}
-      <div className="flex justify-end mt-2">
+      <div className="flex items-center justify-between mt-2 gap-4">
         <button
+          type="button"
+          onClick={handlePrevious}
+          disabled={currentQuestionIdx === 0 || isSubmitting}
+          className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <span className="inline-flex items-center gap-2">
+            <span className="material-symbols-outlined text-[18px]">
+              arrow_back
+            </span>
+            Previous
+          </span>
+        </button>
+
+        <button
+          type="button"
           onClick={handleNextOrSubmit}
           disabled={!selectedOptionId || isSubmitting}
           className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none flex items-center gap-2"

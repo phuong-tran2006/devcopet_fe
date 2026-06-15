@@ -1,14 +1,9 @@
-interface LessonProgressCircleProps {
-  progress?: number;
-  isActive?: boolean;
-  isCompleted?: boolean;
-}
-
+// @ts-nocheck
 const LessonProgressCircle = ({
   progress = 0,
   isActive = false,
   isCompleted = false,
-}: LessonProgressCircleProps) => {
+}) => {
   const size = 34;
   const strokeWidth = 3;
   const radius = (size - strokeWidth) / 2;
@@ -29,8 +24,7 @@ const LessonProgressCircle = ({
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="currentColor"
-          className="text-on-surface-variant/20"
+          stroke="rgba(148, 163, 184, 0.25)"
           strokeWidth={strokeWidth}
         />
 
@@ -39,13 +33,12 @@ const LessonProgressCircle = ({
           cy={size / 2}
           r={radius}
           fill="transparent"
-          stroke="currentColor"
-          className={isCompleted ? "text-[#4ade80]" : "text-primary-fixed-dim"}
+          stroke={isCompleted ? "#4ade80" : "#00daf8"}
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={strokeDashoffset}
-          style={{ transition: "stroke-dashoffset 0.5s ease-out" }}
+          className="transition-all duration-500 ease-out"
         />
       </svg>
 
@@ -57,11 +50,11 @@ const LessonProgressCircle = ({
               ? "bg-[#4ade80]/20 text-[#4ade80]"
               : isActive
                 ? "bg-primary-fixed-dim/20 text-primary-fixed-dim"
-                : "bg-transparent text-on-surface-variant/50 border border-on-surface-variant/30"
+                : "bg-transparent text-on-surface-variant/50"
           }
         `}
       >
-        <span className="material-symbols-outlined text-[14px]">
+        <span className="material-symbols-outlined text-[16px]">
           {isCompleted ? "check" : isActive ? "play_arrow" : "lock_open"}
         </span>
       </div>

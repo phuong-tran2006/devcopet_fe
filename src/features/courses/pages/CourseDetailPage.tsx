@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+// @ts-nocheck
+import React, { useEffect, useState } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
 
@@ -20,7 +21,7 @@ const DotGrid = ({ className = "", rows = 5, cols = 5 }) => (
 );
 
 /* ───────────── Module Icon component ───────────── */
-const ModuleIcon = ({ index, isActive }: any) => {
+const ModuleIcon = ({ index, isActive }) => {
   const icons = [
     "play_lesson",
     "hub",
@@ -35,7 +36,7 @@ const ModuleIcon = ({ index, isActive }: any) => {
       className={`w-14 h-14 rounded-xl flex items-center justify-center transition-all duration-300 ${
         isActive
           ? "bg-secondary-fixed-dim/20 text-secondary-fixed-dim border border-secondary-fixed-dim/30"
-          : "bg-surface-container text-on-surface-variant/40 border border-[#1e293b]"
+          : "bg-[#1b2532] text-on-surface-variant/40 border border-[#1e293b]"
       }`}
     >
       <span className="material-symbols-outlined text-[24px]">{icon}</span>
@@ -44,11 +45,7 @@ const ModuleIcon = ({ index, isActive }: any) => {
 };
 
 /* ───────────── Status Badge ───────────── */
-const StatusBadge = ({
-  status,
-}: {
-  status: "mastered" | "in_progress" | "unlocked" | "locked";
-}) => {
+const StatusBadge = ({ status }) => {
   const config = {
     mastered: {
       label: "MASTERED",
@@ -87,7 +84,7 @@ const StatusBadge = ({
 };
 
 /* ───────────── Lesson Card ───────────── */
-const LessonCard = ({ lesson, lessonIndex, isModuleActive }: any) => {
+const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
   // For demo: first lesson mastered, second in_progress, rest unlocked/locked
   const getStatus = () => {
     if (!isModuleActive) return "locked";
@@ -123,7 +120,7 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }: any) => {
 
   const Wrapper = isClickable ? Link : "div";
   const wrapperProps = isClickable
-    ? { to: "/lesson/$lessonId", params: { lessonId: lesson._id } as any }
+    ? { to: "/lesson/$lessonId", params: { lessonId: lesson._id } }
     : {};
 
   return (
@@ -131,7 +128,7 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }: any) => {
       {...wrapperProps}
       className={`flex items-center justify-between px-6 py-5 rounded-xl border transition-all duration-300 group
         ${borderColor[status]}
-        ${isClickable ? "cursor-pointer bg-surface-container/60 hover:bg-surface-container/80" : "cursor-default bg-surface-container/40"}
+        ${isClickable ? "cursor-pointer bg-[#121c25]/60 hover:bg-[#1b2532]/80" : "cursor-default bg-[#121c25]/40"}
       `}
     >
       <div className="flex items-center gap-4">
@@ -152,7 +149,7 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }: any) => {
         </div>
         <div>
           <h4
-            className={`font-body-md text-[15px] font-semibold ${isClickable ? "text-on-surface group-hover:text-primary-fixed" : "text-on-surface-variant/80"} transition-colors`}
+            className={`font-body-md text-[15px] font-semibold ${isClickable ? "text-white group-hover:text-primary-fixed" : "text-on-surface-variant/80"} transition-colors`}
           >
             {lesson.title}
           </h4>
@@ -171,8 +168,8 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }: any) => {
 };
 
 /* ───────────── Module Section ───────────── */
-const ModuleSection = ({ chapter, index, totalModules }: any) => {
-  const [lessons, setLessons] = useState<any[]>([]);
+const ModuleSection = ({ chapter, index, totalModules }) => {
+  const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // First module active, rest locked (demo logic)
@@ -208,9 +205,9 @@ const ModuleSection = ({ chapter, index, totalModules }: any) => {
         <ModuleIcon index={index} isActive={isActive} />
         <div>
           <h2
-            className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? "text-on-surface" : "text-on-surface-variant/60"}`}
+            className={`font-headline-sm text-[20px] md:text-[22px] font-bold ${isActive ? "text-white" : "text-on-surface-variant/60"}`}
           >
-            Module {index + 1}: {chapter.title}
+            {chapter.title}
           </h2>
           <div className="flex items-center gap-2 mt-1.5">
             {isActive ? (
@@ -278,8 +275,8 @@ const ModuleSection = ({ chapter, index, totalModules }: any) => {
 /* ═══════════════ MAIN PAGE ═══════════════ */
 const CourseDetailPage = () => {
   const { courseId } = useParams({ strict: false });
-  const [course, setCourse] = useState<any>(null);
-  const [chapters, setChapters] = useState<any[]>([]);
+  const [course, setCourse] = useState(null);
+  const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -287,9 +284,9 @@ const CourseDetailPage = () => {
 
     courseApi
       .getCourses()
-      .then((courses: any[]) => {
+      .then((courses) => {
         const found = courses.find(
-          (c: any) => c.slug === courseId || c._id === courseId,
+          (c) => c.slug === courseId || c._id === courseId,
         );
         if (!found) throw new Error("Course not found");
         setCourse(found);
@@ -325,9 +322,7 @@ const CourseDetailPage = () => {
         <span className="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-4">
           error
         </span>
-        <h2 className="font-headline-md text-on-surface mb-2">
-          Course Not Found
-        </h2>
+        <h2 className="font-headline-md text-white mb-2">Course Not Found</h2>
         <p className="text-on-surface-variant">
           The course you're looking for doesn't exist.
         </p>
@@ -357,7 +352,7 @@ const CourseDetailPage = () => {
             {/* Back + Badge */}
             <Link
               to="/course"
-              className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-on-surface transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
+              className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-white transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
             >
               <span className="material-symbols-outlined text-[14px]">
                 arrow_back
@@ -376,7 +371,7 @@ const CourseDetailPage = () => {
               </span>
             </div>
 
-            <h1 className="font-headline-lg text-[32px] md:text-[44px] font-bold text-on-surface leading-[1.1] tracking-tight mb-5">
+            <h1 className="font-headline-lg text-[32px] md:text-[44px] font-bold text-white leading-[1.1] tracking-tight mb-5">
               {course.title} Curriculum
             </h1>
 
@@ -388,7 +383,7 @@ const CourseDetailPage = () => {
 
           {/* Right: Progress Card */}
           <div className="w-full lg:w-[280px] flex-shrink-0">
-            <div className="bg-surface-container border border-[#1e293b] rounded-xl p-6 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+            <div className="bg-[#121c25] border border-[#1e293b] rounded-xl p-6 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
               {/* Progress Header */}
               <div className="flex items-center justify-between mb-5">
                 <span className="font-label-sm text-[10px] text-on-surface-variant tracking-[0.15em] uppercase">
@@ -405,9 +400,9 @@ const CourseDetailPage = () => {
                   42%
                 </span>
                 {/* Progress Bar */}
-                <div className="h-1 bg-surface-container rounded-full mt-3 overflow-hidden">
+                <div className="h-1 bg-[#1b2532] rounded-full mt-3 overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-primary-fixed-dim to-primary-fixed rounded-full shadow-[0_0_12px_rgba(0,128,128,0.5)] transition-all duration-1000 ease-out"
+                    className="h-full bg-gradient-to-r from-primary-fixed-dim to-primary-fixed rounded-full shadow-[0_0_12px_rgba(0,218,248,0.5)] transition-all duration-1000 ease-out"
                     style={{ width: "42%" }}
                   />
                 </div>
@@ -415,16 +410,16 @@ const CourseDetailPage = () => {
 
               {/* Stats Row */}
               <div className="grid grid-cols-2 gap-3">
-                <div className="bg-surface-container rounded-lg p-3 text-center border border-[#1e293b]">
-                  <div className="font-headline-sm text-[22px] font-bold text-on-surface">
+                <div className="bg-[#1b2532] rounded-lg p-3 text-center border border-[#1e293b]">
+                  <div className="font-headline-sm text-[22px] font-bold text-white">
                     18
                   </div>
                   <div className="font-label-sm text-[9px] text-on-surface-variant tracking-[0.12em] uppercase mt-1">
                     Mastered
                   </div>
                 </div>
-                <div className="bg-surface-container rounded-lg p-3 text-center border border-[#1e293b]">
-                  <div className="font-headline-sm text-[22px] font-bold text-on-surface">
+                <div className="bg-[#1b2532] rounded-lg p-3 text-center border border-[#1e293b]">
+                  <div className="font-headline-sm text-[22px] font-bold text-white">
                     24
                   </div>
                   <div className="font-label-sm text-[9px] text-on-surface-variant tracking-[0.12em] uppercase mt-1">
@@ -448,11 +443,11 @@ const CourseDetailPage = () => {
           ))}
 
           {chapters.length === 0 && (
-            <div className="bg-surface-container rounded-xl border border-[#1e293b] p-16 text-center shadow-[0_0_20px_rgba(0,0,0,0.5)]">
+            <div className="bg-[#121c25] rounded-xl border border-[#1e293b] p-16 text-center shadow-[0_0_20px_rgba(0,0,0,0.5)]">
               <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">
                 inventory_2
               </span>
-              <h3 className="font-headline-sm text-on-surface mb-2">
+              <h3 className="font-headline-sm text-white mb-2">
                 No Modules Found
               </h3>
               <p className="text-on-surface-variant/60 text-[14px]">

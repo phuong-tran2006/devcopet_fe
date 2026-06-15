@@ -1,14 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-import MouseTrail from "../../../components/ui/MouseTrail";
-import OnboardingModal from "../../survey/OnboardingModal";
-import SurveyModal from "../../survey/SurveyModal";
-import NamePetModal from "../../survey/NamePetModal";
+import MouseTrail from "../../../../components/ui/MouseTrail";
+import heroMascotVideo from "../../../../assets/videos/7936438193787.mp4";
+import TransparentVideo from "../../../../components/ui/TransparentVideo";
 
 const LandingPage = () => {
-  const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
-  const [isSurveyOpen, setIsSurveyOpen] = useState(false);
-  const [isNamePetOpen, setIsNamePetOpen] = useState(false);
   const glowCardsRef = useRef<any[]>([]);
 
   useEffect(() => {
@@ -95,10 +91,7 @@ const LandingPage = () => {
                   Break every technical limit.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                  <button
-                    onClick={() => setIsOnboardingOpen(true)}
-                    className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-4 px-10 rounded-lg text-[18px] glow-cyan hover:scale-105 transition-all duration-300 ease-out-cubic active:scale-95"
-                  >
+                  <button className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-4 px-10 rounded-lg text-[18px] glow-cyan hover:scale-105 transition-all duration-300 ease-out-cubic active:scale-95">
                     Get Started Now
                   </button>
                   <button className="border border-outline/20 hover:border-outline/40 backdrop-blur-md text-on-surface font-bold py-4 px-10 rounded-lg text-[18px] transition-all duration-300 ease-out-cubic active:scale-95">
@@ -107,7 +100,19 @@ const LandingPage = () => {
                 </div>
               </div>
 
-              {/* Right: Empty for now or just removed to let text breathe */}
+              {/* Right: Video Mascot — green screen removed */}
+              <div className="flex-1 flex items-center justify-center lg:justify-end">
+                <div className="relative w-full max-w-[560px]">
+                  {/* Soft glow behind mascot */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/15 via-cyan-400/8 to-secondary-fixed-dim/15 blur-3xl scale-110 pointer-events-none rounded-full" />
+                  <TransparentVideo
+                    src={heroMascotVideo}
+                    className="w-full"
+                    keyColor={[0, 200, 0]}
+                    tolerance={80}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -473,39 +478,6 @@ const LandingPage = () => {
           </div>
         </section>
       </main>
-
-      <OnboardingModal
-        isOpen={isOnboardingOpen}
-        onClose={() => setIsOnboardingOpen(false)}
-        onBeginSurvey={() => {
-          setIsOnboardingOpen(false);
-          setIsSurveyOpen(true);
-        }}
-      />
-
-      <SurveyModal
-        isOpen={isSurveyOpen}
-        onClose={() => setIsSurveyOpen(false)}
-        onSkip={() => {
-          setIsSurveyOpen(false);
-          setIsNamePetOpen(true);
-        }}
-        onComplete={(answers) => {
-          console.log("Survey answers:", answers);
-          setIsSurveyOpen(false);
-          setIsNamePetOpen(true);
-        }}
-      />
-
-      <NamePetModal
-        isOpen={isNamePetOpen}
-        onClose={() => setIsNamePetOpen(false)}
-        onConfirm={(name) => {
-          console.log("Pet named:", name);
-          setIsNamePetOpen(false);
-          // Navigate to dashboard or next step
-        }}
-      />
     </>
   );
 };
