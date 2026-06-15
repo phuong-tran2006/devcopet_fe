@@ -5,11 +5,11 @@ import { useTheme } from "../../contexts/ThemeContext";
 import Header from "../../components/layout/Header";
 
 // BẢN SỬA ĐÚNG: Gọi trực tiếp tên file gốc cùng cấp thư mục bằng dấu ./ (Bỏ dấu gạch dưới đi)
-import { ProfileSettings } from "./ProfileSettings";
-import { AccountSecurity } from "./AccountSecurity";
-import { PetStatus } from "./PetStatus";
-import { SystemMetrics } from "./SystemMetrics";
-import { AppPreferences } from "./AppPreferences";
+import { ProfileSettings } from "./-ProfileSettings";
+import { AccountSecurity } from "./-AccountSecurity";
+import { PetStatus } from "./-PetStatus";
+import { SystemMetrics } from "./-SystemMetrics";
+import { AppPreferences } from "./-AppPreferences";
 export const Route = createFileRoute("/setting/setting")({
   component: SettingComponent,
 });

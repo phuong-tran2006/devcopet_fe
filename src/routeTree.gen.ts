@@ -9,16 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as CourseRouteImport } from './routes/course'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RoadmapIndexRouteImport } from './routes/roadmap.index'
 import { Route as SettingSettingRouteImport } from './routes/setting/setting'
+import { Route as RoadmapWorldIdRouteImport } from './routes/roadmap.$worldId'
 import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as LessonLessonIdQuizRouteImport } from './routes/lesson/$lessonId.quiz'
 
+const RoadmapRoute = RoadmapRouteImport.update({
+  id: '/roadmap',
+  path: '/roadmap',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
@@ -39,10 +47,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoadmapIndexRoute = RoadmapIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => RoadmapRoute,
+} as any)
 const SettingSettingRoute = SettingSettingRouteImport.update({
   id: '/setting/setting',
   path: '/setting/setting',
   getParentRoute: () => rootRouteImport,
+} as any)
+const RoadmapWorldIdRoute = RoadmapWorldIdRouteImport.update({
+  id: '/$worldId',
+  path: '/$worldId',
+  getParentRoute: () => RoadmapRoute,
 } as any)
 const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
   id: '/lesson/$lessonId',
@@ -70,10 +88,13 @@ export interface FileRoutesByFullPath {
   '/course': typeof CourseRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/roadmap/$worldId': typeof RoadmapWorldIdRoute
   '/setting/setting': typeof SettingSettingRoute
+  '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
 }
 export interface FileRoutesByTo {
@@ -84,7 +105,9 @@ export interface FileRoutesByTo {
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/roadmap/$worldId': typeof RoadmapWorldIdRoute
   '/setting/setting': typeof SettingSettingRoute
+  '/roadmap': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
 }
 export interface FileRoutesById {
@@ -93,10 +116,13 @@ export interface FileRoutesById {
   '/course': typeof CourseRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
   '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/roadmap/$worldId': typeof RoadmapWorldIdRoute
   '/setting/setting': typeof SettingSettingRoute
+  '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
 }
 export interface FileRouteTypes {
@@ -106,10 +132,13 @@ export interface FileRouteTypes {
     | '/course'
     | '/login'
     | '/register'
+    | '/roadmap'
     | '/auth/callback'
     | '/courses/$courseId'
     | '/lesson/$lessonId'
+    | '/roadmap/$worldId'
     | '/setting/setting'
+    | '/roadmap/'
     | '/lesson/$lessonId/quiz'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -120,7 +149,9 @@ export interface FileRouteTypes {
     | '/auth/callback'
     | '/courses/$courseId'
     | '/lesson/$lessonId'
+    | '/roadmap/$worldId'
     | '/setting/setting'
+    | '/roadmap'
     | '/lesson/$lessonId/quiz'
   id:
     | '__root__'
@@ -128,10 +159,13 @@ export interface FileRouteTypes {
     | '/course'
     | '/login'
     | '/register'
+    | '/roadmap'
     | '/auth/callback'
     | '/courses/$courseId'
     | '/lesson/$lessonId'
+    | '/roadmap/$worldId'
     | '/setting/setting'
+    | '/roadmap/'
     | '/lesson/$lessonId/quiz'
   fileRoutesById: FileRoutesById
 }
@@ -140,6 +174,7 @@ export interface RootRouteChildren {
   CourseRoute: typeof CourseRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  RoadmapRoute: typeof RoadmapRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
   CoursesCourseIdRoute: typeof CoursesCourseIdRoute
   LessonLessonIdRoute: typeof LessonLessonIdRouteWithChildren
@@ -148,6 +183,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/register': {
       id: '/register'
       path: '/register'
@@ -176,12 +218,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/roadmap/': {
+      id: '/roadmap/'
+      path: '/'
+      fullPath: '/roadmap/'
+      preLoaderRoute: typeof RoadmapIndexRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
     '/setting/setting': {
       id: '/setting/setting'
       path: '/setting/setting'
       fullPath: '/setting/setting'
       preLoaderRoute: typeof SettingSettingRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/roadmap/$worldId': {
+      id: '/roadmap/$worldId'
+      path: '/$worldId'
+      fullPath: '/roadmap/$worldId'
+      preLoaderRoute: typeof RoadmapWorldIdRouteImport
+      parentRoute: typeof RoadmapRoute
     }
     '/lesson/$lessonId': {
       id: '/lesson/$lessonId'
@@ -214,6 +270,19 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface RoadmapRouteChildren {
+  RoadmapWorldIdRoute: typeof RoadmapWorldIdRoute
+  RoadmapIndexRoute: typeof RoadmapIndexRoute
+}
+
+const RoadmapRouteChildren: RoadmapRouteChildren = {
+  RoadmapWorldIdRoute: RoadmapWorldIdRoute,
+  RoadmapIndexRoute: RoadmapIndexRoute,
+}
+
+const RoadmapRouteWithChildren =
+  RoadmapRoute._addFileChildren(RoadmapRouteChildren)
+
 interface LessonLessonIdRouteChildren {
   LessonLessonIdQuizRoute: typeof LessonLessonIdQuizRoute
 }
@@ -231,6 +300,7 @@ const rootRouteChildren: RootRouteChildren = {
   CourseRoute: CourseRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  RoadmapRoute: RoadmapRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,
   CoursesCourseIdRoute: CoursesCourseIdRoute,
   LessonLessonIdRoute: LessonLessonIdRouteWithChildren,
