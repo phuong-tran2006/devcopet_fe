@@ -1,10 +1,11 @@
-// @ts-nocheck
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 
-import MouseTrail from "../../../../components/ui/MouseTrail";
+import MouseTrail from "../../../components/ui/MouseTrail";
+import heroMascotVideo from "../../../assets/videos/7936438193787.mp4";
+import TransparentVideo from "../../../components/ui/TransparentVideo";
 
 const LandingPage = () => {
-  const glowCardsRef = useRef([]);
+  const glowCardsRef = useRef<any[]>([]);
 
   useEffect(() => {
     const observerOptions = {
@@ -35,7 +36,7 @@ const LandingPage = () => {
     return () => observer.disconnect();
   }, []);
 
-  const addToRefs = (el) => {
+  const addToRefs = (el: any) => {
     if (el && !glowCardsRef.current.includes(el)) {
       glowCardsRef.current.push(el);
     }
@@ -73,37 +74,45 @@ const LandingPage = () => {
         </div>
 
         {/* Hero Section */}
-        <section className="relative min-h-[90vh] flex flex-col items-center justify-center text-center px-margin-desktop py-24 z-10">
-          <div className="max-w-4xl space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full border border-primary-fixed-dim/30 bg-primary-fixed-dim/5 backdrop-blur-md">
-              <span
-                className="material-symbols-outlined text-[18px] text-primary-fixed-dim"
-                style={{ fontVariationSettings: "'FILL' 1" }}
-              >
-                terminal
-              </span>
-              <span className="font-label-sm text-label-sm text-primary-fixed-dim uppercase tracking-widest">
-                SYSTEM ONLINE: V2.4.0
-              </span>
-            </div>
-            <h1 className="font-headline-lg text-headline-lg md:text-[84px] leading-tight font-extrabold tracking-tight text-on-surface">
-              Explore the Depths of <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim via-cyan-300 to-secondary-fixed-dim">
-                Coding
-              </span>
-            </h1>
-            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
-              An AI-powered training system with personalized roadmaps,
-              project-based mentoring, and a community of elite developers.
-              Break every technical limit.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-              <button className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-4 px-10 rounded-lg text-[18px] glow-cyan hover:scale-105 transition-all duration-300 ease-out-cubic active:scale-95">
-                Get Started Now
-              </button>
-              <button className="border border-outline/20 hover:border-outline/40 backdrop-blur-md text-on-surface font-bold py-4 px-10 rounded-lg text-[18px] transition-all duration-300 ease-out-cubic active:scale-95">
-                View Roadmap
-              </button>
+        <section className="relative min-h-[90vh] flex items-center px-margin-desktop py-16 z-10">
+          <div className="w-full max-w-container-max mx-auto">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-12">
+              {/* Left: Text Content */}
+              <div className="flex-1 space-y-8 text-center lg:text-left">
+                <h1 className="font-headline-lg text-headline-lg md:text-[72px] leading-tight font-extrabold tracking-tight text-on-surface">
+                  Explore the Depths of <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim via-cyan-300 to-secondary-fixed-dim">
+                    Coding
+                  </span>
+                </h1>
+                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
+                  An AI-powered training system with personalized roadmaps,
+                  project-based mentoring, and a community of elite developers.
+                  Break every technical limit.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+                  <button className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-4 px-10 rounded-lg text-[18px] glow-cyan hover:scale-105 transition-all duration-300 ease-out-cubic active:scale-95">
+                    Get Started Now
+                  </button>
+                  <button className="border border-outline/20 hover:border-outline/40 backdrop-blur-md text-on-surface font-bold py-4 px-10 rounded-lg text-[18px] transition-all duration-300 ease-out-cubic active:scale-95">
+                    View Roadmap
+                  </button>
+                </div>
+              </div>
+
+              {/* Right: Video Mascot — green screen removed */}
+              <div className="flex-1 flex items-center justify-center lg:justify-end">
+                <div className="relative w-full max-w-[560px]">
+                  {/* Soft glow behind mascot */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/15 via-cyan-400/8 to-secondary-fixed-dim/15 blur-3xl scale-110 pointer-events-none rounded-full" />
+                  <TransparentVideo
+                    src={heroMascotVideo}
+                    className="w-full"
+                    keyColor={[0, 200, 0]}
+                    tolerance={80}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -113,8 +122,8 @@ const LandingPage = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             <div
               ref={addToRefs}
-              style={{ "--glow-color": "#00daf8" }}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              style={{ "--glow-color": "#008080" } as any}
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                 <span className="material-symbols-outlined text-3xl">
@@ -132,8 +141,8 @@ const LandingPage = () => {
 
             <div
               ref={addToRefs}
-              style={{ "--glow-color": "#feb700" }}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              style={{ "--glow-color": "#D8BFD8" } as any}
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                 <span className="material-symbols-outlined text-3xl">
@@ -151,8 +160,8 @@ const LandingPage = () => {
 
             <div
               ref={addToRefs}
-              style={{ "--glow-color": "#00e0ff" }}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              style={{ "--glow-color": "#87A96B" } as any}
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                 <span className="material-symbols-outlined text-3xl">
@@ -181,7 +190,7 @@ const LandingPage = () => {
             {/* Card 1: Interactive Learning */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
@@ -197,7 +206,7 @@ const LandingPage = () => {
                 Hands-on exercises with instant feedback
               </p>
               <div className="space-y-2">
-                <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-on-surface/10 rounded-full overflow-hidden">
                   <div className="h-full bg-primary-fixed-dim w-[37.5%]"></div>
                 </div>
                 <div className="flex justify-end">
@@ -211,8 +220,8 @@ const LandingPage = () => {
             {/* Card 2: Real-world Projects */}
             <div
               ref={addToRefs}
-              style={{ "--glow-color": "#feb700" }}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              style={{ "--glow-color": "#D8BFD8" } as any}
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
@@ -232,7 +241,7 @@ const LandingPage = () => {
             {/* Card 3: Community Support */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
@@ -252,7 +261,7 @@ const LandingPage = () => {
             {/* Card 4: AI Assistance */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
@@ -272,8 +281,8 @@ const LandingPage = () => {
             {/* Card 5: Certificate */}
             <div
               ref={addToRefs}
-              style={{ "--glow-color": "#feb700" }}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              style={{ "--glow-color": "#D8BFD8" } as any}
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
@@ -293,7 +302,7 @@ const LandingPage = () => {
             {/* Card 6: Career Path (Full Width) */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-surface/40 backdrop-blur-xl border border-white/10 rounded-xl spinning-border-card md:col-span-3 shadow-[0_0_20px_rgba(0,218,248,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card md:col-span-3 shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
@@ -327,35 +336,57 @@ const LandingPage = () => {
               </p>
               <div className="flex flex-wrap gap-4">
                 <a
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all"
-                  href="#"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-on-surface/10 bg-on-surface/5 backdrop-blur-md hover:bg-on-surface/10 transition-all text-on-surface hover:text-primary transition-colors"
+                  href="https://discord.gg/devcopet"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
-                    discord
-                  </span>
-                  <span className="font-label-sm uppercase tracking-widest">
+                  <svg
+                    className="w-5 h-5 text-on-surface-variant group-hover:text-primary transition-colors"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.094 13.094 0 0 1-1.873-.894.077.077 0 0 1-.008-.128c.126-.093.252-.19.372-.287a.075.075 0 0 1 .077-.011c3.92 1.793 8.18 1.793 12.061 0a.073.073 0 0 1 .078.009c.12.099.246.195.373.289a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.894.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.156 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.156-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.156 2.418z" />
+                  </svg>
+                  <span className="font-label-sm uppercase tracking-widest text-[12px] font-bold">
                     Discord
                   </span>
                 </a>
                 <a
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all"
-                  href="#"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-on-surface/10 bg-on-surface/5 backdrop-blur-md hover:bg-on-surface/10 transition-all text-on-surface hover:text-primary transition-colors"
+                  href="https://github.com/phuong-tran2006/devcopet_fe"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
-                    hub
-                  </span>
-                  <span className="font-label-sm uppercase tracking-widest">
+                  <svg
+                    className="w-5 h-5 text-on-surface-variant group-hover:text-primary transition-colors"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      clipRule="evenodd"
+                      d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.579.688.481C19.137 20.162 22 16.418 22 12c0-5.523-4.477-10-10-10z"
+                    />
+                  </svg>
+                  <span className="font-label-sm uppercase tracking-widest text-[12px] font-bold">
                     Github
                   </span>
                 </a>
                 <a
-                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-white/10 bg-surface/40 backdrop-blur-md hover:bg-white/5 transition-all"
-                  href="#"
+                  className="flex items-center gap-2 px-6 py-3 rounded-full border border-on-surface/10 bg-on-surface/5 backdrop-blur-md hover:bg-on-surface/10 transition-all text-on-surface hover:text-primary transition-colors"
+                  href="https://linkedin.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
-                    work
-                  </span>
-                  <span className="font-label-sm uppercase tracking-widest">
+                  <svg
+                    className="w-5 h-5 text-on-surface-variant group-hover:text-primary transition-colors"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
+                  </svg>
+                  <span className="font-label-sm uppercase tracking-widest text-[12px] font-bold">
                     Linkedin
                   </span>
                 </a>
@@ -364,7 +395,7 @@ const LandingPage = () => {
 
             <div
               ref={addToRefs}
-              className="bg-surface/40 backdrop-blur-xl border border-outline/20 rounded-xl p-8 spinning-border-card"
+              className="bg-on-surface/5 backdrop-blur-xl border border-outline/20 rounded-xl p-8 spinning-border-card"
             >
               <h3 className="font-headline-sm text-headline-sm text-on-surface mb-8">
                 Our Core Team
@@ -437,7 +468,7 @@ const LandingPage = () => {
                   </div>
                 </div>
               </div>
-              <div className="mt-12 pt-8 border-t border-white/5">
+              <div className="mt-12 pt-8 border-t border-on-surface/5">
                 <p className="text-on-surface-variant italic text-center">
                   "We're always looking for contributors! Help us build the
                   future of education."

@@ -1,19 +1,10 @@
-// @ts-nocheck
-import React, { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import { twMerge } from "tailwind-merge";
 
 const Dropdown = ({
   // Required parameters with defaults
   placeholder = "Select level",
   text_font_size = "16",
-  text_font_family = "Nimbus Sans",
-  text_font_weight = "400",
-  text_line_height = "20px",
-  text_text_align = "left",
-  text_color = "#879392",
-  fill_background_color = "#11212e",
-  border_border = "1 solid #3e4949",
-  border_border_radius = "8px",
 
   // Optional parameters (no defaults)
   layout_gap,
@@ -22,14 +13,10 @@ const Dropdown = ({
   position,
 
   // Standard React props
-  variant,
-  size,
   options = [],
   value,
   defaultValue,
   onChange,
-  onFocus,
-  onBlur,
   disabled = false,
   required = false,
   name,
@@ -38,13 +25,12 @@ const Dropdown = ({
   error,
   helperText,
   className,
-  ...props
-}) => {
+}: any) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedValue, setSelectedValue] = useState(
     value || defaultValue || "",
   );
-  const dropdownRef = useRef(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Safe validation for optional parameters
   const hasValidWidth =
@@ -68,31 +54,17 @@ const Dropdown = ({
     ?.filter(Boolean)
     ?.join(" ");
 
-  // Parse border style
-  const borderParts = border_border?.split(" ");
-  const borderWidth = borderParts?.[0] || "1";
-  const borderStyle = borderParts?.[1] || "solid";
-  const borderColor = borderParts?.[2] || "#3e4949";
-
-  // Build inline styles for required parameters
-  const dropdownStyles = {
+  // Only fontSize is customizable via inline styles
+  const dropdownStyles: React.CSSProperties = {
     fontSize: text_font_size ? `${text_font_size}px` : "16px",
-    fontFamily: text_font_family || "Nimbus Sans",
-    fontWeight: text_font_weight || "400",
-    lineHeight: text_line_height || "20px",
-    textAlign: text_text_align || "left",
-    color: text_color || "#879392",
-    backgroundColor: fill_background_color || "#11212e",
-    border: `${borderWidth}px ${borderStyle} ${borderColor}`,
-    borderRadius: border_border_radius || "8px",
   };
 
   // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = (event: any) => {
       if (
         dropdownRef?.current &&
-        !dropdownRef?.current?.contains(event?.target)
+        !dropdownRef?.current?.contains(event?.target as Node)
       ) {
         setIsOpen(false);
       }
@@ -115,7 +87,7 @@ const Dropdown = ({
     }
   };
 
-  const handleSelect = (option) => {
+  const handleSelect = (option: any) => {
     const newValue = typeof option === "object" ? option?.value : option;
     setSelectedValue(newValue);
     setIsOpen(false);
@@ -132,7 +104,7 @@ const Dropdown = ({
   const getDisplayValue = () => {
     if (!selectedValue) return placeholder;
 
-    const selectedOption = options?.find((opt) =>
+    const selectedOption = options?.find((opt: any) =>
       typeof opt === "object"
         ? opt?.value === selectedValue
         : opt === selectedValue,
@@ -150,13 +122,14 @@ const Dropdown = ({
       className={twMerge(
         "relative flex flex-col",
         hasValidGap ? `gap-[${layout_gap}]` : "gap-2",
+        optionalClasses,
       )}
       ref={dropdownRef}
     >
       {label && (
         <label
           htmlFor={id || name}
-          className="text-sm font-medium text-text-primary mb-1"
+          className="text-sm font-normal text-on-surface pl-1"
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -179,8 +152,10 @@ const Dropdown = ({
         }}
         style={dropdownStyles}
         className={twMerge(
-          "flex items-center justify-between bg-[#11212e] border border-[#3e4949] px-4 py-3",
+          "flex items-center justify-between bg-surface/50 border border-on-surface/10 rounded-lg px-4 py-3 text-on-surface cursor-pointer transition-all duration-200 hover:border-primary-fixed-dim/50 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim focus:border-primary-fixed-dim",
+          !selectedValue && "text-on-surface/40",
           error && "border-red-500 focus:ring-red-500",
+          disabled && "opacity-50 cursor-not-allowed",
           className,
         )}
       >
@@ -189,7 +164,7 @@ const Dropdown = ({
         </span>
         <svg
           className={twMerge(
-            "w-5 h-5 transition-transform duration-200",
+            "w-5 h-5 text-on-surface-variant transition-transform duration-200",
             isOpen && "transform rotate-180",
           )}
           fill="none"
@@ -208,19 +183,18 @@ const Dropdown = ({
         <ul
           id={`${id || name}-listbox`}
           role="listbox"
-          className="absolute z-50 w-full mt-1 bg-[#11212e] border border-[#3e4949] rounded-lg shadow-lg max-h-60 overflow-auto text-[#879392]"
+          className="absolute z-50 w-full mt-1 bg-surface-container border border-on-surface/10 rounded-lg shadow-lg max-h-60 overflow-auto"
           style={{
             top: "100%",
-            fontFamily: text_font_family,
             fontSize: text_font_size ? `${text_font_size}px` : "16px",
           }}
         >
           {options?.length === 0 ? (
-            <li className="px-4 py-2 text-text-secondary">
+            <li className="px-4 py-2 text-on-surface-variant">
               No options available
             </li>
           ) : (
-            options?.map((option, index) => {
+            options?.map((option: any, index: number) => {
               const optionValue =
                 typeof option === "object" ? option?.value : option;
               const optionLabel =
@@ -233,7 +207,7 @@ const Dropdown = ({
                   role="option"
                   aria-selected={isSelected}
                   onClick={() => handleSelect(option)}
-                  onKeyDown={(e) => {
+                  onKeyDown={(e: any) => {
                     if (e?.key === "Enter" || e?.key === " ") {
                       e?.preventDefault();
                       handleSelect(option);
@@ -241,9 +215,10 @@ const Dropdown = ({
                   }}
                   tabIndex={0}
                   className={twMerge(
-                    "px-4 py-3 cursor-pointer transition-colors duration-150 text-[#879392]",
-                    "hover:bg-[#76d6d520] focus:bg-[#76d6d520] focus:outline-none",
-                    isSelected && "bg-[#d8bfd830] text-[#d8bfd8] font-medium",
+                    "px-4 py-3 cursor-pointer transition-colors duration-150 text-on-surface-variant",
+                    "hover:bg-primary-fixed-dim/10 focus:bg-primary-fixed-dim/10 focus:outline-none",
+                    isSelected &&
+                      "bg-primary-fixed-dim/20 text-primary-fixed-dim font-medium",
                   )}
                 >
                   {optionLabel}
@@ -258,7 +233,7 @@ const Dropdown = ({
           id={`${id || name}-helper`}
           className={twMerge(
             "text-xs mt-1",
-            error ? "text-red-500" : "text-text-secondary",
+            error ? "text-red-500" : "text-on-surface-variant",
           )}
         >
           {error || helperText}
