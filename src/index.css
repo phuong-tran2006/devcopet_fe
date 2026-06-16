@@ -120,19 +120,57 @@
 
   html.light {
     --color-background: #f0f2f5;
-    --color-on-background: #334155;
+    --color-on-background: #1a2332;
+
     --color-surface: #ffffff;
-    --color-surface-dim: #e2e8f0;
+    --color-surface-dim: #dce2e8;
     --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f8fafc;
-    --color-surface-container: #f1f5f9;
+    --color-surface-container-low: #f5f7fa;
+    --color-surface-container: #eef1f5;
     --color-surface-container-high: #e2e8f0;
-    --color-surface-container-highest: #cbd5e1;
-    --color-on-surface: #334155;
+    --color-surface-container-highest: #d1d9e4;
+    --color-on-surface: #1a2332;
     --color-on-surface-variant: #475569;
-    --color-outline: #cbd5e1;
+    --color-inverse-surface: #2a3641;
+    --color-inverse-on-surface: #edf1f5;
+    --color-outline: #94a3b8;
+    --color-outline-variant: #cbd5e1;
     --color-surface-variant: #e2e8f0;
+    --color-surface-tint: #006666;
+
+    --color-primary: #006666;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #b2dfdf;
+    --color-on-primary-container: #002020;
+    --color-inverse-primary: #4dd0d0;
+    --color-primary-fixed: #ccebeb;
+    --color-primary-fixed-dim: #006666;
+    --color-on-primary-fixed: #001f25;
+    --color-on-primary-fixed-variant: #004e5a;
+
+    --color-secondary: #8b6b8b;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #f0ddf0;
+    --color-on-secondary-container: #3c2a3c;
+    --color-secondary-fixed: #f4ecf4;
+    --color-secondary-fixed-dim: #8b6b8b;
+    --color-on-secondary-fixed: #271900;
+    --color-on-secondary-fixed-variant: #5e4200;
+
+    --color-tertiary: #5e8a45;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #c8e6b0;
+    --color-on-tertiary-container: #1a3010;
+    --color-tertiary-fixed: #edf3e8;
+    --color-tertiary-fixed-dim: #5e8a45;
+    --color-on-tertiary-fixed: #1b1b1b;
+    --color-on-tertiary-fixed-variant: #474747;
+
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #410002;
   }
 }
 

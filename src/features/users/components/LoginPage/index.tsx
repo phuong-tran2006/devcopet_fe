@@ -35,7 +35,11 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: "/course" });
+      if (!useAuthStore.getState().user?.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: "/course" });
+      }
     }
   }, [isAuthenticated, navigate]);
 
@@ -52,9 +56,20 @@ const Login = () => {
     try {
       const response = await authApi.login({ email, password });
       setAuth(response.accessToken, response.refreshToken, response.user);
-      navigate({ to: "/course" });
+      if (response.user && !response.user.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: "/course" });
+      }
     } catch (err: any) {
-      setError(err?.message || "Login failed. Please check your credentials.");
+      const errorMessage =
+        err?.response?.data?.message ||
+        (Array.isArray(err?.response?.data?.message)
+          ? err?.response?.data?.message[0]
+          : null) ||
+        err?.message ||
+        "Login failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
