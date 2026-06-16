@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as CourseRouteImport } from './routes/course'
@@ -22,6 +23,7 @@ import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as LessonLessonIdQuizRouteImport } from './routes/lesson/$lessonId.quiz'
+import { Route as RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport } from './routes/roadmap.$courseSlug.easy.nodes.$nodeId.challenge'
 
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
@@ -31,6 +33,11 @@ const RoadmapRoute = RoadmapRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -88,12 +95,19 @@ const LessonLessonIdQuizRoute = LessonLessonIdQuizRouteImport.update({
   path: '/quiz',
   getParentRoute: () => LessonLessonIdRoute,
 } as any)
+const RoadmapCourseSlugEasyNodesNodeIdChallengeRoute =
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport.update({
+    id: '/$courseSlug/easy/nodes/$nodeId/challenge',
+    path: '/$courseSlug/easy/nodes/$nodeId/challenge',
+    getParentRoute: () => RoadmapRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/course': typeof CourseRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -103,12 +117,14 @@ export interface FileRoutesByFullPath {
   '/setting/setting': typeof SettingSettingRoute
   '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/course': typeof CourseRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -117,6 +133,7 @@ export interface FileRoutesByTo {
   '/setting/setting': typeof SettingSettingRoute
   '/roadmap': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -124,6 +141,7 @@ export interface FileRoutesById {
   '/course': typeof CourseRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -133,6 +151,7 @@ export interface FileRoutesById {
   '/setting/setting': typeof SettingSettingRoute
   '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -141,6 +160,7 @@ export interface FileRouteTypes {
     | '/course'
     | '/leaderboard'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/roadmap'
     | '/auth/callback'
@@ -150,12 +170,14 @@ export interface FileRouteTypes {
     | '/setting/setting'
     | '/roadmap/'
     | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/course'
     | '/leaderboard'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/auth/callback'
     | '/courses/$courseId'
@@ -164,12 +186,14 @@ export interface FileRouteTypes {
     | '/setting/setting'
     | '/roadmap'
     | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
   id:
     | '__root__'
     | '/'
     | '/course'
     | '/leaderboard'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/roadmap'
     | '/auth/callback'
@@ -179,6 +203,7 @@ export interface FileRouteTypes {
     | '/setting/setting'
     | '/roadmap/'
     | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,6 +211,7 @@ export interface RootRouteChildren {
   CourseRoute: typeof CourseRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   RegisterRoute: typeof RegisterRoute
   RoadmapRoute: typeof RoadmapRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -208,6 +234,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -287,17 +320,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LessonLessonIdQuizRouteImport
       parentRoute: typeof LessonLessonIdRoute
     }
+    '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': {
+      id: '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+      path: '/$courseSlug/easy/nodes/$nodeId/challenge'
+      fullPath: '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+      preLoaderRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
   }
 }
 
 interface RoadmapRouteChildren {
   RoadmapWorldIdRoute: typeof RoadmapWorldIdRoute
   RoadmapIndexRoute: typeof RoadmapIndexRoute
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 
 const RoadmapRouteChildren: RoadmapRouteChildren = {
   RoadmapWorldIdRoute: RoadmapWorldIdRoute,
   RoadmapIndexRoute: RoadmapIndexRoute,
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRoute:
+    RoadmapCourseSlugEasyNodesNodeIdChallengeRoute,
 }
 
 const RoadmapRouteWithChildren =
@@ -320,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   CourseRoute: CourseRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   RegisterRoute: RegisterRoute,
   RoadmapRoute: RoadmapRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,

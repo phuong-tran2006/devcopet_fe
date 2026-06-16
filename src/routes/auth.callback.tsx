@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { useAuthStore } from "../features/users/store/auth.store";
+import { api } from "../services/axiosClient";
 
 export const Route = createFileRoute("/auth/callback")({
   component: AuthCallbackPage,
@@ -17,18 +18,39 @@ function AuthCallbackPage() {
   const { setAuth } = useAuthStore();
 
   useEffect(() => {
-    // The backend redirects to /auth/callback?accessToken=...&refreshToken=...
-    const { accessToken, refreshToken } = search;
+ const handleCallback = async () => {
+  const { accessToken, refreshToken } = search;
 
-    if (accessToken) {
-      // Store tokens and set auth state
-      setAuth(accessToken, refreshToken || "", null); // User info could be fetched next or decoded from JWT
-      navigate({ to: "/" });
+  if (!accessToken) {
+    navigate({
+      to: "/login",
+      search: { error: "social_login_failed" },
+    });
+    return;
+  }
+
+  setAuth(accessToken, refreshToken || "", null);
+
+  try {
+    const response = await api.get("/users/me");
+    const user = response.data;
+
+    setAuth(accessToken, refreshToken || "", user);
+
+    if (!user?.onboardingCompleted) {
+      navigate({ to: "/onboarding" });
     } else {
-      // Failed or no token
-      navigate({ to: "/login", search: { error: "social_login_failed" } });
+      navigate({ to: "/course" });
     }
-  }, [search, navigate, setAuth]);
+  } catch (error) {
+    navigate({
+      to: "/login",
+      search: { error: "social_login_failed" },
+    });
+  }
+};
+
+handleCallback();
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#041521] text-white">

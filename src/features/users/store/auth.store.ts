@@ -4,7 +4,10 @@ interface User {
   id?: string;
   email?: string;
   name?: string;
-  // Add other user fields as needed
+  username?: string;
+  onboardingCompleted?: boolean;
+  petProfileInitialized?: boolean;
+  [key: string]: unknown;
 }
 
 interface AuthState {
@@ -22,20 +25,31 @@ export const useAuthStore = create<AuthState>((set) => ({
   setAuth: (accessToken, refreshToken, user) => {
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("refreshToken", refreshToken);
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
     set({ isAuthenticated: true, user: user || null });
   },
 
   logout: () => {
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
+    localStorage.removeItem("user");
     set({ isAuthenticated: false, user: null });
   },
 
   checkAuth: () => {
     const token = localStorage.getItem("accessToken");
     if (token) {
-      set({ isAuthenticated: true });
-      // Optionally, you can fetch user profile here if you have a /users/me endpoint
+      // Restore user data from localStorage
+      let user: User | null = null;
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) user = JSON.parse(stored);
+      } catch {
+        // ignore parse errors
+      }
+      set({ isAuthenticated: true, user });
     } else {
       set({ isAuthenticated: false, user: null });
     }

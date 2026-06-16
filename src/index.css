@@ -120,19 +120,57 @@
 
   html.light {
     --color-background: #f0f2f5;
-    --color-on-background: #334155;
+    --color-on-background: #1a2332;
+
     --color-surface: #ffffff;
-    --color-surface-dim: #e2e8f0;
+    --color-surface-dim: #dce2e8;
     --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f8fafc;
-    --color-surface-container: #f1f5f9;
+    --color-surface-container-low: #f5f7fa;
+    --color-surface-container: #eef1f5;
     --color-surface-container-high: #e2e8f0;
-    --color-surface-container-highest: #cbd5e1;
-    --color-on-surface: #334155;
+    --color-surface-container-highest: #d1d9e4;
+    --color-on-surface: #1a2332;
     --color-on-surface-variant: #475569;
-    --color-outline: #cbd5e1;
+    --color-inverse-surface: #2a3641;
+    --color-inverse-on-surface: #edf1f5;
+    --color-outline: #94a3b8;
+    --color-outline-variant: #cbd5e1;
     --color-surface-variant: #e2e8f0;
+    --color-surface-tint: #006666;
+
+    --color-primary: #006666;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #b2dfdf;
+    --color-on-primary-container: #002020;
+    --color-inverse-primary: #4dd0d0;
+    --color-primary-fixed: #ccebeb;
+    --color-primary-fixed-dim: #006666;
+    --color-on-primary-fixed: #001f25;
+    --color-on-primary-fixed-variant: #004e5a;
+
+    --color-secondary: #8b6b8b;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #f0ddf0;
+    --color-on-secondary-container: #3c2a3c;
+    --color-secondary-fixed: #f4ecf4;
+    --color-secondary-fixed-dim: #8b6b8b;
+    --color-on-secondary-fixed: #271900;
+    --color-on-secondary-fixed-variant: #5e4200;
+
+    --color-tertiary: #5e8a45;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #c8e6b0;
+    --color-on-tertiary-container: #1a3010;
+    --color-tertiary-fixed: #edf3e8;
+    --color-tertiary-fixed-dim: #5e8a45;
+    --color-on-tertiary-fixed: #1b1b1b;
+    --color-on-tertiary-fixed-variant: #474747;
+
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #410002;
   }
 }
 
@@ -167,6 +205,98 @@
 
   .glow-cyan {
     box-shadow: 0 0 20px rgba(0, 128, 128, 0.45);
+  }
+
+  .roadmap-node-available,
+  .roadmap-node-selected {
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .roadmap-node-available {
+    animation: roadmap-teal-pulse 2.8s ease-in-out infinite;
+  }
+
+  .roadmap-node-available::before,
+  .roadmap-node-selected::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid rgba(34, 197, 94, 0.32);
+    box-shadow:
+      0 0 18px rgba(34, 197, 94, 0.24),
+      0 0 30px rgba(151, 202, 219, 0.16);
+  }
+
+  .roadmap-node-selected {
+    animation: roadmap-selected-glow 2.2s ease-in-out infinite;
+  }
+
+  .roadmap-node-selected::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    pointer-events: none;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(224, 255, 244, 0.18) 46%,
+      rgba(34, 197, 94, 0.24) 52%,
+      transparent 68%
+    );
+    mix-blend-mode: screen;
+    transform: translateX(-75%) rotate(18deg);
+    animation: roadmap-shine 2.6s ease-in-out infinite;
+  }
+
+  @keyframes roadmap-teal-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 18px rgba(151, 202, 219, 0.22),
+        0 0 34px rgba(34, 197, 94, 0.1);
+    }
+
+    50% {
+      box-shadow:
+        0 0 24px rgba(151, 202, 219, 0.36),
+        0 0 44px rgba(34, 197, 94, 0.18);
+    }
+  }
+
+  @keyframes roadmap-selected-glow {
+    0%,
+    100% {
+      box-shadow:
+        0 0 24px rgba(151, 202, 219, 0.38),
+        0 0 42px rgba(34, 197, 94, 0.18);
+    }
+
+    50% {
+      box-shadow:
+        0 0 30px rgba(151, 202, 219, 0.52),
+        0 0 56px rgba(34, 197, 94, 0.26);
+    }
+  }
+
+  @keyframes roadmap-shine {
+    0%,
+    42% {
+      transform: translateX(-75%) rotate(18deg);
+      opacity: 0;
+    }
+
+    52% {
+      opacity: 1;
+    }
+
+    82%,
+    100% {
+      transform: translateX(75%) rotate(18deg);
+      opacity: 0;
+    }
   }
 
   /* Spinning Border Card Effect */
