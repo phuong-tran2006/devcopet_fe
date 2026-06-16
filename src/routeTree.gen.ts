@@ -23,6 +23,7 @@ import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as LessonLessonIdQuizRouteImport } from './routes/lesson/$lessonId.quiz'
+import { Route as RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport } from './routes/roadmap.$courseSlug.easy.nodes.$nodeId.challenge'
 
 const RoadmapRoute = RoadmapRouteImport.update({
   id: '/roadmap',
@@ -94,6 +95,12 @@ const LessonLessonIdQuizRoute = LessonLessonIdQuizRouteImport.update({
   path: '/quiz',
   getParentRoute: () => LessonLessonIdRoute,
 } as any)
+const RoadmapCourseSlugEasyNodesNodeIdChallengeRoute =
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport.update({
+    id: '/$courseSlug/easy/nodes/$nodeId/challenge',
+    path: '/$courseSlug/easy/nodes/$nodeId/challenge',
+    getParentRoute: () => RoadmapRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -110,6 +117,7 @@ export interface FileRoutesByFullPath {
   '/setting/setting': typeof SettingSettingRoute
   '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -125,6 +133,7 @@ export interface FileRoutesByTo {
   '/setting/setting': typeof SettingSettingRoute
   '/roadmap': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -142,6 +151,7 @@ export interface FileRoutesById {
   '/setting/setting': typeof SettingSettingRoute
   '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -160,6 +170,7 @@ export interface FileRouteTypes {
     | '/setting/setting'
     | '/roadmap/'
     | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -175,6 +186,7 @@ export interface FileRouteTypes {
     | '/setting/setting'
     | '/roadmap'
     | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
   id:
     | '__root__'
     | '/'
@@ -191,6 +203,7 @@ export interface FileRouteTypes {
     | '/setting/setting'
     | '/roadmap/'
     | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -307,17 +320,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LessonLessonIdQuizRouteImport
       parentRoute: typeof LessonLessonIdRoute
     }
+    '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': {
+      id: '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+      path: '/$courseSlug/easy/nodes/$nodeId/challenge'
+      fullPath: '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+      preLoaderRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
   }
 }
 
 interface RoadmapRouteChildren {
   RoadmapWorldIdRoute: typeof RoadmapWorldIdRoute
   RoadmapIndexRoute: typeof RoadmapIndexRoute
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
 }
 
 const RoadmapRouteChildren: RoadmapRouteChildren = {
   RoadmapWorldIdRoute: RoadmapWorldIdRoute,
   RoadmapIndexRoute: RoadmapIndexRoute,
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRoute:
+    RoadmapCourseSlugEasyNodesNodeIdChallengeRoute,
 }
 
 const RoadmapRouteWithChildren =

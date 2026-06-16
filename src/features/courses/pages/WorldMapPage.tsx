@@ -5,364 +5,228 @@ const NodeDetailsModal = lazy(
   () => import("../../../components/ui/NodeDetailsModal"),
 );
 
-// ─── Data per difficulty ─────────────────────────────────────────────────────
-
-const EASY_CHAPTERS = [
-  {
-    _id: "e1",
-    title: "Chapter 0: Introduction",
-    status: "completed",
-    stars: 3,
-    lessons: 6,
-    xp: 80,
-  },
-  {
-    _id: "e2",
-    title: "Chapter 1: Output / Print",
-    status: "completed",
-    stars: 2,
-    lessons: 6,
-    xp: 80,
-  },
-  {
-    _id: "e3",
-    title: "Chapter 2: Basic Data Types",
-    status: "in_progress",
-    lessons: 6,
-    xp: 100,
-  },
-  {
-    _id: "e4",
-    title: "Chapter 3: User Input",
-    status: "locked",
-    lessons: 6,
-    xp: 110,
-  },
-  {
-    _id: "e5",
-    title: "Chapter 4: Operators",
-    status: "locked",
-    lessons: 6,
-    xp: 120,
-  },
-  {
-    _id: "e6",
-    title: "Chapter 5: Conditions",
-    status: "locked",
-    lessons: 6,
-    xp: 130,
-    description: "Master the flow of execution and complex decision making.",
-    objectives: [
-      "Understand if/else/elif statements",
-      "Combine logical operators (and, or, not)",
-      "Avoid nested conditionals",
-    ],
-  },
-  {
-    _id: "e7",
-    title: "Chapter 6: Loops",
-    status: "locked",
-    lessons: 6,
-    xp: 140,
-    description: "Repeat actions without repeating code.",
-    objectives: [
-      "Understand while/for loops",
-      "Control loop execution with break/continue",
-      "Iterate over sequences efficiently",
-    ],
-  },
-];
-
-const MEDIUM_CHAPTERS = [
-  {
-    _id: "m1",
-    title: "Chapter 0: Functions & Scope",
-    status: "completed",
-    stars: 3,
-    lessons: 8,
-    xp: 150,
-  },
-  {
-    _id: "m2",
-    title: "Chapter 1: Lists & Tuples",
-    status: "in_progress",
-    lessons: 7,
-    xp: 160,
-  },
-  {
-    _id: "m3",
-    title: "Chapter 2: Dictionaries & Sets",
-    status: "locked",
-    lessons: 8,
-    xp: 170,
-  },
-  {
-    _id: "m4",
-    title: "Chapter 3: File I/O & Modules",
-    status: "locked",
-    lessons: 7,
-    xp: 180,
-  },
-  {
-    _id: "m5",
-    title: "Chapter 4: Error Handling",
-    status: "locked",
-    lessons: 6,
-    xp: 190,
-  },
-  {
-    _id: "m6",
-    title: "Chapter 5: Comprehensions",
-    status: "locked",
-    lessons: 7,
-    xp: 200,
-  },
-  {
-    _id: "m7",
-    title: "Chapter 6: Iterators & Generators",
-    status: "locked",
-    lessons: 8,
-    xp: 220,
-  },
-];
-
-const HARD_CHAPTERS = [
-  {
-    _id: "h1",
-    title: "Chapter 0: OOP Fundamentals",
-    status: "in_progress",
-    lessons: 10,
-    xp: 250,
-  },
-  {
-    _id: "h2",
-    title: "Chapter 1: Decorators",
-    status: "locked",
-    lessons: 8,
-    xp: 280,
-  },
-  {
-    _id: "h3",
-    title: "Chapter 2: Metaclasses",
-    status: "locked",
-    lessons: 9,
-    xp: 300,
-  },
-  {
-    _id: "h4",
-    title: "Chapter 3: Async & Concurrency",
-    status: "locked",
-    lessons: 10,
-    xp: 320,
-  },
-  {
-    _id: "h5",
-    title: "Chapter 4: C Extensions",
-    status: "locked",
-    lessons: 8,
-    xp: 350,
-  },
-  {
-    _id: "h6",
-    title: "Chapter 5: Design Patterns",
-    status: "locked",
-    lessons: 9,
-    xp: 380,
-  },
-  {
-    _id: "h7",
-    title: "Chapter 6: System Programming",
-    status: "locked",
-    lessons: 10,
-    xp: 400,
-  },
-];
-
-// ─── Theme per difficulty ────────────────────────────────────────────────────
-
 const DIFF_CONFIG = {
   easy: {
     label: "Easy",
     accent: "#97CADB",
-    accentDim: "#6aafc5",
     glow: "rgba(151,202,219,0.65)",
     glowWeak: "rgba(151,202,219,0.20)",
     pathColor: "#97CADB",
     gradient: "linear-gradient(90deg, #97CADB, #6aafc5)",
-    nodeCompleted: "bg-[#97CADB] text-[#001e2e]",
-    nodeProgress:
-      "bg-gradient-to-tr from-[#97CADB] to-[#6aafc5] text-[#001e2e]",
-    pillActive: "bg-[#97CADB] text-[#001e2e]",
-    barFrom: "#97CADB",
-    barTo: "#6aafc5",
   },
   medium: {
     label: "Medium",
     accent: "#018ABE",
-    accentDim: "#016490",
     glow: "rgba(1,138,190,0.65)",
     glowWeak: "rgba(1,138,190,0.20)",
     pathColor: "#018ABE",
     gradient: "linear-gradient(90deg, #018ABE, #016490)",
-    nodeCompleted: "bg-[#018ABE] text-[#e0f4ff]",
-    nodeProgress:
-      "bg-gradient-to-tr from-[#018ABE] to-[#016490] text-[#e0f4ff]",
-    pillActive: "bg-[#018ABE] text-[#e0f4ff]",
-    barFrom: "#018ABE",
-    barTo: "#016490",
   },
   hard: {
     label: "Hard",
-    accent: "#02457A",
-    accentDim: "#012d52",
+    accent: "#3a7fc1",
     glow: "rgba(2,69,122,0.80)",
     glowWeak: "rgba(2,69,122,0.25)",
     pathColor: "#3a7fc1",
     gradient: "linear-gradient(90deg, #3a7fc1, #02457A, #012d52)",
-    nodeCompleted: "bg-[#02457A] text-[#c8e4ff]",
-    nodeProgress:
-      "bg-gradient-to-tr from-[#3a7fc1] to-[#02457A] text-[#e0f0ff]",
-    pillActive: "bg-[#02457A] text-[#c8e4ff]",
-    barFrom: "#3a7fc1",
-    barTo: "#02457A",
   },
 } as const;
 
 type Difficulty = keyof typeof DIFF_CONFIG;
+type ChapterStatus = "completed" | "active" | "locked";
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+const statusStyles = {
+  completed: {
+    node: "bg-[#97CADB] text-[#001e2e] border-[#c7f0f7]",
+    icon: "done",
+    label: "Completed",
+  },
+  available: {
+    node: "bg-gradient-to-tr from-[#97CADB] to-[#6aafc5] text-[#001e2e] border-background",
+    icon: "play_arrow",
+    label: "Available",
+  },
+  locked: {
+    node: "bg-surface-container text-on-surface/30 border-on-surface/10",
+    icon: "lock",
+    label: "Locked",
+  },
+} as const;
 
-interface Chapter {
-  _id: string;
-  title: string;
-  status: string;
-  stars?: number;
-  lessons?: number;
-  xp?: number;
-  description?: string;
-  objectives?: string[];
-}
+const getChapterStatus = (chapter: EasyRoadmapChapter): ChapterStatus => {
+  if (chapter.nodes.length === 0) return "locked";
+  if (chapter.nodes.every((node) => node.status === "completed")) {
+    return "completed";
+  }
+  if (chapter.nodes.some((node) => node.status === "available")) {
+    return "active";
+  }
+  return "locked";
+};
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+const normalizeOrder = (chapters: EasyRoadmapChapter[]) =>
+  [...chapters].sort((a, b) => a.order - b.order);
 
-const StarPips = ({ stars, total = 3 }: { stars: number; total?: number }) => (
-  <div className="flex items-center gap-[3px]">
-    {Array.from({ length: total }).map((_, i) => (
-      <div
-        key={i}
-        className={`w-[6px] h-[6px] rounded-full ${
-          i < stars
-            ? "bg-[#FFE052] shadow-[0_0_4px_rgba(255,224,82,0.8)]"
-            : "bg-[#3a4550]"
-        }`}
-      />
-    ))}
-  </div>
-);
-
-// ─── Main Component ───────────────────────────────────────────────────────────
+const getLessonDisplayTitle = (node: EasyRoadmapNode) => node.title.trim();
+const EASY_CHECKPOINT_DURATION = "1 min";
 
 const WorldMapPage = () => {
   const { worldId } = useParams({ strict: false });
+  const courseSlug = worldId;
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [roadmap, setRoadmap] = useState<EasyRoadmapResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [selectedChapter, setSelectedChapter] = useState<
-    (Chapter & { difficulty?: "easy" | "medium" | "hard" }) | null
+  const [selectedNode, setSelectedNode] = useState<
+    (EasyRoadmapNode & { difficulty?: Difficulty }) | null
   >(null);
+  const [selectedChapterId, setSelectedChapterId] = useState<string | null>(
+    null,
+  );
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mainScrollRef = useRef<HTMLElement>(null);
   const activeNodeRef = useRef<HTMLDivElement>(null);
 
   const cfg = DIFF_CONFIG[difficulty];
 
-  // pick chapters by difficulty
-  const allChapters: Record<Difficulty, Chapter[]> = {
-    easy: EASY_CHAPTERS,
-    medium: MEDIUM_CHAPTERS,
-    hard: HARD_CHAPTERS,
-  };
+  const chapters = useMemo(
+    () => normalizeOrder(roadmap?.chapters ?? []),
+    [roadmap],
+  );
 
-  const [apiChapters, setApiChapters] = useState<
-    Record<Difficulty, Chapter[] | null>
-  >({
-    easy: null,
-    medium: null,
-    hard: null,
-  });
+  const flatNodes = useMemo(
+    () =>
+      chapters.flatMap((chapter) =>
+        [...chapter.nodes]
+          .sort((a, b) => a.lessonOrder - b.lessonOrder)
+          .map((node) => ({
+            ...node,
+            chapterTitle: chapter.title,
+            chapterOrder: chapter.order,
+          })),
+      ),
+    [chapters],
+  );
 
-  const chapters = apiChapters[difficulty] ?? allChapters[difficulty];
+  const firstAvailableNodeId = useMemo(
+    () => flatNodes.find((node) => node.status === "available")?.id ?? null,
+    [flatNodes],
+  );
+
+  const completedCount = flatNodes.filter(
+    (node) => node.status === "completed",
+  ).length;
+  const totalNodes = roadmap?.course.totalNodes ?? flatNodes.length;
+  const totalLessons = roadmap?.course.totalLessons ?? flatNodes.length;
+  const completionPct =
+    totalNodes > 0 ? Math.round((completedCount / totalNodes) * 100) : 0;
+  const totalXp = flatNodes.reduce((sum, node) => sum + (node.xp || 0), 0);
 
   useEffect(() => {
     document.title = "Roadmap Path | Devcopet Learn";
-
-    if (worldId) {
-      courseApi
-        .getCourses()
-        .then((courses: any[]) => {
-          const found = courses.find(
-            (c: any) => c.slug === worldId || c._id === worldId,
-          );
-          if (found) return courseApi.getChapters(found._id);
-          throw new Error("Course not found");
-        })
-        .then((data) => {
-          if (data && data.length > 0) {
-            // Map API data into easy chapters (just easy for now — backend doesn't split by diff yet)
-            const mapped: Chapter[] = data.map((ch: any, idx: number) => {
-              let status = "locked";
-              if (idx < 2) status = "completed";
-              else if (idx === 2) status = "in_progress";
-              return {
-                _id: ch._id,
-                title: ch.title,
-                status,
-                stars: idx === 0 ? 3 : idx === 1 ? 2 : undefined,
-                lessons: ch.lessons || 6,
-                xp: ch.xp || 100,
-                description:
-                  ch.description ||
-                  "Master the flow of execution and complex decision making.",
-                objectives: ch.objectives || [
-                  "Understand while/for loops",
-                  "Master if/else conditions",
-                  "Apply logical operators",
-                ],
-              };
-            });
-            setApiChapters((prev) => ({ ...prev, easy: mapped }));
-          }
-        })
-        .catch((err) => console.log("Using mock roadmap data:", err.message));
-    }
-  }, [worldId]);
-
-  useEffect(() => {
-    const handleScroll = () => setShowScrollTop(window.scrollY > 250);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Reset scroll & active node when switching difficulty
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (!courseSlug) {
+      setLoading(false);
+      setError("Course slug is missing.");
+      return;
+    }
+
+    let alive = true;
+    setLoading(true);
+    setError(null);
+    setRoadmap(null);
+    setSelectedChapterId(null);
+
+    courseApi
+      .getEasyRoadmap(courseSlug)
+      .then((data) => {
+        if (!alive) return;
+        setRoadmap(data);
+        setSelectedChapterId(data.chapters[0]?.id ?? null);
+        document.title = `${data.course.title} Roadmap | Devcopet Learn`;
+      })
+      .catch((err) => {
+        if (!alive) return;
+        setError(
+          err?.response?.data?.message ||
+            err?.message ||
+            "Unable to load Easy roadmap.",
+        );
+      })
+      .finally(() => {
+        if (alive) setLoading(false);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, [courseSlug]);
+
+  useEffect(() => {
+    mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   }, [difficulty]);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+  const getNodeCoords = (index: number) => {
+    const y = index * 150 + 120;
+    const xOptions = [150, 340, 520, 340];
+    const x = xOptions[index % xOptions.length];
+    return { x, y };
+  };
+
+  const buildPath = (wantUnlocked: boolean) => {
+    if (flatNodes.length < 2) return "";
+
+    return flatNodes
+      .slice(1)
+      .map((node, idx) => {
+        const prev = flatNodes[idx];
+        const currentIndex = idx + 1;
+        const unlocked =
+          prev.status !== "locked" && node.status !== "locked";
+
+        if (unlocked !== wantUnlocked) return "";
+
+        const p1 = getNodeCoords(currentIndex - 1);
+        const p2 = getNodeCoords(currentIndex);
+        return `M ${p1.x} ${p1.y} C ${p1.x} ${p1.y + 70}, ${p2.x} ${p2.y - 70}, ${p2.x} ${p2.y}`;
+      })
+      .filter(Boolean)
+      .join(" ");
+  };
+
+  const completedD = buildPath(true);
+  const lockedD = buildPath(false);
+  const mapHeight = Math.max(flatNodes.length * 150 + 180, 520);
+
+  const scrollToTop = () =>
+    mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+
   const scrollToActiveNode = () => {
     activeNodeRef.current?.scrollIntoView({
       behavior: "smooth",
       block: "center",
+      inline: "center",
     });
   };
 
-  // Zigzag node positions
-  const getNodeCoords = (index: number) => {
-    const y = index * 200 + 120;
-    const xOptions = [160, 340, 460, 340];
-    const x = xOptions[index % 4];
-    return { x, y };
+  const scrollToChapter = (chapter: EasyRoadmapChapter) => {
+    setSelectedChapterId(chapter.id);
+    const firstNode = chapter.nodes[0];
+    if (!firstNode) return;
+
+    mapContainerRef.current
+      ?.querySelector(`[data-node-id="${firstNode.id}"]`)
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+        inline: "center",
+      });
   };
 
   // SVG path generation memoized
@@ -376,84 +240,138 @@ const WorldMapPage = () => {
         ? inProgressIdx
         : chapters.filter((c) => c.status === "completed").length;
 
-    chapters.forEach((_, idx) => {
-      if (idx === 0) {
-        const { x, y } = getNodeCoords(0);
-        completedD += `M ${x} ${y}`;
-      } else {
-        const p1 = getNodeCoords(idx - 1);
-        const p2 = getNodeCoords(idx);
-        const curve = ` C ${p1.x} ${p1.y + 90}, ${p2.x} ${p2.y - 90}, ${p2.x} ${p2.y}`;
-        if (idx <= cutoffIdx) {
-          if (completedD === "") completedD += `M ${p1.x} ${p1.y}`;
-          completedD += curve;
-        } else {
-          if (lockedD === "") lockedD += `M ${p1.x} ${p1.y}`;
-          lockedD += curve;
-        }
-      }
+  const renderChapterSidebar = () => {
+    if (loading) {
+      return (
+        <div className="px-3 py-4 text-[12px] text-on-surface-variant">
+          Loading chapters...
+        </div>
+      );
+    }
+
+    if (difficulty !== "easy") {
+      return (
+        <div className="mx-3 my-4 rounded-xl border border-on-surface/10 bg-surface-container/60 px-4 py-5">
+          <p className="text-[12px] font-bold text-on-surface">
+            Coming soon
+          </p>
+          <p className="mt-1 text-[11px] leading-relaxed text-on-surface-variant/70">
+            Medium and Hard roadmaps are not available yet.
+          </p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="mx-3 my-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-5">
+          <p className="text-[12px] font-bold text-red-200">Cannot load</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-red-100/70">
+            {error}
+          </p>
+        </div>
+      );
+    }
+
+    return chapters.map((chapter) => {
+      const chapterStatus = getChapterStatus(chapter);
+      const isSelected = selectedChapterId === chapter.id;
+
+      return (
+        <button
+          key={chapter.id}
+          onClick={() => scrollToChapter(chapter)}
+          className={`w-full rounded-xl border px-3 py-3 text-left transition-all duration-200 ${
+            isSelected
+              ? "bg-[#97CADB]/12 border-[#97CADB]/45 shadow-[0_0_16px_rgba(151,202,219,0.12)]"
+              : "bg-on-surface/4 border-on-surface/8 hover:bg-on-surface/7 hover:border-on-surface/18"
+          }`}
+        >
+          <div className="flex items-start gap-3">
+            <div
+              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[12px] font-extrabold ${
+                chapterStatus === "completed"
+                  ? "bg-[#97CADB] text-[#001e2e] border-[#c7f0f7]"
+                  : chapterStatus === "active"
+                    ? "text-[#001e2e] border-background"
+                    : "bg-surface-container text-on-surface/30 border-on-surface/10"
+              }`}
+              style={
+                chapterStatus === "active"
+                  ? {
+                      background: cfg.gradient,
+                      boxShadow: `0 0 12px ${cfg.glowWeak}`,
+                    }
+                  : {}
+              }
+            >
+              {chapterStatus === "completed" ? (
+                <span className="material-symbols-outlined text-[16px]">
+                  done
+                </span>
+              ) : chapterStatus === "locked" ? (
+                <span className="material-symbols-outlined text-[15px]">
+                  lock
+                </span>
+              ) : (
+                chapter.order
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/70">
+                Chapter {chapter.order}
+              </p>
+              <p className="mt-0.5 text-[13px] font-semibold leading-snug text-on-surface">
+                {chapter.title}
+              </p>
+              <p className="mt-1 text-[10px] text-on-surface-variant/55">
+                {chapter.lessonCount} lessons • {chapter.nodeCount} nodes
+              </p>
+            </div>
+          </div>
+        </button>
+      );
     });
-
-    return { completedD, lockedD };
-  }, [chapters]);
-  const mapHeight = chapters.length * 200 + 120;
-  const completedCount = chapters.filter(
-    (c) => c.status === "completed",
-  ).length;
-  const completionPct = Math.round((completedCount / chapters.length) * 100);
-
-  // ─── Difficulty badge metadata ───────────────────────────────────────────────
-  const diffMeta: Record<
-    Difficulty,
-    { totalXP: number; chapters: number; badge: string }
-  > = {
-    easy: { totalXP: 760, chapters: 7, badge: "🌱 Beginner" },
-    medium: { totalXP: 1270, chapters: 7, badge: "⚔️ Challenger" },
-    hard: { totalXP: 2180, chapters: 7, badge: "☠️ Expert" },
   };
 
   return (
-    <div className="flex w-full h-[calc(100vh-80px)] bg-background overflow-hidden relative">
-      {/* =========================================
-          LEFT DRAWER
-      ========================================= */}
+    <div className="relative flex h-[calc(100vh-80px)] w-full overflow-hidden bg-background">
       <aside
         className={`shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${
           drawerOpen ? "w-[320px]" : "w-0"
         }`}
       >
         <div
-          className={`h-full w-[320px] flex flex-col bg-surface border-r border-on-surface/8 shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
-            drawerOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          className={`flex h-full w-[320px] flex-col border-r border-on-surface/8 bg-surface shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
+            drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"
           }`}
         >
-          {/* ── TOP: User Stats ── */}
-          <div className="px-5 pt-5 pb-4 border-b border-on-surface/6 flex-shrink-0">
-            {/* Profile row */}
-            <div className="flex items-center gap-3 mb-4">
+          <div className="shrink-0 border-b border-on-surface/6 px-5 pb-4 pt-5">
+            <div className="mb-4 flex items-center gap-3">
               <div
-                className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl border"
+                className="flex h-12 w-12 items-center justify-center rounded-xl border text-2xl"
                 style={{
-                  background: `${cfg.glowWeak}`,
+                  background: cfg.glowWeak,
                   borderColor: `${cfg.accent}40`,
                   boxShadow: `0 0 15px ${cfg.glowWeak}`,
                 }}
               >
-                🦖
+                <span className="material-symbols-outlined text-[25px]">
+                  psychology
+                </span>
               </div>
               <div className="flex flex-col">
-                <span className="font-extrabold text-[15px] text-on-surface">
+                <span className="text-[15px] font-extrabold text-on-surface">
                   Level 12
                 </span>
-                <span className="text-[10px] text-on-surface-variant font-medium uppercase tracking-wider">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
                   Data Novice
                 </span>
               </div>
             </div>
 
-            {/* Stats grid */}
-            <div className="grid grid-cols-2 gap-2 mb-3">
-              <div className="bg-surface-container/80 border border-on-surface/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
+            <div className="mb-3 grid grid-cols-2 gap-2">
+              <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
                 <span
                   className="material-symbols-outlined text-[16px]"
                   style={{ color: cfg.accent }}
@@ -461,39 +379,39 @@ const WorldMapPage = () => {
                   monetization_on
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-on-surface-variant/70 font-medium uppercase tracking-wide">
-                    XP Earned
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
+                    Roadmap XP
                   </span>
                   <span className="text-[13px] font-bold text-on-surface">
-                    2,450 XP
+                    {totalXp || "--"} XP
                   </span>
                 </div>
               </div>
-              <div className="bg-surface-container/80 border border-on-surface/10 rounded-xl px-3 py-2.5 flex items-center gap-2">
+              <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
                 <span className="material-symbols-outlined text-[16px] text-[#FFE052]">
-                  star
+                  route
                 </span>
                 <div className="flex flex-col">
-                  <span className="text-[9px] text-on-surface-variant/70 font-medium uppercase tracking-wide">
-                    Stars
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
+                    Nodes
                   </span>
                   <span className="text-[13px] font-bold text-on-surface">
-                    120
+                    {totalNodes || "--"}
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* Level progress */}
             <div className="flex flex-col gap-1.5">
-              <div className="flex justify-between items-center text-[10px] font-bold tracking-wider text-on-surface-variant">
-                <span>LEVEL 12</span>
-                <span>72%</span>
+              <div className="flex items-center justify-between text-[10px] font-bold tracking-wider text-on-surface-variant">
+                <span>EASY PROGRESS</span>
+                <span>{completionPct}%</span>
               </div>
-              <div className="h-2 bg-surface-container rounded-full overflow-hidden">
+              <div className="h-2 overflow-hidden rounded-full bg-surface-container">
                 <div
-                  className="h-full w-[72%] rounded-full"
+                  className="h-full rounded-full transition-all duration-700"
                   style={{
+                    width: `${completionPct}%`,
                     background: cfg.gradient,
                     boxShadow: `0 0 10px ${cfg.glowWeak}`,
                   }}
@@ -502,40 +420,23 @@ const WorldMapPage = () => {
             </div>
           </div>
 
-          {/* ── Chapter List Header ── */}
-          <div className="px-5 pt-4 pb-3 flex items-center gap-2 border-b border-on-surface/5 flex-shrink-0">
+          <div className="flex shrink-0 items-center gap-2 border-b border-on-surface/5 px-5 pb-3 pt-4">
             <span
               className="material-symbols-outlined text-[16px]"
               style={{ color: cfg.accent }}
             >
               format_list_bulleted
             </span>
-            <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest flex-1">
+            <span className="flex-1 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
               Chapters
             </span>
-            {/* Mini progress */}
-            <div className="flex items-center gap-1.5">
-              <div className="w-16 h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${completionPct}%`,
-                    background: cfg.gradient,
-                  }}
-                />
-              </div>
-              <span
-                className="text-[10px] font-bold"
-                style={{ color: cfg.accent }}
-              >
-                {completionPct}%
-              </span>
-            </div>
+            <span className="text-[10px] font-bold" style={{ color: cfg.accent }}>
+              {chapters.length || 0}
+            </span>
           </div>
 
-          {/* ── Scrollable Chapter List ── */}
           <div
-            className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-1.5"
+            className="flex flex-1 flex-col gap-1.5 overflow-y-auto px-3 py-3"
             style={{
               scrollbarWidth: "thin",
               scrollbarColor: "#2a3641 transparent",
@@ -689,16 +590,11 @@ const WorldMapPage = () => {
         </div>
       </aside>
 
-      {/* Drawer Toggle Tab */}
       <button
         onClick={() => setDrawerOpen(!drawerOpen)}
-        className={`
-          hidden lg:flex fixed top-[96px] z-50 h-10 w-10 items-center justify-center
-          rounded-full border border-outline/30 bg-surface-container text-on-surface-variant
-          shadow-lg transition-all duration-300
-          hover:border-primary-fixed-dim hover:text-primary-fixed-dim hover:bg-[#17212d]
-          ${drawerOpen ? "left-[335px]" : "left-4"}
-        `}
+        className={`fixed top-[96px] z-50 hidden h-10 w-10 items-center justify-center rounded-full border border-outline/30 bg-surface-container text-on-surface-variant shadow-lg transition-all duration-300 hover:border-primary-fixed-dim hover:bg-[#17212d] hover:text-primary-fixed-dim lg:flex ${
+          drawerOpen ? "left-[335px]" : "left-4"
+        }`}
         aria-label={drawerOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
         <span className="material-symbols-outlined text-[22px]">
@@ -706,19 +602,19 @@ const WorldMapPage = () => {
         </span>
       </button>
 
-      {/* =========================================
-          MAIN MAP AREA
-      ========================================= */}
-      <main className="flex-1 w-full relative overflow-y-auto custom-scrollbar">
-        <section className="flex flex-col items-center justify-start py-10 px-4 z-10 min-h-full">
-          <div className="w-full max-w-[680px] flex flex-col">
-            {/* ── Header ── */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-5 mb-8 border-b border-on-surface/8 pb-7">
+      <main
+        ref={mainScrollRef}
+        onScroll={handleMainScroll}
+        className="custom-scrollbar relative w-full flex-1 overflow-y-auto"
+      >
+        <section className="z-10 flex min-h-full flex-col items-center justify-start px-4 py-10">
+          <div className="flex w-full max-w-[720px] flex-col">
+            <div className="mb-8 flex flex-col justify-between gap-5 border-b border-on-surface/8 pb-7 md:flex-row md:items-center">
               <div className="flex items-center gap-4">
                 <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center border"
+                  className="flex h-11 w-11 items-center justify-center rounded-xl border"
                   style={{
-                    background: `${cfg.glowWeak}`,
+                    background: cfg.glowWeak,
                     borderColor: `${cfg.accent}50`,
                     boxShadow: `0 0 20px ${cfg.glowWeak}`,
                   }}
@@ -731,27 +627,26 @@ const WorldMapPage = () => {
                   </span>
                 </div>
                 <div>
-                  <h1 className="text-[32px] md:text-[38px] font-extrabold text-on-surface tracking-wide uppercase leading-none">
-                    Python World
+                  <h1 className="text-[32px] font-extrabold uppercase leading-none tracking-wide text-on-surface md:text-[38px]">
+                    {roadmap?.course.title || "Course Roadmap"}
                   </h1>
                   <span
-                    className="text-[11px] font-bold tracking-widest uppercase"
+                    className="text-[11px] font-bold uppercase tracking-widest"
                     style={{ color: cfg.accent }}
                   >
-                    {diffMeta[difficulty].badge} ·{" "}
-                    {diffMeta[difficulty].chapters} Chapters ·{" "}
-                    {diffMeta[difficulty].totalXP} XP
+                    {difficulty === "easy"
+                      ? `${roadmap?.course.totalChapters ?? 0} chapters • ${totalLessons} lessons • ${totalNodes} nodes`
+                      : "Coming soon"}
                   </span>
                 </div>
               </div>
 
-              {/* Difficulty Pills */}
-              <div className="flex bg-surface-container/90 p-1 rounded-xl border border-on-surface/10 text-[12px] font-bold uppercase tracking-wider gap-0.5">
+              <div className="flex gap-0.5 rounded-xl border border-on-surface/10 bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
                 {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
                   <button
                     key={d}
                     onClick={() => setDifficulty(d)}
-                    className={`px-5 py-2 rounded-lg transition-all duration-200 ${
+                    className={`rounded-lg px-5 py-2 transition-all duration-200 ${
                       difficulty === d
                         ? "text-[#0d1117] shadow-md"
                         : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
@@ -771,15 +666,14 @@ const WorldMapPage = () => {
               </div>
             </div>
 
-            {/* ── World Progress Bar ── */}
-            <div className="flex flex-col gap-2 mb-8 border border-on-surface/10 bg-surface-container/60 rounded-2xl px-5 py-4">
-              <div className="flex justify-between items-center text-[13px] font-bold tracking-wider text-on-surface-variant">
-                <span>World Completion</span>
+            <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-on-surface/10 bg-surface-container/60 px-5 py-4">
+              <div className="flex items-center justify-between text-[13px] font-bold tracking-wider text-on-surface-variant">
+                <span>Easy Completion</span>
                 <span className="text-[15px]" style={{ color: cfg.accent }}>
                   {completionPct}%
                 </span>
               </div>
-              <div className="h-3 bg-surface-container rounded-full overflow-hidden">
+              <div className="h-3 overflow-hidden rounded-full bg-surface-container">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
@@ -789,18 +683,17 @@ const WorldMapPage = () => {
                   }}
                 />
               </div>
-              <div className="flex justify-between text-[11px] text-on-surface-variant/60 font-medium mt-0.5">
-                <span>{completedCount} chapters done</span>
-                <span>{chapters.length} total</span>
+              <div className="mt-0.5 flex justify-between text-[11px] font-medium text-on-surface-variant/60">
+                <span>{completedCount} lesson nodes done</span>
+                <span>{totalNodes} total nodes</span>
               </div>
             </div>
 
-            {/* ── Difficulty banner for Medium / Hard ── */}
             {difficulty !== "easy" && (
               <div
-                className="flex items-center gap-3 px-4 py-3 rounded-xl border mb-6"
+                className="mb-6 flex items-center gap-3 rounded-xl border px-4 py-4"
                 style={{
-                  background: `${cfg.glowWeak}`,
+                  background: cfg.glowWeak,
                   borderColor: `${cfg.accent}35`,
                 }}
               >
@@ -808,246 +701,256 @@ const WorldMapPage = () => {
                   className="material-symbols-outlined text-[22px]"
                   style={{ color: cfg.accent }}
                 >
-                  {difficulty === "medium" ? "fitness_center" : "skull"}
+                  construction
                 </span>
                 <div>
-                  <p className="text-[12px] font-bold text-on-surface">
-                    {difficulty === "medium"
-                      ? "Challenger Mode — Unlock after completing Easy"
-                      : "Expert Mode — Unlock after completing Medium"}
+                  <p className="text-[13px] font-bold text-on-surface">
+                    Coming soon
                   </p>
-                  <p className="text-[10px] text-on-surface-variant/70 mt-0.5">
-                    {difficulty === "medium"
-                      ? "Deeper concepts, more complex exercises. +50% XP multiplier."
-                      : "No guardrails. Raw difficulty. +100% XP multiplier."}
+                  <p className="mt-0.5 text-[11px] leading-relaxed text-on-surface-variant/70">
+                    {DIFF_CONFIG[difficulty].label} roadmap data is not
+                    implemented yet.
                   </p>
                 </div>
               </div>
             )}
 
-            {/* ── Interactive Road Map ── */}
-            <div
-              ref={mapContainerRef}
-              className="relative w-full overflow-visible select-none"
-              style={{ height: `${mapHeight}px` }}
-            >
-              <svg
-                className="absolute inset-0 pointer-events-none w-full h-full"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  <filter id={`glow-${difficulty}`}>
-                    <feGaussianBlur stdDeviation="4" result="coloredBlur" />
-                    <feMerge>
-                      <feMergeNode in="coloredBlur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
-                </defs>
-
-                {completedD && (
-                  <path
-                    d={completedD}
-                    fill="none"
-                    stroke={cfg.pathColor}
-                    strokeWidth="6"
-                    strokeLinecap="round"
-                    filter={`url(#glow-${difficulty})`}
-                  />
-                )}
-                {lockedD && (
-                  <path
-                    d={lockedD}
-                    fill="none"
-                    stroke="var(--color-outline)"
-                    strokeWidth="5"
-                    strokeLinecap="round"
-                    strokeDasharray="8,10"
-                    opacity="0.5"
-                  />
-                )}
-              </svg>
-
-              {/* Chapter Nodes */}
-              {chapters.map((chapter, idx) => {
-                const { x, y } = getNodeCoords(idx);
-                const isCompleted = chapter.status === "completed";
-                const isInProgress = chapter.status === "in_progress";
-                const isLocked = chapter.status === "locked";
-                const isHovered = hoveredNode === chapter._id;
-
-                return (
+            {difficulty === "easy" && loading && (
+              <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-on-surface/8 bg-surface-container/40">
+                <div className="flex flex-col items-center gap-3">
                   <div
-                    key={chapter._id}
-                    ref={isInProgress ? activeNodeRef : null}
-                    data-chapter-id={chapter._id}
-                    className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center gap-1.5 z-10 cursor-pointer"
-                    style={{ left: `${x}px`, top: `${y}px` }}
-                    onMouseEnter={() => setHoveredNode(chapter._id)}
-                    onMouseLeave={() => setHoveredNode(null)}
-                    onClick={() => {
-                      setSelectedChapter({ ...chapter, difficulty });
-                    }}
+                    className="h-11 w-11 animate-spin rounded-full border-4 border-t-transparent"
+                    style={{ borderColor: `${cfg.accent}55`, borderTopColor: "transparent" }}
+                  />
+                  <p className="text-[12px] font-bold uppercase tracking-widest text-on-surface-variant">
+                    Loading Easy roadmap
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {difficulty === "easy" && !loading && error && (
+              <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
+                <span className="material-symbols-outlined mb-3 text-[34px] text-red-200">
+                  error
+                </span>
+                <h2 className="text-[18px] font-extrabold text-on-surface">
+                  Easy roadmap could not load
+                </h2>
+                <p className="mx-auto mt-2 max-w-[420px] text-[13px] leading-relaxed text-on-surface-variant">
+                  {error}
+                </p>
+                <button
+                  onClick={() => {
+                    if (!courseSlug) return;
+                    setLoading(true);
+                    setError(null);
+                    courseApi
+                      .getEasyRoadmap(courseSlug)
+                      .then(setRoadmap)
+                      .catch((err) =>
+                        setError(
+                          err?.response?.data?.message ||
+                            err?.message ||
+                            "Unable to load Easy roadmap.",
+                        ),
+                      )
+                      .finally(() => setLoading(false));
+                  }}
+                  className="mt-5 rounded-xl bg-[#97CADB] px-5 py-3 text-[12px] font-extrabold uppercase tracking-wider text-[#001e2e] transition hover:bg-[#b7e4ef]"
+                >
+                  Retry
+                </button>
+              </div>
+            )}
+
+            {difficulty === "easy" &&
+              !loading &&
+              !error &&
+              flatNodes.length === 0 && (
+                <div className="rounded-2xl border border-on-surface/10 bg-surface-container/50 px-6 py-8 text-center">
+                  <h2 className="text-[18px] font-extrabold text-on-surface">
+                    No lesson nodes yet
+                  </h2>
+                  <p className="mt-2 text-[13px] text-on-surface-variant">
+                    The Easy roadmap returned no lessons for this course.
+                  </p>
+                </div>
+              )}
+
+            {difficulty === "easy" &&
+              !loading &&
+              !error &&
+              flatNodes.length > 0 && (
+                <div
+                  ref={mapContainerRef}
+                  className="relative w-full select-none overflow-visible"
+                  style={{ height: `${mapHeight}px` }}
+                >
+                  <svg
+                    className="pointer-events-none absolute inset-0 h-full w-full"
+                    xmlns="http://www.w3.org/2000/svg"
                   >
-                    {/* Tooltip */}
-                    {isHovered && (
+                    <defs>
+                      <filter id="glow-easy-roadmap">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                        <feMerge>
+                          <feMergeNode in="coloredBlur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                    </defs>
+
+                    {completedD && (
+                      <path
+                        d={completedD}
+                        fill="none"
+                        stroke={DIFF_CONFIG.easy.pathColor}
+                        strokeLinecap="round"
+                        strokeWidth="6"
+                        filter="url(#glow-easy-roadmap)"
+                      />
+                    )}
+                    {lockedD && (
+                      <path
+                        d={lockedD}
+                        fill="none"
+                        stroke="var(--color-outline)"
+                        strokeDasharray="8,10"
+                        strokeLinecap="round"
+                        strokeWidth="5"
+                        opacity="0.5"
+                      />
+                    )}
+                  </svg>
+
+                  {flatNodes.map((node, idx) => {
+                    const { x, y } = getNodeCoords(idx);
+                    const styles = statusStyles[node.status];
+                    const isHovered = hoveredNode === node.id;
+                    const isActive = firstAvailableNodeId === node.id;
+                    const isSelected = selectedNode?.id === node.id;
+                    const lessonTitle = getLessonDisplayTitle(node);
+                    const nodeGlowClass =
+                      node.status === "available"
+                        ? isActive || isSelected
+                          ? "roadmap-node-selected"
+                          : "roadmap-node-available"
+                        : "";
+                    const isFirstInChapter =
+                      idx === 0 ||
+                      flatNodes[idx - 1].chapterId !== node.chapterId;
+
+                    return (
                       <div
-                        className="absolute z-30 pointer-events-none"
-                        style={{
-                          bottom: "calc(100% + 14px)",
-                          left: "50%",
-                          transform: "translateX(-50%)",
+                        key={node.id}
+                        ref={isActive ? activeNodeRef : null}
+                        data-node-id={node.id}
+                        data-chapter-id={node.chapterId}
+                        className="absolute z-10 flex -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-center gap-1.5"
+                        style={{ left: `${x}px`, top: `${y}px` }}
+                        onMouseEnter={() => setHoveredNode(node.id)}
+                        onMouseLeave={() => setHoveredNode(null)}
+                        onClick={() => {
+                          setSelectedNode({ ...node, difficulty: "easy" });
+                          setSelectedChapterId(node.chapterId);
                         }}
                       >
-                        <div className="bg-surface-container border border-on-surface/15 rounded-xl px-4 py-3 shadow-xl min-w-[180px] text-center">
-                          <p className="text-[13px] font-bold text-on-surface whitespace-nowrap mb-1.5">
-                            {chapter.title}
-                          </p>
-                          <div className="flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
-                            <span className="flex items-center gap-1">
-                              <span className="material-symbols-outlined text-[12px]">
-                                book
-                              </span>
-                              {chapter.lessons || "?"} lessons
-                            </span>
-                            <span className="flex items-center gap-1 text-[#FFE052]">
-                              <span className="material-symbols-outlined text-[12px]">
-                                bolt
-                              </span>
-                              {chapter.xp || "?"}xp
-                            </span>
-                          </div>
-                          {isLocked && (
-                            <p className="text-[10px] text-on-surface-variant/50 mt-1.5">
-                              Complete previous to unlock
-                            </p>
-                          )}
+                        {isFirstInChapter && (
                           <div
-                            className="absolute top-full left-1/2 -translate-x-1/2 border-[6px] border-transparent opacity-20"
-                            style={{
-                              borderTopColor: "var(--color-on-surface)",
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* ── Completed Node ── */}
-                    {isCompleted && (
-                      <div
-                        className={`flex flex-col items-center transition-transform duration-300 ${
-                          isHovered ? "scale-110" : "scale-100"
-                        }`}
-                      >
-                        <div
-                          className={`w-14 h-14 rounded-full flex items-center justify-center font-bold border-2 border-on-surface/20 ${cfg.nodeCompleted}`}
-                          style={{ boxShadow: `0 0 24px ${cfg.glow}` }}
-                        >
-                          <span className="material-symbols-outlined text-[26px] font-extrabold">
-                            done
-                          </span>
-                        </div>
-                        {chapter.stars !== undefined && (
-                          <div
-                            className="mt-1.5 px-2.5 py-1 rounded-full flex items-center gap-1.5 border"
-                            style={{
-                              background: "var(--color-background)",
-                              borderColor: `${cfg.accent}28`,
-                            }}
+                            className="absolute left-1/2 top-[-74px] z-0 -translate-x-1/2 whitespace-nowrap rounded-full border bg-background/95 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant shadow-lg"
+                            style={{ borderColor: `${cfg.accent}30` }}
                           >
-                            <StarPips stars={chapter.stars} />
-                            <span className="text-[9px] font-bold text-[#FFE052]">
-                              {chapter.stars}/3
-                            </span>
+                            Chapter {node.chapterOrder}
                           </div>
                         )}
-                        <span className="mt-1 text-[11px] font-semibold text-on-surface-variant/80 max-w-[120px] text-center leading-tight">
-                          {chapter.title}
-                        </span>
-                      </div>
-                    )}
 
-                    {/* ── In Progress Node ── */}
-                    {isInProgress && (
-                      <div
-                        className={`flex flex-col items-center relative transition-transform duration-300 ${
-                          isHovered ? "scale-110" : "scale-100"
-                        }`}
-                      >
-                        <div
-                          className="absolute rounded-full animate-ping opacity-20 scale-150"
-                          style={{
-                            inset: 0,
-                            background: cfg.accent,
-                          }}
-                        />
-                        <div
-                          className="w-16 h-16 rounded-full flex flex-col items-center justify-center font-extrabold text-[18px] border-4 border-background relative z-10"
-                          style={{
-                            background: cfg.gradient,
-                            color: "#fff",
-                            boxShadow: `0 0 32px ${cfg.glow}`,
-                          }}
-                        >
-                          {idx + 1}
-                        </div>
-                        <div
-                          className="mt-2 px-3 py-1 rounded-full border"
-                          style={{
-                            background: `${cfg.glowWeak}`,
-                            borderColor: `${cfg.accent}40`,
-                          }}
-                        >
-                          <span
-                            className="text-[10px] font-extrabold tracking-wide uppercase"
-                            style={{ color: cfg.accent }}
-                          >
-                            Active
-                          </span>
-                        </div>
-                        <span className="mt-1 text-[12px] font-bold text-on-surface max-w-[130px] text-center leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
-                          {chapter.title}
-                        </span>
-                      </div>
-                    )}
+                        {isHovered && (
+                          <div className="pointer-events-none absolute bottom-[calc(100%+14px)] left-1/2 z-30 -translate-x-1/2">
+                            <div className="min-w-[220px] max-w-[280px] rounded-xl border border-on-surface/15 bg-surface-container px-4 py-3 text-center shadow-xl">
+                              <p className="mb-1 text-[11px] font-extrabold uppercase tracking-widest text-[#97CADB]">
+                                {node.label}
+                              </p>
+                              <p className="text-[13px] font-bold leading-snug text-on-surface">
+                                {lessonTitle}
+                              </p>
+                              <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
+                                <span className="flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-[12px]">
+                                    bolt
+                                  </span>
+                                  {node.xp || 0} XP
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-[12px]">
+                                    schedule
+                                  </span>
+                                  {EASY_CHECKPOINT_DURATION}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
 
-                    {/* ── Locked Node ── */}
-                    {isLocked && (
-                      <div
-                        className={`flex flex-col items-center transition-transform duration-300 ${
-                          isHovered ? "scale-105" : "scale-100"
-                        }`}
-                      >
-                        <div className="w-11 h-11 rounded-full bg-surface-container text-on-surface/20 flex items-center justify-center border border-on-surface/5 shadow-inner">
-                          <span className="material-symbols-outlined text-[17px]">
-                            lock
-                          </span>
+                        {isActive && (
+                          <div
+                            className="absolute rounded-full opacity-20 animate-ping"
+                            style={{
+                              inset: -8,
+                              background: cfg.accent,
+                            }}
+                          />
+                        )}
+
+                        <div
+                          className={`relative z-10 flex items-center justify-center rounded-full border-4 font-extrabold shadow-lg transition-transform duration-300 ${
+                            isActive ? "h-16 w-16 text-[17px]" : "h-14 w-14 text-[15px]"
+                          } ${styles.node} ${nodeGlowClass} ${isHovered ? "scale-110" : "scale-100"}`}
+                          style={
+                            node.status !== "locked"
+                              ? { boxShadow: `0 0 24px ${cfg.glowWeak}` }
+                              : {}
+                          }
+                        >
+                          {node.status === "locked" ? (
+                            <span className="material-symbols-outlined text-[18px]">
+                              lock
+                            </span>
+                          ) : (
+                            node.label
+                          )}
                         </div>
-                        <span className="mt-1.5 text-[10px] font-medium text-on-surface-variant/40 max-w-[100px] text-center leading-tight">
-                          {chapter.title}
+
+                        <span
+                          className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                            node.status === "locked"
+                              ? "border-on-surface/10 bg-surface-container text-on-surface-variant/40"
+                              : "border-[#97CADB]/25 bg-background text-[#97CADB]"
+                          }`}
+                        >
+                          {styles.label}
                         </span>
                       </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                    );
+                  })}
+                </div>
+              )}
           </div>
         </section>
 
-        {/* ── FLOATING BUTTONS ── */}
-        <div className="fixed bottom-8 right-8 flex flex-col gap-3 z-50">
+        <div className="fixed bottom-8 right-8 z-50 flex flex-col gap-3">
           <button
             onClick={scrollToActiveNode}
-            title="Jump to In-Progress Node"
-            className="group w-12 h-12 rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300"
+            title="Jump to available lesson"
+            className="group flex h-12 w-12 items-center justify-center rounded-full transition-all duration-300 hover:scale-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+            disabled={!firstAvailableNodeId}
             style={{
               background: cfg.gradient,
               boxShadow: `0 4px 20px ${cfg.glowWeak}`,
               color: "#fff",
             }}
           >
-            <span className="material-symbols-outlined text-[20px] group-hover:rotate-12 transition-transform duration-300">
+            <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-12">
               my_location
             </span>
           </button>
@@ -1055,14 +958,14 @@ const WorldMapPage = () => {
           <div
             className={`transition-all duration-300 ${
               showScrollTop
-                ? "opacity-100 translate-y-0 pointer-events-auto"
-                : "opacity-0 translate-y-4 pointer-events-none"
+                ? "translate-y-0 opacity-100"
+                : "pointer-events-none translate-y-4 opacity-0"
             }`}
           >
             <button
               onClick={scrollToTop}
-              title="Scroll to Top"
-              className="w-12 h-12 rounded-full bg-surface-container/90 backdrop-blur-md border border-on-surface/10 hover:border-on-surface/25 text-on-surface-variant hover:text-on-surface hover:scale-110 active:scale-95 transition-all duration-300 flex items-center justify-center shadow-lg"
+              title="Scroll to top"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-on-surface/10 bg-surface-container/90 text-on-surface-variant shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-on-surface/25 hover:text-on-surface active:scale-95"
             >
               <span className="material-symbols-outlined text-[20px]">
                 arrow_upward
@@ -1072,13 +975,12 @@ const WorldMapPage = () => {
         </div>
       </main>
 
-      <Suspense fallback={<div className="text-center py-4">Loading...</div>}>
-        <NodeDetailsModal
-          isOpen={!!selectedChapter}
-          onClose={() => setSelectedChapter(null)}
-          chapter={selectedChapter}
-        />
-      </Suspense>
+      <NodeDetailsModal
+        isOpen={!!selectedNode}
+        onClose={() => setSelectedNode(null)}
+        courseSlug={courseSlug}
+        node={selectedNode}
+      />
     </div>
   );
 };
