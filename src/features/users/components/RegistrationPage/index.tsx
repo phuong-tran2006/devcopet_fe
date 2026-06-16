@@ -41,7 +41,11 @@ const RegistrationPage = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: "/course" });
+      if (!useAuthStore.getState().user?.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: "/course" });
+      }
     }
   }, [isAuthenticated, navigate]);
 
@@ -112,23 +116,51 @@ const RegistrationPage = () => {
 
     setLoading(true);
     try {
-      const response = await authApi.register({
+      // Register the account first
+      await authApi.register({
         email: formData.email,
         password: formData.password,
         name: formData.fullName,
+        username: formData.username,
       });
 
       setSuccessMessage("Account created successfully! Redirecting...");
 
-      if (response.accessToken) {
-        setAuth(response.accessToken, response.refreshToken, response.user);
-        setTimeout(() => navigate({ to: "/course" }), 1500);
-      } else {
+      // Auto-login after successful registration to get tokens
+      try {
+        const loginResponse = await authApi.login({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (loginResponse.accessToken) {
+          setAuth(
+            loginResponse.accessToken,
+            loginResponse.refreshToken,
+            loginResponse.user,
+          );
+          setTimeout(() => {
+            if (loginResponse.user && !loginResponse.user.onboardingCompleted) {
+              navigate({ to: "/onboarding" });
+            } else {
+              navigate({ to: "/course" });
+            }
+          }, 1500);
+        }
+      } catch {
+        // If auto-login fails, redirect to login page
         setTimeout(() => navigate({ to: "/login" }), 1500);
       }
     } catch (err: any) {
+      const errorMessage =
+        err?.response?.data?.message ||
+        (Array.isArray(err?.response?.data?.message)
+          ? err?.response?.data?.message[0]
+          : null) ||
+        err?.message ||
+        "Registration failed. Please try again.";
       setErrors({
-        submit: err?.message || "Registration failed. Please try again.",
+        submit: errorMessage,
       });
     } finally {
       setLoading(false);

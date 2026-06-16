@@ -1,7 +1,9 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
-import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
+const NodeDetailsModal = lazy(
+  () => import("../../../components/ui/NodeDetailsModal"),
+);
 
 // ─── Data per difficulty ─────────────────────────────────────────────────────
 
@@ -363,8 +365,8 @@ const WorldMapPage = () => {
     return { x, y };
   };
 
-  // SVG path
-  const generatePath = () => {
+  // SVG path generation memoized
+  const { completedD, lockedD } = useMemo(() => {
     if (chapters.length === 0) return { completedD: "", lockedD: "" };
     let completedD = "";
     let lockedD = "";
@@ -393,9 +395,7 @@ const WorldMapPage = () => {
     });
 
     return { completedD, lockedD };
-  };
-
-  const { completedD, lockedD } = generatePath();
+  }, [chapters]);
   const mapHeight = chapters.length * 200 + 120;
   const completedCount = chapters.filter(
     (c) => c.status === "completed",
@@ -541,111 +541,118 @@ const WorldMapPage = () => {
               scrollbarColor: "#2a3641 transparent",
             }}
           >
-            {chapters.map((chapter, idx) => {
-              const isCompleted = chapter.status === "completed";
-              const isInProgress = chapter.status === "in_progress";
-              const isLocked = chapter.status === "locked";
+            {/* Memoized chapter buttons */}
+            {useMemo(
+              () =>
+                chapters.map((chapter, idx) => {
+                  const isCompleted = chapter.status === "completed";
+                  const isInProgress = chapter.status === "in_progress";
+                  const isLocked = chapter.status === "locked";
 
-              return (
-                <button
-                  key={chapter._id}
-                  onClick={() => {
+                  const handleClick = () => {
                     if (!isLocked) {
                       setSelectedChapter({ ...chapter, difficulty });
                     }
-                  }}
-                  disabled={isLocked}
-                  className={`
-                    w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200
-                    ${isCompleted ? "border-on-surface/10 hover:border-on-surface/20 bg-on-surface/4 hover:bg-on-surface/8 cursor-pointer" : ""}
-                    ${isInProgress ? "ring-1 cursor-pointer" : ""}
-                    ${isLocked ? "bg-transparent border-on-surface/5 opacity-35 cursor-not-allowed" : ""}
-                  `}
-                  style={
-                    isInProgress
-                      ? {
-                          background: `${cfg.glowWeak}`,
-                          borderColor: `${cfg.accent}50`,
-                          boxShadow: `0 0 12px ${cfg.glowWeak}`,
-                          ["--tw-ring-color" as string]: cfg.accent,
-                        }
-                      : {}
-                  }
-                >
-                  {/* Status icon */}
-                  <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold
-                      ${isCompleted ? cfg.nodeCompleted : ""}
-                      ${isLocked ? "bg-surface-container text-on-surface/20 border border-on-surface/10" : ""}
-                    `}
-                    style={
-                      isInProgress
-                        ? {
-                            background: cfg.gradient,
-                            color: "#fff",
-                            boxShadow: `0 0 10px ${cfg.glowWeak}`,
-                          }
-                        : {}
-                    }
-                  >
-                    {isCompleted && (
-                      <span
-                        className="material-symbols-outlined text-[14px]"
-                        style={{ fontVariationSettings: "'FILL' 1" }}
-                      >
-                        done
-                      </span>
-                    )}
-                    {isInProgress && (
-                      <span className="text-[11px] font-extrabold">
-                        {idx + 1}
-                      </span>
-                    )}
-                    {isLocked && (
-                      <span className="material-symbols-outlined text-[13px]">
-                        lock
-                      </span>
-                    )}
-                  </div>
+                  };
 
-                  {/* Chapter info */}
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <span
-                      className={`text-[12px] font-semibold truncate leading-snug ${
-                        isLocked
-                          ? "text-on-surface-variant/40"
-                          : "text-on-surface-variant"
-                      }`}
-                      style={isInProgress ? { color: "#fff" } : {}}
+                  return (
+                    <button
+                      key={chapter._id}
+                      onClick={handleClick}
+                      disabled={isLocked}
+                      className={`
+                      w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200
+                      ${isCompleted ? "border-on-surface/10 hover:border-on-surface/20 bg-on-surface/4 hover:bg-on-surface/8 cursor-pointer" : ""}
+                      ${isInProgress ? "ring-1 cursor-pointer" : ""}
+                      ${isLocked ? "bg-transparent border-on-surface/5 opacity-35 cursor-not-allowed" : ""}
+                    `}
+                      style={
+                        isInProgress
+                          ? {
+                              background: `${cfg.glowWeak}`,
+                              borderColor: `${cfg.accent}50`,
+                              boxShadow: `0 0 12px ${cfg.glowWeak}`,
+                              ["--tw-ring-color" as string]: cfg.accent,
+                            }
+                          : {}
+                      }
                     >
-                      {chapter.title}
-                    </span>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[9px] text-on-surface-variant/50">
-                        {chapter.lessons || "?"} lessons
-                      </span>
-                      {isCompleted && chapter.stars && (
-                        <StarPips stars={chapter.stars} />
-                      )}
-                      {isInProgress && (
+                      {/* Status icon */}
+                      <div
+                        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold
+                        ${isCompleted ? cfg.nodeCompleted : ""}
+                        ${isLocked ? "bg-surface-container text-on-surface/20 border border-on-surface/10" : ""}
+                      `}
+                        style={
+                          isInProgress
+                            ? {
+                                background: cfg.gradient,
+                                color: "#fff",
+                                boxShadow: `0 0 10px ${cfg.glowWeak}`,
+                              }
+                            : {}
+                        }
+                      >
+                        {isCompleted && (
+                          <span
+                            className="material-symbols-outlined text-[14px]"
+                            style={{ fontVariationSettings: "'FILL' 1" }}
+                          >
+                            done
+                          </span>
+                        )}
+                        {isInProgress && (
+                          <span className="text-[11px] font-extrabold">
+                            {idx + 1}
+                          </span>
+                        )}
+                        {isLocked && (
+                          <span className="material-symbols-outlined text-[13px]">
+                            lock
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Chapter info */}
+                      <div className="flex flex-col flex-1 min-w-0">
                         <span
-                          className="text-[9px] font-bold uppercase tracking-wide"
-                          style={{ color: cfg.accent }}
+                          className={`text-[12px] font-semibold truncate leading-snug ${
+                            isLocked
+                              ? "text-on-surface-variant/40"
+                              : "text-on-surface-variant"
+                          }`}
+                          style={isInProgress ? { color: "#fff" } : {}}
                         >
-                          Active
+                          {chapter.title}
+                        </span>
+                        <div className="flex items-center gap-2 mt-0.5">
+                          <span className="text-[9px] text-on-surface-variant/50">
+                            {chapter.lessons || "?"} lessons
+                          </span>
+                          {isCompleted && chapter.stars && (
+                            <StarPips stars={chapter.stars} />
+                          )}
+                          {isInProgress && (
+                            <span
+                              className="text-[9px] font-bold uppercase tracking-wide"
+                              style={{ color: cfg.accent }}
+                            >
+                              Active
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {!isLocked && (
+                        <span className="material-symbols-outlined text-[15px] text-on-surface/20 flex-shrink-0">
+                          chevron_right
                         </span>
                       )}
-                    </div>
-                  </div>
-
-                  {!isLocked && (
-                    <span className="material-symbols-outlined text-[15px] text-on-surface/20 flex-shrink-0">
-                      chevron_right
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+                    </button>
+                  );
+                }),
+              [chapters, cfg, difficulty],
+            )}
           </div>
 
           {/* ── Bottom: Stars + Upgrade ── */}
@@ -1065,12 +1072,13 @@ const WorldMapPage = () => {
         </div>
       </main>
 
-      {/* Node Details Modal */}
-      <NodeDetailsModal
-        isOpen={!!selectedChapter}
-        onClose={() => setSelectedChapter(null)}
-        chapter={selectedChapter}
-      />
+      <Suspense fallback={<div className="text-center py-4">Loading...</div>}>
+        <NodeDetailsModal
+          isOpen={!!selectedChapter}
+          onClose={() => setSelectedChapter(null)}
+          chapter={selectedChapter}
+        />
+      </Suspense>
     </div>
   );
 };

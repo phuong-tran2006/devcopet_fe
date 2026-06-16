@@ -132,7 +132,9 @@ const LessonDetailPage = () => {
         <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
           error
         </span>
-        <h2 className="font-headline-md text-white mb-2">Lesson Not Found</h2>
+        <h2 className="font-headline-md text-on-surface mb-2">
+          Lesson Not Found
+        </h2>
         <p className="text-on-surface-variant">
           We couldn't find the lesson you were looking for.
         </p>
@@ -180,9 +182,9 @@ const LessonDetailPage = () => {
           onClick={() => setIsSidebarOpen((prev) => !prev)}
           className={`
       hidden lg:flex fixed top-[96px] z-50 h-10 w-10 items-center justify-center
-      rounded-full border border-outline/30 bg-[#121c25] text-on-surface-variant
+      rounded-full border border-outline/30 bg-surface-container text-on-surface-variant
       shadow-lg transition-all duration-300
-      hover:border-primary-fixed-dim hover:text-primary-fixed-dim hover:bg-[#17212d]
+      hover:border-primary-fixed-dim hover:text-primary-fixed-dim hover:bg-surface-container-high
       ${isSidebarOpen ? "left-[415px]" : "left-4"}
     `}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
@@ -198,8 +200,8 @@ const LessonDetailPage = () => {
         className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar"
       >
         {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
-        <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-[#1e293b] pb-4">
-          <button className="flex items-center gap-2 text-on-surface-variant hover:text-white">
+        <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-outline-variant pb-4">
+          <button className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface">
             <span className="material-symbols-outlined text-[20px]">
               menu_open
             </span>
@@ -216,7 +218,7 @@ const LessonDetailPage = () => {
           {/* Back navigation (chỉ hiện trên Mobile, vì Desktop có nút ở Sidebar) */}
           <button
             onClick={() => window.history.back()}
-            className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
+            className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
           >
             <span className="material-symbols-outlined text-[16px]">
               arrow_back
@@ -298,7 +300,7 @@ const LessonDetailPage = () => {
                         style={atomDark}
                         language={language}
                         PreTag="div"
-                        className="rounded-xl my-6 border border-outline/20 !bg-[#121c25]"
+                        className="rounded-xl my-6 border border-outline/20 !bg-surface-container-low"
                       />
                     );
                   }
@@ -306,7 +308,7 @@ const LessonDetailPage = () => {
                   return (
                     <code
                       {...props}
-                      className={`${className} bg-surface-container-high text-primary-fixed px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+                      className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
                     >
                       {children}
                     </code>
