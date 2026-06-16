@@ -58,8 +58,17 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get("error");
+    if (errorParam === "social_login_failed") {
+      setError("Social login failed. Please try again.");
+    }
+  }, []);
+
   const handleSocialLogin = (provider: string) => {
-    window.location.href = `http://localhost:3000/auth/${provider}`;
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    window.location.href = `${apiUrl}/auth/${provider}`;
   };
 
   const handleInputChange = (setter: any) => (e: any) => {

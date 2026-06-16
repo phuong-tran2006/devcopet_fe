@@ -26,7 +26,7 @@ function AuthCallbackPage() {
       navigate({ to: "/" });
     } else {
       // Failed or no token
-      navigate({ to: "/login" });
+      navigate({ to: "/login", search: { error: "social_login_failed" } });
     }
   }, [search, navigate, setAuth]);
 

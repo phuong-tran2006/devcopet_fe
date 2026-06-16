@@ -136,7 +136,8 @@ const RegistrationPage = () => {
   };
 
   const handleSocialLogin = (provider: string) => {
-    window.location.href = `http://localhost:3000/auth/${provider}`;
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    window.location.href = `${apiUrl}/auth/${provider}`;
   };
 
   return (
