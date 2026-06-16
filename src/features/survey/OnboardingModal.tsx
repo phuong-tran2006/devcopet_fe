@@ -1,18 +1,13 @@
 import { useEffect, useRef, useState } from "react";
-import heroMascotVideo from "../../assets/videos/video.mp4";
+import heroMascotVideo from "../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../components/ui/TransparentVideo";
 
 interface OnboardingModalProps {
   isOpen: boolean;
-  onClose: () => void;
   onBeginSurvey?: () => void;
 }
 
-const OnboardingModal = ({
-  isOpen,
-  onClose,
-  onBeginSurvey,
-}: OnboardingModalProps) => {
+const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -21,29 +16,13 @@ const OnboardingModal = ({
       setIsVisible(true);
       document.body.style.overflow = "hidden";
     } else {
-      setTimeout(() => setIsVisible(false), 300); // match transition duration
+      setTimeout(() => setIsVisible(false), 300);
       document.body.style.overflow = "unset";
     }
     return () => {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        modalRef.current &&
-        !modalRef.current.contains(event.target as Node)
-      ) {
-        onClose();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [isOpen, onClose]);
 
   if (!isOpen && !isVisible) return null;
 
@@ -59,24 +38,15 @@ const OnboardingModal = ({
           isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-8"
         }`}
       >
-        {/* Left Side: Mascot Video in Glow Box */}
+        {/* Left Side: Mascot Video */}
         <div className="flex-1 w-full max-w-[540px] relative shrink-0">
-          {/* Subtle background circular lines */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[100%] h-[100%] rounded-full border border-sky-400/20 dark:border-[#0ea5e9]/20 absolute animate-[spin_60s_linear_infinite]" />
-            <div className="w-[85%] h-[85%] rounded-full border border-teal-400/20 dark:border-[#2dd4bf]/20 absolute animate-[spin_40s_linear_infinite_reverse]" />
-          </div>
-
-          {/* Main glowing container */}
-          <div className="relative aspect-square w-full bg-gray-50 dark:bg-[#0d151c] rounded-full border border-gray-200 dark:border-[#1e293b] shadow-[0_0_50px_rgba(45,212,191,0.15)] flex items-center justify-center overflow-hidden group">
-            {/* Soft inner glow */}
-            <div className="absolute inset-0 bg-gradient-to-br from-[#0ea5e9]/10 to-transparent opacity-50 rounded-full" />
-
+          <div className="relative w-full max-w-[560px] mx-auto">
+            <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/15 via-cyan-400/8 to-secondary-fixed-dim/15 blur-3xl scale-110 pointer-events-none rounded-full" />
             <TransparentVideo
               src={heroMascotVideo}
-              className="absolute w-[200%] h-[200%] flex items-center justify-center drop-shadow-[0_0_15px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_0_15px_rgba(255,255,255,0.1)] transition-transform duration-700 group-hover:scale-105"
-              keyColor={[0, 255, 0]}
-              tolerance={190}
+              className="w-full"
+              keyColor={[0, 200, 0]}
+              tolerance={80}
             />
           </div>
         </div>
@@ -106,7 +76,6 @@ const OnboardingModal = ({
           </div>
 
           <div className="space-y-3 pt-2">
-            {/* Feature Card 1 */}
             <div className="bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#2dd4bf]/40 dark:hover:border-[#2dd4bf]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-[#1a2b3c] flex items-center justify-center text-teal-600 dark:text-[#2dd4bf] shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
@@ -124,7 +93,6 @@ const OnboardingModal = ({
               </div>
             </div>
 
-            {/* Feature Card 2 */}
             <div className="bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#a78bfa]/40 dark:hover:border-[#a78bfa]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-[#1a2336] flex items-center justify-center text-purple-600 dark:text-[#a78bfa] shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
@@ -142,7 +110,6 @@ const OnboardingModal = ({
               </div>
             </div>
 
-            {/* Feature Card 3 */}
             <div className="bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#4ade80]/40 dark:hover:border-[#4ade80]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-[#182a22] flex items-center justify-center text-green-600 dark:text-[#4ade80] shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
@@ -161,7 +128,6 @@ const OnboardingModal = ({
             </div>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center gap-4 pt-6">
             <button
               onClick={onBeginSurvey}
@@ -172,17 +138,10 @@ const OnboardingModal = ({
                 arrow_forward
               </span>
             </button>
-            <button
-              onClick={onClose}
-              className="flex-1 md:flex-none text-gray-600 dark:text-[#94a3b8] font-semibold text-[15px] py-3 px-8 rounded-lg border border-gray-200 dark:border-[#1e293b] bg-white dark:bg-[#151e29] hover:bg-gray-50 dark:hover:bg-[#1a2b3c] hover:text-gray-900 dark:hover:text-white active:scale-95 transition-all duration-300"
-            >
-              Skip for now
-            </button>
           </div>
         </div>
       </div>
 
-      {/* Pagination Dots */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
         <div className="w-10 h-1.5 rounded-full bg-[#d4a8d4]" />
         <div className="w-10 h-1.5 rounded-full bg-gray-300 dark:bg-[#1e293b]" />

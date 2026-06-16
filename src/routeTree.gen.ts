@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RoadmapRouteImport } from './routes/roadmap'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
 import { Route as CourseRouteImport } from './routes/course'
@@ -31,6 +32,11 @@ const RoadmapRoute = RoadmapRouteImport.update({
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
   path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/course': typeof CourseRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/course': typeof CourseRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/course': typeof CourseRoute
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/course'
     | '/leaderboard'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/roadmap'
     | '/auth/callback'
@@ -156,6 +166,7 @@ export interface FileRouteTypes {
     | '/course'
     | '/leaderboard'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/auth/callback'
     | '/courses/$courseId'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/course'
     | '/leaderboard'
     | '/login'
+    | '/onboarding'
     | '/register'
     | '/roadmap'
     | '/auth/callback'
@@ -186,6 +198,7 @@ export interface RootRouteChildren {
   CourseRoute: typeof CourseRoute
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   RegisterRoute: typeof RegisterRoute
   RoadmapRoute: typeof RoadmapRouteWithChildren
   AuthCallbackRoute: typeof AuthCallbackRoute
@@ -208,6 +221,13 @@ declare module '@tanstack/react-router' {
       path: '/register'
       fullPath: '/register'
       preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -320,6 +340,7 @@ const rootRouteChildren: RootRouteChildren = {
   CourseRoute: CourseRoute,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   RegisterRoute: RegisterRoute,
   RoadmapRoute: RoadmapRouteWithChildren,
   AuthCallbackRoute: AuthCallbackRoute,

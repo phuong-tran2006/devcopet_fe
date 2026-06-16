@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import heroMascotVideo from "../../assets/videos/video.mp4";
+import heroMascotVideo from "../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../components/ui/TransparentVideo";
 
 interface NamePetModalProps {
@@ -77,13 +77,13 @@ const NamePetModal = ({ isOpen, onConfirm }: NamePetModalProps) => {
         </div>
 
         {/* Mascot Area */}
-        <div className="relative w-48 h-48 md:w-56 md:h-56 flex items-center justify-center mb-8 shrink-0">
-          <div className="absolute inset-0 bg-gradient-to-t from-sky-400/10 dark:from-[#0ea5e9]/10 to-transparent rounded-full blur-2xl"></div>
+        <div className="relative w-full max-w-[352px] flex items-center justify-center mb-8 shrink-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/15 via-cyan-400/8 to-secondary-fixed-dim/15 blur-3xl scale-110 pointer-events-none rounded-full" />
           <TransparentVideo
             src={heroMascotVideo}
-            className="absolute w-[150%] h-[150%] translate-y-6 object-contain drop-shadow-[0_0_20px_rgba(0,0,0,0.1)] dark:drop-shadow-[0_0_20px_rgba(45,212,191,0.2)]"
-            keyColor={[0, 255, 0]}
-            tolerance={220}
+            className="h-auto w-48 object-contain sm:w-56 md:w-64"
+            keyColor={[0, 200, 0]}
+            tolerance={80}
           />
         </div>
 

@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from "react";
+import { mascotAxolotl } from "../users/constants/authImages";
 
 interface SurveyModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  embedded?: boolean;
+  onClose?: () => void;
   onSkip?: () => void;
   onComplete?: (answers: Record<number, string>) => void;
 }
 
-const surveyQuestions = [
+export const surveyQuestions = [
   {
     id: 1,
     question: "What is the main reason you started using this platform?",
@@ -417,6 +419,7 @@ const surveyQuestions = [
 
 const SurveyModal = ({
   isOpen,
+  embedded = false,
   onClose,
   onSkip,
   onComplete,
@@ -432,24 +435,30 @@ const SurveyModal = ({
   useEffect(() => {
     if (isOpen) {
       setIsVisible(true);
-      document.body.style.overflow = "hidden";
+      if (!embedded) {
+        document.body.style.overflow = "hidden";
+      }
       setCurrentQuestionIndex(0);
       setAnswers({});
     } else {
       setTimeout(() => setIsVisible(false), 300);
-      document.body.style.overflow = "unset";
+      if (!embedded) {
+        document.body.style.overflow = "unset";
+      }
     }
     return () => {
-      document.body.style.overflow = "unset";
+      if (!embedded) {
+        document.body.style.overflow = "unset";
+      }
     };
-  }, [isOpen]);
+  }, [isOpen, embedded]);
 
   const handleNext = () => {
     if (currentQuestionIndex < totalQuestions - 1) {
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
       if (onComplete) onComplete(answers);
-      else onClose();
+      else onClose?.();
     }
   };
 
@@ -473,108 +482,127 @@ const SurveyModal = ({
   const currentQuestion = surveyQuestions[currentQuestionIndex];
   const selectedOption = answers[currentQuestionIndex];
 
-  return (
+  const surveyCard = (
     <div
-      className={`fixed inset-0 z-[110] flex items-center justify-center bg-white/80 dark:bg-[#0a1118]/90 backdrop-blur-md px-4 transition-opacity duration-300 ${
-        isOpen ? "opacity-100" : "opacity-0"
+      ref={modalRef}
+      className={`relative w-full max-w-[560px] flex flex-col items-center transition-all duration-300 transform ${
+        isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-8"
       }`}
     >
-      <div
-        ref={modalRef}
-        className={`relative w-full max-w-[540px] flex flex-col items-center transition-all duration-300 transform ${
-          isOpen ? "scale-100 translate-y-0" : "scale-95 translate-y-8"
-        }`}
-      >
-        {/* Main Card */}
-        <div className="w-full bg-white dark:bg-[#0d151c] rounded-2xl border border-gray-200 dark:border-[#1e293b] overflow-hidden shadow-2xl relative flex flex-col max-h-[calc(100vh-120px)]">
-          {/* Progress Bar */}
-          <div className="w-full h-1 bg-gray-200 dark:bg-[#1e293b] shrink-0">
-            <div
-              className="h-full bg-[#d4a8d4] transition-all duration-500 ease-out"
-              style={{ width: `${progress}%` }}
-            ></div>
+      {/* Mascot avatar overlapping card top */}
+      <div className="relative z-10 -mb-10 flex items-center justify-center">
+        <div className="w-20 h-20 rounded-full border-2 border-[#d4a8d4]/40 bg-[#0d151c] p-1 shadow-[0_0_30px_rgba(212,168,212,0.25)]">
+          <img
+            src={mascotAxolotl}
+            alt="Devcopet mascot"
+            className="w-full h-full rounded-full object-cover"
+          />
+        </div>
+      </div>
+
+      <div className="w-full bg-white dark:bg-[#0d151c] rounded-2xl border border-gray-200 dark:border-[#1e293b] overflow-hidden shadow-2xl relative flex flex-col max-h-[calc(100vh-200px)]">
+        <div className="w-full h-1 bg-gray-200 dark:bg-[#1e293b] shrink-0">
+          <div
+            className="h-full bg-[#d4a8d4] transition-all duration-500 ease-out"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <div className="pt-12 px-6 pb-6 md:px-8 md:pb-8 flex-1 overflow-y-auto">
+          <div className="text-center mb-8">
+            <span className="text-[10px] font-extrabold tracking-[0.2em] text-gray-500 dark:text-[#64748b] uppercase block mb-4">
+              QUESTION {currentQuestionIndex + 1} OF {totalQuestions}
+            </span>
+            <h2 className="text-[22px] md:text-[28px] font-extrabold text-gray-900 dark:text-white leading-snug">
+              {currentQuestion.question}
+            </h2>
           </div>
 
-          <div className="p-6 md:p-8 flex-1 overflow-y-auto">
-            {/* Header */}
-            <div className="text-center mb-8">
-              <span className="text-[10px] font-extrabold tracking-[0.2em] text-gray-500 dark:text-[#64748b] uppercase block mb-4">
-                QUESTION {currentQuestionIndex + 1} OF {totalQuestions}
-              </span>
-              <h2 className="text-[24px] md:text-[28px] font-extrabold text-gray-900 dark:text-white leading-snug">
-                {currentQuestion.question}
-              </h2>
-            </div>
-
-            {/* Options */}
-            <div className="space-y-3">
-              {currentQuestion.options.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => handleOptionClick(option.id)}
-                  className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 group ${
+          <div className="space-y-3">
+            {currentQuestion.options.map((option) => (
+              <button
+                key={option.id}
+                onClick={() => handleOptionClick(option.id)}
+                className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 group ${
+                  selectedOption === option.id
+                    ? "border-[#d4a8d4] bg-[#d4a8d4]/10"
+                    : "border-gray-200 dark:border-[#1e293b] bg-gray-50 dark:bg-[#151e29] hover:border-gray-400 dark:hover:border-[#475569] hover:bg-gray-100 dark:hover:bg-[#1a2b3c]"
+                }`}
+              >
+                <div
+                  className={`w-7 h-7 shrink-0 rounded-full border flex items-center justify-center text-[11px] font-bold transition-colors ${
                     selectedOption === option.id
-                      ? "border-[#a78bfa] bg-[#a78bfa]/10"
-                      : "border-gray-200 dark:border-[#1e293b] bg-gray-50 dark:bg-[#151e29] hover:border-gray-400 dark:hover:border-[#475569] hover:bg-gray-100 dark:hover:bg-[#1a2b3c]"
+                      ? "border-[#d4a8d4] text-[#d4a8d4] bg-[#d4a8d4]/20"
+                      : "border-gray-400 dark:border-[#475569] text-gray-500 dark:text-[#94a3b8] group-hover:border-gray-600 dark:group-hover:border-[#94a3b8] group-hover:text-gray-800 dark:group-hover:text-white"
                   }`}
                 >
-                  <div
-                    className={`w-7 h-7 shrink-0 rounded-full border flex items-center justify-center text-[11px] font-bold transition-colors ${
-                      selectedOption === option.id
-                        ? "border-[#a78bfa] text-[#a78bfa] bg-[#a78bfa]/20"
-                        : "border-gray-400 dark:border-[#475569] text-gray-500 dark:text-[#94a3b8] group-hover:border-gray-600 dark:group-hover:border-[#94a3b8] group-hover:text-gray-800 dark:group-hover:text-white"
-                    }`}
-                  >
-                    {option.id}
-                  </div>
-                  <span
-                    className={`text-[14px] md:text-[15px] transition-colors ${
-                      selectedOption === option.id
-                        ? "text-gray-900 dark:text-white font-medium"
-                        : "text-gray-600 dark:text-[#cbd5e1] group-hover:text-gray-900 dark:group-hover:text-white"
-                    }`}
-                  >
-                    {option.text}
-                  </span>
-                </button>
-              ))}
-            </div>
+                  {option.id}
+                </div>
+                <span
+                  className={`text-[14px] md:text-[15px] transition-colors ${
+                    selectedOption === option.id
+                      ? "text-gray-900 dark:text-white font-medium"
+                      : "text-gray-600 dark:text-[#cbd5e1] group-hover:text-gray-900 dark:group-hover:text-white"
+                  }`}
+                >
+                  {option.text}
+                </span>
+              </button>
+            ))}
           </div>
+        </div>
 
-          {/* Footer */}
-          <div className="p-5 md:px-8 bg-gray-50 dark:bg-[#0d151c] border-t border-gray-200 dark:border-[#1e293b] flex items-center justify-between shrink-0">
-            <button
-              onClick={handlePrevious}
-              disabled={currentQuestionIndex === 0}
-              className={`flex items-center gap-2 text-[13px] font-bold uppercase tracking-wider transition-colors ${
-                currentQuestionIndex === 0
-                  ? "text-gray-300 dark:text-[#334155] cursor-not-allowed"
-                  : "text-gray-500 dark:text-[#64748b] hover:text-gray-900 dark:hover:text-white"
-              }`}
-            >
-              <span className="material-symbols-outlined text-[18px]">
-                arrow_back
-              </span>
-              Previous Question
-            </button>
+        <div className="p-5 md:px-8 bg-gray-50 dark:bg-[#0d151c] border-t border-gray-200 dark:border-[#1e293b] flex items-center justify-between shrink-0">
+          <button
+            onClick={handlePrevious}
+            disabled={currentQuestionIndex === 0}
+            className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-wider transition-colors ${
+              currentQuestionIndex === 0
+                ? "text-gray-300 dark:text-[#334155] cursor-not-allowed"
+                : "text-gray-500 dark:text-[#64748b] hover:text-gray-900 dark:hover:text-white"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">
+              arrow_back
+            </span>
+            Previous Question
+          </button>
 
-            {/* Optional Skip button to exit early */}
+          {!embedded && (
             <button
               onClick={onSkip || onClose}
               className="text-[13px] font-bold text-gray-500 dark:text-[#64748b] hover:text-gray-900 dark:hover:text-white transition-colors"
             >
               Skip Survey
             </button>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Pagination Dots (Step 2 Active) */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3">
+      <div className="mt-8 flex items-center gap-3">
         <div className="w-12 h-2 rounded-full bg-gray-300 dark:bg-[#1e293b] transition-all duration-300" />
         <div className="w-12 h-2 rounded-full bg-[#d4a8d4] transition-all duration-300" />
         <div className="w-12 h-2 rounded-full bg-gray-300 dark:bg-[#1e293b] transition-all duration-300" />
       </div>
+    </div>
+  );
+
+  if (embedded) {
+    if (!isOpen && !isVisible) return null;
+    return (
+      <div className="w-full flex items-center justify-center py-4">
+        {surveyCard}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className={`fixed inset-0 z-[110] flex items-center justify-center bg-white/80 dark:bg-[#0a1118]/90 backdrop-blur-md px-4 transition-opacity duration-300 ${
+        isOpen ? "opacity-100" : "opacity-0"
+      }`}
+    >
+      {surveyCard}
     </div>
   );
 };
