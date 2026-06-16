@@ -40,6 +40,38 @@ export interface EasyRoadmapResponse {
   chapters: EasyRoadmapChapter[];
 }
 
+export type EasyChallengeOptionId = "A" | "B" | "C" | "D";
+
+export interface EasyNodeChallengeResponse {
+  node: {
+    id: string;
+    lessonId: string;
+    chapterId: string;
+    label: string;
+    title: string;
+    status: EasyRoadmapNodeStatus;
+  };
+  challenge: {
+    id: string;
+    type: "multiple_choice";
+    title: string;
+    question: string;
+    options: Array<{
+      id: EasyChallengeOptionId;
+      text: string;
+    }>;
+    xp: number;
+    estimatedMinutes: number;
+  };
+}
+
+export interface SubmitEasyNodeChallengeResponse {
+  correct: boolean;
+  message: string;
+  correctOptionId?: EasyChallengeOptionId;
+  explanation?: string;
+}
+
 export const courseApi = {
   getCourses: async () => {
     const response = await api.get(`/courses`);
@@ -70,6 +102,24 @@ export const courseApi = {
     courseSlug: string,
   ): Promise<EasyRoadmapResponse> => {
     const response = await api.get(`/roadmaps/${courseSlug}/easy`);
+    return response.data;
+  },
+
+  getEasyNodeChallenge: async (
+    nodeId: string,
+  ): Promise<EasyNodeChallengeResponse> => {
+    const response = await api.get(`/roadmaps/easy/nodes/${nodeId}/challenge`);
+    return response.data;
+  },
+
+  submitEasyNodeChallenge: async (
+    nodeId: string,
+    selectedOptionId: EasyChallengeOptionId,
+  ): Promise<SubmitEasyNodeChallengeResponse> => {
+    const response = await api.post(
+      `/roadmaps/easy/nodes/${nodeId}/challenge/submit`,
+      { selectedOptionId },
+    );
     return response.data;
   },
 };

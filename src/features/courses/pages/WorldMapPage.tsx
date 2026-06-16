@@ -70,6 +70,9 @@ const getChapterStatus = (chapter: EasyRoadmapChapter): ChapterStatus => {
 const normalizeOrder = (chapters: EasyRoadmapChapter[]) =>
   [...chapters].sort((a, b) => a.order - b.order);
 
+const getLessonDisplayTitle = (node: EasyRoadmapNode) => node.title.trim();
+const EASY_CHECKPOINT_DURATION = "1 min";
+
 const WorldMapPage = () => {
   const { worldId } = useParams({ strict: false });
   const courseSlug = worldId;
@@ -679,6 +682,14 @@ const WorldMapPage = () => {
                     const styles = statusStyles[node.status];
                     const isHovered = hoveredNode === node.id;
                     const isActive = firstAvailableNodeId === node.id;
+                    const isSelected = selectedNode?.id === node.id;
+                    const lessonTitle = getLessonDisplayTitle(node);
+                    const nodeGlowClass =
+                      node.status === "available"
+                        ? isActive || isSelected
+                          ? "roadmap-node-selected"
+                          : "roadmap-node-available"
+                        : "";
                     const isFirstInChapter =
                       idx === 0 ||
                       flatNodes[idx - 1].chapterId !== node.chapterId;
@@ -714,7 +725,7 @@ const WorldMapPage = () => {
                                 {node.label}
                               </p>
                               <p className="text-[13px] font-bold leading-snug text-on-surface">
-                                {node.title}
+                                {lessonTitle}
                               </p>
                               <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
                                 <span className="flex items-center gap-1">
@@ -723,14 +734,12 @@ const WorldMapPage = () => {
                                   </span>
                                   {node.xp || 0} XP
                                 </span>
-                                {node.duration && (
-                                  <span className="flex items-center gap-1">
-                                    <span className="material-symbols-outlined text-[12px]">
-                                      schedule
-                                    </span>
-                                    {node.duration} min
+                                <span className="flex items-center gap-1">
+                                  <span className="material-symbols-outlined text-[12px]">
+                                    schedule
                                   </span>
-                                )}
+                                  {EASY_CHECKPOINT_DURATION}
+                                </span>
                               </div>
                             </div>
                           </div>
@@ -749,7 +758,7 @@ const WorldMapPage = () => {
                         <div
                           className={`relative z-10 flex items-center justify-center rounded-full border-4 font-extrabold shadow-lg transition-transform duration-300 ${
                             isActive ? "h-16 w-16 text-[17px]" : "h-14 w-14 text-[15px]"
-                          } ${styles.node} ${isHovered ? "scale-110" : "scale-100"}`}
+                          } ${styles.node} ${nodeGlowClass} ${isHovered ? "scale-110" : "scale-100"}`}
                           style={
                             node.status !== "locked"
                               ? { boxShadow: `0 0 24px ${cfg.glowWeak}` }
@@ -822,6 +831,7 @@ const WorldMapPage = () => {
       <NodeDetailsModal
         isOpen={!!selectedNode}
         onClose={() => setSelectedNode(null)}
+        courseSlug={courseSlug}
         node={selectedNode}
       />
     </div>

@@ -5,6 +5,7 @@ import type { EasyRoadmapNode } from "../../features/courses/api/course.api";
 export interface NodeDetailsProps {
   isOpen: boolean;
   onClose: () => void;
+  courseSlug?: string;
   node: (EasyRoadmapNode & { difficulty?: "easy" | "medium" | "hard" }) | null;
 }
 
@@ -29,7 +30,15 @@ const statusCopy = {
   },
 } as const;
 
-const NodeDetailsModal = ({ isOpen, onClose, node }: NodeDetailsProps) => {
+const getLessonDisplayTitle = (node: EasyRoadmapNode) => node.title.trim();
+const EASY_CHECKPOINT_DURATION = "1 min";
+
+const NodeDetailsModal = ({
+  isOpen,
+  onClose,
+  courseSlug,
+  node,
+}: NodeDetailsProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
@@ -62,19 +71,20 @@ const NodeDetailsModal = ({ isOpen, onClose, node }: NodeDetailsProps) => {
 
   const copy = statusCopy[node.status];
   const isLocked = node.status === "locked";
+  const isActionDisabled = isLocked || !courseSlug;
+  const lessonTitle = getLessonDisplayTitle(node);
 
-  const openLesson = () => {
-    if (isLocked) return;
+  const openChallenge = () => {
+    if (isActionDisabled) return;
 
     onClose();
-    if (node.href) {
-      window.location.assign(node.href);
-      return;
-    }
 
     navigate({
-      to: "/lesson/$lessonId",
-      params: { lessonId: node.lessonId },
+      to: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+      params: {
+        courseSlug,
+        nodeId: node.id,
+      },
     });
   };
 
@@ -107,7 +117,7 @@ const NodeDetailsModal = ({ isOpen, onClose, node }: NodeDetailsProps) => {
         </div>
 
         <h2 className="text-[24px] font-extrabold text-on-surface leading-tight pr-8 mb-3">
-          {node.title}
+          {lessonTitle}
         </h2>
         {node.description && (
           <p className="text-[14px] text-on-surface-variant leading-relaxed mb-6">
@@ -129,16 +139,16 @@ const NodeDetailsModal = ({ isOpen, onClose, node }: NodeDetailsProps) => {
               Duration
             </span>
             <span className="text-[16px] font-extrabold text-on-surface">
-              {node.duration ? `${node.duration} min` : "--"}
+              {EASY_CHECKPOINT_DURATION}
             </span>
           </div>
         </div>
 
         <button
-          onClick={openLesson}
-          disabled={isLocked}
+          onClick={openChallenge}
+          disabled={isActionDisabled}
           className={`w-full font-extrabold text-[14px] tracking-wider py-4 rounded-xl transition-all duration-300 uppercase ${
-            isLocked
+            isActionDisabled
               ? "bg-on-surface/8 text-on-surface-variant/45 cursor-not-allowed"
               : "bg-[#97CADB] text-[#001e2e] hover:bg-[#b7e4ef] hover:scale-[1.01] active:scale-[0.98] shadow-[0_8px_30px_rgba(151,202,219,0.22)]"
           }`}

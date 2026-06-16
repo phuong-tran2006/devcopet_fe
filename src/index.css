@@ -169,6 +169,98 @@
     box-shadow: 0 0 20px rgba(0, 128, 128, 0.45);
   }
 
+  .roadmap-node-available,
+  .roadmap-node-selected {
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .roadmap-node-available {
+    animation: roadmap-teal-pulse 2.8s ease-in-out infinite;
+  }
+
+  .roadmap-node-available::before,
+  .roadmap-node-selected::before {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: inherit;
+    pointer-events: none;
+    border: 1px solid rgba(34, 197, 94, 0.32);
+    box-shadow:
+      0 0 18px rgba(34, 197, 94, 0.24),
+      0 0 30px rgba(151, 202, 219, 0.16);
+  }
+
+  .roadmap-node-selected {
+    animation: roadmap-selected-glow 2.2s ease-in-out infinite;
+  }
+
+  .roadmap-node-selected::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    pointer-events: none;
+    background: linear-gradient(
+      115deg,
+      transparent 30%,
+      rgba(224, 255, 244, 0.18) 46%,
+      rgba(34, 197, 94, 0.24) 52%,
+      transparent 68%
+    );
+    mix-blend-mode: screen;
+    transform: translateX(-75%) rotate(18deg);
+    animation: roadmap-shine 2.6s ease-in-out infinite;
+  }
+
+  @keyframes roadmap-teal-pulse {
+    0%,
+    100% {
+      box-shadow:
+        0 0 18px rgba(151, 202, 219, 0.22),
+        0 0 34px rgba(34, 197, 94, 0.1);
+    }
+
+    50% {
+      box-shadow:
+        0 0 24px rgba(151, 202, 219, 0.36),
+        0 0 44px rgba(34, 197, 94, 0.18);
+    }
+  }
+
+  @keyframes roadmap-selected-glow {
+    0%,
+    100% {
+      box-shadow:
+        0 0 24px rgba(151, 202, 219, 0.38),
+        0 0 42px rgba(34, 197, 94, 0.18);
+    }
+
+    50% {
+      box-shadow:
+        0 0 30px rgba(151, 202, 219, 0.52),
+        0 0 56px rgba(34, 197, 94, 0.26);
+    }
+  }
+
+  @keyframes roadmap-shine {
+    0%,
+    42% {
+      transform: translateX(-75%) rotate(18deg);
+      opacity: 0;
+    }
+
+    52% {
+      opacity: 1;
+    }
+
+    82%,
+    100% {
+      transform: translateX(75%) rotate(18deg);
+      opacity: 0;
+    }
+  }
+
   /* Spinning Border Card Effect */
   .spinning-border-card {
     position: relative;
