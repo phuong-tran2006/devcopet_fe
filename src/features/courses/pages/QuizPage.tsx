@@ -147,7 +147,10 @@ const QuizPage = () => {
   );
 
   const renderMultipleChoice = () => {
-    let codeStr = q.codeSnippet?.content || "";
+    let codeStr =
+      typeof q.codeSnippet === "string"
+        ? q.codeSnippet
+        : q.codeSnippet?.content || "";
     if (q.type === "multiple_choice" && selectedOption) {
       const opt = q.options?.find((o) => o.id === selectedOption);
       if (opt) {
@@ -437,6 +440,11 @@ const QuizPage = () => {
   };
 
   const renderReview = () => {
+    const codeSnippet =
+      typeof q.codeSnippet === "string"
+        ? q.codeSnippet
+        : q.codeSnippet?.content || "";
+
     return (
       <div className="flex flex-col xl:flex-row gap-6 w-full h-full">
         {/* Left Pane - Code & Options */}
@@ -455,7 +463,7 @@ const QuizPage = () => {
               What will be the output of this code snippet?
             </p>
             <div className="bg-[#1b2028] rounded-xl p-5 font-mono text-[14px] leading-relaxed text-[#d1d5db] border border-outline/10 mb-8">
-              {q.codeSnippet?.split("\\n").map((line, i) => {
+              {codeSnippet.split("\\n").map((line, i) => {
                 if (line.includes("let") || line.includes("for")) {
                   const parts = line.split(" ");
                   return (
