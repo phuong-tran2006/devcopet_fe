@@ -428,6 +428,7 @@ const SurveyModal = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const modalRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>();
 
   const totalQuestions = surveyQuestions.length;
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
@@ -453,33 +454,38 @@ const SurveyModal = ({
     };
   }, [isOpen, embedded]);
 
-  const handleNext = () => {
+  const handleNext = (currentAnswers = answers) => {
     if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      setCurrentQuestionIndex((prev) => Math.min(prev + 1, totalQuestions - 1));
     } else {
-      if (onComplete) onComplete(answers);
+      if (onComplete) onComplete(currentAnswers);
       else onClose?.();
     }
   };
 
   const handlePrevious = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex((prev) => prev - 1);
     }
   };
 
   const handleOptionClick = (id: string) => {
-    setAnswers((prev) => ({ ...prev, [currentQuestionIndex]: id }));
+    const newAnswers = { ...answers, [currentQuestionIndex]: id };
+    setAnswers(newAnswers);
+
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     // Auto-advance after a short delay
-    setTimeout(() => {
-      handleNext();
+    timeoutRef.current = setTimeout(() => {
+      handleNext(newAnswers);
     }, 350);
   };
 
   if (!isOpen && !isVisible) return null;
 
   const currentQuestion = surveyQuestions[currentQuestionIndex];
+  if (!currentQuestion) return null;
   const selectedOption = answers[currentQuestionIndex];
 
   const surveyCard = (
