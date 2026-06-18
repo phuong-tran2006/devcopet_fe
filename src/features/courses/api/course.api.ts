@@ -91,6 +91,128 @@ export interface SubmitEasyNodeChallengeResponse {
   review?: EasyNodeChallengeReview;
 }
 
+export type MediumChallengeType = "multiple_choice" | "drag_drop";
+
+export interface MediumRoadmapNode {
+  id: string;
+  chapterId?: string;
+  chapterOrder: number;
+  order: number;
+  label: string;
+  title: string;
+  type: MediumChallengeType;
+  status: EasyRoadmapNodeStatus;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface MediumRoadmapChapter {
+  id: string;
+  chapterId?: string;
+  title: string;
+  order: number;
+  nodeCount: 5;
+  nodes: MediumRoadmapNode[];
+}
+
+export interface MediumRoadmapResponse {
+  course: {
+    id: string;
+    slug: string;
+    title: string;
+    totalChapters: number;
+    totalNodes: number;
+  };
+  mode: "medium";
+  chapters: MediumRoadmapChapter[];
+}
+
+export interface MediumChallengeNode {
+  id: string;
+  label: string;
+  title: string;
+  type: MediumChallengeType;
+  status: EasyRoadmapNodeStatus;
+}
+
+export interface MediumCodeSnippet {
+  language: "python";
+  code: string;
+}
+
+export interface MediumMultipleChoiceChallenge {
+  id: string;
+  type: "multiple_choice";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  options: Array<{
+    id: EasyChallengeOptionId;
+    text: string;
+  }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface MediumDragDropChallenge {
+  id: string;
+  type: "drag_drop";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  template: string;
+  poolItems: Array<{
+    id: string;
+    text: string;
+  }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export type MediumNodeChallenge =
+  | MediumMultipleChoiceChallenge
+  | MediumDragDropChallenge;
+
+export type MediumNodeChallengeReview =
+  | {
+      selectedOptionId?: EasyChallengeOptionId;
+      correctOptionId?: EasyChallengeOptionId;
+      correct: boolean;
+      explanation: string;
+      completedAt?: string;
+    }
+  | {
+      dropZoneMap?: Record<string, string>;
+      correctDropZoneMap?: Record<string, string>;
+      correct: boolean;
+      explanation: string;
+      completedAt?: string;
+    };
+
+export interface MediumNodeChallengeResponse {
+  node: MediumChallengeNode;
+  challenge: MediumNodeChallenge;
+  review?: MediumNodeChallengeReview;
+}
+
+export type SubmitMediumNodeChallengePayload =
+  | {
+      type: "multiple_choice";
+      selectedOptionId: EasyChallengeOptionId;
+    }
+  | {
+      type: "drag_drop";
+      dropZoneMap: Record<string, string>;
+    };
+
+export interface SubmitMediumNodeChallengeResponse {
+  correct: boolean;
+  message: string;
+  correctOptionId?: EasyChallengeOptionId;
+  correctDropZoneMap?: Record<string, string>;
+  explanation?: string;
+}
+
 export const courseApi = {
   getCourses: async () => {
     const response = await api.get(`/courses`);
@@ -138,6 +260,33 @@ export const courseApi = {
     const response = await api.post(
       `/roadmaps/easy/nodes/${nodeId}/challenge/submit`,
       { selectedOptionId },
+    );
+    return response.data;
+  },
+
+  getMediumRoadmap: async (
+    courseSlug: string,
+  ): Promise<MediumRoadmapResponse> => {
+    const response = await api.get(`/roadmaps/${courseSlug}/medium`);
+    return response.data;
+  },
+
+  getMediumNodeChallenge: async (
+    nodeId: string,
+  ): Promise<MediumNodeChallengeResponse> => {
+    const response = await api.get(
+      `/roadmaps/medium/nodes/${nodeId}/challenge`,
+    );
+    return response.data;
+  },
+
+  submitMediumNodeChallenge: async (
+    nodeId: string,
+    payload: SubmitMediumNodeChallengePayload,
+  ): Promise<SubmitMediumNodeChallengeResponse> => {
+    const response = await api.post(
+      `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
+      payload,
     );
     return response.data;
   },
