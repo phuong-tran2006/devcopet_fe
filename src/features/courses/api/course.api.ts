@@ -146,6 +146,9 @@ export interface MediumMultipleChoiceChallenge {
   title: string;
   question: string;
   codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
   options: Array<{
     id: EasyChallengeOptionId;
     text: string;
@@ -160,6 +163,9 @@ export interface MediumDragDropChallenge {
   title: string;
   question: string;
   codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
   template: string;
   poolItems: Array<{
     id: string;
