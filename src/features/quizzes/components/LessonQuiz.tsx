@@ -134,12 +134,12 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
     return (
       <div
         key={q.index}
-        className={`bg-[#121c25] rounded-xl border p-6 shadow-lg transition-colors ${
+        className={`bg-surface-container rounded-xl border p-6 shadow-lg transition-colors ${
           isReviewMode && qResult
             ? qResult.isCorrect
               ? "border-[#4ade80]/30"
               : "border-[#f87171]/30"
-            : "border-white/5"
+            : "border-outline/20"
         }`}
       >
         <div className="flex items-center justify-between mb-4">
@@ -205,7 +205,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
                   "border-[#f87171]/50 bg-[#f87171]/15 text-[#f87171] cursor-default";
               } else {
                 style =
-                  "border-white/5 bg-surface/20 text-on-surface-variant/50 cursor-default opacity-60";
+                  "border-outline/10 bg-surface/20 text-on-surface-variant/50 cursor-default opacity-60";
               }
             }
 
@@ -268,7 +268,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
             </div>
 
             {qResult.explanation && (
-              <div className="p-6 rounded-xl bg-[#0b1118]/90 border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
+              <div className="p-6 rounded-xl bg-surface-container-low border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
                 <span className="font-bold text-primary-fixed-dim block mb-2 text-[12px] uppercase tracking-widest">
                   Explanation
                 </span>
@@ -286,7 +286,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "idle") {
     return (
-      <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-surface-container rounded-xl p-8 border border-outline/20 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <h3 className="font-headline-sm text-on-surface mb-2">
             Ready to test your knowledge?
@@ -313,7 +313,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "loading") {
     return (
-      <div className="bg-[#121c25] rounded-xl p-8 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)] flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-surface-container rounded-xl p-8 border border-outline/20 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <h3 className="font-headline-sm text-on-surface mb-2">
             Ready to test your knowledge?
@@ -338,7 +338,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
   // ══════════════════════════════════════════════════════════════════════
   if (phase === "not_found") {
     return (
-      <div className="bg-[#121c25] rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
+      <div className="bg-surface-container rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
         <span className="material-symbols-outlined text-3xl mb-2 block">
           quiz
         </span>
@@ -425,7 +425,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
 
         {/* Review Single Question */}
         <div className="flex flex-col gap-6">
-          <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
+          <div className="bg-surface-container rounded-xl p-5 border border-outline/20 shadow-lg">
             <div className="flex items-center justify-between mb-3">
               <div>
                 <h3 className="font-headline-sm text-on-surface text-[20px]">
@@ -520,7 +520,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
   return (
     <div className="flex flex-col gap-6">
       {/* ── Quiz Header (Progress) ── */}
-      <div className="bg-[#121c25] rounded-xl p-5 border border-primary-fixed-dim/30 shadow-[0_0_20px_rgba(0,218,248,0.1)]">
+      <div className="bg-surface-container rounded-xl p-5 border border-outline/20 shadow-lg">
         <div className="flex items-center justify-between mb-3">
           <div className="font-headline-sm text-on-surface">
             {quiz.title || "Lesson Quiz"}

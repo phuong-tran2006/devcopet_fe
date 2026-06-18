@@ -9,6 +9,15 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   const workerRef = useRef(null);
   const timeoutRef = useRef(null);
   const currentRunId = useRef(0);
+  const textareaRef = useRef(null);
+
+  // Auto-resize textarea on initial load to fit all code
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [initialCode]);
 
   // Initialize the worker on component mount
   useEffect(() => {
@@ -169,11 +178,12 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
       {/* Editor */}
       <div className="p-4 border-b border-[#1E293B] relative group">
         <textarea
+          ref={textareaRef}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck="false"
-          className="w-full bg-transparent text-[#e2e8f0] font-mono text-[14px] leading-relaxed resize-y min-h-[120px] outline-none"
+          className="custom-scrollbar w-full bg-transparent text-[#e2e8f0] font-mono text-[14px] leading-relaxed resize-y min-h-[120px] outline-none"
           style={{ fontFamily: "Roboto Mono, monospace" }}
         />
       </div>

@@ -120,19 +120,57 @@
 
   html.light {
     --color-background: #f0f2f5;
-    --color-on-background: #334155;
+    --color-on-background: #1a2332;
+
     --color-surface: #ffffff;
-    --color-surface-dim: #e2e8f0;
+    --color-surface-dim: #dce2e8;
     --color-surface-bright: #ffffff;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f8fafc;
-    --color-surface-container: #f1f5f9;
+    --color-surface-container-low: #f5f7fa;
+    --color-surface-container: #eef1f5;
     --color-surface-container-high: #e2e8f0;
-    --color-surface-container-highest: #cbd5e1;
-    --color-on-surface: #334155;
+    --color-surface-container-highest: #d1d9e4;
+    --color-on-surface: #1a2332;
     --color-on-surface-variant: #475569;
-    --color-outline: #cbd5e1;
+    --color-inverse-surface: #2a3641;
+    --color-inverse-on-surface: #edf1f5;
+    --color-outline: #94a3b8;
+    --color-outline-variant: #cbd5e1;
     --color-surface-variant: #e2e8f0;
+    --color-surface-tint: #006666;
+
+    --color-primary: #006666;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #b2dfdf;
+    --color-on-primary-container: #002020;
+    --color-inverse-primary: #4dd0d0;
+    --color-primary-fixed: #ccebeb;
+    --color-primary-fixed-dim: #006666;
+    --color-on-primary-fixed: #001f25;
+    --color-on-primary-fixed-variant: #004e5a;
+
+    --color-secondary: #8b6b8b;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #f0ddf0;
+    --color-on-secondary-container: #3c2a3c;
+    --color-secondary-fixed: #f4ecf4;
+    --color-secondary-fixed-dim: #8b6b8b;
+    --color-on-secondary-fixed: #271900;
+    --color-on-secondary-fixed-variant: #5e4200;
+
+    --color-tertiary: #5e8a45;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #c8e6b0;
+    --color-on-tertiary-container: #1a3010;
+    --color-tertiary-fixed: #edf3e8;
+    --color-tertiary-fixed-dim: #5e8a45;
+    --color-on-tertiary-fixed: #1b1b1b;
+    --color-on-tertiary-fixed-variant: #474747;
+
+    --color-error: #ba1a1a;
+    --color-on-error: #ffffff;
+    --color-error-container: #ffdad6;
+    --color-on-error-container: #410002;
   }
 }
 
@@ -373,22 +411,28 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--color-on-surface) 15%, transparent);
+    background: rgba(255, 255, 255, 0.4);
     border-radius: 10px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: color-mix(in srgb, var(--color-on-surface) 25%, transparent);
+    background: rgba(255, 255, 255, 0.6);
+  }
+
+  /* Customize the resize handle for textareas */
+  .custom-scrollbar::-webkit-resizer {
+    background-color: rgba(0, 128, 128, 0.15);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2300daf8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='15 3 21 3 21 9'/%3E%3Cpolyline points='9 21 3 21 3 15'/%3E%3Cline x1='21' y1='3' x2='14' y2='10'/%3E%3Cline x1='3' y1='21' x2='10' y2='14'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    border-top: 1px solid rgba(0, 128, 128, 0.5);
+    border-left: 1px solid rgba(0, 128, 128, 0.5);
+    border-top-left-radius: 6px;
   }
 
   /* For Firefox */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: color-mix(
-        in srgb,
-        var(--color-on-surface) 15%,
-        transparent
-      )
-      transparent;
+    scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
   }
 }

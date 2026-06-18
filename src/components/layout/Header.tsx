@@ -90,24 +90,29 @@ const Header = () => {
                 </div>
 
                 {/* Dropdown Menu */}
-                <div className="absolute top-10 right-0 w-40 bg-surface-container-high/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden transform origin-top-right group-hover:scale-100 scale-95">
-                  <div className="flex flex-col gap-1 p-2">
-                    <button className="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-white/5 rounded-lg transition-colors font-medium flex items-center gap-2">
-                      <span className="material-symbols-outlined text-[16px]">
-                        person
-                      </span>
-                      Profile
-                    </button>
-                    <div className="h-px w-full bg-white/5 my-1"></div>
-                    <button
-                      onClick={handleLogout}
-                      className="w-full text-left px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors font-medium flex items-center gap-2"
-                    >
-                      <span className="material-symbols-outlined text-[16px]">
-                        logout
-                      </span>
-                      Logout
-                    </button>
+                <div className="absolute top-full right-0 w-40 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                  <div className="bg-surface-container-high/95 backdrop-blur-lg border border-white/10 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.8)] overflow-hidden transform origin-top-right group-hover:scale-100 scale-95">
+                    <div className="flex flex-col gap-1 p-2">
+                      <Link
+                        to="/profile"
+                        className="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-white/5 rounded-lg transition-colors font-medium flex items-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          person
+                        </span>
+                        Profile
+                      </Link>
+                      <div className="h-px w-full bg-white/5 my-1"></div>
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors font-medium flex items-center gap-2"
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          logout
+                        </span>
+                        Logout
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>

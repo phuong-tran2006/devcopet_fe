@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import Button from "../../../../components/ui/Button";
@@ -35,7 +36,11 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: "/course" });
+      if (!useAuthStore.getState().user?.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: "/course" });
+      }
     }
   }, [isAuthenticated, navigate]);
 
@@ -52,16 +57,36 @@ const Login = () => {
     try {
       const response = await authApi.login({ email, password });
       setAuth(response.accessToken, response.refreshToken, response.user);
-      navigate({ to: "/course" });
+      if (response.user && !response.user.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: "/course" });
+      }
     } catch (err: any) {
-      setError(err?.message || "Login failed. Please check your credentials.");
+      const errorMessage =
+        err?.response?.data?.message ||
+        (Array.isArray(err?.response?.data?.message)
+          ? err?.response?.data?.message[0]
+          : null) ||
+        err?.message ||
+        "Login failed. Please check your credentials.";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const errorParam = params.get("error");
+    if (errorParam === "social_login_failed") {
+      setError("Social login failed. Please try again.");
+    }
+  }, []);
+
   const handleSocialLogin = (provider: string) => {
-    window.location.href = `http://localhost:3000/auth/${provider}`;
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    window.location.href = `${apiUrl}/auth/${provider}`;
   };
 
   const handleInputChange = (setter: any) => (e: any) => {
