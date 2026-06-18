@@ -91,87 +91,127 @@ export interface SubmitEasyNodeChallengeResponse {
   review?: EasyNodeChallengeReview;
 }
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export type MediumChallengeType = "multiple_choice" | "drag_drop";
 
-const mockRoadmap: EasyRoadmapResponse = {
+export interface MediumRoadmapNode {
+  id: string;
+  chapterId?: string;
+  chapterOrder: number;
+  order: number;
+  label: string;
+  title: string;
+  type: MediumChallengeType;
+  status: EasyRoadmapNodeStatus;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface MediumRoadmapChapter {
+  id: string;
+  chapterId?: string;
+  title: string;
+  order: number;
+  nodeCount: 5;
+  nodes: MediumRoadmapNode[];
+}
+
+export interface MediumRoadmapResponse {
   course: {
-    id: "python-basic",
-    slug: "python-basic",
-    title: "Python Basic",
-    totalChapters: 2,
-    totalLessons: 4,
-    totalNodes: 4,
-  },
-  mode: "easy",
-  chapters: [
-    {
-      id: "ch1",
-      title: "Introduction",
-      order: 1,
-      lessonCount: 2,
-      nodeCount: 2,
-      nodes: [
-        {
-          id: "node1",
-          lessonId: "lesson1",
-          chapterId: "ch1",
-          chapterOrder: 1,
-          lessonOrder: 1,
-          label: "Getting Started",
-          title: "Introduction to Python",
-          status: "completed",
-          xp: 10,
-          duration: 5,
-        },
-        {
-          id: "node2",
-          lessonId: "lesson2",
-          chapterId: "ch1",
-          chapterOrder: 1,
-          lessonOrder: 2,
-          label: "Variables",
-          title: "Variables and Data Types",
-          status: "available",
-          xp: 15,
-          duration: 10,
-        },
-      ],
-    },
-    {
-      id: "ch2",
-      title: "Control Flow",
-      order: 2,
-      lessonCount: 2,
-      nodeCount: 2,
-      nodes: [
-        {
-          id: "node3",
-          lessonId: "lesson3",
-          chapterId: "ch2",
-          chapterOrder: 2,
-          lessonOrder: 1,
-          label: "If Statements",
-          title: "Conditional Logic",
-          status: "locked",
-          xp: 20,
-          duration: 15,
-        },
-        {
-          id: "node4",
-          lessonId: "lesson4",
-          chapterId: "ch2",
-          chapterOrder: 2,
-          lessonOrder: 2,
-          label: "Loops",
-          title: "For and While Loops",
-          status: "locked",
-          xp: 25,
-          duration: 20,
-        },
-      ],
-    },
-  ],
-};
+    id: string;
+    slug: string;
+    title: string;
+    totalChapters: number;
+    totalNodes: number;
+  };
+  mode: "medium";
+  chapters: MediumRoadmapChapter[];
+}
+
+export interface MediumChallengeNode {
+  id: string;
+  label: string;
+  title: string;
+  type: MediumChallengeType;
+  status: EasyRoadmapNodeStatus;
+}
+
+export interface MediumCodeSnippet {
+  language: "python";
+  code: string;
+}
+
+export interface MediumMultipleChoiceChallenge {
+  id: string;
+  type: "multiple_choice";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  options: Array<{
+    id: EasyChallengeOptionId;
+    text: string;
+  }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface MediumDragDropChallenge {
+  id: string;
+  type: "drag_drop";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  template: string;
+  poolItems: Array<{
+    id: string;
+    text: string;
+  }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export type MediumNodeChallenge =
+  | MediumMultipleChoiceChallenge
+  | MediumDragDropChallenge;
+
+export type MediumNodeChallengeReview =
+  | {
+      selectedOptionId?: EasyChallengeOptionId;
+      correctOptionId?: EasyChallengeOptionId;
+      correct: boolean;
+      explanation: string;
+      completedAt?: string;
+    }
+  | {
+      dropZoneMap?: Record<string, string>;
+      correctDropZoneMap?: Record<string, string>;
+      correct: boolean;
+      explanation: string;
+      completedAt?: string;
+    };
+
+export interface MediumNodeChallengeResponse {
+  node: MediumChallengeNode;
+  challenge: MediumNodeChallenge;
+  review?: MediumNodeChallengeReview;
+}
+
+export type SubmitMediumNodeChallengePayload =
+  | {
+      type: "multiple_choice";
+      selectedOptionId: EasyChallengeOptionId;
+    }
+  | {
+      type: "drag_drop";
+      dropZoneMap: Record<string, string>;
+    };
+
+export interface SubmitMediumNodeChallengeResponse {
+  correct: boolean;
+  message: string;
+  correctOptionId?: EasyChallengeOptionId;
+  correctDropZoneMap?: Record<string, string>;
+  explanation?: string;
+}
 
 export const courseApi = {
   getCourses: async () => {
@@ -252,5 +292,32 @@ export const courseApi = {
       explanation:
         "Python is dynamically typed and doesn't require keywords like var or int to define variables. Semicolons are also not required.",
     };
+  },
+
+  getMediumRoadmap: async (
+    courseSlug: string,
+  ): Promise<MediumRoadmapResponse> => {
+    const response = await api.get(`/roadmaps/${courseSlug}/medium`);
+    return response.data;
+  },
+
+  getMediumNodeChallenge: async (
+    nodeId: string,
+  ): Promise<MediumNodeChallengeResponse> => {
+    const response = await api.get(
+      `/roadmaps/medium/nodes/${nodeId}/challenge`,
+    );
+    return response.data;
+  },
+
+  submitMediumNodeChallenge: async (
+    nodeId: string,
+    payload: SubmitMediumNodeChallengePayload,
+  ): Promise<SubmitMediumNodeChallengeResponse> => {
+    const response = await api.post(
+      `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
+      payload,
+    );
+    return response.data;
   },
 };

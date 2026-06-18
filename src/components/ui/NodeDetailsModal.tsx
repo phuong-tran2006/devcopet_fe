@@ -1,12 +1,19 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import type { EasyRoadmapNode } from "../../features/courses/api/course.api";
+import type {
+  EasyRoadmapNode,
+  MediumRoadmapNode,
+} from "../../features/courses/api/course.api";
+
+type RoadmapDetailNode =
+  | (EasyRoadmapNode & { difficulty?: "easy" })
+  | (MediumRoadmapNode & { difficulty?: "medium" });
 
 export interface NodeDetailsProps {
   isOpen: boolean;
   onClose: () => void;
   courseSlug?: string;
-  node: (EasyRoadmapNode & { difficulty?: "easy" | "medium" | "hard" }) | null;
+  node: RoadmapDetailNode | null;
 }
 
 const statusCopy = {
@@ -30,8 +37,10 @@ const statusCopy = {
   },
 } as const;
 
-const getLessonDisplayTitle = (node: EasyRoadmapNode) => node.title.trim();
+const getNodeDisplayTitle = (node: RoadmapDetailNode) => node.title.trim();
 const EASY_CHECKPOINT_DURATION = "1 min";
+const getTypeLabel = (type?: string) =>
+  type === "drag_drop" ? "Drag Drop" : "Multiple Choice";
 
 const NodeDetailsModal = ({
   isOpen,
@@ -72,12 +81,27 @@ const NodeDetailsModal = ({
   const copy = statusCopy[node.status];
   const isLocked = node.status === "locked";
   const isActionDisabled = isLocked || !courseSlug;
-  const lessonTitle = getLessonDisplayTitle(node);
+  const nodeTitle = getNodeDisplayTitle(node);
+  const isMediumNode = node.difficulty === "medium";
+  const duration = isMediumNode
+    ? `${node.estimatedMinutes || 1} min`
+    : EASY_CHECKPOINT_DURATION;
 
   const openChallenge = () => {
     if (isActionDisabled) return;
 
     onClose();
+
+    if (isMediumNode) {
+      navigate({
+        to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+        params: {
+          courseSlug,
+          nodeId: node.id,
+        },
+      });
+      return;
+    }
 
     navigate({
       to: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
@@ -112,14 +136,22 @@ const NodeDetailsModal = ({
             <span className="material-symbols-outlined text-[14px]">
               {copy.icon}
             </span>
-            {copy.label}
+          {copy.label}
           </span>
+          {isMediumNode && (
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#018ABE]/30 bg-[#018ABE]/10 text-[#97CADB] text-[10px] font-bold uppercase tracking-widest">
+              <span className="material-symbols-outlined text-[14px]">
+                {node.type === "drag_drop" ? "drag_indicator" : "quiz"}
+              </span>
+              {getTypeLabel(node.type)}
+            </span>
+          )}
         </div>
 
         <h2 className="text-[24px] font-extrabold text-on-surface leading-tight pr-8 mb-3">
-          {lessonTitle}
+          {nodeTitle}
         </h2>
-        {node.description && (
+        {"description" in node && node.description && (
           <p className="text-[14px] text-on-surface-variant leading-relaxed mb-6">
             {node.description}
           </p>
@@ -139,7 +171,7 @@ const NodeDetailsModal = ({
               Duration
             </span>
             <span className="text-[16px] font-extrabold text-on-surface">
-              {EASY_CHECKPOINT_DURATION}
+              {duration}
             </span>
           </div>
         </div>

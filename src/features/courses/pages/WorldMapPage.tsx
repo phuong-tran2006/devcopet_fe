@@ -1,10 +1,16 @@
 // @ts-nocheck
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams } from "@tanstack/react-router";
-import { courseApi } from "../api/course.api";
-const NodeDetailsModal = lazy(
-  () => import("../../../components/ui/NodeDetailsModal"),
-);
+import {
+  courseApi,
+  type EasyRoadmapChapter,
+  type EasyRoadmapNode,
+  type EasyRoadmapResponse,
+  type MediumRoadmapChapter,
+  type MediumRoadmapNode,
+  type MediumRoadmapResponse,
+} from "../api/course.api";
+import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
 
 const DIFF_CONFIG = {
   easy: {
@@ -35,6 +41,9 @@ const DIFF_CONFIG = {
 
 type Difficulty = keyof typeof DIFF_CONFIG;
 type ChapterStatus = "completed" | "active" | "locked";
+type SelectedRoadmapNode =
+  | (EasyRoadmapNode & { difficulty?: "easy" })
+  | (MediumRoadmapNode & { difficulty?: "medium" });
 
 const statusStyles = {
   completed: {
@@ -54,7 +63,9 @@ const statusStyles = {
   },
 } as const;
 
-const getChapterStatus = (chapter: EasyRoadmapChapter): ChapterStatus => {
+const getChapterStatus = (
+  chapter: EasyRoadmapChapter | MediumRoadmapChapter,
+): ChapterStatus => {
   if (chapter.nodes.length === 0) return "locked";
   if (chapter.nodes.every((node) => node.status === "completed")) {
     return "completed";
@@ -65,25 +76,29 @@ const getChapterStatus = (chapter: EasyRoadmapChapter): ChapterStatus => {
   return "locked";
 };
 
-const normalizeOrder = (chapters: EasyRoadmapChapter[]) =>
+const normalizeOrder = <T extends { order: number }>(chapters: T[]) =>
   [...chapters].sort((a, b) => a.order - b.order);
 
 const getLessonDisplayTitle = (node: EasyRoadmapNode) => node.title.trim();
 const EASY_CHECKPOINT_DURATION = "1 min";
+const getMediumTypeLabel = (type: MediumRoadmapNode["type"]) =>
+  type === "drag_drop" ? "Drag Drop" : "Multiple Choice";
 
 const WorldMapPage = () => {
   const { worldId } = useParams({ strict: false });
   const courseSlug = worldId;
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
   const [roadmap, setRoadmap] = useState<EasyRoadmapResponse | null>(null);
+  const [mediumRoadmap, setMediumRoadmap] =
+    useState<MediumRoadmapResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [selectedNode, setSelectedNode] = useState<
-    (EasyRoadmapNode & { difficulty?: Difficulty }) | null
-  >(null);
+  const [selectedNode, setSelectedNode] = useState<SelectedRoadmapNode | null>(
+    null,
+  );
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(
     null,
   );
@@ -97,6 +112,10 @@ const WorldMapPage = () => {
   const chapters = useMemo(
     () => normalizeOrder(roadmap?.chapters ?? []),
     [roadmap],
+  );
+  const mediumChapters = useMemo(
+    () => normalizeOrder(mediumRoadmap?.chapters ?? []),
+    [mediumRoadmap],
   );
 
   const flatNodes = useMemo(
@@ -113,19 +132,36 @@ const WorldMapPage = () => {
     [chapters],
   );
 
-  const firstAvailableNodeId = useMemo(
-    () => flatNodes.find((node) => node.status === "available")?.id ?? null,
-    [flatNodes],
+  const mediumFlatNodes = useMemo(
+    () =>
+      mediumChapters.flatMap((chapter) =>
+        [...chapter.nodes]
+          .sort((a, b) => a.order - b.order)
+          .map((node) => ({
+            ...node,
+            chapterTitle: chapter.title,
+            chapterOrder: chapter.order,
+          })),
+      ),
+    [mediumChapters],
   );
 
-  const completedCount = flatNodes.filter(
+  const activeFlatNodes = difficulty === "medium" ? mediumFlatNodes : flatNodes;
+  const firstAvailableNodeId = useMemo(
+    () =>
+      activeFlatNodes.find((node) => node.status === "available")?.id ?? null,
+    [activeFlatNodes],
+  );
+  const completedCount = activeFlatNodes.filter(
     (node) => node.status === "completed",
   ).length;
-  const totalNodes = roadmap?.course.totalNodes ?? flatNodes.length;
+  const currentCourse =
+    difficulty === "medium" ? mediumRoadmap?.course : roadmap?.course;
+  const totalNodes = currentCourse?.totalNodes ?? activeFlatNodes.length;
   const totalLessons = roadmap?.course.totalLessons ?? flatNodes.length;
   const completionPct =
     totalNodes > 0 ? Math.round((completedCount / totalNodes) * 100) : 0;
-  const totalXp = flatNodes.reduce((sum, node) => sum + (node.xp || 0), 0);
+  const totalXp = activeFlatNodes.reduce((sum, node) => sum + (node.xp || 0), 0);
 
   useEffect(() => {
     document.title = "Roadmap Path | Devcopet Learn";
@@ -138,17 +174,31 @@ const WorldMapPage = () => {
       return;
     }
 
+    if (difficulty === "hard") {
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     let alive = true;
     setLoading(true);
     setError(null);
-    setRoadmap(null);
     setSelectedChapterId(null);
+    setSelectedNode(null);
 
-    courseApi
-      .getEasyRoadmap(courseSlug)
+    const request =
+      difficulty === "medium"
+        ? courseApi.getMediumRoadmap(courseSlug)
+        : courseApi.getEasyRoadmap(courseSlug);
+
+    request
       .then((data) => {
         if (!alive) return;
-        setRoadmap(data);
+        if (data.mode === "medium") {
+          setMediumRoadmap(data);
+        } else {
+          setRoadmap(data);
+        }
         setSelectedChapterId(data.chapters[0]?.id ?? null);
         document.title = `${data.course.title} Roadmap | Devcopet Learn`;
       })
@@ -157,7 +207,7 @@ const WorldMapPage = () => {
         setError(
           err?.response?.data?.message ||
             err?.message ||
-            "Unable to load Easy roadmap.",
+            `Unable to load ${DIFF_CONFIG[difficulty].label} roadmap.`,
         );
       })
       .finally(() => {
@@ -167,7 +217,7 @@ const WorldMapPage = () => {
     return () => {
       alive = false;
     };
-  }, [courseSlug]);
+  }, [courseSlug, difficulty]);
 
   useEffect(() => {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -185,12 +235,12 @@ const WorldMapPage = () => {
   };
 
   const buildPath = (wantUnlocked: boolean) => {
-    if (flatNodes.length < 2) return "";
+    if (activeFlatNodes.length < 2) return "";
 
-    return flatNodes
+    return activeFlatNodes
       .slice(1)
       .map((node, idx) => {
-        const prev = flatNodes[idx];
+        const prev = activeFlatNodes[idx];
         const currentIndex = idx + 1;
         const unlocked = prev.status !== "locked" && node.status !== "locked";
 
@@ -206,7 +256,7 @@ const WorldMapPage = () => {
 
   const completedD = buildPath(true);
   const lockedD = buildPath(false);
-  const mapHeight = Math.max(flatNodes.length * 150 + 180, 520);
+  const mapHeight = Math.max(activeFlatNodes.length * 150 + 180, 520);
 
   const scrollToTop = () =>
     mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
@@ -219,7 +269,7 @@ const WorldMapPage = () => {
     });
   };
 
-  const scrollToChapter = (chapter: EasyRoadmapChapter) => {
+  const scrollToChapter = (chapter: EasyRoadmapChapter | MediumRoadmapChapter) => {
     setSelectedChapterId(chapter.id);
     const firstNode = chapter.nodes[0];
     if (!firstNode) return;
@@ -242,7 +292,7 @@ const WorldMapPage = () => {
       );
     }
 
-    if (difficulty !== "easy") {
+    if (difficulty === "hard") {
       return (
         <div className="mx-3 my-4 rounded-xl border border-on-surface/10 bg-surface-container/60 px-4 py-5">
           <p className="text-[12px] font-bold text-on-surface">Coming soon</p>
@@ -264,9 +314,16 @@ const WorldMapPage = () => {
       );
     }
 
-    return chapters.map((chapter) => {
+    const sidebarChapters =
+      difficulty === "medium" ? mediumChapters : chapters;
+
+    return sidebarChapters.map((chapter) => {
       const chapterStatus = getChapterStatus(chapter);
       const isSelected = selectedChapterId === chapter.id;
+      const meta =
+        difficulty === "medium"
+          ? `${chapter.nodeCount} nodes`
+          : `${(chapter as EasyRoadmapChapter).lessonCount} lessons • ${chapter.nodeCount} nodes`;
 
       return (
         <button
@@ -316,7 +373,7 @@ const WorldMapPage = () => {
                 {chapter.title}
               </p>
               <p className="mt-1 text-[10px] text-on-surface-variant/55">
-                {chapter.lessonCount} lessons • {chapter.nodeCount} nodes
+                {meta}
               </p>
             </div>
           </div>
@@ -622,7 +679,7 @@ const WorldMapPage = () => {
                 </div>
                 <div>
                   <h1 className="text-[32px] font-extrabold uppercase leading-none tracking-wide text-on-surface md:text-[38px]">
-                    {roadmap?.course.title || "Course Roadmap"}
+                    {currentCourse?.title || "Course Roadmap"}
                   </h1>
                   <span
                     className="text-[11px] font-bold uppercase tracking-widest"
@@ -630,7 +687,9 @@ const WorldMapPage = () => {
                   >
                     {difficulty === "easy"
                       ? `${roadmap?.course.totalChapters ?? 0} chapters • ${totalLessons} lessons • ${totalNodes} nodes`
-                      : "Coming soon"}
+                      : difficulty === "medium"
+                        ? `${mediumRoadmap?.course.totalChapters ?? 0} chapters • ${totalNodes} nodes`
+                        : "Coming soon"}
                   </span>
                 </div>
               </div>
@@ -662,7 +721,7 @@ const WorldMapPage = () => {
 
             <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-on-surface/10 bg-surface-container/60 px-5 py-4">
               <div className="flex items-center justify-between text-[13px] font-bold tracking-wider text-on-surface-variant">
-                <span>Easy Completion</span>
+                <span>{DIFF_CONFIG[difficulty].label} Completion</span>
                 <span className="text-[15px]" style={{ color: cfg.accent }}>
                   {completionPct}%
                 </span>
@@ -678,12 +737,15 @@ const WorldMapPage = () => {
                 />
               </div>
               <div className="mt-0.5 flex justify-between text-[11px] font-medium text-on-surface-variant/60">
-                <span>{completedCount} lesson nodes done</span>
+                <span>
+                  {completedCount} {difficulty === "easy" ? "lesson " : ""}
+                  nodes done
+                </span>
                 <span>{totalNodes} total nodes</span>
               </div>
             </div>
 
-            {difficulty !== "easy" && (
+            {difficulty === "hard" && (
               <div
                 className="mb-6 flex items-center gap-3 rounded-xl border px-4 py-4"
                 style={{
@@ -709,7 +771,7 @@ const WorldMapPage = () => {
               </div>
             )}
 
-            {difficulty === "easy" && loading && (
+            {difficulty !== "hard" && loading && (
               <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-on-surface/8 bg-surface-container/40">
                 <div className="flex flex-col items-center gap-3">
                   <div
@@ -720,19 +782,19 @@ const WorldMapPage = () => {
                     }}
                   />
                   <p className="text-[12px] font-bold uppercase tracking-widest text-on-surface-variant">
-                    Loading Easy roadmap
+                    Loading {DIFF_CONFIG[difficulty].label} roadmap
                   </p>
                 </div>
               </div>
             )}
 
-            {difficulty === "easy" && !loading && error && (
+            {difficulty !== "hard" && !loading && error && (
               <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
                 <span className="material-symbols-outlined mb-3 text-[34px] text-red-200">
                   error
                 </span>
                 <h2 className="text-[18px] font-extrabold text-on-surface">
-                  Easy roadmap could not load
+                  {DIFF_CONFIG[difficulty].label} roadmap could not load
                 </h2>
                 <p className="mx-auto mt-2 max-w-[420px] text-[13px] leading-relaxed text-on-surface-variant">
                   {error}
@@ -742,14 +804,23 @@ const WorldMapPage = () => {
                     if (!courseSlug) return;
                     setLoading(true);
                     setError(null);
-                    courseApi
-                      .getEasyRoadmap(courseSlug)
-                      .then(setRoadmap)
+                    const request =
+                      difficulty === "medium"
+                        ? courseApi.getMediumRoadmap(courseSlug)
+                        : courseApi.getEasyRoadmap(courseSlug);
+                    request
+                      .then((data) => {
+                        if (data.mode === "medium") {
+                          setMediumRoadmap(data);
+                        } else {
+                          setRoadmap(data);
+                        }
+                      })
                       .catch((err) =>
                         setError(
                           err?.response?.data?.message ||
                             err?.message ||
-                            "Unable to load Easy roadmap.",
+                            `Unable to load ${DIFF_CONFIG[difficulty].label} roadmap.`,
                         ),
                       )
                       .finally(() => setLoading(false));
@@ -904,6 +975,177 @@ const WorldMapPage = () => {
                             isActive
                               ? "h-16 w-16 text-[17px]"
                               : "h-14 w-14 text-[15px]"
+                          } ${styles.node} ${nodeGlowClass} ${isHovered ? "scale-110" : "scale-100"}`}
+                          style={
+                            node.status !== "locked"
+                              ? { boxShadow: `0 0 24px ${cfg.glowWeak}` }
+                              : {}
+                          }
+                        >
+                          {node.status === "locked" ? (
+                            <span className="material-symbols-outlined text-[18px]">
+                              lock
+                            </span>
+                          ) : (
+                            node.label
+                          )}
+                        </div>
+
+                        <span
+                          className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                            node.status === "locked"
+                              ? "border-on-surface/10 bg-surface-container text-on-surface-variant/40"
+                              : "border-[#97CADB]/25 bg-background text-[#97CADB]"
+                          }`}
+                        >
+                          {styles.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+            {difficulty === "medium" &&
+              !loading &&
+              !error &&
+              mediumFlatNodes.length === 0 && (
+                <div className="rounded-2xl border border-on-surface/10 bg-surface-container/50 px-6 py-8 text-center">
+                  <h2 className="text-[18px] font-extrabold text-on-surface">
+                    No Medium nodes yet
+                  </h2>
+                  <p className="mt-2 text-[13px] text-on-surface-variant">
+                    The Medium roadmap returned no challenge nodes for this
+                    course.
+                  </p>
+                </div>
+              )}
+
+            {difficulty === "medium" &&
+              !loading &&
+              !error &&
+              mediumFlatNodes.length > 0 && (
+                <div
+                  ref={mapContainerRef}
+                  className="relative w-full select-none overflow-visible"
+                  style={{ height: `${mapHeight}px` }}
+                >
+                  <svg
+                    className="pointer-events-none absolute inset-0 h-full w-full"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <defs>
+                      <filter id="glow-medium-roadmap">
+                        <feGaussianBlur stdDeviation="4" result="coloredBlur" />
+                        <feMerge>
+                          <feMergeNode in="coloredBlur" />
+                          <feMergeNode in="SourceGraphic" />
+                        </feMerge>
+                      </filter>
+                    </defs>
+
+                    {completedD && (
+                      <path
+                        d={completedD}
+                        fill="none"
+                        stroke={DIFF_CONFIG.medium.pathColor}
+                        strokeLinecap="round"
+                        strokeWidth="6"
+                        filter="url(#glow-medium-roadmap)"
+                      />
+                    )}
+                    {lockedD && (
+                      <path
+                        d={lockedD}
+                        fill="none"
+                        stroke="var(--color-outline)"
+                        strokeDasharray="8,10"
+                        strokeLinecap="round"
+                        strokeWidth="5"
+                        opacity="0.5"
+                      />
+                    )}
+                  </svg>
+
+                  {mediumFlatNodes.map((node, idx) => {
+                    const { x, y } = getNodeCoords(idx);
+                    const styles = statusStyles[node.status];
+                    const isHovered = hoveredNode === node.id;
+                    const isActive = firstAvailableNodeId === node.id;
+                    const isSelected = selectedNode?.id === node.id;
+                    const chapterForNode = mediumChapters.find(
+                      (chapter) => chapter.order === node.chapterOrder,
+                    );
+                    const nodeGlowClass =
+                      node.status === "available"
+                        ? isActive || isSelected
+                          ? "roadmap-node-selected"
+                          : "roadmap-node-available"
+                        : "";
+                    const isFirstInChapter =
+                      idx === 0 ||
+                      mediumFlatNodes[idx - 1].chapterOrder !==
+                        node.chapterOrder;
+
+                    return (
+                      <div
+                        key={node.id}
+                        ref={isActive ? activeNodeRef : null}
+                        data-node-id={node.id}
+                        data-chapter-id={
+                          chapterForNode?.id ?? node.chapterId ?? node.chapterOrder
+                        }
+                        className="absolute z-10 flex -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-center gap-1.5"
+                        style={{ left: `${x}px`, top: `${y}px` }}
+                        onMouseEnter={() => setHoveredNode(node.id)}
+                        onMouseLeave={() => setHoveredNode(null)}
+                        onClick={() => {
+                          setSelectedNode({ ...node, difficulty: "medium" });
+                          setSelectedChapterId(
+                            chapterForNode?.id ?? node.chapterId ?? null,
+                          );
+                        }}
+                      >
+                        {isFirstInChapter && (
+                          <div
+                            className="absolute left-1/2 top-[-74px] z-0 -translate-x-1/2 whitespace-nowrap rounded-full border bg-background/95 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant shadow-lg"
+                            style={{ borderColor: `${cfg.accent}30` }}
+                          >
+                            Chapter {node.chapterOrder}
+                          </div>
+                        )}
+
+                        {isHovered && (
+                          <div className="pointer-events-none absolute bottom-[calc(100%+14px)] left-1/2 z-30 -translate-x-1/2">
+                            <div className="min-w-[230px] max-w-[300px] rounded-xl border border-on-surface/15 bg-surface-container px-4 py-3 text-center shadow-xl">
+                              <p className="mb-1 text-[11px] font-extrabold uppercase tracking-widest text-[#97CADB]">
+                                {node.label}
+                              </p>
+                              <p className="text-[13px] font-bold leading-snug text-on-surface">
+                                {node.title}
+                              </p>
+                              <div className="mt-2 flex flex-wrap items-center justify-center gap-3 text-[11px] text-on-surface-variant">
+                                <span>{getMediumTypeLabel(node.type)}</span>
+                                <span>{node.xp || 0} XP</span>
+                                <span>{node.estimatedMinutes || 1} min</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+
+                        {isActive && (
+                          <div
+                            className="absolute rounded-full opacity-20 animate-ping"
+                            style={{
+                              inset: -8,
+                              background: cfg.accent,
+                            }}
+                          />
+                        )}
+
+                        <div
+                          className={`relative z-10 flex items-center justify-center rounded-full border-4 font-extrabold shadow-lg transition-transform duration-300 ${
+                            isActive ? "h-16 w-16 text-[15px]" : "h-14 w-14 text-[13px]"
                           } ${styles.node} ${nodeGlowClass} ${isHovered ? "scale-110" : "scale-100"}`}
                           style={
                             node.status !== "locked"
