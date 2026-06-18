@@ -18,39 +18,40 @@ function AuthCallbackPage() {
   const { setAuth } = useAuthStore();
 
   useEffect(() => {
- const handleCallback = async () => {
-  const { accessToken, refreshToken } = search;
+    const handleCallback = async () => {
+      const { accessToken, refreshToken } = search;
 
-  if (!accessToken) {
-    navigate({
-      to: "/login",
-      search: { error: "social_login_failed" },
-    });
-    return;
-  }
+      if (!accessToken) {
+        navigate({
+          to: "/login",
+          search: { error: "social_login_failed" },
+        });
+        return;
+      }
 
-  setAuth(accessToken, refreshToken || "", null);
+      setAuth(accessToken, refreshToken || "", null);
 
-  try {
-    const response = await api.get("/users/me");
-    const user = response.data;
+      try {
+        const response = await api.get("/users/me");
+        const user = response.data;
 
-    setAuth(accessToken, refreshToken || "", user);
+        setAuth(accessToken, refreshToken || "", user);
 
-    if (!user?.onboardingCompleted) {
-      navigate({ to: "/onboarding" });
-    } else {
-      navigate({ to: "/course" });
-    }
-  } catch (error) {
-    navigate({
-      to: "/login",
-      search: { error: "social_login_failed" },
-    });
-  }
-};
+        if (!user?.onboardingCompleted) {
+          navigate({ to: "/onboarding" });
+        } else {
+          navigate({ to: "/course" });
+        }
+      } catch (error) {
+        navigate({
+          to: "/login",
+          search: { error: "social_login_failed" },
+        });
+      }
+    };
 
-handleCallback();
+    handleCallback();
+  }, [navigate, search, setAuth]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#041521] text-white">

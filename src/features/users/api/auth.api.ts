@@ -78,8 +78,7 @@ export const authApi = {
 
     const accessToken = `mock_access_token_${Date.now()}`;
     const refreshToken = `mock_refresh_token_${Date.now()}`;
-    delete (user as any).password;
-    const userWithoutPassword = user;
+    const { password, ...userWithoutPassword } = user;
 
     return {
       accessToken,
@@ -95,7 +94,9 @@ export const authApi = {
     // Mock implementation based on chithanh branch
     await delay(800);
 
-    const username = (data as RegisterDto & { fullName?: string }).fullName?.trim() || data.email.split("@")[0];
+    const username =
+      (data as RegisterDto & { fullName?: string }).fullName?.trim() ||
+      data.email.split("@")[0];
 
     if (!data.email || !data.password) {
       throw new Error("Email and password are required");
@@ -118,7 +119,9 @@ export const authApi = {
       password: data.password,
       fullName: (data as any).fullName || username,
       avatar: null,
-      codingExperience: (data as RegisterDto & { codingExperience?: string }).codingExperience || "beginner",
+      codingExperience:
+        (data as RegisterDto & { codingExperience?: string })
+          .codingExperience || "beginner",
       dateOfBirth: null,
       createdAt: new Date().toISOString(),
       role: "user",
@@ -128,8 +131,7 @@ export const authApi = {
 
     const accessToken = `mock_access_token_${Date.now()}`;
     const refreshToken = `mock_refresh_token_${Date.now()}`;
-    delete (newUser as any).password;
-    const userWithoutPassword = newUser;
+    const { password, ...userWithoutPassword } = newUser;
 
     return {
       accessToken,
