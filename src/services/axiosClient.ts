@@ -30,6 +30,11 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
+    // If the request opts out of auth redirect, just reject without refresh attempt
+    if (originalRequest?._skipAuthRedirect && error.response?.status === 401) {
+      return Promise.reject(error);
+    }
+
     // If the error is 401 and we haven't already retried, AND it's not a login/refresh request
     if (
       error.response?.status === 401 &&
