@@ -41,6 +41,33 @@ export interface EasyRoadmapResponse {
 }
 
 export type EasyChallengeOptionId = "A" | "B" | "C" | "D";
+export type EasyNodeChallengePromptType = "code_mcq" | "concept_mcq";
+
+export interface EasyNodeChallenge {
+  id: string;
+  type: "multiple_choice";
+  promptType?: EasyNodeChallengePromptType;
+  title: string;
+  question: string;
+  codeSnippet?: {
+    language: "python";
+    code: string;
+  };
+  options: Array<{
+    id: EasyChallengeOptionId;
+    text: string;
+  }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface EasyNodeChallengeReview {
+  selectedOptionId: EasyChallengeOptionId;
+  correctOptionId: EasyChallengeOptionId;
+  correct: boolean;
+  explanation: string;
+  completedAt?: string;
+}
 
 export interface EasyNodeChallengeResponse {
   node: {
@@ -51,25 +78,17 @@ export interface EasyNodeChallengeResponse {
     title: string;
     status: EasyRoadmapNodeStatus;
   };
-  challenge: {
-    id: string;
-    type: "multiple_choice";
-    title: string;
-    question: string;
-    options: Array<{
-      id: EasyChallengeOptionId;
-      text: string;
-    }>;
-    xp: number;
-    estimatedMinutes: number;
-  };
+  challenge: EasyNodeChallenge | null;
+  review?: EasyNodeChallengeReview;
+  message?: string;
 }
 
 export interface SubmitEasyNodeChallengeResponse {
-  correct: boolean;
+  correct?: boolean;
   message: string;
   correctOptionId?: EasyChallengeOptionId;
   explanation?: string;
+  review?: EasyNodeChallengeReview;
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
