@@ -1,26 +1,30 @@
-import React, { useState } from "react";
+import React from "react";
+import { useTheme } from "../../contexts/ThemeContext";
 
 interface AppPreferencesProps {
   theme: "light" | "dark";
   toggleTheme: () => void;
 }
 
-// Đảm bảo export chính xác tên component bằng từ khóa 'export const'
-export const AppPreferences: React.FC<AppPreferencesProps> = ({
-  theme,
-  toggleTheme,
-}) => {
-  const [language, setLanguage] = useState("English (US)");
-  const [haptic, setHaptic] = useState(true);
-  const [scale, setScale] = useState(50);
-  const [brightness, setBrightness] = useState(60);
-  const [fontSize, setFontSize] = useState(40);
-
-  const [protocols, setProtocols] = useState({
-    questAlerts: true,
-    healthWarning: true,
-    worldUpdates: false,
-  });
+export const AppPreferences: React.FC<AppPreferencesProps> = () => {
+  const {
+    theme,
+    toggleTheme,
+    language,
+    setLanguage,
+    haptic,
+    setHaptic,
+    scale,
+    setScale,
+    brightness,
+    setBrightness,
+    fontSize,
+    setFontSize,
+    protocols,
+    setProtocols,
+    t,
+    triggerHaptic,
+  } = useTheme();
 
   return (
     <div
@@ -31,14 +35,14 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
       }`}
     >
       <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
-        🎛️ App Preferences
+        🎛️ {t("appPreferences")}
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* 1. Theme Mode */}
         <div className="space-y-2">
           <label className="text-xs text-on-surface-variant font-medium block">
-            Theme Mode
+            {t("themeMode")}
           </label>
           <button
             onClick={toggleTheme}
@@ -49,12 +53,10 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
             }`}
           >
             <span>
-              {theme === "dark"
-                ? "Cyberpunk Dark (Active)"
-                : "Clean Light Mode (Active)"}
+              {theme === "dark" ? t("cyberpunkDark") : t("cleanLight")}
             </span>
             <span className="text-xs text-on-surface-variant">
-              ❖ Click to toggle
+              {t("clickToToggle")}
             </span>
           </button>
         </div>
@@ -62,7 +64,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
         {/* 2. Core Language */}
         <div className="space-y-2">
           <label className="text-xs text-on-surface-variant font-medium block">
-            Core Language
+            {t("coreLanguage")}
           </label>
           <div className="relative">
             <select
@@ -74,8 +76,8 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
                   : "bg-slate-50 border-slate-200 text-slate-800"
               }`}
             >
-              <option>English (US)</option>
-              <option>Tiếng Việt (VN)</option>
+              <option value="English (US)">English (US)</option>
+              <option value="Tiếng Việt (VN)">Tiếng Việt (VN)</option>
             </select>
             <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-xs">
               ▼
@@ -86,7 +88,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
         {/* 3. Haptic Feedback */}
         <div className="space-y-2">
           <label className="text-xs text-on-surface-variant font-medium block">
-            Haptic Feedback
+            {t("hapticFeedback")}
           </label>
           <div
             className={`grid grid-cols-2 p-1 border rounded-xl ${theme === "dark" ? "bg-[#040d14] border-[#14232e]" : "bg-slate-100 border-slate-200"}`}
@@ -99,7 +101,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
                   : "text-on-surface-variant"
               }`}
             >
-              ON
+              {t("on")}
             </button>
             <button
               onClick={() => setHaptic(false)}
@@ -109,7 +111,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
                   : "text-on-surface-variant"
               }`}
             >
-              OFF
+              {t("off")}
             </button>
           </div>
         </div>
@@ -117,15 +119,15 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
         {/* 4. Interface Scale */}
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs text-on-surface-variant font-medium">
-            <label>Interface Scale</label>
+            <label>{t("interfaceScale")}</label>
             <span className="font-mono text-[10px]">{scale}%</span>
           </div>
           <div className="flex items-center gap-2 pt-2">
             <span className="text-on-surface-variant text-xs">🔍</span>
             <input
               type="range"
-              min="25"
-              max="100"
+              min="50"
+              max="150"
               value={scale}
               onChange={(e) => setScale(Number(e.target.value))}
               className="w-full accent-[#7fe3dd] h-1 bg-[#14232e] rounded-lg cursor-pointer"
@@ -137,14 +139,14 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
         {/* 5. System Brightness */}
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs text-on-surface-variant font-medium">
-            <label>System Brightness</label>
+            <label>{t("systemBrightness")}</label>
             <span className="font-mono text-[10px]">{brightness}%</span>
           </div>
           <div className="flex items-center gap-2 pt-2">
             <span className="text-on-surface-variant text-xs">☀️</span>
             <input
               type="range"
-              min="0"
+              min="10"
               max="100"
               value={brightness}
               onChange={(e) => setBrightness(Number(e.target.value))}
@@ -157,7 +159,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
         {/* 6. Master Font Size */}
         <div className="space-y-2">
           <div className="flex justify-between items-center text-xs text-on-surface-variant font-medium">
-            <label>Master Font Size</label>
+            <label>{t("masterFontSize")}</label>
             <span className="font-mono text-[10px]">{fontSize}px</span>
           </div>
           <div className="flex items-center gap-2 pt-2">
@@ -167,7 +169,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
             <input
               type="range"
               min="12"
-              max="64"
+              max="48"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
               className="w-full accent-[#7fe3dd] h-1 bg-[#14232e] rounded-lg cursor-pointer"
@@ -188,10 +190,10 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
         }`}
       >
         <p className="text-xs font-bold tracking-wider text-on-surface-variant uppercase flex items-center gap-2">
-          🔔 Notification Protocols
+          🔔 {t("notificationProtocols")}
         </p>
         <div className="flex flex-wrap gap-6 pt-1">
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-300 cursor-pointer font-medium">
             <input
               type="checkbox"
               checked={protocols.questAlerts}
@@ -200,9 +202,9 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
               }
               className="accent-[#7fe3dd] rounded"
             />
-            Quest Alerts
+            {t("questAlerts")}
           </label>
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-300 cursor-pointer font-medium">
             <input
               type="checkbox"
               checked={protocols.healthWarning}
@@ -211,9 +213,9 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
               }
               className="accent-[#7fe3dd] rounded"
             />
-            Health Warning
+            {t("healthWarning")}
           </label>
-          <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
+          <label className="flex items-center gap-2 text-xs text-slate-800 dark:text-slate-300 cursor-pointer font-medium">
             <input
               type="checkbox"
               checked={protocols.worldUpdates}
@@ -222,7 +224,7 @@ export const AppPreferences: React.FC<AppPreferencesProps> = ({
               }
               className="accent-[#7fe3dd] rounded"
             />
-            World Updates
+            {t("worldUpdates")}
           </label>
         </div>
       </div>

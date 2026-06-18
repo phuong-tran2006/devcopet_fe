@@ -104,12 +104,12 @@ const LandingPage = () => {
               <div className="flex-1 flex items-center justify-center lg:justify-end">
                 <div className="relative w-full max-w-[560px]">
                   {/* Soft glow behind mascot */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/15 via-cyan-400/8 to-secondary-fixed-dim/15 blur-3xl scale-110 pointer-events-none rounded-full" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/15 via-cyan-400/8 to-secondary-fixed-dim/15 blur-3xl scale-110 pointer-events-none rounded-full hidden dark:block" />
                   <TransparentVideo
                     src={heroMascotVideo}
                     className="w-full"
                     keyColor={[0, 200, 0]}
-                    tolerance={80}
+                    tolerance={28}
                   />
                 </div>
               </div>
