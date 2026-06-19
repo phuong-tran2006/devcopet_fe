@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useNavigate, useMatchRoute } from "@tanstack/react-router";
 import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
+import NotificationDropdown from "./NotificationDropdown";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();

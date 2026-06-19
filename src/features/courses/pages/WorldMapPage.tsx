@@ -1322,3 +1322,5 @@ const WorldMapPage = () => {
 };
 
 export default WorldMapPage;
+
+// trigger HMR
