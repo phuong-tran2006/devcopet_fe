@@ -15,12 +15,17 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CourseRouteImport } from './routes/course'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as RoadmapIndexRouteImport } from './routes/roadmap.index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as SettingSettingRouteImport } from './routes/setting/setting'
 import { Route as RoadmapWorldIdRouteImport } from './routes/roadmap.$worldId'
 import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
+import { Route as DashboardRankingsRouteImport } from './routes/dashboard.rankings'
+import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
+import { Route as DashboardActiveRouteImport } from './routes/dashboard.active'
 import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
 import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
 import { Route as LessonLessonIdQuizRouteImport } from './routes/lesson/$lessonId.quiz'
@@ -57,6 +62,11 @@ const LeaderboardRoute = LeaderboardRouteImport.update({
   path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CourseRoute = CourseRouteImport.update({
   id: '/course',
   path: '/course',
@@ -72,6 +82,11 @@ const RoadmapIndexRoute = RoadmapIndexRouteImport.update({
   path: '/',
   getParentRoute: () => RoadmapRoute,
 } as any)
+const DashboardIndexRoute = DashboardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const SettingSettingRoute = SettingSettingRouteImport.update({
   id: '/setting/setting',
   path: '/setting/setting',
@@ -86,6 +101,21 @@ const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
   id: '/lesson/$lessonId',
   path: '/lesson/$lessonId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRankingsRoute = DashboardRankingsRouteImport.update({
+  id: '/rankings',
+  path: '/rankings',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardActiveRoute = DashboardActiveRouteImport.update({
+  id: '/active',
+  path: '/active',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
   id: '/courses/$courseId',
@@ -118,6 +148,7 @@ const RoadmapCourseSlugEasyNodesNodeIdChallengeRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/course': typeof CourseRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -126,9 +157,13 @@ export interface FileRoutesByFullPath {
   '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dashboard/active': typeof DashboardActiveRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/rankings': typeof DashboardRankingsRoute
   '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
   '/roadmap/$worldId': typeof RoadmapWorldIdRoute
   '/setting/setting': typeof SettingSettingRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
   '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
@@ -144,9 +179,13 @@ export interface FileRoutesByTo {
   '/register': typeof RegisterRoute
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dashboard/active': typeof DashboardActiveRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/rankings': typeof DashboardRankingsRoute
   '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
   '/roadmap/$worldId': typeof RoadmapWorldIdRoute
   '/setting/setting': typeof SettingSettingRoute
+  '/dashboard': typeof DashboardIndexRoute
   '/roadmap': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
   '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
@@ -156,6 +195,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/course': typeof CourseRoute
+  '/dashboard': typeof DashboardRouteWithChildren
   '/leaderboard': typeof LeaderboardRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -164,9 +204,13 @@ export interface FileRoutesById {
   '/roadmap': typeof RoadmapRouteWithChildren
   '/auth/callback': typeof AuthCallbackRoute
   '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dashboard/active': typeof DashboardActiveRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/rankings': typeof DashboardRankingsRoute
   '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
   '/roadmap/$worldId': typeof RoadmapWorldIdRoute
   '/setting/setting': typeof SettingSettingRoute
+  '/dashboard/': typeof DashboardIndexRoute
   '/roadmap/': typeof RoadmapIndexRoute
   '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
   '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
@@ -177,6 +221,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/course'
+    | '/dashboard'
     | '/leaderboard'
     | '/login'
     | '/onboarding'
@@ -185,9 +230,13 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/auth/callback'
     | '/courses/$courseId'
+    | '/dashboard/active'
+    | '/dashboard/history'
+    | '/dashboard/rankings'
     | '/lesson/$lessonId'
     | '/roadmap/$worldId'
     | '/setting/setting'
+    | '/dashboard/'
     | '/roadmap/'
     | '/lesson/$lessonId/quiz'
     | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
@@ -203,9 +252,13 @@ export interface FileRouteTypes {
     | '/register'
     | '/auth/callback'
     | '/courses/$courseId'
+    | '/dashboard/active'
+    | '/dashboard/history'
+    | '/dashboard/rankings'
     | '/lesson/$lessonId'
     | '/roadmap/$worldId'
     | '/setting/setting'
+    | '/dashboard'
     | '/roadmap'
     | '/lesson/$lessonId/quiz'
     | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
@@ -214,6 +267,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/course'
+    | '/dashboard'
     | '/leaderboard'
     | '/login'
     | '/onboarding'
@@ -222,9 +276,13 @@ export interface FileRouteTypes {
     | '/roadmap'
     | '/auth/callback'
     | '/courses/$courseId'
+    | '/dashboard/active'
+    | '/dashboard/history'
+    | '/dashboard/rankings'
     | '/lesson/$lessonId'
     | '/roadmap/$worldId'
     | '/setting/setting'
+    | '/dashboard/'
     | '/roadmap/'
     | '/lesson/$lessonId/quiz'
     | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
@@ -234,6 +292,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CourseRoute: typeof CourseRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
   LeaderboardRoute: typeof LeaderboardRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -290,6 +349,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LeaderboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/course': {
       id: '/course'
       path: '/course'
@@ -311,6 +377,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RoadmapIndexRouteImport
       parentRoute: typeof RoadmapRoute
     }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/setting/setting': {
       id: '/setting/setting'
       path: '/setting/setting'
@@ -331,6 +404,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/lesson/$lessonId'
       preLoaderRoute: typeof LessonLessonIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/rankings': {
+      id: '/dashboard/rankings'
+      path: '/rankings'
+      fullPath: '/dashboard/rankings'
+      preLoaderRoute: typeof DashboardRankingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/history': {
+      id: '/dashboard/history'
+      path: '/history'
+      fullPath: '/dashboard/history'
+      preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/active': {
+      id: '/dashboard/active'
+      path: '/active'
+      fullPath: '/dashboard/active'
+      preLoaderRoute: typeof DashboardActiveRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/courses/$courseId': {
       id: '/courses/$courseId'
@@ -370,6 +464,24 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface DashboardRouteChildren {
+  DashboardActiveRoute: typeof DashboardActiveRoute
+  DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardRankingsRoute: typeof DashboardRankingsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
+}
+
+const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardActiveRoute: DashboardActiveRoute,
+  DashboardHistoryRoute: DashboardHistoryRoute,
+  DashboardRankingsRoute: DashboardRankingsRoute,
+  DashboardIndexRoute: DashboardIndexRoute,
+}
+
+const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
+  DashboardRouteChildren,
+)
+
 interface RoadmapRouteChildren {
   RoadmapWorldIdRoute: typeof RoadmapWorldIdRoute
   RoadmapIndexRoute: typeof RoadmapIndexRoute
@@ -404,6 +516,7 @@ const LessonLessonIdRouteWithChildren = LessonLessonIdRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CourseRoute: CourseRoute,
+  DashboardRoute: DashboardRouteWithChildren,
   LeaderboardRoute: LeaderboardRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
