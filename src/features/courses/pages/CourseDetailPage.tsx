@@ -94,7 +94,7 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
   };
 
   const status = getStatus();
-  const isClickable = status !== "locked";
+  const isClickable = status === "mastered" || status === "in_progress";
 
   const iconMap = {
     mastered: "check_circle",
