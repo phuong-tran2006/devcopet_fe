@@ -8,6 +8,7 @@ import {
   type EasyNodeChallengeReview,
   type SubmitEasyNodeChallengeResponse,
 } from "../api/course.api";
+import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
@@ -771,6 +772,18 @@ const EasyNodeChallengePage = () => {
           )}
         </section>
       </div>
+
+      {data && (
+        <RoadmapAiHelper
+          nodeId={nodeId ?? null}
+          nodeTitle={data.node.title}
+          nodeStatus={data.node.status}
+          mode="easy"
+          accentColor="#63f1e3"
+          accentGradient="linear-gradient(to right, #00a99d, #223746)"
+          accentGlowWeak="rgba(99,241,227,0.2)"
+        />
+      )}
     </main>
   );
 };

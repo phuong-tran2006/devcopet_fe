@@ -10,6 +10,7 @@ import {
   type MediumNodeChallengeResponse,
   type SubmitMediumNodeChallengeResponse,
 } from "../api/course.api";
+import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 
@@ -1003,6 +1004,18 @@ const MediumNodeChallengePage = () => {
             </div>
           )}
         </div>
+      )}
+
+      {data && (
+        <RoadmapAiHelper
+          nodeId={nodeId ?? null}
+          nodeTitle={data.node.title}
+          nodeStatus={data.node.status}
+          mode="medium"
+          accentColor="#63f1e3"
+          accentGradient="linear-gradient(to right, #00a99d, #223746)"
+          accentGlowWeak="rgba(99,241,227,0.2)"
+        />
       )}
     </main>
   );

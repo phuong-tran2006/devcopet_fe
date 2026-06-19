@@ -435,4 +435,131 @@
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.4) transparent;
   }
+
+  /* ── AI Helper Panel ─────────────────────────────────────── */
+
+  .ai-helper-panel {
+    animation: ai-panel-slide-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .ai-helper-fab {
+    animation: ai-fab-appear 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .ai-sparkle-icon {
+    animation: ai-sparkle-pulse 2.4s ease-in-out infinite;
+  }
+
+  .ai-sparkle-spin {
+    animation: ai-spin 1s linear infinite;
+  }
+
+  .ai-shimmer {
+    animation: ai-shimmer 1.6s ease-in-out infinite;
+  }
+
+  .ai-answer-appear {
+    animation: ai-answer-fade 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .ai-prompt-chip {
+    transition:
+      background-color 0.2s,
+      border-color 0.2s,
+      transform 0.15s,
+      opacity 0.2s;
+  }
+
+  .ai-prompt-chip:not(:disabled):hover {
+    filter: brightness(1.1);
+  }
+
+  .ai-answer-content .markdown-body {
+    font-size: 13px;
+  }
+
+  .ai-answer-content .markdown-body p {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .ai-answer-content .markdown-body h1,
+  .ai-answer-content .markdown-body h2,
+  .ai-answer-content .markdown-body h3 {
+    font-size: 15px;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  .ai-answer-content .markdown-body ul,
+  .ai-answer-content .markdown-body ol {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  @keyframes ai-panel-slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes ai-fab-appear {
+    from {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes ai-sparkle-pulse {
+    0%,
+    100% {
+      filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.2));
+      transform: scale(1);
+    }
+    50% {
+      filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
+      transform: scale(1.08);
+    }
+  }
+
+  @keyframes ai-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes ai-shimmer {
+    0% {
+      opacity: 0.35;
+    }
+    50% {
+      opacity: 0.7;
+    }
+    100% {
+      opacity: 0.35;
+    }
+  }
+
+  @keyframes ai-answer-fade {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 }

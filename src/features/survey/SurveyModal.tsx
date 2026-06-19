@@ -428,7 +428,7 @@ const SurveyModal = ({
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const modalRef = useRef<HTMLDivElement>(null);
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const totalQuestions = surveyQuestions.length;
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
