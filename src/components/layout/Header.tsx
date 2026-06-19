@@ -68,7 +68,14 @@ const Header = () => {
         <div className="flex items-center gap-6">
           {isAuthenticated ? (
             <>
-              <NotificationDropdown />
+              <button
+                onClick={() => triggerHaptic(40)}
+                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  notifications
+                </span>
+              </button>
               <button
                 onClick={toggleTheme}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
