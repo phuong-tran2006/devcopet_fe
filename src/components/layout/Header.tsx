@@ -3,6 +3,7 @@ import React from "react";
 import { Link, useNavigate, useMatchRoute } from "@tanstack/react-router";
 import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
+import NotificationDropdown from "./NotificationDropdown";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
@@ -67,14 +68,7 @@ const Header = () => {
         <div className="flex items-center gap-6">
           {isAuthenticated ? (
             <>
-              <button
-                onClick={() => triggerHaptic(40)}
-                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  notifications
-                </span>
-              </button>
+              <NotificationDropdown />
               <button
                 onClick={toggleTheme}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
