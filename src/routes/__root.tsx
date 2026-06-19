@@ -17,6 +17,22 @@ function RootContent() {
         </div>
         <Footer />
         <TanStackRouterDevtools />
+        {/* Global Brightness Overlay */}
+        <div
+          id="brightness-overlay"
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            backgroundColor: "black",
+            pointerEvents: "none",
+            zIndex: 999999,
+            opacity: "var(--brightness-opacity, 0)",
+            transition: "opacity 0.15s ease",
+          }}
+        />
       </div>
     </ThemeProvider>
   );

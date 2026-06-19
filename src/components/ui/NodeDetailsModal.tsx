@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { useTheme } from "../../contexts/ThemeContext";
 import type {
   EasyRoadmapNode,
   MediumRoadmapNode,
@@ -16,18 +17,42 @@ export interface NodeDetailsProps {
   node: RoadmapDetailNode | null;
 }
 
+const DIFF_CONFIG = {
+  easy: {
+    accent: "#97CADB",
+    gradient: "linear-gradient(90deg, #97CADB, #6aafc5)",
+    glowWeak: "rgba(151,202,219,0.20)",
+    buttonHover: "#b7e4ef",
+    textOnAccent: "#001e2e",
+  },
+  medium: {
+    accent: "#018ABE",
+    gradient: "linear-gradient(90deg, #018ABE, #016490)",
+    glowWeak: "rgba(1,138,190,0.20)",
+    buttonHover: "#029cd6",
+    textOnAccent: "#ffffff",
+  },
+  hard: {
+    accent: "#3a7fc1",
+    gradient: "linear-gradient(90deg, #3a7fc1, #02457A)",
+    glowWeak: "rgba(2,69,122,0.25)",
+    buttonHover: "#4e96db",
+    textOnAccent: "#ffffff",
+  },
+} as const;
+
 const statusCopy = {
   completed: {
     label: "Completed",
     icon: "done",
     button: "Review",
-    badge: "bg-[#97CADB]/15 text-[#97CADB] border-[#97CADB]/30",
+    badge: "",
   },
   available: {
     label: "Available",
     icon: "play_arrow",
     button: "Start",
-    badge: "bg-[#97CADB]/15 text-[#97CADB] border-[#97CADB]/30",
+    badge: "",
   },
   locked: {
     label: "Locked",
@@ -50,6 +75,8 @@ const NodeDetailsModal = ({
 }: NodeDetailsProps) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -87,6 +114,8 @@ const NodeDetailsModal = ({
     ? `${node.estimatedMinutes || 1} min`
     : EASY_CHECKPOINT_DURATION;
 
+  const cfg = DIFF_CONFIG[node.difficulty || "easy"];
+
   const openChallenge = () => {
     if (isActionDisabled) return;
 
@@ -117,6 +146,14 @@ const NodeDetailsModal = ({
       <div
         ref={modalRef}
         className="relative w-full max-w-[420px] bg-surface-container-high border border-outline/20 rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.4)] overflow-hidden flex flex-col p-7 animate-in fade-in zoom-in-95 duration-300"
+        style={
+          {
+            "--accent-color": cfg.accent,
+            "--accent-glow": cfg.glowWeak,
+            "--accent-text": isLight ? "#000000" : cfg.textOnAccent,
+            "--accent-hover": cfg.buttonHover,
+          } as React.CSSProperties
+        }
       >
         <button
           onClick={onClose}
@@ -127,19 +164,42 @@ const NodeDetailsModal = ({
         </button>
 
         <div className="flex items-center gap-2 mb-5">
-          <span className="px-3 py-1 rounded-full border border-[#97CADB]/30 bg-[#97CADB]/10 text-[#97CADB] text-[12px] font-extrabold tracking-widest">
+          <span
+            className="px-3 py-1 rounded-full border text-[12px] font-extrabold tracking-widest"
+            style={{
+              borderColor: `${cfg.accent}4d`,
+              backgroundColor: `${cfg.accent}1a`,
+              color: cfg.accent,
+            }}
+          >
             {node.label}
           </span>
           <span
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest ${copy.badge}`}
+            style={
+              node.status !== "locked"
+                ? {
+                    borderColor: `${cfg.accent}4d`,
+                    backgroundColor: `${cfg.accent}1a`,
+                    color: cfg.accent,
+                  }
+                : {}
+            }
           >
             <span className="material-symbols-outlined text-[14px]">
               {copy.icon}
             </span>
-          {copy.label}
+            {copy.label}
           </span>
           {isMediumNode && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-[#018ABE]/30 bg-[#018ABE]/10 text-[#97CADB] text-[10px] font-bold uppercase tracking-widest">
+            <span
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest"
+              style={{
+                borderColor: `${cfg.accent}4d`,
+                backgroundColor: `${cfg.accent}1a`,
+                color: cfg.accent,
+              }}
+            >
               <span className="material-symbols-outlined text-[14px]">
                 {node.type === "drag_drop" ? "drag_indicator" : "quiz"}
               </span>
@@ -182,13 +242,16 @@ const NodeDetailsModal = ({
           className={`w-full font-extrabold text-[14px] tracking-wider py-4 rounded-xl transition-all duration-300 uppercase ${
             isActionDisabled
               ? "bg-on-surface/8 text-on-surface-variant/45 cursor-not-allowed"
-              : "bg-[#97CADB] text-[#001e2e] hover:bg-[#b7e4ef] hover:scale-[1.01] active:scale-[0.98] shadow-[0_8px_30px_rgba(151,202,219,0.22)]"
+              : "bg-[var(--accent-color)] text-[var(--accent-text)] hover:bg-[var(--accent-hover)] hover:scale-[1.01] active:scale-[0.98] shadow-[0_8px_30px_var(--accent-glow)]"
           }`}
         >
           {copy.button}
         </button>
 
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-[#97CADB] via-[#6aafc5] to-[#018ABE]" />
+        <div
+          className="absolute bottom-0 left-0 w-full h-1"
+          style={{ background: cfg.gradient }}
+        />
       </div>
     </div>
   );

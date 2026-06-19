@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
+import type { KeyboardEvent, PointerEvent, ReactNode } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   courseApi,
   type EasyChallengeOptionId,
   type MediumDragDropChallenge,
+  type MediumNodeChallenge,
   type MediumMultipleChoiceChallenge,
   type MediumNodeChallengeResponse,
   type SubmitMediumNodeChallengeResponse,
 } from "../api/course.api";
+import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 
@@ -17,34 +19,46 @@ const sortOptions = (options: MediumMultipleChoiceChallenge["options"]) =>
     (a, b) => OPTION_ORDER.indexOf(a.id) - OPTION_ORDER.indexOf(b.id),
   );
 
-const extractDropZoneIds = (template: string) => {
-  const matches = [
-    ...template.matchAll(
-      /{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g,
-    ),
-  ];
+const DROP_ZONE_REGEX =
+  /\[(DROP_ZONE_\d+)\]|{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
 
-  return Array.from(
-    new Set(matches.map((match) => match[1] || match[2] || match[3])),
-  );
+const getDropZoneKeyFromMatch = (match: RegExpMatchArray | RegExpExecArray) =>
+  match[1] || match[2] || match[3] || match[4];
+
+const getDropZoneIdAtPoint = (clientX: number, clientY: number) => {
+  const zoneElement = document
+    .elementsFromPoint(clientX, clientY)
+    .map((element) =>
+      element instanceof HTMLElement
+        ? element.closest<HTMLElement>("[data-drop-zone-id]")
+        : null,
+    )
+    .find((element): element is HTMLElement => !!element?.dataset.dropZoneId);
+
+  return zoneElement?.dataset.dropZoneId ?? null;
+};
+
+const extractDropZoneIds = (template: string) => {
+  const matches = [...template.matchAll(DROP_ZONE_REGEX)];
+
+  return Array.from(new Set(matches.map(getDropZoneKeyFromMatch)));
 };
 
 const renderTemplateParts = (
   template: string,
   renderDropZone: (zoneId: string) => ReactNode,
 ) => {
-  const regex =
-    /{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
   const parts: ReactNode[] = [];
   let lastIndex = 0;
   let match: RegExpExecArray | null;
+  const regex = new RegExp(DROP_ZONE_REGEX);
 
   while ((match = regex.exec(template)) !== null) {
     if (match.index > lastIndex) {
       parts.push(template.slice(lastIndex, match.index));
     }
 
-    parts.push(renderDropZone(match[1] || match[2] || match[3]));
+    parts.push(renderDropZone(getDropZoneKeyFromMatch(match)));
     lastIndex = regex.lastIndex;
   }
 
@@ -74,6 +88,84 @@ const CodeSnippetCard = ({
   );
 };
 
+const getChallengeHint = (challenge: MediumNodeChallenge | null) => {
+  if (!challenge) return "";
+
+  return (
+    challenge.hint ||
+    challenge.hints?.find((hint) => hint.text.trim().length > 0)?.text ||
+    ""
+  );
+};
+
+const FeedbackPanel = ({
+  state,
+  message,
+  explanation,
+  hint,
+}: {
+  state: "correct" | "incorrect";
+  message: string;
+  explanation: string;
+  hint: string;
+}) => {
+  const isCorrect = state === "correct";
+
+  return (
+    <div
+      className={`mx-6 mb-6 rounded-xl border px-5 py-5 shadow-[0_0_24px_rgba(99,241,227,0.08)] ${
+        isCorrect
+          ? "border-[#63f1e3]/35 bg-[#10262c]"
+          : "border-amber-300/30 bg-[#241b12]"
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <span
+          className={`material-symbols-outlined mt-0.5 text-[22px] ${
+            isCorrect ? "text-[#63f1e3]" : "text-amber-200"
+          }`}
+        >
+          {isCorrect ? "check_circle" : "error"}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p
+            className={`text-[11px] font-bold uppercase tracking-widest ${
+              isCorrect ? "text-[#63f1e3]" : "text-amber-200"
+            }`}
+          >
+            {isCorrect ? "Success Feedback" : "Feedback"}
+          </p>
+          {message && (
+            <p className="mt-2 text-[15px] font-semibold leading-relaxed text-on-surface">
+              {message}
+            </p>
+          )}
+          {explanation && (
+            <div className="mt-4 rounded-lg border border-white/10 bg-black/15 px-4 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                Explanation
+              </p>
+              <p className="mt-2 text-[14px] leading-relaxed text-on-surface-variant">
+                {explanation}
+              </p>
+            </div>
+          )}
+          {hint && (
+            <div className="mt-3 rounded-lg border border-[#63f1e3]/25 bg-[#63f1e3]/10 px-4 py-3">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                Hint
+              </p>
+              <p className="mt-2 text-[14px] leading-relaxed text-on-surface-variant">
+                {hint}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const MediumNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -84,8 +176,19 @@ const MediumNodeChallengePage = () => {
   const [selectedPoolItemId, setSelectedPoolItemId] = useState<string | null>(
     null,
   );
+  const [draggingPoolItemId, setDraggingPoolItemId] = useState<string | null>(
+    null,
+  );
+  const [dragOverZoneId, setDragOverZoneId] = useState<string | null>(null);
+  const [dragPreview, setDragPreview] = useState<{
+    itemId: string;
+    x: number;
+    y: number;
+  } | null>(null);
   const [result, setResult] =
     useState<SubmitMediumNodeChallengeResponse | null>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +205,7 @@ const MediumNodeChallengePage = () => {
   const dragDropChallenge = isDragDrop
     ? (challenge as MediumDragDropChallenge)
     : null;
+  const canEditDragDrop = !isLockedMode && !isReviewMode && !result;
 
   const options = useMemo(
     () => sortOptions(multipleChoiceChallenge?.options ?? []),
@@ -110,28 +214,33 @@ const MediumNodeChallengePage = () => {
 
   const dropZoneIds = useMemo(
     () =>
-      dragDropChallenge
-        ? extractDropZoneIds(dragDropChallenge.template)
-        : [],
+      dragDropChallenge ? extractDropZoneIds(dragDropChallenge.template) : [],
     [dragDropChallenge],
   );
 
   const reviewDropZoneMap =
     data?.review && "dropZoneMap" in data.review ? data.review.dropZoneMap : {};
+  const canRevealAnswerDetails = isReviewMode || result?.correct === true;
   const correctDropZoneMap =
-    result?.correctDropZoneMap ??
-    (data?.review && "correctDropZoneMap" in data.review
-      ? data.review.correctDropZoneMap
-      : undefined);
+    canRevealAnswerDetails && result?.correctDropZoneMap
+      ? result.correctDropZoneMap
+      : canRevealAnswerDetails &&
+          data?.review &&
+          "correctDropZoneMap" in data.review
+        ? data.review.correctDropZoneMap
+        : undefined;
   const selectedReviewOptionId =
     data?.review && "selectedOptionId" in data.review
       ? data.review.selectedOptionId
       : undefined;
   const correctOptionId =
-    result?.correctOptionId ??
-    (data?.review && "correctOptionId" in data.review
-      ? data.review.correctOptionId
-      : undefined);
+    canRevealAnswerDetails && result?.correctOptionId
+      ? result.correctOptionId
+      : canRevealAnswerDetails &&
+          data?.review &&
+          "correctOptionId" in data.review
+        ? data.review.correctOptionId
+        : undefined;
 
   useEffect(() => {
     if (!nodeId) {
@@ -147,12 +256,32 @@ const MediumNodeChallengePage = () => {
     setSelectedOptionId(null);
     setDropZoneMap({});
     setSelectedPoolItemId(null);
+    setDraggingPoolItemId(null);
+    setDragOverZoneId(null);
+    setDragPreview(null);
     setResult(null);
+    setShowSuccessModal(false);
+    setNextChallengeLoading(false);
 
-    courseApi
-      .getMediumNodeChallenge(nodeId)
-      .then((response) => {
+    Promise.all([
+      courseApi.getMediumNodeChallenge(nodeId),
+      courseSlug
+        ? courseApi.getMediumRoadmap(courseSlug)
+        : Promise.resolve(null),
+    ])
+      .then(([response, roadmap]) => {
         if (!alive) return;
+        if (roadmap) {
+          const nodes = [...roadmap.chapters]
+            .sort((a, b) => a.order - b.order)
+            .flatMap((chapter) =>
+              [...chapter.nodes].sort((a, b) => a.order - b.order),
+            );
+          const index = nodes.findIndex((n) => n.id === nodeId);
+          if (index >= 0) {
+            response.node.label = (index + 1).toString();
+          }
+        }
         setData(response);
         if (response.review) {
           if ("selectedOptionId" in response.review) {
@@ -188,17 +317,61 @@ const MediumNodeChallengePage = () => {
     });
   };
 
+  const goToNextChallenge = async () => {
+    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+
+    setNextChallengeLoading(true);
+    try {
+      const roadmap = await courseApi.getMediumRoadmap(courseSlug);
+      const nodes = [...roadmap.chapters]
+        .sort((a, b) => a.order - b.order)
+        .flatMap((chapter) =>
+          [...chapter.nodes].sort((a, b) => a.order - b.order),
+        );
+      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
+      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
+
+      if (!nextNode) {
+        goBackToRoadmap();
+        return;
+      }
+
+      navigate({
+        to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+        params: {
+          courseSlug,
+          nodeId: nextNode.id,
+        },
+      });
+    } catch (err) {
+      console.error("Unable to open next Medium challenge:", err);
+      goBackToRoadmap();
+    } finally {
+      setNextChallengeLoading(false);
+    }
+  };
+
   const submitChallenge = () => {
     if (!nodeId || !challenge || submitting || result || isReviewMode) return;
 
     setSubmitting(true);
     setSubmitError(null);
 
+    const requiredDropZoneMap = dropZoneIds.reduce<Record<string, string>>(
+      (acc, zoneId) => {
+        if (dropZoneMap[zoneId]) {
+          acc[zoneId] = dropZoneMap[zoneId];
+        }
+        return acc;
+      },
+      {},
+    );
+
     const payload = isMultipleChoice
       ? selectedOptionId
         ? { type: "multiple_choice" as const, selectedOptionId }
         : null
-      : { type: "drag_drop" as const, dropZoneMap };
+      : { type: "drag_drop" as const, dropZoneMap: requiredDropZoneMap };
 
     if (!payload) {
       setSubmitting(false);
@@ -207,7 +380,10 @@ const MediumNodeChallengePage = () => {
 
     courseApi
       .submitMediumNodeChallenge(nodeId, payload)
-      .then((response) => setResult(response))
+      .then((response) => {
+        setResult(response);
+        setShowSuccessModal(response.correct);
+      })
       .catch((err) => {
         setSubmitError(
           err?.response?.data?.message ||
@@ -218,14 +394,124 @@ const MediumNodeChallengePage = () => {
       .finally(() => setSubmitting(false));
   };
 
-  const assignPoolItem = (zoneId: string) => {
-    if (!selectedPoolItemId || isReviewMode || result) return;
+  const assignPoolItemToZone = (zoneId: string, itemId: string) => {
+    if (!canEditDragDrop) return;
 
-    setDropZoneMap((prev) => ({
-      ...prev,
-      [zoneId]: selectedPoolItemId,
-    }));
+    setDropZoneMap((prev) => {
+      const next = Object.fromEntries(
+        Object.entries(prev).filter(
+          ([, mappedItemId]) => mappedItemId !== itemId,
+        ),
+      );
+
+      return {
+        ...next,
+        [zoneId]: itemId,
+      };
+    });
+  };
+
+  const assignSelectedPoolItem = (zoneId: string) => {
+    if (!selectedPoolItemId) return;
+
+    assignPoolItemToZone(zoneId, selectedPoolItemId);
     setSelectedPoolItemId(null);
+  };
+
+  const startPointerPoolItemDrag = (
+    event: PointerEvent<HTMLDivElement>,
+    itemId: string,
+  ) => {
+    if (!canEditDragDrop) return;
+
+    event.preventDefault();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDraggingPoolItemId(itemId);
+    setSelectedPoolItemId(itemId);
+    setDragPreview({ itemId, x: event.clientX, y: event.clientY });
+    setDragOverZoneId(getDropZoneIdAtPoint(event.clientX, event.clientY));
+  };
+
+  const movePointerPoolItemDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (!canEditDragDrop || !draggingPoolItemId) return;
+
+    setDragPreview({
+      itemId: draggingPoolItemId,
+      x: event.clientX,
+      y: event.clientY,
+    });
+    setDragOverZoneId(getDropZoneIdAtPoint(event.clientX, event.clientY));
+  };
+
+  const finishPointerPoolItemDrag = (
+    event: PointerEvent<HTMLDivElement>,
+    itemId: string,
+  ) => {
+    if (!canEditDragDrop) return;
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    const zoneId = getDropZoneIdAtPoint(event.clientX, event.clientY);
+
+    if (zoneId) {
+      assignPoolItemToZone(zoneId, itemId);
+      setSelectedPoolItemId(null);
+    } else {
+      setSelectedPoolItemId(itemId);
+    }
+
+    setDraggingPoolItemId(null);
+    setDragOverZoneId(null);
+    setDragPreview(null);
+  };
+
+  const cancelPointerPoolItemDrag = (event: PointerEvent<HTMLDivElement>) => {
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+
+    setDraggingPoolItemId(null);
+    setDragOverZoneId(null);
+    setDragPreview(null);
+  };
+
+  const selectPoolItemWithKeyboard = (
+    event: KeyboardEvent<HTMLDivElement>,
+    itemId: string,
+  ) => {
+    if (!canEditDragDrop || (event.key !== "Enter" && event.key !== " ")) {
+      return;
+    }
+
+    event.preventDefault();
+    setSelectedPoolItemId(itemId);
+  };
+
+  const resetDragDropAnswers = () => {
+    if (!canEditDragDrop) return;
+
+    setDropZoneMap({});
+    setSelectedPoolItemId(null);
+    setDraggingPoolItemId(null);
+    setDragOverZoneId(null);
+    setDragPreview(null);
+    setSubmitError(null);
+  };
+
+  const handleTryAgain = () => {
+    if (isReviewMode || isLockedMode || !result || result.correct) return;
+
+    setSelectedOptionId(null);
+    setSelectedPoolItemId(null);
+    setDraggingPoolItemId(null);
+    setDragOverZoneId(null);
+    setDragPreview(null);
+    setDropZoneMap({});
+    setResult(null);
+    setShowSuccessModal(false);
+    setSubmitError(null);
   };
 
   const getPoolItemText = (itemId?: string) =>
@@ -260,10 +546,14 @@ const MediumNodeChallengePage = () => {
   };
 
   const isDropZoneWrong = (zoneId: string) => {
+    if (result && !result.correct && !isReviewMode) {
+      return !!dropZoneMap[zoneId];
+    }
     if (!correctDropZoneMap) return false;
     const selectedMap = isReviewMode ? reviewDropZoneMap : dropZoneMap;
     return (
-      !!selectedMap?.[zoneId] && selectedMap[zoneId] !== correctDropZoneMap[zoneId]
+      !!selectedMap?.[zoneId] &&
+      selectedMap[zoneId] !== correctDropZoneMap[zoneId]
     );
   };
 
@@ -275,6 +565,32 @@ const MediumNodeChallengePage = () => {
       ? !!selectedOptionId
       : dropZoneIds.length > 0 &&
         dropZoneIds.every((zoneId) => !!dropZoneMap[zoneId]));
+  const feedbackState = result
+    ? result.correct
+      ? "correct"
+      : "incorrect"
+    : data?.review
+      ? data.review.correct
+        ? "correct"
+        : "incorrect"
+      : null;
+  const feedbackMessage =
+    result?.message ||
+    (data?.review
+      ? data.review.correct
+        ? "Challenge completed."
+        : "Review your previous attempt."
+      : "");
+  const shouldShowLearningDetails = result?.correct === true || isReviewMode;
+  const feedbackExplanation = shouldShowLearningDetails
+    ? result?.explanation ||
+      data?.review?.explanation ||
+      challenge?.explanation ||
+      ""
+    : "";
+  const feedbackHint = shouldShowLearningDetails
+    ? getChallengeHint(challenge)
+    : "";
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-[#071217] px-5 py-9 text-on-surface md:px-8">
@@ -315,7 +631,9 @@ const MediumNodeChallengePage = () => {
               </h1>
               <p className="mt-2 text-[15px] text-on-surface-variant">
                 {data.node.title} •{" "}
-                {challenge.type === "drag_drop" ? "Drag Drop" : "Multiple Choice"}{" "}
+                {challenge.type === "drag_drop"
+                  ? "Drag Drop"
+                  : "Multiple Choice"}{" "}
                 • {challenge.xp} XP • {challenge.estimatedMinutes} min
               </p>
             </div>
@@ -367,37 +685,83 @@ const MediumNodeChallengePage = () => {
                 {dragDropChallenge && (
                   <div className="grid gap-5 p-6 lg:grid-cols-[1fr_260px]">
                     <div className="rounded-xl border border-[#263b44] bg-[#0b151b] p-5">
-                      <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                        Template
-                      </p>
-                      <div className="whitespace-pre-wrap font-mono text-[15px] leading-8 text-on-surface">
-                        {renderTemplateParts(dragDropChallenge.template, (zoneId) => {
-                          const selectedMap = isReviewMode
-                            ? reviewDropZoneMap
-                            : dropZoneMap;
-                          const selectedItemId = selectedMap?.[zoneId];
-                          const correct = isDropZoneCorrect(zoneId);
-                          const wrong = isDropZoneWrong(zoneId);
+                      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                            Template
+                          </p>
+                          <p className="mt-1 text-[12px] text-on-surface-variant">
+                            Drag a pool item into a drop zone, or click an item
+                            then click a drop zone.
+                          </p>
+                        </div>
+                        {canEditDragDrop && (
+                          <button
+                            type="button"
+                            onClick={resetDragDropAnswers}
+                            className="rounded-lg border border-[#263b44] px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3]"
+                          >
+                            Reset
+                          </button>
+                        )}
+                      </div>
+                      <div className="whitespace-pre-wrap rounded-xl border border-[#1f333c] bg-[#071217] p-4 font-mono text-[15px] leading-10 text-on-surface">
+                        {renderTemplateParts(
+                          dragDropChallenge.template,
+                          (zoneId) => {
+                            const selectedMap = isReviewMode
+                              ? reviewDropZoneMap
+                              : dropZoneMap;
+                            const selectedItemId = selectedMap?.[zoneId];
+                            const correctItemId = correctDropZoneMap?.[zoneId];
+                            const correct = isDropZoneCorrect(zoneId);
+                            const wrong = isDropZoneWrong(zoneId);
+                            const canAssign =
+                              canEditDragDrop &&
+                              (!!selectedPoolItemId || !!draggingPoolItemId);
+                            const isDragTarget = dragOverZoneId === zoneId;
+                            const isDraggingAnyItem =
+                              canEditDragDrop && !!draggingPoolItemId;
 
-                          return (
-                            <button
-                              key={zoneId}
-                              type="button"
-                              onClick={() => assignPoolItem(zoneId)}
-                              className={`mx-1 inline-flex min-h-[34px] min-w-[104px] items-center justify-center rounded-lg border px-3 py-1 font-sans text-[13px] font-bold ${
-                                correct
-                                  ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
-                                  : wrong
-                                    ? "border-[#ef4444] bg-[#ef4444]/12 text-red-100"
-                                    : "border-[#63f1e3]/35 bg-[#13282d] text-on-surface"
-                              }`}
-                            >
-                              {selectedItemId
-                                ? getPoolItemText(selectedItemId)
-                                : zoneId}
-                            </button>
-                          );
-                        })}
+                            return (
+                              <button
+                                key={zoneId}
+                                data-drop-zone-id={zoneId}
+                                type="button"
+                                onClick={() => assignSelectedPoolItem(zoneId)}
+                                disabled={!canEditDragDrop}
+                                className={`mx-1 inline-flex min-h-[46px] w-[156px] items-center justify-center rounded-lg border px-3 py-2 align-middle font-sans text-[13px] font-bold transition disabled:cursor-default ${
+                                  correct
+                                    ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
+                                    : wrong
+                                      ? "border-[#ef4444] bg-[#ef4444]/12 text-red-100"
+                                      : isDragTarget
+                                        ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3] shadow-[0_0_24px_rgba(99,241,227,0.28)]"
+                                        : selectedItemId
+                                          ? "border-blue-400 bg-blue-500/15 text-blue-100 shadow-[0_0_16px_rgba(59,130,246,0.16)]"
+                                          : isDraggingAnyItem
+                                            ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
+                                            : canAssign
+                                              ? "border-gray-400 bg-gray-500/15 text-gray-200 shadow-[0_0_14px_rgba(148,163,184,0.14)]"
+                                              : "border-dashed border-gray-500/70 bg-gray-500/10 text-gray-300"
+                                }`}
+                              >
+                                <span className="flex flex-col items-center leading-tight">
+                                  <span>
+                                    {selectedItemId
+                                      ? getPoolItemText(selectedItemId)
+                                      : zoneId}
+                                  </span>
+                                  {wrong && correctItemId && (
+                                    <span className="mt-1 text-[10px] font-semibold text-[#63f1e3]">
+                                      Correct: {getPoolItemText(correctItemId)}
+                                    </span>
+                                  )}
+                                </span>
+                              </button>
+                            );
+                          },
+                        )}
                       </div>
                     </div>
 
@@ -405,27 +769,45 @@ const MediumNodeChallengePage = () => {
                       <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
                         Pool Items
                       </p>
+                      {selectedPoolItemId && canEditDragDrop && (
+                        <p className="mb-3 rounded-lg border border-[#63f1e3]/25 bg-[#63f1e3]/10 px-3 py-2 text-[12px] font-semibold text-[#63f1e3]">
+                          Selected: {getPoolItemText(selectedPoolItemId)}
+                        </p>
+                      )}
                       <div className="flex flex-col gap-3">
                         {dragDropChallenge.poolItems.map((item) => {
                           const used = Object.values(dropZoneMap).includes(
                             item.id,
                           );
                           return (
-                            <button
+                            <div
                               key={item.id}
-                              type="button"
-                              disabled={isReviewMode || !!result}
-                              onClick={() => setSelectedPoolItemId(item.id)}
-                              className={`rounded-lg border px-4 py-3 text-left text-[14px] font-bold transition ${
-                                selectedPoolItemId === item.id
-                                  ? "border-[#63f1e3] bg-[#63f1e3]/12 text-[#63f1e3]"
-                                  : used
-                                    ? "border-[#263b44] bg-[#10191f] text-on-surface-variant/55"
-                                    : "border-[#263b44] bg-[#10191f] text-on-surface-variant hover:text-on-surface"
+                              role="button"
+                              tabIndex={canEditDragDrop ? 0 : -1}
+                              aria-disabled={!canEditDragDrop}
+                              onPointerDown={(event) =>
+                                startPointerPoolItemDrag(event, item.id)
+                              }
+                              onPointerMove={movePointerPoolItemDrag}
+                              onPointerUp={(event) =>
+                                finishPointerPoolItemDrag(event, item.id)
+                              }
+                              onPointerCancel={cancelPointerPoolItemDrag}
+                              onKeyDown={(event) =>
+                                selectPoolItemWithKeyboard(event, item.id)
+                              }
+                              className={`flex min-h-[56px] touch-none select-none items-center rounded-lg border px-4 py-3 text-left text-[14px] font-bold transition ${
+                                draggingPoolItemId === item.id
+                                  ? "cursor-grabbing border-[#63f1e3] bg-[#63f1e3]/12 text-[#63f1e3] opacity-45"
+                                  : selectedPoolItemId === item.id
+                                    ? "cursor-grab border-[#63f1e3] bg-[#63f1e3]/12 text-[#63f1e3]"
+                                    : used
+                                      ? "cursor-grab border-[#263b44] bg-[#10191f] text-on-surface-variant/55"
+                                      : "cursor-grab border-[#263b44] bg-[#10191f] text-on-surface-variant hover:text-on-surface"
                               }`}
                             >
                               {item.text}
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
@@ -439,18 +821,26 @@ const MediumNodeChallengePage = () => {
                   </p>
                 )}
 
-                {(result || data.review) && (
-                  <div className="mx-6 mb-6 rounded-lg border border-[#63f1e3]/25 bg-[#10262c] px-5 py-4">
-                    <p className="text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                      Feedback
-                    </p>
-                    <p className="mt-2 text-[14px] leading-relaxed text-on-surface-variant">
-                      {result?.explanation ||
-                        data.review?.explanation ||
-                        result?.message}
-                    </p>
-                  </div>
+                {feedbackState && (
+                  <FeedbackPanel
+                    state={feedbackState}
+                    message={feedbackMessage}
+                    explanation={feedbackExplanation}
+                    hint={feedbackHint}
+                  />
                 )}
+
+                {result &&
+                  !result.correct &&
+                  !isReviewMode &&
+                  !isLockedMode && (
+                    <button
+                      onClick={handleTryAgain}
+                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
+                    >
+                      Try Again
+                    </button>
+                  )}
 
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
@@ -484,6 +874,23 @@ const MediumNodeChallengePage = () => {
                   data.review?.explanation ||
                   "Complete this Medium checkpoint to continue through the roadmap."}
               </p>
+              {result && !result.correct && !isReviewMode && !isLockedMode && (
+                <button
+                  onClick={handleTryAgain}
+                  className="mt-5 w-full rounded-xl bg-[#63f1e3] px-4 py-3 text-[12px] font-extrabold uppercase tracking-widest text-[#052023] transition hover:bg-[#86fff4]"
+                >
+                  Try Again
+                </button>
+              )}
+              {result?.correct && !isReviewMode && (
+                <button
+                  onClick={goToNextChallenge}
+                  disabled={nextChallengeLoading}
+                  className="mt-5 w-full rounded-xl bg-[#63f1e3] px-4 py-3 text-[12px] font-extrabold uppercase tracking-widest text-[#052023] transition hover:bg-[#86fff4] disabled:cursor-wait disabled:opacity-70"
+                >
+                  {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                </button>
+              )}
             </div>
             <button
               onClick={goBackToRoadmap}
@@ -492,7 +899,123 @@ const MediumNodeChallengePage = () => {
               Back to Roadmap
             </button>
           </aside>
+
+          {showSuccessModal && result?.correct && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+              <div className="relative w-full max-w-[480px] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                <button
+                  onClick={() => setShowSuccessModal(false)}
+                  className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+                  aria-label="Close result"
+                >
+                  <span className="material-symbols-outlined text-[22px]">
+                    close
+                  </span>
+                </button>
+
+                <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
+                    <span className="material-symbols-outlined text-[46px]">
+                      star
+                    </span>
+                  </div>
+
+                  <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                    Mission
+                    <br />
+                    Accomplished
+                  </h2>
+
+                  <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#1b3440]/70 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
+                        <span className="material-symbols-outlined text-[24px]">
+                          psychology
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                          “{result.message || "Correct. Nice work."}”
+                        </p>
+                        {result.explanation && (
+                          <p className="mt-2 text-[12px] leading-relaxed text-on-surface-variant/80">
+                            {result.explanation}
+                          </p>
+                        )}
+                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                          Axo-Script
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-7 grid grid-cols-2 gap-4">
+                    <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
+                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                        Reward
+                      </p>
+                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
+                        +{challenge.xp}
+                      </p>
+                      <p className="text-[18px] font-bold text-[#63f1e3]">XP</p>
+                    </div>
+                    <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
+                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                        Bonus
+                      </p>
+                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
+                        +10
+                      </p>
+                      <p className="text-[18px] font-bold text-[#f5c6ff]">
+                        Stars
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={goToNextChallenge}
+                    disabled={nextChallengeLoading}
+                    className="mt-7 w-full rounded-lg bg-[#63f1e3] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#052023] shadow-[0_10px_28px_rgba(99,241,227,0.24)] transition hover:bg-[#86fff4] disabled:cursor-wait disabled:opacity-70"
+                  >
+                    {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                    <span className="ml-2">→</span>
+                  </button>
+
+                  <button
+                    onClick={() => setShowSuccessModal(false)}
+                    className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
+                  >
+                    Review Mission
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {dragPreview && canEditDragDrop && (
+            <div
+              className="pointer-events-none fixed z-[140] flex min-h-[56px] w-[220px] -translate-x-1/2 -translate-y-1/2 items-center rounded-lg border border-[#63f1e3] bg-[#123139] px-4 py-3 text-left text-[14px] font-extrabold text-[#bffff9] shadow-[0_0_28px_rgba(99,241,227,0.28)]"
+              style={{
+                left: dragPreview.x,
+                top: dragPreview.y,
+              }}
+            >
+              {getPoolItemText(dragPreview.itemId)}
+            </div>
+          )}
         </div>
+      )}
+
+      {data && (
+        <RoadmapAiHelper
+          nodeId={nodeId ?? null}
+          nodeTitle={data.node.title}
+          nodeStatus={data.node.status}
+          mode="medium"
+          accentColor="#63f1e3"
+          accentGradient="linear-gradient(to right, #00a99d, #223746)"
+          accentGlowWeak="rgba(99,241,227,0.2)"
+        />
       )}
     </main>
   );

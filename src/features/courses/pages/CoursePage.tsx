@@ -189,6 +189,87 @@ const CoursePage = () => {
               </div>
             </div>
           </div>
+          {/* update thêm python dsa course */}
+          {/* DSA Python Card */}
+          <div className="bg-surface-container rounded-xl overflow-hidden border border-on-surface/10 flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-[280px] flex-shrink-0">
+            {/* Top Banner section */}
+            <div className="h-[90px] bg-primary-container relative flex items-center justify-center">
+              {/* Python SVG Icon */}
+              <svg
+                viewBox="0 0 110 110"
+                className="w-[50px] h-[50px] group-hover:scale-105 transition-transform duration-500 ease-out"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fill="#387EB8"
+                  d="M53.79,3.08C25.07,3.08,21.84,15.53,21.84,15.53l0.04,12.78h32.61v4.54H16.14c0,0-15.01-1.74-15.01,23.18  c0,24.91,12.98,24.28,12.98,24.28h7.24v-11.4c0,0-0.12-14.28,14.07-14.28h22.25c0,0,13.62,0.11,13.62-13.25V17.06  C71.3,17.06,73.5,3.08,53.79,3.08z M38.45,9.66c2.61,0,4.72,2.11,4.72,4.72c0,2.61-2.11,4.72-4.72,4.72c-2.61,0-4.72-2.11-4.72-4.72  C33.73,11.78,35.84,9.66,38.45,9.66z"
+                />
+                <path
+                  fill="#FFE052"
+                  d="M54.89,106.92c28.72,0,31.95-12.45,31.95-12.45l-0.04-12.78H54.19v-4.54h38.35c0,0,15.01,1.74,15.01-23.18  c0-24.91-12.98-24.28-12.98-24.28h-7.24v11.4c0,0,0.12,14.28-14.07,14.28H50.99c0,0-13.62-0.11-13.62,13.25v24.32  C37.38,92.94,35.18,106.92,54.89,106.92z M70.23,100.34c-2.61,0-4.72-2.11-4.72-4.72c0-2.61,2.11-4.72,4.72-4.72  c2.61,0,4.72,2.11,4.72,4.72C74.95,98.22,72.84,100.34,70.23,100.34z"
+                />
+              </svg>
+            </div>
+
+            {/* Content section */}
+            <div className="p-4 flex-1 flex flex-col">
+              <div className="flex justify-between items-start mb-1">
+                <h3 className="font-headline-sm text-[16px] text-on-surface">
+                  DSA Python
+                </h3>
+                <button className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg hover:bg-surface-container-high hover:text-on-surface transition-colors flex items-center justify-center">
+                  <span className="material-symbols-outlined text-[14px]">
+                    data_object
+                  </span>
+                </button>
+              </div>
+
+              <p className="font-body-sm text-on-surface-variant text-[11px] leading-relaxed mb-3 line-clamp-2">
+                Master Data Structures and Algorithms with Python. Learn to
+                solve complex problems efficiently.
+              </p>
+
+              <div className="flex gap-2 mb-3">
+                <div className="bg-surface-container rounded-lg p-2 flex-1">
+                  <div className="font-label-sm text-[8px] text-on-surface-variant tracking-widest mb-0.5 uppercase">
+                    UNITS
+                  </div>
+                  <div className="text-on-surface text-[12px] font-semibold">
+                    12 Units
+                  </div>
+                </div>
+                <div className="bg-surface-container rounded-lg p-2 flex-1">
+                  <div className="font-label-sm text-[8px] text-on-surface-variant tracking-widest mb-0.5 uppercase">
+                    REWARD
+                  </div>
+                  <div className="text-on-surface text-[12px] font-semibold">
+                    1,500 XP
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-auto">
+                <div className="flex justify-between text-[10px] font-bold mb-1.5">
+                  <span className="text-on-surface">Progress</span>
+                  <span className="text-primary-fixed-dim">0%</span>
+                </div>
+                <div className="h-1 bg-surface-container rounded-full overflow-hidden mb-3">
+                  <div className="h-full bg-primary-fixed-dim w-[0%] rounded-full shadow-[0_0_10px_rgba(0,218,248,0.5)]"></div>
+                </div>
+
+                <Link
+                  to="/courses/$courseId"
+                  params={{ courseId: "python-dsa" }}
+                  className="w-full bg-primary-fixed-dim text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)]"
+                >
+                  Start Course{" "}
+                  <span className="material-symbols-outlined text-[14px]">
+                    arrow_forward
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </main>

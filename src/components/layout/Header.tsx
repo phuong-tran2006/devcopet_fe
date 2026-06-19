@@ -4,13 +4,14 @@ import { Link, useNavigate, useMatchRoute } from "@tanstack/react-router";
 import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
 
-const NavLink = ({ to, label, exact = false }) => {
+const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
   const isActive = matchRoute({ to, fuzzy: !exact });
 
   return (
     <Link
       to={to}
+      onClick={onClick}
       className={`font-body-md text-body-md transition-colors ${isActive ? "text-primary-fixed-dim border-b-2 border-primary-fixed-dim pb-1" : "text-on-surface-variant hover:text-on-surface"}`}
     >
       {label}
@@ -20,7 +21,7 @@ const NavLink = ({ to, label, exact = false }) => {
 
 const Header = () => {
   const { isAuthenticated, user, logout } = useAuthStore();
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, t, triggerHaptic } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -34,22 +35,42 @@ const Header = () => {
         <div className="flex items-center gap-12">
           <Link
             to="/"
+            onClick={() => triggerHaptic(40)}
             className="font-headline-sm text-headline-sm tracking-tighter text-primary-fixed-dim font-bold"
           >
             DevCopet
           </Link>
           <div className="hidden md:flex gap-8 items-center">
-            <NavLink to="/course" label="Course" />
-            <NavLink to="/roadmap" label="Roadmap" />
-            <NavLink to="/dashboard" label="Arena" />
-            <NavLink to="/leaderboard" label="LeaderBoard" />
+            <NavLink
+              to="/course"
+              label={t("course")}
+              onClick={() => triggerHaptic(40)}
+            />
+            <NavLink
+              to="/roadmap"
+              label={t("roadmap")}
+              onClick={() => triggerHaptic(40)}
+            />
+            <NavLink
+              to="/dashboard"
+              label={t("arena")}
+              onClick={() => triggerHaptic(40)}
+            />
+            <NavLink
+              to="/leaderboard"
+              label={t("leaderboard")}
+              onClick={() => triggerHaptic(40)}
+            />
           </div>
         </div>
 
         <div className="flex items-center gap-6">
           {isAuthenticated ? (
             <>
-              <button className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface">
+              <button
+                onClick={() => triggerHaptic(40)}
+                className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
+              >
                 <span className="material-symbols-outlined text-[20px]">
                   notifications
                 </span>
@@ -64,6 +85,7 @@ const Header = () => {
               </button>
               <Link
                 to="/setting/setting"
+                onClick={() => triggerHaptic(40)}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
               >
                 <span className="material-symbols-outlined text-[20px]">
@@ -95,22 +117,26 @@ const Header = () => {
                     <div className="flex flex-col gap-1 p-2">
                       <Link
                         to="/profile"
+                        onClick={() => triggerHaptic(40)}
                         className="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-white/5 rounded-lg transition-colors font-medium flex items-center gap-2"
                       >
                         <span className="material-symbols-outlined text-[16px]">
                           person
                         </span>
-                        Profile
+                        {t("profile")}
                       </Link>
                       <div className="h-px w-full bg-white/5 my-1"></div>
                       <button
-                        onClick={handleLogout}
+                        onClick={() => {
+                          triggerHaptic(50);
+                          handleLogout();
+                        }}
                         className="w-full text-left px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors font-medium flex items-center gap-2"
                       >
                         <span className="material-symbols-outlined text-[16px]">
                           logout
                         </span>
-                        Logout
+                        {t("logout")}
                       </button>
                     </div>
                   </div>
@@ -121,15 +147,17 @@ const Header = () => {
             <>
               <Link
                 to="/login"
+                onClick={() => triggerHaptic(40)}
                 className="font-body-md text-body-md text-on-surface-variant hover:text-on-surface transition-all duration-300 ease-out-cubic active:scale-95"
               >
-                Login
+                {t("login")}
               </Link>
               <Link
                 to="/register"
+                onClick={() => triggerHaptic(40)}
                 className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-2 px-6 rounded-lg glow-cyan hover:bg-primary-container transition-all duration-300 ease-out-cubic active:scale-95"
               >
-                Sign Up
+                {t("signUp")}
               </Link>
             </>
           )}

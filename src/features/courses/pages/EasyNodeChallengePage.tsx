@@ -8,6 +8,7 @@ import {
   type EasyNodeChallengeReview,
   type SubmitEasyNodeChallengeResponse,
 } from "../api/course.api";
+import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
@@ -113,13 +114,28 @@ const EasyNodeChallengePage = () => {
     setWrongAttempt(null);
     setCopiedCode(false);
 
-    courseApi
-      .getEasyNodeChallenge(nodeId)
-      .then((response) => {
+    Promise.all([
+      courseApi.getEasyNodeChallenge(nodeId),
+      courseSlug ? courseApi.getEasyRoadmap(courseSlug) : Promise.resolve(null),
+    ])
+      .then(([response, roadmap]) => {
         if (!alive) return;
         const normalizedResponse = normalizeChallengeResponse(response);
+        if (roadmap) {
+          const nodes = [...roadmap.chapters]
+            .sort((a, b) => a.order - b.order)
+            .flatMap((chapter) =>
+              [...chapter.nodes].sort((a, b) => a.lessonOrder - b.lessonOrder),
+            );
+          const index = nodes.findIndex((n) => n.id === nodeId);
+          if (index >= 0) {
+            normalizedResponse.node.label = (index + 1).toString();
+          }
+        }
         setData(normalizedResponse);
-        setSelectedOptionId(normalizedResponse.review?.selectedOptionId ?? null);
+        setSelectedOptionId(
+          normalizedResponse.review?.selectedOptionId ?? null,
+        );
         setResult(null);
         document.title = `${normalizedResponse.node.label} Challenge | Devcopet`;
       })
@@ -313,9 +329,7 @@ const EasyNodeChallengePage = () => {
             </div>
             <div>
               <p className="text-[14px] font-semibold">Level 12</p>
-              <p className="text-[11px] text-on-surface-variant">
-                Data Novice
-              </p>
+              <p className="text-[11px] text-on-surface-variant">Data Novice</p>
             </div>
           </div>
 
@@ -441,7 +455,9 @@ const EasyNodeChallengePage = () => {
                             <span className="material-symbols-outlined text-[18px]">
                               code
                             </span>
-                            <span>{formatCodeLanguage(codeSnippet.language)}</span>
+                            <span>
+                              {formatCodeLanguage(codeSnippet.language)}
+                            </span>
                           </div>
                           <button
                             type="button"
@@ -622,9 +638,8 @@ const EasyNodeChallengePage = () => {
                       <div
                         className="h-full rounded-full bg-[#63f1e3]"
                         style={{
-                          width: (review?.correct ?? result?.correct)
-                            ? "85%"
-                            : "0%",
+                          width:
+                            (review?.correct ?? result?.correct) ? "85%" : "0%",
                         }}
                       />
                     </div>
@@ -757,6 +772,18 @@ const EasyNodeChallengePage = () => {
           )}
         </section>
       </div>
+
+      {data && (
+        <RoadmapAiHelper
+          nodeId={nodeId ?? null}
+          nodeTitle={data.node.title}
+          nodeStatus={data.node.status}
+          mode="easy"
+          accentColor="#63f1e3"
+          accentGradient="linear-gradient(to right, #00a99d, #223746)"
+          accentGlowWeak="rgba(99,241,227,0.2)"
+        />
+      )}
     </main>
   );
 };

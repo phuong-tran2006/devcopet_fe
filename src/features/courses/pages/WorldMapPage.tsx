@@ -11,6 +11,7 @@ import {
   type MediumRoadmapResponse,
 } from "../api/course.api";
 import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 const DIFF_CONFIG = {
   easy: {
@@ -47,12 +48,12 @@ type SelectedRoadmapNode =
 
 const statusStyles = {
   completed: {
-    node: "bg-[#97CADB] text-[#001e2e] border-[#c7f0f7]",
+    node: "",
     icon: "done",
     label: "Completed",
   },
   available: {
-    node: "bg-gradient-to-tr from-[#97CADB] to-[#6aafc5] text-[#001e2e] border-background",
+    node: "",
     icon: "play_arrow",
     label: "Available",
   },
@@ -76,6 +77,46 @@ const getChapterStatus = (
   return "locked";
 };
 
+const getNodeDynamicStyle = (
+  nodeStatus: EasyRoadmapNodeStatus,
+  difficulty: Difficulty,
+  cfg: (typeof DIFF_CONFIG)[Difficulty],
+  isLight: boolean,
+): React.CSSProperties => {
+  if (nodeStatus === "locked") return {};
+
+  const style: React.CSSProperties = {
+    boxShadow: `0 0 24px ${cfg.glowWeak}`,
+    "--node-accent": cfg.accent,
+    "--node-glow": cfg.glow,
+    "--node-glow-weak": cfg.glowWeak,
+  } as any;
+
+  if (nodeStatus === "completed") {
+    style.backgroundColor = cfg.accent;
+    style.borderColor = isLight
+      ? "#475569"
+      : difficulty === "easy"
+        ? "#c7f0f7"
+        : `${cfg.accent}80`;
+    style.color = isLight
+      ? "#000000"
+      : difficulty === "easy"
+        ? "#001e2e"
+        : "#ffffff";
+  } else if (nodeStatus === "available") {
+    style.background = cfg.gradient;
+    style.borderColor = "var(--color-background)";
+    style.color = isLight
+      ? "#000000"
+      : difficulty === "easy"
+        ? "#001e2e"
+        : "#ffffff";
+  }
+
+  return style;
+};
+
 const normalizeOrder = <T extends { order: number }>(chapters: T[]) =>
   [...chapters].sort((a, b) => a.order - b.order);
 
@@ -85,6 +126,8 @@ const getMediumTypeLabel = (type: MediumRoadmapNode["type"]) =>
   type === "drag_drop" ? "Drag Drop" : "Multiple Choice";
 
 const WorldMapPage = () => {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const { worldId } = useParams({ strict: false });
   const courseSlug = worldId;
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
@@ -118,33 +161,37 @@ const WorldMapPage = () => {
     [mediumRoadmap],
   );
 
-  const flatNodes = useMemo(
-    () =>
-      chapters.flatMap((chapter) =>
-        [...chapter.nodes]
-          .sort((a, b) => a.lessonOrder - b.lessonOrder)
-          .map((node) => ({
-            ...node,
-            chapterTitle: chapter.title,
-            chapterOrder: chapter.order,
-          })),
-      ),
-    [chapters],
-  );
+  const flatNodes = useMemo(() => {
+    const sorted = chapters.flatMap((chapter) =>
+      [...chapter.nodes]
+        .sort((a, b) => a.lessonOrder - b.lessonOrder)
+        .map((node) => ({
+          ...node,
+          chapterTitle: chapter.title,
+          chapterOrder: chapter.order,
+        })),
+    );
+    return sorted.map((node, idx) => ({
+      ...node,
+      label: (idx + 1).toString(),
+    }));
+  }, [chapters]);
 
-  const mediumFlatNodes = useMemo(
-    () =>
-      mediumChapters.flatMap((chapter) =>
-        [...chapter.nodes]
-          .sort((a, b) => a.order - b.order)
-          .map((node) => ({
-            ...node,
-            chapterTitle: chapter.title,
-            chapterOrder: chapter.order,
-          })),
-      ),
-    [mediumChapters],
-  );
+  const mediumFlatNodes = useMemo(() => {
+    const sorted = mediumChapters.flatMap((chapter) =>
+      [...chapter.nodes]
+        .sort((a, b) => a.order - b.order)
+        .map((node) => ({
+          ...node,
+          chapterTitle: chapter.title,
+          chapterOrder: chapter.order,
+        })),
+    );
+    return sorted.map((node, idx) => ({
+      ...node,
+      label: (idx + 1).toString(),
+    }));
+  }, [mediumChapters]);
 
   const activeFlatNodes = difficulty === "medium" ? mediumFlatNodes : flatNodes;
   const firstAvailableNodeId = useMemo(
@@ -161,7 +208,10 @@ const WorldMapPage = () => {
   const totalLessons = roadmap?.course.totalLessons ?? flatNodes.length;
   const completionPct =
     totalNodes > 0 ? Math.round((completedCount / totalNodes) * 100) : 0;
-  const totalXp = activeFlatNodes.reduce((sum, node) => sum + (node.xp || 0), 0);
+  const totalXp = activeFlatNodes.reduce(
+    (sum, node) => sum + (node.xp || 0),
+    0,
+  );
 
   useEffect(() => {
     document.title = "Roadmap Path | Devcopet Learn";
@@ -269,7 +319,9 @@ const WorldMapPage = () => {
     });
   };
 
-  const scrollToChapter = (chapter: EasyRoadmapChapter | MediumRoadmapChapter) => {
+  const scrollToChapter = (
+    chapter: EasyRoadmapChapter | MediumRoadmapChapter,
+  ) => {
     setSelectedChapterId(chapter.id);
     const firstNode = chapter.nodes[0];
     if (!firstNode) return;
@@ -314,8 +366,7 @@ const WorldMapPage = () => {
       );
     }
 
-    const sidebarChapters =
-      difficulty === "medium" ? mediumChapters : chapters;
+    const sidebarChapters = difficulty === "medium" ? mediumChapters : chapters;
 
     return sidebarChapters.map((chapter) => {
       const chapterStatus = getChapterStatus(chapter);
@@ -452,7 +503,7 @@ const WorldMapPage = () => {
 
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between text-[10px] font-bold tracking-wider text-on-surface-variant">
-                <span>EASY PROGRESS</span>
+                <span>{difficulty.toUpperCase()} PROGRESS</span>
                 <span>{completionPct}%</span>
               </div>
               <div className="h-2 overflow-hidden rounded-full bg-surface-container">
@@ -497,9 +548,10 @@ const WorldMapPage = () => {
             {useMemo(
               () =>
                 chapters.map((chapter, idx) => {
-                  const isCompleted = chapter.status === "completed";
-                  const isInProgress = chapter.status === "in_progress";
-                  const isLocked = chapter.status === "locked";
+                  const chapterStatus = getChapterStatus(chapter);
+                  const isCompleted = chapterStatus === "completed";
+                  const isInProgress = chapterStatus === "active";
+                  const isLocked = chapterStatus === "locked";
 
                   const handleClick = () => {
                     if (!isLocked) {
@@ -532,17 +584,31 @@ const WorldMapPage = () => {
                       {/* Status icon */}
                       <div
                         className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold
-                        ${isCompleted ? cfg.nodeCompleted : ""}
                         ${isLocked ? "bg-surface-container text-on-surface/20 border border-on-surface/10" : ""}
                       `}
                         style={
-                          isInProgress
+                          isCompleted
                             ? {
-                                background: cfg.gradient,
-                                color: "#fff",
-                                boxShadow: `0 0 10px ${cfg.glowWeak}`,
+                                backgroundColor: cfg.accent,
+                                borderColor:
+                                  difficulty === "easy"
+                                    ? "#c7f0f7"
+                                    : `${cfg.accent}80`,
+                                color: isLight
+                                  ? "#000000"
+                                  : difficulty === "easy"
+                                    ? "#001e2e"
+                                    : "#ffffff",
+                                borderWidth: "1px",
+                                borderStyle: "solid",
                               }
-                            : {}
+                            : isInProgress
+                              ? {
+                                  background: cfg.gradient,
+                                  color: isLight ? "#000000" : "#fff",
+                                  boxShadow: `0 0 10px ${cfg.glowWeak}`,
+                                }
+                              : {}
                         }
                       >
                         {isCompleted && (
@@ -573,17 +639,18 @@ const WorldMapPage = () => {
                               ? "text-on-surface-variant/40"
                               : "text-on-surface-variant"
                           }`}
-                          style={isInProgress ? { color: "#fff" } : {}}
+                          style={
+                            isInProgress
+                              ? { color: isLight ? "#000000" : "#fff" }
+                              : {}
+                          }
                         >
                           {chapter.title}
                         </span>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[9px] text-on-surface-variant/50">
-                            {chapter.lessons || "?"} lessons
+                            {chapter.lessonCount || "?"} lessons
                           </span>
-                          {isCompleted && chapter.stars && (
-                            <StarPips stars={chapter.stars} />
-                          )}
                           {isInProgress && (
                             <span
                               className="text-[9px] font-bold uppercase tracking-wide"
@@ -936,8 +1003,11 @@ const WorldMapPage = () => {
                         {isHovered && (
                           <div className="pointer-events-none absolute bottom-[calc(100%+14px)] left-1/2 z-30 -translate-x-1/2">
                             <div className="min-w-[220px] max-w-[280px] rounded-xl border border-on-surface/15 bg-surface-container px-4 py-3 text-center shadow-xl">
-                              <p className="mb-1 text-[11px] font-extrabold uppercase tracking-widest text-[#97CADB]">
-                                {node.label}
+                              <p
+                                className="mb-1 text-[11px] font-extrabold uppercase tracking-widest"
+                                style={{ color: cfg.accent }}
+                              >
+                                Lesson {node.label}
                               </p>
                               <p className="text-[13px] font-bold leading-snug text-on-surface">
                                 {lessonTitle}
@@ -976,11 +1046,12 @@ const WorldMapPage = () => {
                               ? "h-16 w-16 text-[17px]"
                               : "h-14 w-14 text-[15px]"
                           } ${styles.node} ${nodeGlowClass} ${isHovered ? "scale-110" : "scale-100"}`}
-                          style={
-                            node.status !== "locked"
-                              ? { boxShadow: `0 0 24px ${cfg.glowWeak}` }
-                              : {}
-                          }
+                          style={getNodeDynamicStyle(
+                            node.status,
+                            difficulty,
+                            cfg,
+                            isLight,
+                          )}
                         >
                           {node.status === "locked" ? (
                             <span className="material-symbols-outlined text-[18px]">
@@ -995,8 +1066,16 @@ const WorldMapPage = () => {
                           className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                             node.status === "locked"
                               ? "border-on-surface/10 bg-surface-container text-on-surface-variant/40"
-                              : "border-[#97CADB]/25 bg-background text-[#97CADB]"
+                              : "bg-background"
                           }`}
+                          style={
+                            node.status !== "locked"
+                              ? {
+                                  borderColor: `${cfg.accent}40`,
+                                  color: cfg.accent,
+                                }
+                              : {}
+                          }
                         >
                           {styles.label}
                         </span>
@@ -1093,7 +1172,9 @@ const WorldMapPage = () => {
                         ref={isActive ? activeNodeRef : null}
                         data-node-id={node.id}
                         data-chapter-id={
-                          chapterForNode?.id ?? node.chapterId ?? node.chapterOrder
+                          chapterForNode?.id ??
+                          node.chapterId ??
+                          node.chapterOrder
                         }
                         className="absolute z-10 flex -translate-x-1/2 -translate-y-1/2 cursor-pointer flex-col items-center gap-1.5"
                         style={{ left: `${x}px`, top: `${y}px` }}
@@ -1118,8 +1199,11 @@ const WorldMapPage = () => {
                         {isHovered && (
                           <div className="pointer-events-none absolute bottom-[calc(100%+14px)] left-1/2 z-30 -translate-x-1/2">
                             <div className="min-w-[230px] max-w-[300px] rounded-xl border border-on-surface/15 bg-surface-container px-4 py-3 text-center shadow-xl">
-                              <p className="mb-1 text-[11px] font-extrabold uppercase tracking-widest text-[#97CADB]">
-                                {node.label}
+                              <p
+                                className="mb-1 text-[11px] font-extrabold uppercase tracking-widest"
+                                style={{ color: cfg.accent }}
+                              >
+                                Challenge {node.label}
                               </p>
                               <p className="text-[13px] font-bold leading-snug text-on-surface">
                                 {node.title}
@@ -1145,13 +1229,16 @@ const WorldMapPage = () => {
 
                         <div
                           className={`relative z-10 flex items-center justify-center rounded-full border-4 font-extrabold shadow-lg transition-transform duration-300 ${
-                            isActive ? "h-16 w-16 text-[15px]" : "h-14 w-14 text-[13px]"
+                            isActive
+                              ? "h-16 w-16 text-[15px]"
+                              : "h-14 w-14 text-[13px]"
                           } ${styles.node} ${nodeGlowClass} ${isHovered ? "scale-110" : "scale-100"}`}
-                          style={
-                            node.status !== "locked"
-                              ? { boxShadow: `0 0 24px ${cfg.glowWeak}` }
-                              : {}
-                          }
+                          style={getNodeDynamicStyle(
+                            node.status,
+                            difficulty,
+                            cfg,
+                            isLight,
+                          )}
                         >
                           {node.status === "locked" ? (
                             <span className="material-symbols-outlined text-[18px]">
@@ -1166,8 +1253,16 @@ const WorldMapPage = () => {
                           className={`rounded-full border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                             node.status === "locked"
                               ? "border-on-surface/10 bg-surface-container text-on-surface-variant/40"
-                              : "border-[#97CADB]/25 bg-background text-[#97CADB]"
+                              : "bg-background"
                           }`}
+                          style={
+                            node.status !== "locked"
+                              ? {
+                                  borderColor: `${cfg.accent}40`,
+                                  color: cfg.accent,
+                                }
+                              : {}
+                          }
                         >
                           {styles.label}
                         </span>
@@ -1188,7 +1283,7 @@ const WorldMapPage = () => {
             style={{
               background: cfg.gradient,
               boxShadow: `0 4px 20px ${cfg.glowWeak}`,
-              color: "#fff",
+              color: isLight ? "#000000" : "#fff",
             }}
           >
             <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-12">
