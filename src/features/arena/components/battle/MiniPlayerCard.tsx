@@ -6,6 +6,9 @@ interface MiniPlayerCardProps {
   icon: string;
   iconColor: string;
   isRightAlign?: boolean;
+  rank?: string;
+  score?: number;
+  answered?: boolean;
 }
 
 const MiniPlayerCard = ({
@@ -16,12 +19,14 @@ const MiniPlayerCard = ({
   icon,
   iconColor,
   isRightAlign = false,
+  rank,
+  score = 0,
+  answered = false,
 }: MiniPlayerCardProps) => {
   return (
-    <div className="flex items-center dark:bg-[#111921] bg-surface-container rounded-2xl p-2.5 shadow-lg border dark:border-white/5 border-outline/10 w-[280px] transition-colors duration-300">
-      {/* Left Avatar (if not right aligned) */}
+    <div className="flex items-center dark:bg-[#111921] bg-surface-container rounded-xl p-2 shadow-lg border dark:border-white/5 border-outline/10 w-[230px] transition-colors duration-300">
       {!isRightAlign && (
-        <div className="w-12 h-12 rounded-full border-2 dark:border-[#e69b9b] border-error overflow-hidden shrink-0 mr-3 p-0.5 transition-colors duration-300">
+        <div className="w-10 h-10 rounded-full border-2 dark:border-[#e69b9b] border-error overflow-hidden shrink-0 mr-2.5 p-0.5 transition-colors duration-300">
           <img
             src={avatarUrl}
             alt={name}
@@ -30,17 +35,29 @@ const MiniPlayerCard = ({
         </div>
       )}
 
-      {/* Info Column */}
-      <div
-        className={`flex flex-col flex-1 ${isRightAlign ? "items-start" : "items-start"}`}
-      >
-        <span
-          className="text-[12px] font-bold dark:text-gray-200 text-on-surface mb-1 px-1 truncate w-full transition-colors duration-300"
-          style={isRightAlign ? { textAlign: "right" } : {}}
-        >
-          {name}
-        </span>
-        <div className="w-full dark:bg-[#1e262f] bg-surface-container-highest h-2.5 rounded-full overflow-hidden transition-colors duration-300">
+      <div className="flex flex-col flex-1 min-w-0">
+        <div className="flex items-center justify-between gap-2 mb-1">
+          <span
+            className="text-[12px] font-black dark:text-gray-200 text-on-surface truncate transition-colors duration-300"
+            style={isRightAlign ? { textAlign: "right" } : {}}
+          >
+            {name}
+          </span>
+          <span
+            className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${answered ? "dark:bg-[#1e4e50] bg-primary/10 text-primary" : "dark:bg-white/5 bg-outline/10 dark:text-gray-500 text-on-surface-variant"}`}
+          >
+            {answered ? "LOCKED" : "..."}
+          </span>
+        </div>
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="text-[10px] uppercase font-bold dark:text-gray-500 text-on-surface-variant truncate">
+            {rank || "Rank"}
+          </span>
+          <span className="text-[11px] font-black dark:text-[#4dd0d0] text-primary">
+            {score}
+          </span>
+        </div>
+        <div className="w-full dark:bg-[#1e262f] bg-surface-container-highest h-2 rounded-full overflow-hidden transition-colors duration-300">
           <div
             className="h-full rounded-full transition-all duration-500 ease-out"
             style={{
@@ -52,9 +69,8 @@ const MiniPlayerCard = ({
         </div>
       </div>
 
-      {/* Right Avatar (if right aligned) */}
       {isRightAlign && (
-        <div className="w-12 h-12 rounded-full border-2 dark:border-[#81e6d9] border-primary overflow-hidden shrink-0 ml-3 p-0.5 transition-colors duration-300">
+        <div className="w-10 h-10 rounded-full border-2 dark:border-[#81e6d9] border-primary overflow-hidden shrink-0 ml-2.5 p-0.5 transition-colors duration-300">
           <img
             src={avatarUrl}
             alt={name}
@@ -63,12 +79,10 @@ const MiniPlayerCard = ({
         </div>
       )}
 
-      {/* Side Icon (always on the far right for both in the screenshot?) */}
-      {/* Wait, screenshot shows left card has flame on the right. Right card has star on the right. */}
-      <div className={`shrink-0 flex items-center justify-center w-8 h-8 ml-2`}>
+      <div className="shrink-0 flex items-center justify-center w-7 h-7 ml-2">
         <span
           className="material-symbols-outlined transition-colors duration-300"
-          style={{ color: iconColor, fontSize: "20px" }}
+          style={{ color: iconColor, fontSize: "18px" }}
         >
           {icon}
         </span>
