@@ -46,7 +46,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
               src={heroMascotVideo}
               className="w-full"
               keyColor={[0, 200, 0]}
-              tolerance={80}
+              tolerance={28}
             />
           </div>
         </div>
@@ -54,13 +54,6 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
         {/* Right Side: Content */}
         <div className="flex-1 w-full text-left space-y-6">
           <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="h-[2px] w-8 bg-gradient-to-r from-pink-400 to-purple-400" />
-              <span className="text-[12px] font-bold tracking-[0.2em] text-gray-500 dark:text-[#94a3b8] uppercase">
-                ONBOARDING PHASE 01
-              </span>
-            </div>
-
             <h2 className="text-[32px] md:text-[40px] font-extrabold text-gray-900 dark:text-white leading-tight">
               Meet Your New <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#2dd4bf] to-[#0ea5e9]">
@@ -76,7 +69,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
           </div>
 
           <div className="space-y-3 pt-2">
-            <div className="bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#2dd4bf]/40 dark:hover:border-[#2dd4bf]/40 transition-colors">
+            <div className="bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#2dd4bf] dark:hover:border-[#2dd4bf]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-[#1a2b3c] flex items-center justify-center text-teal-600 dark:text-[#2dd4bf] shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
                   psychology
@@ -93,7 +86,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#a78bfa]/40 dark:hover:border-[#a78bfa]/40 transition-colors">
+            <div className="bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#a78bfa] dark:hover:border-[#a78bfa]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-[#1a2336] flex items-center justify-center text-purple-600 dark:text-[#a78bfa] shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
                   forum
@@ -110,7 +103,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#4ade80]/40 dark:hover:border-[#4ade80]/40 transition-colors">
+            <div className="bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#4ade80] dark:hover:border-[#4ade80]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-[#182a22] flex items-center justify-center text-green-600 dark:text-[#4ade80] shrink-0">
                 <span className="material-symbols-outlined text-[20px]">
                   trending_up

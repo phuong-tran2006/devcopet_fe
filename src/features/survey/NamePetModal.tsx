@@ -83,14 +83,14 @@ const NamePetModal = ({ isOpen, onConfirm }: NamePetModalProps) => {
             src={heroMascotVideo}
             className="h-auto w-48 object-contain sm:w-56 md:w-64"
             keyColor={[0, 200, 0]}
-            tolerance={80}
+            tolerance={28}
           />
         </div>
 
         {/* Input Card */}
-        <div className="w-full bg-white dark:bg-[#151e29] border border-gray-200 dark:border-[#1e293b] rounded-2xl p-6 md:p-8 shadow-2xl">
+        <div className="w-full bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-2xl p-6 md:p-8 shadow-2xl">
           <div className="flex flex-col gap-2 mb-6">
-            <label className="text-[10px] font-extrabold tracking-[0.15em] text-gray-500 dark:text-[#94a3b8] uppercase pl-1">
+            <label className="text-[10px] font-extrabold tracking-[0.15em] text-black dark:text-[#94a3b8] uppercase pl-1">
               NAME YOUR AXOLOTL
             </label>
             <div className="relative flex items-center">
@@ -107,7 +107,7 @@ const NamePetModal = ({ isOpen, onConfirm }: NamePetModalProps) => {
                 value={petName}
                 onChange={(e) => setPetName(e.target.value)}
                 placeholder="e.g. Byte, Pixel, Glitch..."
-                className="w-full bg-gray-50 dark:bg-[#0d151c] border border-gray-200 dark:border-[#1e293b] text-gray-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-[#d4a8d4] focus:ring-1 focus:ring-[#d4a8d4] transition-all placeholder:text-gray-400 dark:placeholder:text-[#475569] text-[15px]"
+                className="w-full bg-white dark:bg-[#0d151c] border border-black dark:border-[#1e293b] text-gray-900 dark:text-white rounded-xl py-3 pl-11 pr-4 focus:outline-none focus:border-[#d4a8d4] focus:ring-1 focus:ring-[#d4a8d4] transition-all placeholder:text-gray-500 dark:placeholder:text-[#475569] text-[15px]"
                 autoFocus
               />
             </div>

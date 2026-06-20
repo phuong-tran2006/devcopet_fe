@@ -8,7 +8,7 @@ const MatchmakingPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
     if (status === "searching") {
       // Simulate finding an opponent after 3 seconds
       timeoutId = setTimeout(() => {

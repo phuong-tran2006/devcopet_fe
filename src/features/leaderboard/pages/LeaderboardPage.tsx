@@ -197,21 +197,34 @@ const LeaderboardPage = () => {
 
           {/* World Tabs */}
           <div className="flex items-center gap-2 bg-surface-container/50 border border-on-surface/10 p-1.5 rounded-xl shadow-sm">
-            {["Python World", "Java World", "C++ World"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 ${
-                  activeTab === tab
-                    ? "bg-primary-fixed-dim/20 text-primary border border-primary-fixed-dim/30 shadow-md"
-                    : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
-                }`}
-              >
-                {tab.split(" ")[0]}
-                <br className="hidden md:block" />
-                {tab.split(" ")[1]}
-              </button>
-            ))}
+            {["Python World", "Java World", "C++ World"].map((tab) => {
+              const isLocked = tab === "Java World" || tab === "C++ World";
+              return (
+                <button
+                  key={tab}
+                  onClick={() => !isLocked && setActiveTab(tab)}
+                  disabled={isLocked}
+                  className={`px-5 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center justify-center gap-1.5 ${
+                    isLocked
+                      ? "opacity-40 cursor-not-allowed text-on-surface-variant/60"
+                      : activeTab === tab
+                        ? "bg-primary-fixed-dim/20 text-primary border border-primary-fixed-dim/30 shadow-md"
+                        : "text-on-surface-variant hover:text-on-surface hover:bg-surface-container"
+                  }`}
+                >
+                  <div className="text-center">
+                    {tab.split(" ")[0]}
+                    <br className="hidden md:block" />
+                    {tab.split(" ")[1]}
+                  </div>
+                  {isLocked && (
+                    <span className="material-symbols-outlined text-[14px]">
+                      lock
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
 
