@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { mascotAxolotl } from "../users/constants/authImages";
 
 interface SurveyModalProps {
@@ -7,6 +7,7 @@ interface SurveyModalProps {
   onClose?: () => void;
   onSkip?: () => void;
   onComplete?: (answers: Record<number, string>) => void;
+  questions?: any[];
 }
 
 export const surveyQuestions = [
@@ -423,6 +424,7 @@ const SurveyModal = ({
   onClose,
   onSkip,
   onComplete,
+  questions,
 }: SurveyModalProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -430,7 +432,22 @@ const SurveyModal = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const totalQuestions = surveyQuestions.length;
+  // Map backend questions to local format if supplied
+  const transformedQuestions = useMemo(() => {
+    if (questions && questions.length > 0) {
+      return questions.map((q: any) => ({
+        id: q.questionNumber,
+        question: q.descriptionEn || q.titleEn || q.question || "",
+        options: (q.options || []).map((o: any) => ({
+          id: o.key || o.id,
+          text: o.textEn || o.text || "",
+        })),
+      }));
+    }
+    return surveyQuestions;
+  }, [questions]);
+
+  const totalQuestions = transformedQuestions.length;
   const progress = ((currentQuestionIndex + 1) / totalQuestions) * 100;
 
   useEffect(() => {
@@ -484,7 +501,7 @@ const SurveyModal = ({
 
   if (!isOpen && !isVisible) return null;
 
-  const currentQuestion = surveyQuestions[currentQuestionIndex];
+  const currentQuestion = transformedQuestions[currentQuestionIndex];
   if (!currentQuestion) return null;
   const selectedOption = answers[currentQuestionIndex];
 

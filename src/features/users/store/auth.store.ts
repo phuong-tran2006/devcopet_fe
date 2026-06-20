@@ -5,6 +5,10 @@ interface User {
   email?: string;
   name?: string;
   username?: string;
+  avatarUrl?: string;
+  bio?: string;
+  level?: number;
+  exp?: number;
   onboardingCompleted?: boolean;
   petProfileInitialized?: boolean;
   [key: string]: unknown;
@@ -38,10 +42,10 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isAuthenticated: false, user: null });
   },
 
-  checkAuth: () => {
+  checkAuth: async () => {
     const token = localStorage.getItem("accessToken");
     if (token) {
-      // Restore user data from localStorage
+      // Restore user data from localStorage first for instant UI response
       let user: User | null = null;
       try {
         const stored = localStorage.getItem("user");
@@ -50,6 +54,24 @@ export const useAuthStore = create<AuthState>((set) => ({
         // ignore parse errors
       }
       set({ isAuthenticated: true, user });
+
+      // Fetch fresh user details to validate the token and prevent stale/deleted user session issues
+      try {
+        const { api } = await import("../../../services/axiosClient");
+        const response = await api.get("/users/me");
+        const freshUser = response.data;
+        localStorage.setItem("user", JSON.stringify(freshUser));
+        set({ isAuthenticated: true, user: freshUser });
+      } catch (error: any) {
+        console.error("Failed to validate auth token or fetch user session:", error);
+        // If 401 unauthorized (e.g. database cleared), log out immediately
+        if (error?.response?.status === 401) {
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("user");
+          set({ isAuthenticated: false, user: null });
+        }
+      }
     } else {
       set({ isAuthenticated: false, user: null });
     }

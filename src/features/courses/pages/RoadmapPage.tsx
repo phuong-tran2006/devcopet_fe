@@ -1,12 +1,20 @@
 import { useEffect, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const RoadmapPage = () => {
   const [pythonCompletion, setPythonCompletion] = useState<number>(0);
+  const { isAuthenticated } = useAuthStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Select Your Domain | Devcopet Learn";
+
+    if (!isAuthenticated) {
+      setPythonCompletion(0);
+      return;
+    }
 
     let alive = true;
     const courseSlug = "python-basic";
@@ -49,7 +57,7 @@ const RoadmapPage = () => {
     });
 
     return () => { alive = false; };
-  }, []);
+  }, [isAuthenticated]);
 
   return (
     <main className="relative min-h-[calc(100vh-80px)] w-full flex flex-col items-center justify-start bg-background overflow-hidden pb-16 px-4 md:px-8 lg:px-16">
@@ -153,6 +161,15 @@ const RoadmapPage = () => {
             <Link
               to="/roadmap/$worldId"
               params={{ worldId: "python-basic" }}
+              onClick={(e) => {
+                if (!isAuthenticated) {
+                  e.preventDefault();
+                  navigate({
+                    to: "/login",
+                    search: { redirect: "/roadmap/python-basic" },
+                  });
+                }
+              }}
               className="mt-auto w-full bg-primary-fixed-dim text-on-primary-fixed font-extrabold text-[12px] py-2.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
               Enter World{" "}

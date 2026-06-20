@@ -5,11 +5,25 @@ import QuestionBoard from "../components/battle/QuestionBoard";
 import OptionButton from "../components/battle/OptionButton";
 import RoundResultView from "../components/battle/RoundResultView";
 import VictoryView from "../components/battle/VictoryView";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const BattlePage = () => {
+  const { user: currentUser } = useAuthStore();
+  const [opponent, setOpponent] = useState<any>(null);
   const [phase, setPhase] = useState<"playing" | "result" | "victory">(
     "playing",
   );
+
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("currentOpponent");
+      if (saved) {
+        setOpponent(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
 
   useEffect(() => {
     let timeoutId: ReturnType<typeof setTimeout>;
@@ -29,8 +43,8 @@ const BattlePage = () => {
           <div className="flex justify-between items-start w-full max-w-6xl mx-auto mt-4 relative">
             {/* Opponent Card (Top Left) */}
             <MiniPlayerCard
-              name="Coberpinja_99"
-              avatarUrl="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              name={opponent?.username || "ByteMaster"}
+              avatarUrl={opponent?.avatarUrl || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
               hpPercentage={60}
               hpColor="#ff8a8a"
               icon="local_fire_department"
@@ -44,8 +58,8 @@ const BattlePage = () => {
 
             {/* User Card (Top Right) */}
             <MiniPlayerCard
-              name="You (DevPro)"
-              avatarUrl="/axolotl.png"
+              name={currentUser?.username || "You"}
+              avatarUrl={(currentUser?.avatarUrl as string) || "/axolotl.png"}
               hpPercentage={85}
               hpColor="#4dd0d0"
               icon="star"

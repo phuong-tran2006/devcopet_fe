@@ -1,8 +1,13 @@
 interface OpponentCardProps {
   status: "idle" | "searching" | "found";
+  opponent?: {
+    username?: string;
+    level?: number;
+    avatarUrl?: string;
+  } | null;
 }
 
-const OpponentCard = ({ status }: OpponentCardProps) => {
+const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
   return (
     <div
       className={`relative w-full max-w-[340px] aspect-[4/3] rounded-3xl dark:bg-[#1e262f] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${status === "idle" ? "opacity-70" : "opacity-90"}`}
@@ -69,21 +74,25 @@ const OpponentCard = ({ status }: OpponentCardProps) => {
             <div className="absolute inset-0 rounded-full border-2 border-[#ff3b30] blur-[4px] animate-pulse" />
             <div className="w-[100px] h-[100px] rounded-full border-2 border-[#ff3b30] overflow-hidden p-0.5 relative z-10 dark:bg-[#0e141a] bg-surface transition-colors duration-300">
               <img
-                src="https://i.pravatar.cc/150?u=byte"
+                src={opponent?.avatarUrl || "https://i.pravatar.cc/150?u=byte"}
                 alt="Opponent"
                 className="w-full h-full rounded-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.parentElement!.innerHTML = "🦎";
+                }}
               />
             </div>
           </div>
           <h3 className="text-[24px] font-extrabold dark:text-white text-on-surface mb-2 transition-colors duration-300">
-            ByteMaster
+            {opponent?.username || "ByteMaster"}
           </h3>
           <div className="flex items-center gap-2">
             <div className="dark:bg-[#7e4141]/40 bg-error/10 border dark:border-[#7e4141] border-error/30 dark:text-[#f5b8b8] text-error text-[11px] font-bold px-2 py-0.5 rounded uppercase transition-colors duration-300">
-              LVL 40
+              LVL {opponent?.level || 40}
             </div>
             <span className="dark:text-gray-400 text-on-surface-variant text-[13px] transition-colors duration-300">
-              Elite
+              {(opponent?.level || 40) >= 15 ? "Elite" : "Novice"}
             </span>
           </div>
         </>

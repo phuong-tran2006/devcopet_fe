@@ -1,7 +1,40 @@
 import { useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { useAuthStore } from "../../../users/store/auth.store";
 
 const VictoryView = () => {
   const navigate = useNavigate();
+  const { user: currentUser, checkAuth } = useAuthStore();
+  const [opponent, setOpponent] = useState<any>(null);
+  const [submitted, setSubmitted] = useState(false);
+  const [xpGained] = useState(150);
+
+  useEffect(() => {
+    const saved = sessionStorage.getItem("currentOpponent");
+    if (saved) {
+      try {
+        setOpponent(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (submitted) return;
+    const submitBattleResult = async () => {
+      setSubmitted(true);
+      try {
+        const { api } = await import("../../../../services/axiosClient");
+        await api.post("/users/battle/submit", { expChange: 150 });
+        // Refresh player info (to update level, exp, etc. in global store)
+        await checkAuth();
+      } catch (err) {
+        console.error("Failed to submit battle result", err);
+      }
+    };
+    submitBattleResult();
+  }, [submitted, checkAuth]);
 
   return (
     <div className="w-full h-full flex items-center justify-center animate-fade-in absolute inset-0 z-50 dark:bg-black/60 bg-black/30 backdrop-blur-sm p-4 transition-colors duration-300">
@@ -23,9 +56,13 @@ const VictoryView = () => {
           <div className="w-[140px] h-[140px] rounded-full border border-dashed dark:border-white/50 border-outline/50 p-2 relative z-10 transition-colors duration-300">
             <div className="w-full h-full rounded-full overflow-hidden border-[4px] border-[#d69ba2] shadow-[0_0_20px_rgba(214,155,162,0.4)]">
               <img
-                src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                src={(currentUser?.avatarUrl as string) || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
                 alt="Player"
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
+                  e.currentTarget.parentElement!.innerHTML = "🦖";
+                }}
               />
             </div>
           </div>
@@ -35,24 +72,26 @@ const VictoryView = () => {
 
         {/* Player Name & Rank Up */}
         <h2 className="text-[32px] font-black dark:text-[#f4d8e8] text-primary drop-shadow-[0_0_10px_rgba(244,216,232,0.5)] tracking-wide transition-colors duration-300">
-          PlayerOne
+          {currentUser?.username || "PlayerOne"}
         </h2>
         <div className="mt-3 dark:bg-[#1e4e50] bg-primary/10 border border-[#0d9488] text-[#4fd1c5] px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg transition-colors duration-300">
           <span className="material-symbols-outlined text-[16px]">
             emoji_events
           </span>
-          <span className="text-[12px] font-bold tracking-wider">RANK UP</span>
+          <span className="text-[12px] font-bold tracking-wider">
+            LVL {currentUser?.level || 1}
+          </span>
         </div>
 
         {/* Score Board */}
         <div className="w-full dark:bg-[#11161d] bg-surface-container-highest rounded-2xl mt-10 p-6 flex items-center justify-between relative shadow-inner border dark:border-black/20 border-outline/10 transition-colors duration-300">
           {/* Player Score */}
           <div className="flex flex-col items-center w-[45%]">
-            <span className="dark:text-gray-400 text-on-surface-variant text-[11px] font-bold tracking-[0.2em] mb-1 transition-colors duration-300">
-              PLAYERONE
+            <span className="dark:text-gray-400 text-on-surface-variant text-[11px] font-bold tracking-[0.2em] mb-1 transition-colors duration-300 truncate max-w-full">
+              {currentUser?.username?.toUpperCase() || "YOU"}
             </span>
-            <span className="text-[40px] font-black dark:text-[#f4d8e8] text-primary drop-shadow-[0_0_10px_rgba(244,216,232,0.4)] leading-none transition-colors duration-300">
-              2,450
+            <span className="text-[32px] font-black dark:text-[#f4d8e8] text-primary drop-shadow-[0_0_10px_rgba(244,216,232,0.4)] leading-none transition-colors duration-300">
+              +{xpGained} XP
             </span>
           </div>
 
@@ -68,11 +107,11 @@ const VictoryView = () => {
 
           {/* Opponent Score */}
           <div className="flex flex-col items-center w-[45%]">
-            <span className="dark:text-gray-400 text-on-surface-variant text-[11px] font-bold tracking-[0.2em] mb-1 transition-colors duration-300">
-              RIVALDEV
+            <span className="dark:text-gray-400 text-on-surface-variant text-[11px] font-bold tracking-[0.2em] mb-1 transition-colors duration-300 truncate max-w-full">
+              {opponent?.username?.toUpperCase() || "RIVAL"}
             </span>
-            <span className="text-[40px] font-black dark:text-white text-on-surface leading-none transition-colors duration-300">
-              1,820
+            <span className="text-[32px] font-black dark:text-white text-on-surface leading-none transition-colors duration-300">
+              +0 XP
             </span>
           </div>
         </div>

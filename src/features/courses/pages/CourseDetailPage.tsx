@@ -84,17 +84,15 @@ const StatusBadge = ({ status }) => {
 };
 
 /* ───────────── Lesson Card ───────────── */
-const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
-  // For demo: first lesson mastered, second in_progress, rest unlocked/locked
+const LessonCard = ({ lesson }) => {
   const getStatus = () => {
-    if (!isModuleActive) return "locked";
-    if (lessonIndex === 0) return "mastered";
-    if (lessonIndex === 1) return "in_progress";
-    return "unlocked";
+    if (lesson.status === "completed") return "mastered";
+    if (lesson.status === "available") return "in_progress";
+    return "locked";
   };
 
   const status = getStatus();
-  const isClickable = status === "mastered" || status === "in_progress";
+  const isClickable = lesson.canAccess;
 
   const iconMap = {
     mastered: "check_circle",
@@ -120,7 +118,7 @@ const LessonCard = ({ lesson, lessonIndex, isModuleActive }) => {
 
   const Wrapper = isClickable ? Link : "div";
   const wrapperProps = isClickable
-    ? { to: "/lesson/$lessonId", params: { lessonId: lesson._id } }
+    ? { to: "/lesson/$lessonId", params: { lessonId: lesson._id || lesson.id } }
     : {};
 
   return (
@@ -172,16 +170,16 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // First module active, rest locked (demo logic)
-  const isActive = index === 0;
+  const isActive = chapter.status !== "locked";
 
   useEffect(() => {
+    const chapterId = chapter._id || chapter.id;
     courseApi
-      .getLessons(chapter._id)
+      .getLessons(chapterId)
       .then((data) => setLessons(data || []))
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
-  }, [chapter._id]);
+  }, [chapter._id, chapter.id]);
 
   const getRankLabel = () => {
     const ranks = [
@@ -213,7 +211,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
             {isActive ? (
               <>
                 <span className="font-label-sm text-[11px] text-primary-fixed-dim tracking-[0.08em]">
-                  100% Completed
+                  {chapter.progress ? `${chapter.progress.percent}%` : "0%"} Completed
                 </span>
                 <span className="text-on-surface-variant/40 text-[11px]">
                   •
@@ -249,12 +247,10 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
             <div className="w-7 h-7 border-2 border-primary-fixed-dim/60 border-t-transparent rounded-full animate-spin" />
           </div>
         ) : lessons.length > 0 ? (
-          lessons.map((lesson, idx) => (
+          lessons.map((lesson) => (
             <LessonCard
-              key={lesson._id}
+              key={lesson._id || lesson.id}
               lesson={lesson}
-              lessonIndex={idx}
-              isModuleActive={isActive}
             />
           ))
         ) : (
@@ -341,8 +337,18 @@ const CourseDetailPage = () => {
   // Stats
   const totalLessons =
     course.totalLessons ||
-    chapters.reduce((sum, ch) => sum + (ch.totalLessons || 0), 0);
+    chapters.reduce((sum, ch) => sum + (ch.progress?.totalLessons || 0), 0);
   const totalModules = chapters.length || course.totalChapters || 0;
+
+  // Calculate dynamic stats
+  const totalCompletedLessons = chapters.reduce(
+    (sum, ch) => sum + (ch.progress?.completedLessons || 0),
+    0,
+  );
+  const overallPercent =
+    totalLessons > 0 ? Math.round((totalCompletedLessons / totalLessons) * 100) : 0;
+  const totalUnlockedLessons =
+    totalCompletedLessons < totalLessons ? totalCompletedLessons + 1 : totalCompletedLessons;
 
   return (
     <main className="w-full relative pb-20 min-h-screen">
@@ -399,13 +405,13 @@ const CourseDetailPage = () => {
               {/* Percentage */}
               <div className="mb-6">
                 <span className="font-headline-md text-[36px] font-bold text-primary-fixed-dim">
-                  42%
+                  {overallPercent}%
                 </span>
                 {/* Progress Bar */}
                 <div className="h-1 bg-surface-container-highest rounded-full mt-3 overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-primary-fixed-dim to-primary-fixed rounded-full shadow-[0_0_12px_rgba(0,218,248,0.5)] transition-all duration-1000 ease-out"
-                    style={{ width: "42%" }}
+                    style={{ width: `${overallPercent}%` }}
                   />
                 </div>
               </div>
@@ -414,7 +420,7 @@ const CourseDetailPage = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div className="bg-surface-container-high rounded-lg p-3 text-center border border-outline-variant">
                   <div className="font-headline-sm text-[22px] font-bold text-on-surface">
-                    18
+                    {totalCompletedLessons}
                   </div>
                   <div className="font-label-sm text-[9px] text-on-surface-variant tracking-[0.12em] uppercase mt-1">
                     Mastered
@@ -422,7 +428,7 @@ const CourseDetailPage = () => {
                 </div>
                 <div className="bg-surface-container-high rounded-lg p-3 text-center border border-outline-variant">
                   <div className="font-headline-sm text-[22px] font-bold text-on-surface">
-                    24
+                    {totalUnlockedLessons}
                   </div>
                   <div className="font-label-sm text-[9px] text-on-surface-variant tracking-[0.12em] uppercase mt-1">
                     Unlocked

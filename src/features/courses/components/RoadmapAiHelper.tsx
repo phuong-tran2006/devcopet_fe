@@ -85,7 +85,7 @@ const RoadmapAiHelper = ({
     "linear-gradient(145deg, rgba(7, 18, 23, 0.95) 0%, rgba(13, 35, 41, 0.95) 100%)";
   const headerBgGradient = `linear-gradient(90deg, ${accentColor}15, ${accentColor}05)`;
 
-  const isHidden = !nodeId || nodeStatus === "locked" || mode === "hard";
+  const isHidden = !nodeId || nodeStatus === "locked";
   if (isHidden) return null;
 
   if (panelState === "collapsed") {

@@ -37,7 +37,12 @@ function AuthCallbackPage() {
 
         setAuth(accessToken, refreshToken || "", user);
 
-        navigate({ to: "/course" });
+        const redirectUrl = search.redirect || new URLSearchParams(window.location.search).get("redirect");
+        if (!user?.onboardingCompleted) {
+          navigate({ to: "/onboarding" });
+        } else {
+          navigate({ to: redirectUrl || "/course" });
+        }
       } catch (error) {
         navigate({
           to: "/login",

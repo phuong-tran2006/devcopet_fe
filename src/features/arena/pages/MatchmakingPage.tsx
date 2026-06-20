@@ -1,25 +1,52 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import PlayerCard from "../components/PlayerCard";
 import OpponentCard from "../components/OpponentCard";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const MatchmakingPage = () => {
   const [status, setStatus] = useState<"idle" | "searching" | "found">("idle");
+  const [opponent, setOpponent] = useState<any>(null);
   const navigate = useNavigate();
+  const { user: currentUser } = useAuthStore();
 
-  useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    if (status === "searching") {
-      // Simulate finding an opponent after 3 seconds
-      timeoutId = setTimeout(() => {
+  const handleStartSearch = async () => {
+    setStatus("searching");
+    try {
+      const { api } = await import("../../../services/axiosClient");
+      const response = await api.get("/users/match");
+      const opponentData = response.data;
+      setOpponent(opponentData);
+      sessionStorage.setItem("currentOpponent", JSON.stringify(opponentData));
+      // Delay for visual effect
+      setTimeout(() => {
         setStatus("found");
-      }, 3000);
+      }, 2000);
+    } catch (err) {
+      console.error("Matchmaking failed", err);
+      // Fallback opponent
+      const fallbackOpponent = {
+        _id: "mock-opponent",
+        username: "ByteMaster",
+        level: 40,
+        exp: 39500,
+        avatarUrl: "https://i.pravatar.cc/150?u=byte",
+        bio: "Ready to battle!",
+      };
+      setOpponent(fallbackOpponent);
+      sessionStorage.setItem("currentOpponent", JSON.stringify(fallbackOpponent));
+      setTimeout(() => {
+        setStatus("found");
+      }, 2000);
     }
-    return () => clearTimeout(timeoutId);
-  }, [status]);
+  };
 
-  const handleStartSearch = () => setStatus("searching");
-  const handleCancelSearch = () => setStatus("idle");
+  const handleCancelSearch = () => {
+    setStatus("idle");
+    setOpponent(null);
+    sessionStorage.removeItem("currentOpponent");
+  };
+
   const handleReady = () => {
     navigate({ to: "/dashboard/active" });
   };
@@ -54,7 +81,12 @@ const MatchmakingPage = () => {
       <div className="relative flex items-center justify-center gap-4 sm:gap-8 lg:gap-16 w-full max-w-5xl">
         {/* Left Card */}
         <div className="flex-1 flex justify-end">
-          <PlayerCard />
+          <PlayerCard
+            name={currentUser?.username || "CodeNinja"}
+            level={Number(currentUser?.level) || 1}
+            rank={(currentUser?.level || 1) >= 15 ? "Elite" : "Novice"}
+            avatarUrl={(currentUser?.avatarUrl as string) || "https://i.pravatar.cc/150?u=a04258114e29026702d"}
+          />
         </div>
 
         {/* VS Badge */}
@@ -86,7 +118,7 @@ const MatchmakingPage = () => {
 
         {/* Right Card */}
         <div className="flex-1 flex justify-start">
-          <OpponentCard status={status} />
+          <OpponentCard status={status} opponent={opponent} />
         </div>
       </div>
 
