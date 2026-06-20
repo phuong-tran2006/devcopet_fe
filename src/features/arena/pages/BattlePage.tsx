@@ -12,7 +12,7 @@ const BattlePage = () => {
   );
 
   useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
+    let timeoutId: ReturnType<typeof setTimeout>;
     if (phase === "result") {
       timeoutId = setTimeout(() => {
         setPhase("victory");

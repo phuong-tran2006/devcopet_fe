@@ -37,11 +37,7 @@ function AuthCallbackPage() {
 
         setAuth(accessToken, refreshToken || "", user);
 
-        if (!user?.onboardingCompleted) {
-          navigate({ to: "/onboarding" });
-        } else {
-          navigate({ to: "/course" });
-        }
+        navigate({ to: "/course" });
       } catch (error) {
         navigate({
           to: "/login",

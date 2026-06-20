@@ -90,14 +90,6 @@ const LandingPage = () => {
                   project-based mentoring, and a community of elite developers.
                   Break every technical limit.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
-                  <button className="bg-primary-fixed-dim text-on-primary-fixed font-bold py-4 px-10 rounded-lg text-[18px] glow-cyan hover:scale-105 transition-all duration-300 ease-out-cubic active:scale-95">
-                    Get Started Now
-                  </button>
-                  <button className="border border-outline/20 hover:border-outline/40 backdrop-blur-md text-on-surface font-bold py-4 px-10 rounded-lg text-[18px] transition-all duration-300 ease-out-cubic active:scale-95">
-                    View Roadmap
-                  </button>
-                </div>
               </div>
 
               {/* Right: Video Mascot — green screen removed */}

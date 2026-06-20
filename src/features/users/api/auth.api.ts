@@ -48,10 +48,21 @@ export const changePassword = async (payload: {
 
 export const authApi = {
   login: async (data: LoginDto) => {
-    // try {
-    //   const response = await api.post("/auth/login", data);
-    //   return response.data;
-    // } catch(e) { ... fallback to mock }
+    try {
+      const response = await api.post("/auth/login", data);
+      return response.data;
+    } catch (err: any) {
+      if (
+        err.response &&
+        (err.response.status === 400 || err.response.status === 401)
+      ) {
+        const message = err.response.data?.message || err.message;
+        throw new Error(Array.isArray(message) ? message[0] : message);
+      }
+      console.warn(
+        "Real login API failed or unavailable. Falling back to mock.",
+      );
+    }
 
     // Mock implementation based on chithanh branch
     await delay(800);
@@ -88,8 +99,21 @@ export const authApi = {
   },
 
   register: async (data: RegisterDto) => {
-    // const response = await api.post("/auth/register", data);
-    // return response.data;
+    try {
+      const response = await api.post("/auth/register", data);
+      return response.data;
+    } catch (err: any) {
+      if (
+        err.response &&
+        (err.response.status === 400 || err.response.status === 409)
+      ) {
+        const message = err.response.data?.message || err.message;
+        throw new Error(Array.isArray(message) ? message[0] : message);
+      }
+      console.warn(
+        "Real register API failed or unavailable. Falling back to mock.",
+      );
+    }
 
     // Mock implementation based on chithanh branch
     await delay(800);
@@ -154,9 +178,15 @@ export const authApi = {
   },
 
   logout: async () => {
-    // const response = await api.post("/auth/logout");
-    // return response.data;
-    await delay(300);
-    return true;
+    try {
+      const response = await api.post("/auth/logout");
+      return response.data;
+    } catch (err) {
+      console.warn(
+        "Real logout API failed or unavailable. Falling back to mock.",
+      );
+      await delay(300);
+      return true;
+    }
   },
 };

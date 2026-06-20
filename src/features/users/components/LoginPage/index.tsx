@@ -36,11 +36,7 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (!useAuthStore.getState().user?.onboardingCompleted) {
-        navigate({ to: "/onboarding" });
-      } else {
-        navigate({ to: "/course" });
-      }
+      navigate({ to: "/course" });
     }
   }, [isAuthenticated, navigate]);
 
@@ -57,11 +53,7 @@ const Login = () => {
     try {
       const response = await authApi.login({ email, password });
       setAuth(response.accessToken, response.refreshToken, response.user);
-      if (response.user && !response.user.onboardingCompleted) {
-        navigate({ to: "/onboarding" });
-      } else {
-        navigate({ to: "/course" });
-      }
+      navigate({ to: "/course" });
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||
