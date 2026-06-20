@@ -3,6 +3,10 @@ import ReactDOM from "react-dom/client";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 
 import { routeTree } from "./routeTree.gen";
+import { useAuthStore } from "./features/users/store/auth.store";
+
+// Restore auth session from localStorage before routing
+useAuthStore.getState().checkAuth();
 
 const router = createRouter({ routeTree });
 

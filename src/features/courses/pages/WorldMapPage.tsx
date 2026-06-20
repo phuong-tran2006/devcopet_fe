@@ -909,13 +909,27 @@ const WorldMapPage = () => {
               !loading &&
               !error &&
               flatNodes.length === 0 && (
-                <div className="rounded-2xl border border-on-surface/10 bg-surface-container/50 px-6 py-8 text-center">
-                  <h2 className="text-[18px] font-extrabold text-on-surface">
-                    No lesson nodes yet
-                  </h2>
-                  <p className="mt-2 text-[13px] text-on-surface-variant">
-                    The Easy roadmap returned no lessons for this course.
-                  </p>
+                <div
+                  className="mb-6 flex items-center gap-3 rounded-xl border px-4 py-4"
+                  style={{
+                    background: cfg.glowWeak,
+                    borderColor: `${cfg.accent}35`,
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined text-[22px]"
+                    style={{ color: cfg.accent }}
+                  >
+                    construction
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-bold text-on-surface">
+                      Coming soon
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-on-surface-variant/70">
+                      Easy roadmap data is not implemented yet.
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -1095,14 +1109,27 @@ const WorldMapPage = () => {
               !loading &&
               !error &&
               mediumFlatNodes.length === 0 && (
-                <div className="rounded-2xl border border-on-surface/10 bg-surface-container/50 px-6 py-8 text-center">
-                  <h2 className="text-[18px] font-extrabold text-on-surface">
-                    No Medium nodes yet
-                  </h2>
-                  <p className="mt-2 text-[13px] text-on-surface-variant">
-                    The Medium roadmap returned no challenge nodes for this
-                    course.
-                  </p>
+                <div
+                  className="mb-6 flex items-center gap-3 rounded-xl border px-4 py-4"
+                  style={{
+                    background: cfg.glowWeak,
+                    borderColor: `${cfg.accent}35`,
+                  }}
+                >
+                  <span
+                    className="material-symbols-outlined text-[22px]"
+                    style={{ color: cfg.accent }}
+                  >
+                    construction
+                  </span>
+                  <div>
+                    <p className="text-[13px] font-bold text-on-surface">
+                      Coming soon
+                    </p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-on-surface-variant/70">
+                      Medium roadmap data is not implemented yet.
+                    </p>
+                  </div>
                 </div>
               )}
 

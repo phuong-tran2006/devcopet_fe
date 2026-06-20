@@ -10,7 +10,7 @@ const RoadmapPage = () => {
 
     let alive = true;
     const courseSlug = "python-basic";
-    
+
     Promise.all([
       courseApi.getEasyRoadmap(courseSlug).catch(() => null),
       courseApi.getMediumRoadmap(courseSlug).catch(() => null),
@@ -132,7 +132,7 @@ const RoadmapPage = () => {
                 <span className="text-primary">{pythonCompletion}%</span>
               </div>
               <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div 
+                <div
                   className="h-full bg-primary-fixed-dim rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]"
                   style={{ width: `${pythonCompletion}%` }}
                 ></div>
