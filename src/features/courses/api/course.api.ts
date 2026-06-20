@@ -219,6 +219,29 @@ export interface SubmitMediumNodeChallengeResponse {
   explanation?: string;
 }
 
+export type HardRoadmapNode = MediumRoadmapNode;
+export type HardRoadmapChapter = Omit<MediumRoadmapChapter, "nodes"> & {
+  nodes: HardRoadmapNode[];
+};
+export interface HardRoadmapResponse {
+  course: {
+    id: string;
+    slug: string;
+    title: string;
+    totalChapters: number;
+    totalNodes: number;
+  };
+  mode: "hard";
+  chapters: HardRoadmapChapter[];
+}
+export type HardChallengeNode = MediumChallengeNode;
+export type HardMultipleChoiceChallenge = MediumMultipleChoiceChallenge;
+export type HardDragDropChallenge = MediumDragDropChallenge;
+export type HardNodeChallenge = MediumNodeChallenge;
+export type HardNodeChallengeResponse = MediumNodeChallengeResponse;
+export type SubmitHardNodeChallengePayload = SubmitMediumNodeChallengePayload;
+export type SubmitHardNodeChallengeResponse = SubmitMediumNodeChallengeResponse;
+
 export const courseApi = {
   getCourses: async () => {
     const response = await api.get(`/courses`);
@@ -290,6 +313,29 @@ export const courseApi = {
   ): Promise<SubmitMediumNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
+      payload,
+    );
+    return response.data;
+  },
+
+  getHardRoadmap: async (courseSlug: string): Promise<HardRoadmapResponse> => {
+    const response = await api.get(`/roadmaps/${courseSlug}/hard`);
+    return response.data;
+  },
+
+  getHardNodeChallenge: async (
+    nodeId: string,
+  ): Promise<HardNodeChallengeResponse> => {
+    const response = await api.get(`/roadmaps/hard/nodes/${nodeId}/challenge`);
+    return response.data;
+  },
+
+  submitHardNodeChallenge: async (
+    nodeId: string,
+    payload: SubmitHardNodeChallengePayload,
+  ): Promise<SubmitHardNodeChallengeResponse> => {
+    const response = await api.post(
+      `/roadmaps/hard/nodes/${nodeId}/challenge/submit`,
       payload,
     );
     return response.data;

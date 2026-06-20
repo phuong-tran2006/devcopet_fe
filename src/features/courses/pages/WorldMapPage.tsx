@@ -9,6 +9,9 @@ import {
   type MediumRoadmapChapter,
   type MediumRoadmapNode,
   type MediumRoadmapResponse,
+  type HardRoadmapChapter,
+  type HardRoadmapNode,
+  type HardRoadmapResponse,
 } from "../api/course.api";
 import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
 import { useTheme } from "../../../contexts/ThemeContext";
@@ -44,7 +47,8 @@ type Difficulty = keyof typeof DIFF_CONFIG;
 type ChapterStatus = "completed" | "active" | "locked";
 type SelectedRoadmapNode =
   | (EasyRoadmapNode & { difficulty?: "easy" })
-  | (MediumRoadmapNode & { difficulty?: "medium" });
+  | (MediumRoadmapNode & { difficulty?: "medium" })
+  | (HardRoadmapNode & { difficulty?: "hard" });
 
 const statusStyles = {
   completed: {
@@ -65,7 +69,7 @@ const statusStyles = {
 } as const;
 
 const getChapterStatus = (
-  chapter: EasyRoadmapChapter | MediumRoadmapChapter,
+  chapter: EasyRoadmapChapter | MediumRoadmapChapter | HardRoadmapChapter,
 ): ChapterStatus => {
   if (chapter.nodes.length === 0) return "locked";
   if (chapter.nodes.every((node) => node.status === "completed")) {
@@ -134,6 +138,9 @@ const WorldMapPage = () => {
   const [roadmap, setRoadmap] = useState<EasyRoadmapResponse | null>(null);
   const [mediumRoadmap, setMediumRoadmap] =
     useState<MediumRoadmapResponse | null>(null);
+  const [hardRoadmap, setHardRoadmap] = useState<HardRoadmapResponse | null>(
+    null,
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -159,6 +166,10 @@ const WorldMapPage = () => {
   const mediumChapters = useMemo(
     () => normalizeOrder(mediumRoadmap?.chapters ?? []),
     [mediumRoadmap],
+  );
+  const hardChapters = useMemo(
+    () => normalizeOrder(hardRoadmap?.chapters ?? []),
+    [hardRoadmap],
   );
 
   const flatNodes = useMemo(() => {
@@ -193,7 +204,28 @@ const WorldMapPage = () => {
     }));
   }, [mediumChapters]);
 
-  const activeFlatNodes = difficulty === "medium" ? mediumFlatNodes : flatNodes;
+  const hardFlatNodes = useMemo(() => {
+    const sorted = hardChapters.flatMap((chapter) =>
+      [...chapter.nodes]
+        .sort((a, b) => a.order - b.order)
+        .map((node) => ({
+          ...node,
+          chapterTitle: chapter.title,
+          chapterOrder: chapter.order,
+        })),
+    );
+    return sorted.map((node, idx) => ({
+      ...node,
+      label: (idx + 1).toString(),
+    }));
+  }, [hardChapters]);
+
+  const activeFlatNodes =
+    difficulty === "hard"
+      ? hardFlatNodes
+      : difficulty === "medium"
+        ? mediumFlatNodes
+        : flatNodes;
   const firstAvailableNodeId = useMemo(
     () =>
       activeFlatNodes.find((node) => node.status === "available")?.id ?? null,
@@ -203,7 +235,11 @@ const WorldMapPage = () => {
     (node) => node.status === "completed",
   ).length;
   const currentCourse =
-    difficulty === "medium" ? mediumRoadmap?.course : roadmap?.course;
+    difficulty === "hard"
+      ? hardRoadmap?.course
+      : difficulty === "medium"
+        ? mediumRoadmap?.course
+        : roadmap?.course;
   const totalNodes = currentCourse?.totalNodes ?? activeFlatNodes.length;
   const totalLessons = roadmap?.course.totalLessons ?? flatNodes.length;
   const completionPct =
@@ -224,12 +260,6 @@ const WorldMapPage = () => {
       return;
     }
 
-    if (difficulty === "hard") {
-      setLoading(false);
-      setError(null);
-      return;
-    }
-
     let alive = true;
     setLoading(true);
     setError(null);
@@ -237,17 +267,21 @@ const WorldMapPage = () => {
     setSelectedNode(null);
 
     const request =
-      difficulty === "medium"
-        ? courseApi.getMediumRoadmap(courseSlug)
-        : courseApi.getEasyRoadmap(courseSlug);
+      difficulty === "hard"
+        ? courseApi.getHardRoadmap(courseSlug)
+        : difficulty === "medium"
+          ? courseApi.getMediumRoadmap(courseSlug)
+          : courseApi.getEasyRoadmap(courseSlug);
 
     request
       .then((data) => {
         if (!alive) return;
-        if (data.mode === "medium") {
-          setMediumRoadmap(data);
+        if (data.mode === "hard") {
+          setHardRoadmap(data as HardRoadmapResponse);
+        } else if (data.mode === "medium") {
+          setMediumRoadmap(data as MediumRoadmapResponse);
         } else {
-          setRoadmap(data);
+          setRoadmap(data as EasyRoadmapResponse);
         }
         setSelectedChapterId(data.chapters[0]?.id ?? null);
         document.title = `${data.course.title} Roadmap | Devcopet Learn`;
@@ -320,7 +354,7 @@ const WorldMapPage = () => {
   };
 
   const scrollToChapter = (
-    chapter: EasyRoadmapChapter | MediumRoadmapChapter,
+    chapter: EasyRoadmapChapter | MediumRoadmapChapter | HardRoadmapChapter,
   ) => {
     setSelectedChapterId(chapter.id);
     const firstNode = chapter.nodes[0];
@@ -344,17 +378,6 @@ const WorldMapPage = () => {
       );
     }
 
-    if (difficulty === "hard") {
-      return (
-        <div className="mx-3 my-4 rounded-xl border border-on-surface/10 bg-surface-container/60 px-4 py-5">
-          <p className="text-[12px] font-bold text-on-surface">Coming soon</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-on-surface-variant/70">
-            Medium and Hard roadmaps are not available yet.
-          </p>
-        </div>
-      );
-    }
-
     if (error) {
       return (
         <div className="mx-3 my-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-5">
@@ -366,7 +389,12 @@ const WorldMapPage = () => {
       );
     }
 
-    const sidebarChapters = difficulty === "medium" ? mediumChapters : chapters;
+    const sidebarChapters =
+      difficulty === "hard"
+        ? hardChapters
+        : difficulty === "medium"
+          ? mediumChapters
+          : chapters;
 
     return sidebarChapters.map((chapter) => {
       const chapterStatus = getChapterStatus(chapter);
@@ -756,7 +784,9 @@ const WorldMapPage = () => {
                       ? `${roadmap?.course.totalChapters ?? 0} chapters • ${totalLessons} lessons • ${totalNodes} nodes`
                       : difficulty === "medium"
                         ? `${mediumRoadmap?.course.totalChapters ?? 0} chapters • ${totalNodes} nodes`
-                        : "Coming soon"}
+                        : difficulty === "hard"
+                          ? `${hardRoadmap?.course.totalChapters ?? 0} chapters • ${totalNodes} nodes`
+                          : "Coming soon"}
                   </span>
                 </div>
               </div>
@@ -812,33 +842,7 @@ const WorldMapPage = () => {
               </div>
             </div>
 
-            {difficulty === "hard" && (
-              <div
-                className="mb-6 flex items-center gap-3 rounded-xl border px-4 py-4"
-                style={{
-                  background: cfg.glowWeak,
-                  borderColor: `${cfg.accent}35`,
-                }}
-              >
-                <span
-                  className="material-symbols-outlined text-[22px]"
-                  style={{ color: cfg.accent }}
-                >
-                  construction
-                </span>
-                <div>
-                  <p className="text-[13px] font-bold text-on-surface">
-                    Coming soon
-                  </p>
-                  <p className="mt-0.5 text-[11px] leading-relaxed text-on-surface-variant/70">
-                    {DIFF_CONFIG[difficulty].label} roadmap data is not
-                    implemented yet.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {difficulty !== "hard" && loading && (
+            {loading && (
               <div className="flex min-h-[360px] items-center justify-center rounded-2xl border border-on-surface/8 bg-surface-container/40">
                 <div className="flex flex-col items-center gap-3">
                   <div
@@ -855,7 +859,7 @@ const WorldMapPage = () => {
               </div>
             )}
 
-            {difficulty !== "hard" && !loading && error && (
+            {!loading && error && (
               <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
                 <span className="material-symbols-outlined mb-3 text-[34px] text-red-200">
                   error
@@ -1085,25 +1089,25 @@ const WorldMapPage = () => {
                 </div>
               )}
 
-            {difficulty === "medium" &&
+            {difficulty !== "easy" &&
               !loading &&
               !error &&
-              mediumFlatNodes.length === 0 && (
+              activeFlatNodes.length === 0 && (
                 <div className="rounded-2xl border border-on-surface/10 bg-surface-container/50 px-6 py-8 text-center">
                   <h2 className="text-[18px] font-extrabold text-on-surface">
-                    No Medium nodes yet
+                    No {DIFF_CONFIG[difficulty].label} nodes yet
                   </h2>
                   <p className="mt-2 text-[13px] text-on-surface-variant">
-                    The Medium roadmap returned no challenge nodes for this
-                    course.
+                    The {DIFF_CONFIG[difficulty].label} roadmap returned no
+                    challenge nodes for this course.
                   </p>
                 </div>
               )}
 
-            {difficulty === "medium" &&
+            {difficulty !== "easy" &&
               !loading &&
               !error &&
-              mediumFlatNodes.length > 0 && (
+              activeFlatNodes.length > 0 && (
                 <div
                   ref={mapContainerRef}
                   className="relative w-full select-none overflow-visible"
@@ -1114,7 +1118,7 @@ const WorldMapPage = () => {
                     xmlns="http://www.w3.org/2000/svg"
                   >
                     <defs>
-                      <filter id="glow-medium-roadmap">
+                      <filter id={`glow-${difficulty}-roadmap`}>
                         <feGaussianBlur stdDeviation="4" result="coloredBlur" />
                         <feMerge>
                           <feMergeNode in="coloredBlur" />
@@ -1127,10 +1131,10 @@ const WorldMapPage = () => {
                       <path
                         d={completedD}
                         fill="none"
-                        stroke={DIFF_CONFIG.medium.pathColor}
+                        stroke={cfg.pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-medium-roadmap)"
+                        filter={`url(#glow-${difficulty}-roadmap)`}
                       />
                     )}
                     {lockedD && (
@@ -1146,13 +1150,18 @@ const WorldMapPage = () => {
                     )}
                   </svg>
 
-                  {mediumFlatNodes.map((node, idx) => {
+                  {activeFlatNodes.map((node, idx) => {
                     const { x, y } = getNodeCoords(idx);
-                    const styles = statusStyles[node.status];
+                    const styles =
+                      statusStyles[node.status as keyof typeof statusStyles] ||
+                      statusStyles.locked;
                     const isHovered = hoveredNode === node.id;
                     const isActive = firstAvailableNodeId === node.id;
                     const isSelected = selectedNode?.id === node.id;
-                    const chapterForNode = mediumChapters.find(
+
+                    const activeChapters =
+                      difficulty === "hard" ? hardChapters : mediumChapters;
+                    const chapterForNode = activeChapters.find(
                       (chapter) => chapter.order === node.chapterOrder,
                     );
                     const nodeGlowClass =
@@ -1163,7 +1172,7 @@ const WorldMapPage = () => {
                         : "";
                     const isFirstInChapter =
                       idx === 0 ||
-                      mediumFlatNodes[idx - 1].chapterOrder !==
+                      activeFlatNodes[idx - 1].chapterOrder !==
                         node.chapterOrder;
 
                     return (
@@ -1181,7 +1190,10 @@ const WorldMapPage = () => {
                         onMouseEnter={() => setHoveredNode(node.id)}
                         onMouseLeave={() => setHoveredNode(null)}
                         onClick={() => {
-                          setSelectedNode({ ...node, difficulty: "medium" });
+                          setSelectedNode({
+                            ...node,
+                            difficulty,
+                          } as SelectedRoadmapNode);
                           setSelectedChapterId(
                             chapterForNode?.id ?? node.chapterId ?? null,
                           );

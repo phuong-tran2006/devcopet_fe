@@ -4,11 +4,13 @@ import { useTheme } from "../../contexts/ThemeContext";
 import type {
   EasyRoadmapNode,
   MediumRoadmapNode,
+  HardRoadmapNode,
 } from "../../features/courses/api/course.api";
 
 type RoadmapDetailNode =
   | (EasyRoadmapNode & { difficulty?: "easy" })
-  | (MediumRoadmapNode & { difficulty?: "medium" });
+  | (MediumRoadmapNode & { difficulty?: "medium" })
+  | (HardRoadmapNode & { difficulty?: "hard" });
 
 export interface NodeDetailsProps {
   isOpen: boolean;
@@ -109,8 +111,9 @@ const NodeDetailsModal = ({
   const isLocked = node.status === "locked";
   const isActionDisabled = isLocked || !courseSlug;
   const nodeTitle = getNodeDisplayTitle(node);
-  const isMediumNode = node.difficulty === "medium";
-  const duration = isMediumNode
+  const isAdvancedNode =
+    node.difficulty === "medium" || node.difficulty === "hard";
+  const duration = isAdvancedNode
     ? `${node.estimatedMinutes || 1} min`
     : EASY_CHECKPOINT_DURATION;
 
@@ -121,7 +124,18 @@ const NodeDetailsModal = ({
 
     onClose();
 
-    if (isMediumNode) {
+    if (node.difficulty === "hard") {
+      navigate({
+        to: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+        params: {
+          courseSlug,
+          nodeId: node.id,
+        },
+      });
+      return;
+    }
+
+    if (node.difficulty === "medium") {
       navigate({
         to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
         params: {
@@ -191,7 +205,7 @@ const NodeDetailsModal = ({
             </span>
             {copy.label}
           </span>
-          {isMediumNode && (
+          {isAdvancedNode && (
             <span
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest"
               style={{

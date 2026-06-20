@@ -4,17 +4,17 @@ import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   courseApi,
   type EasyChallengeOptionId,
-  type MediumDragDropChallenge,
-  type MediumNodeChallenge,
-  type MediumMultipleChoiceChallenge,
-  type MediumNodeChallengeResponse,
-  type SubmitMediumNodeChallengeResponse,
+  type HardDragDropChallenge,
+  type HardNodeChallenge,
+  type HardMultipleChoiceChallenge,
+  type HardNodeChallengeResponse,
+  type SubmitHardNodeChallengeResponse,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 
-const sortOptions = (options: MediumMultipleChoiceChallenge["options"]) =>
+const sortOptions = (options: HardMultipleChoiceChallenge["options"]) =>
   [...options].sort(
     (a, b) => OPTION_ORDER.indexOf(a.id) - OPTION_ORDER.indexOf(b.id),
   );
@@ -88,7 +88,7 @@ const CodeSnippetCard = ({
   );
 };
 
-const getChallengeHint = (challenge: MediumNodeChallenge | null) => {
+const getChallengeHint = (challenge: HardNodeChallenge | null) => {
   if (!challenge) return "";
 
   return (
@@ -170,10 +170,10 @@ const FeedbackPanel = ({
   );
 };
 
-const MediumNodeChallengePage = () => {
+const HardNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
-  const [data, setData] = useState<MediumNodeChallengeResponse | null>(null);
+  const [data, setData] = useState<HardNodeChallengeResponse | null>(null);
   const [selectedOptionId, setSelectedOptionId] =
     useState<EasyChallengeOptionId | null>(null);
   const [dropZoneMap, setDropZoneMap] = useState<Record<string, string>>({});
@@ -189,8 +189,9 @@ const MediumNodeChallengePage = () => {
     x: number;
     y: number;
   } | null>(null);
-  const [result, setResult] =
-    useState<SubmitMediumNodeChallengeResponse | null>(null);
+  const [result, setResult] = useState<SubmitHardNodeChallengeResponse | null>(
+    null,
+  );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -204,10 +205,10 @@ const MediumNodeChallengePage = () => {
   const isMultipleChoice = challenge?.type === "multiple_choice";
   const isDragDrop = challenge?.type === "drag_drop";
   const multipleChoiceChallenge = isMultipleChoice
-    ? (challenge as MediumMultipleChoiceChallenge)
+    ? (challenge as HardMultipleChoiceChallenge)
     : null;
   const dragDropChallenge = isDragDrop
-    ? (challenge as MediumDragDropChallenge)
+    ? (challenge as HardDragDropChallenge)
     : null;
   const canEditDragDrop = !isLockedMode && !isReviewMode && !result;
 
@@ -268,10 +269,8 @@ const MediumNodeChallengePage = () => {
     setNextChallengeLoading(false);
 
     Promise.all([
-      courseApi.getMediumNodeChallenge(nodeId),
-      courseSlug
-        ? courseApi.getMediumRoadmap(courseSlug)
-        : Promise.resolve(null),
+      courseApi.getHardNodeChallenge(nodeId),
+      courseSlug ? courseApi.getHardRoadmap(courseSlug) : Promise.resolve(null),
     ])
       .then(([response, roadmap]) => {
         if (!alive) return;
@@ -295,14 +294,14 @@ const MediumNodeChallengePage = () => {
             setDropZoneMap(response.review.dropZoneMap ?? {});
           }
         }
-        document.title = `${response.node.label} Medium Challenge | Devcopet`;
+        document.title = `${response.node.label} Hard Challenge | Devcopet`;
       })
       .catch((err) => {
         if (!alive) return;
         setError(
           err?.response?.data?.message ||
             err?.message ||
-            "Unable to load this Medium challenge.",
+            "Unable to load this Hard challenge.",
         );
       })
       .finally(() => {
@@ -326,7 +325,7 @@ const MediumNodeChallengePage = () => {
 
     setNextChallengeLoading(true);
     try {
-      const roadmap = await courseApi.getMediumRoadmap(courseSlug);
+      const roadmap = await courseApi.getHardRoadmap(courseSlug);
       const nodes = [...roadmap.chapters]
         .sort((a, b) => a.order - b.order)
         .flatMap((chapter) =>
@@ -341,14 +340,14 @@ const MediumNodeChallengePage = () => {
       }
 
       navigate({
-        to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+        to: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
         params: {
           courseSlug,
           nodeId: nextNode.id,
         },
       });
     } catch (err) {
-      console.error("Unable to open next Medium challenge:", err);
+      console.error("Unable to open next Hard challenge:", err);
       goBackToRoadmap();
     } finally {
       setNextChallengeLoading(false);
@@ -383,7 +382,7 @@ const MediumNodeChallengePage = () => {
     }
 
     courseApi
-      .submitMediumNodeChallenge(nodeId, payload)
+      .submitHardNodeChallenge(nodeId, payload)
       .then((response) => {
         setResult(response);
         setShowSuccessModal(response.correct);
@@ -1151,4 +1150,4 @@ const MediumNodeChallengePage = () => {
   );
 };
 
-export default MediumNodeChallengePage;
+export default HardNodeChallengePage;
