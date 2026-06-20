@@ -1,9 +1,54 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { courseApi } from "../api/course.api";
 
 const RoadmapPage = () => {
+  const [pythonCompletion, setPythonCompletion] = useState<number>(0);
+
   useEffect(() => {
     document.title = "Select Your Domain | Devcopet Learn";
+
+    let alive = true;
+    const courseSlug = "python-basic";
+    
+    Promise.all([
+      courseApi.getEasyRoadmap(courseSlug).catch(() => null),
+      courseApi.getMediumRoadmap(courseSlug).catch(() => null),
+      courseApi.getHardRoadmap(courseSlug).catch(() => null)
+    ]).then(([easy, medium, hard]) => {
+      if (!alive) return;
+      let total = 0;
+      let completed = 0;
+
+      const processRoadmap = (roadmap: any) => {
+        if (!roadmap) return;
+        if (typeof roadmap.completedNodes === "number" && typeof roadmap.totalNodes === "number") {
+          completed += roadmap.completedNodes;
+          total += roadmap.totalNodes;
+        } else if (roadmap.chapters) {
+          roadmap.chapters.forEach((chapter: any) => {
+            chapter.nodes?.forEach((node: any) => {
+              total += 1;
+              if (node.status === "completed") {
+                completed += 1;
+              }
+            });
+          });
+        }
+      };
+
+      processRoadmap(easy);
+      processRoadmap(medium);
+      processRoadmap(hard);
+
+      if (total > 0) {
+        setPythonCompletion(Math.round((completed / total) * 100));
+      } else {
+        setPythonCompletion(0);
+      }
+    });
+
+    return () => { alive = false; };
   }, []);
 
   return (
@@ -84,10 +129,13 @@ const RoadmapPage = () => {
                 <span className="text-on-surface-variant">
                   World Completion
                 </span>
-                <span className="text-primary">78%</span>
+                <span className="text-primary">{pythonCompletion}%</span>
               </div>
               <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary-fixed-dim w-[78%] rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]"></div>
+                <div 
+                  className="h-full bg-primary-fixed-dim rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]"
+                  style={{ width: `${pythonCompletion}%` }}
+                ></div>
               </div>
             </div>
 
@@ -115,19 +163,19 @@ const RoadmapPage = () => {
           </div>
 
           {/* Card 2: Java */}
-          <div className="bg-surface rounded-2xl border border-outline/30 p-6 flex flex-col hover:border-water/50 hover:shadow-[0_8px_30px_rgba(59,130,246,0.2)] transition-all duration-500 ease-out-cubic group relative overflow-hidden opacity-90 hover:opacity-100">
+          <div className="bg-surface rounded-2xl border border-outline/20 p-6 flex flex-col relative overflow-hidden select-none opacity-70">
             {/* Header Badge */}
             <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-secondary bg-[#D8BFD8]/10 border border-[#D8BFD8]/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                Lvl. 12 Initiate
+              <span className="text-[10px] text-on-surface/40 bg-on-surface/5 border border-on-surface/10 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
+                Lvl. 0 Locked
               </span>
             </div>
 
             {/* Logo Wrapper */}
-            <div className="h-[100px] w-full bg-[#D8BFD8]/10 border border-[#D8BFD8]/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-[#D8BFD8]/20 transition-colors">
+            <div className="h-[100px] w-full bg-on-surface/5 border border-on-surface/5 rounded-xl flex items-center justify-center mb-6 opacity-40">
               <svg
                 viewBox="0 0 80 80"
-                className="w-[52px] h-[52px] group-hover:scale-105 transition-transform duration-500 ease-out"
+                className="w-[52px] h-[52px]"
                 fill="none"
                 xmlns="http://www.w3.org/2000/svg"
               >
@@ -173,10 +221,10 @@ const RoadmapPage = () => {
 
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
-              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-secondary transition-colors">
+              <h2 className="font-headline-sm text-[22px] font-bold text-on-surface/40 tracking-wide">
                 Java World
               </h2>
-              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
+              <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant/40 min-h-[54px] line-clamp-3">
                 The titan of enterprise and Android development. Build robust,
                 scalable monoliths that stand the test of time.
               </p>
@@ -184,38 +232,37 @@ const RoadmapPage = () => {
 
             {/* Progress Slider */}
             <div className="flex flex-col gap-1.5 mb-6">
-              <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider">
+              <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider opacity-40">
                 <span className="text-on-surface-variant">
                   World Completion
                 </span>
-                <span className="text-secondary">24%</span>
+                <span>0%</span>
               </div>
-              <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-[#D8BFD8] w-[24%] rounded-full shadow-[0_0_10px_rgba(216,191,216,0.4)]"></div>
+              <div className="h-1.5 bg-surface-container/40 rounded-full overflow-hidden">
+                <div className="h-full bg-on-surface/10 w-[0%] rounded-full"></div>
               </div>
             </div>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
+            <div className="flex flex-wrap gap-2 mb-6 opacity-40">
+              <span className="text-[9px] font-bold text-on-surface-variant/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
                 ENTERPRISE
               </span>
-              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
+              <span className="text-[9px] font-bold text-on-surface-variant/60 bg-on-surface/5 border border-on-surface/5 px-2 py-0.5 rounded uppercase tracking-wider">
                 ANDROID
               </span>
             </div>
 
             {/* Action Button */}
-            <Link
-              to="/roadmap/$worldId"
-              params={{ worldId: "java-basic" }}
-              className="mt-auto w-full bg-[#D8BFD8] text-[#3c2a3c] font-extrabold text-[12px] py-2.5 rounded-xl hover:bg-[#e6d5e6] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(216,191,216,0.3)] hover:scale-[1.02] active:scale-[0.98] text-center"
+            <button
+              disabled
+              className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              Enter World{" "}
               <span className="material-symbols-outlined text-[15px]">
-                arrow_forward
+                lock
               </span>
-            </Link>
+              Unlock at Lvl 12
+            </button>
           </div>
 
           {/* Card 3: C++ */}

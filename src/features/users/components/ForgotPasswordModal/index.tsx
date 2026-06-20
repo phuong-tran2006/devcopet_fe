@@ -145,7 +145,9 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
             <p className="mb-2 text-xs font-bold uppercase tracking-[0.25em] text-primary-fixed-dim">
               Account Recovery
             </p>
-            <h2 className="text-2xl font-bold text-on-surface">Forgot password</h2>
+            <h2 className="text-2xl font-bold text-on-surface">
+              Forgot password
+            </h2>
             <p className="mt-2 text-sm leading-6 text-on-surface-variant">
               {step === 1
                 ? "Enter your email address. We will send a 6-digit reset code."
@@ -163,10 +165,14 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
         </div>
 
         <div className="mb-6 grid grid-cols-2 gap-3 text-xs font-bold uppercase tracking-[0.18em]">
-          <div className={`rounded-lg border px-3 py-2 ${step === 1 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}>
+          <div
+            className={`rounded-lg border px-3 py-2 ${step === 1 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
+          >
             1. Email
           </div>
-          <div className={`rounded-lg border px-3 py-2 ${step === 2 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}>
+          <div
+            className={`rounded-lg border px-3 py-2 ${step === 2 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
+          >
             2. Reset
           </div>
         </div>
@@ -188,10 +194,10 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
 
             <Button
               type="submit"
-                text={loading ? "Sending code..." : "Send reset code"}
-                layout_width="full"
-                className="w-full"
-                disabled={loading}
+              text={loading ? "Sending code..." : "Send reset code"}
+              layout_width="full"
+              className="w-full"
+              disabled={loading}
             />
           </form>
         ) : (
@@ -203,7 +209,9 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
                 inputMode="numeric"
                 maxLength={6}
                 value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                onChange={(e) =>
+                  setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
                 placeholder="6-digit code"
                 autoComplete="one-time-code"
                 className="w-full rounded-lg border border-on-surface/10 bg-surface/60 px-4 py-3 text-on-surface outline-none transition focus:border-primary-fixed-dim focus:ring-2 focus:ring-primary-fixed-dim/40"
@@ -260,11 +268,16 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
 
         {devResetCode ? (
           <div className="mt-4 rounded-lg border border-primary-fixed-dim/30 bg-primary-fixed-dim/10 px-4 py-3 text-sm text-on-surface">
-            Dev reset code: <span className="font-mono font-bold text-primary-fixed-dim">{devResetCode}</span>
+            Dev reset code:{" "}
+            <span className="font-mono font-bold text-primary-fixed-dim">
+              {devResetCode}
+            </span>
           </div>
         ) : null}
 
-        {message ? <p className="mt-4 text-sm text-primary-fixed-dim">{message}</p> : null}
+        {message ? (
+          <p className="mt-4 text-sm text-primary-fixed-dim">{message}</p>
+        ) : null}
         {error ? <p className="mt-4 text-sm text-red-400">{error}</p> : null}
       </div>
     </div>

@@ -4,11 +4,13 @@ import { useTheme } from "../../contexts/ThemeContext";
 import type {
   EasyRoadmapNode,
   MediumRoadmapNode,
+  HardRoadmapNode,
 } from "../../features/courses/api/course.api";
 
 type RoadmapDetailNode =
   | (EasyRoadmapNode & { difficulty?: "easy" })
-  | (MediumRoadmapNode & { difficulty?: "medium" });
+  | (MediumRoadmapNode & { difficulty?: "medium" })
+  | (HardRoadmapNode & { difficulty?: "hard" });
 
 export interface NodeDetailsProps {
   isOpen: boolean;
@@ -110,9 +112,11 @@ const NodeDetailsModal = ({
   const isActionDisabled = isLocked || !courseSlug;
   const nodeTitle = getNodeDisplayTitle(node);
   const isMediumNode = node.difficulty === "medium";
-  const duration = isMediumNode
-    ? `${node.estimatedMinutes || 1} min`
-    : EASY_CHECKPOINT_DURATION;
+  const isHardNode = node.difficulty === "hard";
+  const duration =
+    isMediumNode || isHardNode
+      ? `${node.estimatedMinutes || 1} min`
+      : EASY_CHECKPOINT_DURATION;
 
   const cfg = DIFF_CONFIG[node.difficulty || "easy"];
 
@@ -124,6 +128,17 @@ const NodeDetailsModal = ({
     if (isMediumNode) {
       navigate({
         to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+        params: {
+          courseSlug,
+          nodeId: node.id,
+        },
+      });
+      return;
+    }
+
+    if (isHardNode) {
+      navigate({
+        to: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
         params: {
           courseSlug,
           nodeId: node.id,
@@ -191,7 +206,7 @@ const NodeDetailsModal = ({
             </span>
             {copy.label}
           </span>
-          {isMediumNode && (
+          {(isMediumNode || isHardNode) && (
             <span
               className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-widest"
               style={{
@@ -201,9 +216,20 @@ const NodeDetailsModal = ({
               }}
             >
               <span className="material-symbols-outlined text-[14px]">
-                {node.type === "drag_drop" ? "drag_indicator" : "quiz"}
+                {node.type === "drag_drop" || node.type === "drag_drop_matching"
+                  ? "drag_indicator"
+                  : node.type.includes("ordering") ||
+                      node.type.includes("ranking")
+                    ? "sort"
+                    : node.type.includes("code") ||
+                        node.type.includes("bug") ||
+                        node.type === "fill_missing_line"
+                      ? "code"
+                      : "quiz"}
               </span>
-              {getTypeLabel(node.type)}
+              {isHardNode
+                ? node.type.replace(/_/g, " ")
+                : getTypeLabel(node.type)}
             </span>
           )}
         </div>
