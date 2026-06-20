@@ -1,9 +1,54 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import { courseApi } from "../api/course.api";
 
 const RoadmapPage = () => {
+  const [pythonCompletion, setPythonCompletion] = useState<number>(0);
+
   useEffect(() => {
     document.title = "Select Your Domain | Devcopet Learn";
+
+    let alive = true;
+    const courseSlug = "python-basic";
+
+    Promise.all([
+      courseApi.getEasyRoadmap(courseSlug).catch(() => null),
+      courseApi.getMediumRoadmap(courseSlug).catch(() => null),
+      courseApi.getHardRoadmap(courseSlug).catch(() => null)
+    ]).then(([easy, medium, hard]) => {
+      if (!alive) return;
+      let total = 0;
+      let completed = 0;
+
+      const processRoadmap = (roadmap: any) => {
+        if (!roadmap) return;
+        if (typeof roadmap.completedNodes === "number" && typeof roadmap.totalNodes === "number") {
+          completed += roadmap.completedNodes;
+          total += roadmap.totalNodes;
+        } else if (roadmap.chapters) {
+          roadmap.chapters.forEach((chapter: any) => {
+            chapter.nodes?.forEach((node: any) => {
+              total += 1;
+              if (node.status === "completed") {
+                completed += 1;
+              }
+            });
+          });
+        }
+      };
+
+      processRoadmap(easy);
+      processRoadmap(medium);
+      processRoadmap(hard);
+
+      if (total > 0) {
+        setPythonCompletion(Math.round((completed / total) * 100));
+      } else {
+        setPythonCompletion(0);
+      }
+    });
+
+    return () => { alive = false; };
   }, []);
 
   return (
@@ -84,10 +129,13 @@ const RoadmapPage = () => {
                 <span className="text-on-surface-variant">
                   World Completion
                 </span>
-                <span className="text-primary">78%</span>
+                <span className="text-primary">{pythonCompletion}%</span>
               </div>
               <div className="h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-primary-fixed-dim w-[78%] rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]"></div>
+                <div
+                  className="h-full bg-primary-fixed-dim rounded-full shadow-[0_0_10px_rgba(0,128,128,0.4)]"
+                  style={{ width: `${pythonCompletion}%` }}
+                ></div>
               </div>
             </div>
 
@@ -183,8 +231,8 @@ const RoadmapPage = () => {
             </div>
 
             {/* Progress Slider */}
-            <div className="flex flex-col gap-1.5 mb-6 opacity-40">
-              <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider">
+            <div className="flex flex-col gap-1.5 mb-6">
+              <div className="flex justify-between items-center text-[11px] font-semibold tracking-wider opacity-40">
                 <span className="text-on-surface-variant">
                   World Completion
                 </span>
@@ -213,7 +261,7 @@ const RoadmapPage = () => {
               <span className="material-symbols-outlined text-[15px]">
                 lock
               </span>
-              Unlock at Lvl 10
+              Unlock at Lvl 12
             </button>
           </div>
 

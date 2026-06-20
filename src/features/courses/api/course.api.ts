@@ -219,6 +219,163 @@ export interface SubmitMediumNodeChallengeResponse {
   explanation?: string;
 }
 
+export type HardChallengeType =
+  | "multiple_choice"
+  | "code_trace"
+  | "bug_hunt"
+  | "choose_better_algorithm"
+  | "simulation"
+  | "fill_missing_line"
+  | "drag_drop_matching"
+  | "ordering_steps"
+  | "ranking";
+
+export interface HardRoadmapNode {
+  id: string;
+  chapterId?: string;
+  chapterOrder: number;
+  order: number;
+  label: string;
+  title: string;
+  type: HardChallengeType;
+  status: EasyRoadmapNodeStatus;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface HardRoadmapChapter {
+  id: string;
+  chapterId?: string;
+  title: string;
+  order: number;
+  nodeCount: number;
+  nodes: HardRoadmapNode[];
+}
+
+export interface HardRoadmapResponse {
+  course: {
+    id: string;
+    slug: string;
+    title: string;
+    totalChapters: number;
+    totalNodes: number;
+  };
+  mode: "hard";
+  chapters: HardRoadmapChapter[];
+}
+
+export interface HardChallengeNode {
+  id: string;
+  label: string;
+  title: string;
+  type: HardChallengeType;
+  status: EasyRoadmapNodeStatus;
+}
+
+export interface HardMultipleChoiceChallenge {
+  id: string;
+  type:
+    | "multiple_choice"
+    | "code_trace"
+    | "bug_hunt"
+    | "choose_better_algorithm"
+    | "simulation"
+    | "fill_missing_line";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
+  options: Array<{
+    id: string;
+    text: string;
+  }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface HardDragDropChallenge {
+  id: string;
+  type: "drag_drop_matching";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
+  items: Array<{ id: string; text: string }>;
+  choices: Array<{ id: string; text: string }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface HardOrderingChallenge {
+  id: string;
+  type: "ordering_steps" | "ranking";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
+  steps: Array<{ id: string; text: string }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export type HardNodeChallenge =
+  | HardMultipleChoiceChallenge
+  | HardDragDropChallenge
+  | HardOrderingChallenge;
+
+export type HardNodeChallengeReview = {
+  correct: boolean;
+  explanation: string;
+  petFeedback?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  completedAt?: string;
+  selectedOptionId?: string;
+  correctOptionId?: string;
+  matchingMap?: Record<string, string>;
+  correctMatchingMap?: Record<string, string>;
+  orderedIds?: string[];
+  correctOrderedIds?: string[];
+};
+
+export interface HardNodeChallengeResponse {
+  node: HardChallengeNode;
+  challenge: HardNodeChallenge;
+  review?: HardNodeChallengeReview;
+}
+
+export type SubmitHardNodeChallengePayload =
+  | {
+      type:
+        | "multiple_choice"
+        | "code_trace"
+        | "bug_hunt"
+        | "choose_better_algorithm"
+        | "simulation"
+        | "fill_missing_line";
+      selectedOptionId: string;
+    }
+  | { type: "drag_drop_matching"; matchingMap: Record<string, string> }
+  | { type: "ordering_steps" | "ranking"; orderedIds: string[] };
+
+export interface SubmitHardNodeChallengeResponse {
+  correct: boolean;
+  message: string;
+  explanation?: string;
+  petFeedback?: string;
+  timeComplexity?: string;
+  spaceComplexity?: string;
+  correctOptionId?: string;
+  correctMatchingMap?: Record<string, string>;
+  correctOrderedIds?: string[];
+}
+
 export const courseApi = {
   getCourses: async () => {
     const response = await api.get(`/courses`);
@@ -290,6 +447,29 @@ export const courseApi = {
   ): Promise<SubmitMediumNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
+      payload,
+    );
+    return response.data;
+  },
+
+  getHardRoadmap: async (courseSlug: string): Promise<HardRoadmapResponse> => {
+    const response = await api.get(`/roadmaps/${courseSlug}/hard`);
+    return response.data;
+  },
+
+  getHardNodeChallenge: async (
+    nodeId: string,
+  ): Promise<HardNodeChallengeResponse> => {
+    const response = await api.get(`/roadmaps/hard/nodes/${nodeId}/challenge`);
+    return response.data;
+  },
+
+  submitHardNodeChallenge: async (
+    nodeId: string,
+    payload: SubmitHardNodeChallengePayload,
+  ): Promise<SubmitHardNodeChallengeResponse> => {
+    const response = await api.post(
+      `/roadmaps/hard/nodes/${nodeId}/challenge/submit`,
       payload,
     );
     return response.data;
