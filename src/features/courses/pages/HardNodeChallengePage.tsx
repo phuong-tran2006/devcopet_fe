@@ -5,6 +5,7 @@ import {
   courseApi,
   type HardNodeChallengeResponse,
   type SubmitHardNodeChallengeResponse,
+  type SubmitHardNodeChallengePayload,
   type HardMultipleChoiceChallenge,
   type HardDragDropChallenge,
   type HardOrderingChallenge,
@@ -14,7 +15,7 @@ import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 // ── Template drop-zone helpers (same pattern as MediumNodeChallengePage) ──────
 const DROP_ZONE_REGEX =
-  /\[(DROP_ZONE_\d+)\]|{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
+  /\[([A-Za-z0-9_-]+)\]|{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
 
 const getDropZoneKeyFromMatch = (match: RegExpMatchArray | RegExpExecArray) =>
   match[1] || match[2] || match[3] || match[4];
@@ -357,19 +358,29 @@ const HardNodeChallengePage = () => {
     setSubmitting(true);
     setSubmitError(null);
 
-    let payload: any = {};
+    let payload: SubmitHardNodeChallengePayload;
     if (isOptionBased) {
       if (!selectedOptionId) {
         setSubmitting(false);
         return;
       }
-      payload = { type: challenge.type, selectedOptionId };
+      payload = {
+        type: challenge.type as SubmitHardNodeChallengePayload["type"] & (
+          | "multiple_choice"
+          | "code_trace"
+          | "bug_hunt"
+          | "choose_better_algorithm"
+          | "simulation"
+          | "fill_missing_line"
+        ),
+        selectedOptionId,
+      };
     } else if (isDragDropMatching) {
       if (Object.keys(matchingMap).length === 0) {
         setSubmitting(false);
         return;
       }
-      payload = { type: challenge.type, matchingMap };
+      payload = { type: challenge.type as "drag_drop_matching", matchingMap };
     } else if (isHardDragDrop) {
       const filledMap = dropZoneIds.reduce<Record<string, string>>(
         (acc, zoneId) => {
@@ -380,7 +391,13 @@ const HardNodeChallengePage = () => {
       );
       payload = { type: "drag_drop", dropZoneMap: filledMap };
     } else if (isOrdering) {
-      payload = { type: challenge.type, orderedIds };
+      payload = {
+        type: challenge.type as "ordering_steps" | "ranking",
+        orderedIds,
+      };
+    } else {
+      setSubmitting(false);
+      return;
     }
 
     try {
@@ -666,15 +683,8 @@ const HardNodeChallengePage = () => {
                       key={zoneId}
                       onClick={() => {
                         if (!canEdit) return;
-                        if (assignedItemId) {
-                          // click on filled zone → remove assignment
-                          setDropZoneMap((prev) => {
-                            const next = { ...prev };
-                            delete next[zoneId];
-                            return next;
-                          });
-                        } else if (selectedPoolItemId) {
-                          // assign selected pool item to this zone
+                        if (selectedPoolItemId) {
+                          // assign selected pool item to this zone (overwriting previous selection)
                           setDropZoneMap((prev) => {
                             // remove previous zone using same item
                             const cleaned = Object.fromEntries(
@@ -685,6 +695,13 @@ const HardNodeChallengePage = () => {
                             return { ...cleaned, [zoneId]: selectedPoolItemId };
                           });
                           setSelectedPoolItemId(null);
+                        } else if (assignedItemId) {
+                          // click on filled zone without selection → remove assignment
+                          setDropZoneMap((prev) => {
+                            const next = { ...prev };
+                            delete next[zoneId];
+                            return next;
+                          });
                         }
                       }}
                       className={[
@@ -707,6 +724,21 @@ const HardNodeChallengePage = () => {
                       )}
                       {isIncorrect && correctItem && (
                         <span className="ml-1 text-[11px] text-[#63f1e3]">→ {correctItem.text}</span>
+                      )}
+                      {canEdit && assignedItemId && (
+                        <span
+                          className="ml-1.5 hover:text-red-400 text-on-surface-variant/70 text-[14px] cursor-pointer material-symbols-outlined flex items-center justify-center"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDropZoneMap((prev) => {
+                              const next = { ...prev };
+                              delete next[zoneId];
+                              return next;
+                            });
+                          }}
+                        >
+                          cancel
+                        </span>
                       )}
                     </button>
                   );

@@ -369,20 +369,37 @@ export interface HardNodeChallengeResponse {
   review?: HardNodeChallengeReview;
 }
 
+export interface OptionPayload {
+  type:
+    | "multiple_choice"
+    | "code_trace"
+    | "bug_hunt"
+    | "choose_better_algorithm"
+    | "simulation"
+    | "fill_missing_line";
+  selectedOptionId: string;
+}
+
+export interface MatchingPayload {
+  type: "drag_drop_matching";
+  matchingMap: Record<string, string>;
+}
+
+export interface DragDropPayload {
+  type: "drag_drop";
+  dropZoneMap: Record<string, string>;
+}
+
+export interface OrderingPayload {
+  type: "ordering_steps" | "ranking";
+  orderedIds: string[];
+}
+
 export type SubmitHardNodeChallengePayload =
-  | {
-      type:
-        | "multiple_choice"
-        | "code_trace"
-        | "bug_hunt"
-        | "choose_better_algorithm"
-        | "simulation"
-        | "fill_missing_line";
-      selectedOptionId: string;
-    }
-  | { type: "drag_drop_matching"; matchingMap: Record<string, string> }
-  | { type: "drag_drop"; dropZoneMap: Record<string, string> }
-  | { type: "ordering_steps" | "ranking"; orderedIds: string[] };
+  | OptionPayload
+  | MatchingPayload
+  | DragDropPayload
+  | OrderingPayload;
 
 export interface SubmitHardNodeChallengeResponse {
   correct: boolean;

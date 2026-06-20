@@ -20,7 +20,7 @@ const sortOptions = (options: MediumMultipleChoiceChallenge["options"]) =>
   );
 
 const DROP_ZONE_REGEX =
-  /\[(DROP_ZONE_\d+)\]|{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
+  /\[([A-Za-z0-9_-]+)\]|{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
 
 const getDropZoneKeyFromMatch = (match: RegExpMatchArray | RegExpExecArray) =>
   match[1] || match[2] || match[3] || match[4];
