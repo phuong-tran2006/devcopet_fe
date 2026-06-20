@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import {
@@ -10,20 +10,17 @@ import {
   type HardDragDropChallenge,
   type HardOrderingChallenge,
   type HardFillTemplateChallenge,
+  type OptionPayload,
+  type OrderingPayload,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 
 // ── Template drop-zone helpers (same pattern as MediumNodeChallengePage) ──────
 const DROP_ZONE_REGEX =
-  /\[([A-Za-z0-9_-]+)\]|{{\s*([A-Za-z0-9_-]+)\s*}}|\[\[\s*([A-Za-z0-9_-]+)\s*\]\]|__([A-Za-z0-9_-]+)__/g;
+  /\[([A-Za-z][A-Za-z0-9_-]*)\]|{{\s*([A-Za-z][A-Za-z0-9_-]*)\s*}}|\[\[\s*([A-Za-z][A-Za-z0-9_-]*)\s*\]\]|__([A-Za-z][A-Za-z0-9_-]*?)__/g;
 
 const getDropZoneKeyFromMatch = (match: RegExpMatchArray | RegExpExecArray) =>
   match[1] || match[2] || match[3] || match[4];
-
-const extractDropZoneIds = (template: string): string[] => {
-  const matches = [...template.matchAll(DROP_ZONE_REGEX)];
-  return Array.from(new Set(matches.map(getDropZoneKeyFromMatch)));
-};
 
 const renderTemplateParts = (
   template: string,
@@ -31,17 +28,122 @@ const renderTemplateParts = (
 ): ReactNode[] => {
   const parts: ReactNode[] = [];
   let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  const regex = new RegExp(DROP_ZONE_REGEX);
-  while ((match = regex.exec(template)) !== null) {
-    if (match.index > lastIndex)
+  const matches = [...template.matchAll(DROP_ZONE_REGEX)];
+
+  for (const match of matches) {
+    if (match.index === undefined) continue;
+    if (match.index > lastIndex) {
       parts.push(template.slice(lastIndex, match.index));
-    parts.push(renderDropZone(getDropZoneKeyFromMatch(match)));
-    lastIndex = regex.lastIndex;
+    }
+    const zoneId = getDropZoneKeyFromMatch(match);
+    parts.push(
+      <Fragment key={`drop-zone-${zoneId}-${match.index}`}>
+        {renderDropZone(zoneId)}
+      </Fragment>,
+    );
+    lastIndex = match.index + match[0].length;
   }
-  if (lastIndex < template.length) parts.push(template.slice(lastIndex));
+
+  if (lastIndex < template.length) {
+    parts.push(template.slice(lastIndex));
+  }
   return parts;
 };
+
+type TemplateRow =
+  | {
+      kind: "match";
+      id: string;
+      prompt: string;
+      zoneId: string;
+    }
+  | {
+      kind: "text";
+      id: string;
+      text: string;
+    };
+
+const isLikelyDropZoneLabel = (label: string) =>
+  label.includes("_") ||
+  /^[A-Z0-9_]+$/.test(label) ||
+  /^(blank|position|slot|stack|queue|root|leaf|parent|children|right|left)/i.test(
+    label,
+  );
+
+const buildTemplateRows = (template: string): TemplateRow[] => {
+  let anonymousBlankIndex = 1;
+
+  return template
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((rawLine, index) => {
+      // 1. First check if it's a direct colon-separated key-value match
+      const colonMatch = /^([A-Za-z][A-Za-z0-9_-]*)\s*:\s*(.+)$/.exec(rawLine);
+      if (colonMatch && isLikelyDropZoneLabel(colonMatch[1])) {
+        return {
+          kind: "match",
+          id: `match-${colonMatch[1]}-${index}`,
+          prompt: colonMatch[2].replace(/_{3,}/g, "_____").trim(),
+          zoneId: colonMatch[1],
+        };
+      }
+
+      // 2. Perform replacements sequentially to normalize slot drop zones
+      let line = rawLine;
+
+      // Replace bare named slot patterns with bracketed drop zones (e.g. blank_1 -> [blank_1])
+      line = line.replace(
+        /\b((?:blank|position|slot)_[A-Za-z0-9]+)\b/g,
+        "[$1]",
+      );
+
+      // Replace 3+ underscores with synthetic blank drop zones
+      line = line.replace(
+        /_{3,}/g,
+        () => `[blank_${anonymousBlankIndex++}]`,
+      );
+
+      // 3. Inspect matches after all normalizations are done
+      const matches = [...line.matchAll(DROP_ZONE_REGEX)];
+      if (matches.length === 1) {
+        const match = matches[0];
+        const zoneId = getDropZoneKeyFromMatch(match);
+        const prompt = `${line
+          .slice(0, match.index)
+          .replace(/\s*[-=]*>\s*$/, "")
+          .trim()} ${line.slice(match.index + match[0].length).trim()}`.trim();
+
+        if (prompt) {
+          return {
+            kind: "match",
+            id: `match-${zoneId}-${index}`,
+            prompt,
+            zoneId,
+          };
+        }
+      }
+
+      // Otherwise, return as a text row (which might contain 0 or multiple drop zones)
+      return {
+        kind: "text",
+        id: `text-${index}`,
+        text: line,
+      };
+    });
+};
+
+const extractDropZoneIds = (template: string): string[] => {
+  const zoneIds = buildTemplateRows(template).flatMap((row) => {
+    if (row.kind === "match") return [row.zoneId];
+    return [...row.text.matchAll(DROP_ZONE_REGEX)].map(getDropZoneKeyFromMatch);
+  });
+
+  return Array.from(new Set(zoneIds));
+};
+
+const getOrderingItems = (challenge: HardOrderingChallenge | null) =>
+  challenge?.steps ?? challenge?.poolItems ?? [];
 // ─────────────────────────────────────────────────────────────────────────────
 
 const CodeSnippetCard = ({
@@ -187,7 +289,9 @@ const HardNodeChallengePage = () => {
 
   // drag_drop (fill-template) state
   const [dropZoneMap, setDropZoneMap] = useState<Record<string, string>>({});
-  const [selectedPoolItemId, setSelectedPoolItemId] = useState<string | null>(null);
+  const [selectedPoolItemId, setSelectedPoolItemId] = useState<string | null>(
+    null,
+  );
 
   const [selectedMatchItem, setSelectedMatchItem] = useState<string | null>(
     null,
@@ -254,27 +358,138 @@ const HardNodeChallengePage = () => {
       ? data.review.dropZoneMap
       : dropZoneMap;
 
-  const correctOptionId =
-    (canRevealAnswerDetails &&
-      (result?.correctOptionId || data?.review?.correctOptionId)) ||
-    undefined;
-  const correctMatchingMap =
-    (canRevealAnswerDetails &&
-      (result?.correctMatchingMap || data?.review?.correctMatchingMap)) ||
-    undefined;
-  const correctOrderedIds =
-    (canRevealAnswerDetails &&
-      (result?.correctOrderedIds || data?.review?.correctOrderedIds)) ||
-    undefined;
-  const correctDropZoneMap =
-    (canRevealAnswerDetails &&
-      (result?.correctDropZoneMap || data?.review?.correctDropZoneMap)) ||
-    undefined;
+  const correctOptionId = canRevealAnswerDetails
+    ? result?.correctOptionId || data?.review?.correctOptionId
+    : undefined;
+  const correctMatchingMap = canRevealAnswerDetails
+    ? result?.correctMatchingMap || data?.review?.correctMatchingMap
+    : undefined;
+  const correctOrderedIds = canRevealAnswerDetails
+    ? result?.correctOrderedIds || data?.review?.correctOrderedIds
+    : undefined;
+  const correctDropZoneMap = canRevealAnswerDetails
+    ? result?.correctDropZoneMap || data?.review?.correctDropZoneMap
+    : undefined;
 
   const dropZoneIds = useMemo(
-    () => (hardFillChallenge ? extractDropZoneIds(hardFillChallenge.template) : []),
+    () =>
+      hardFillChallenge ? extractDropZoneIds(hardFillChallenge.template) : [],
     [hardFillChallenge],
   );
+  const templateRows = useMemo(
+    () =>
+      hardFillChallenge ? buildTemplateRows(hardFillChallenge.template) : [],
+    [hardFillChallenge],
+  );
+  const orderingItems = useMemo(
+    () => getOrderingItems(orderingChallenge),
+    [orderingChallenge],
+  );
+
+  const getDropPoolItemText = (itemId?: string) =>
+    hardFillChallenge?.poolItems.find((item) => item.id === itemId)?.text ??
+    itemId ??
+    "";
+
+  const clearDropZone = (zoneId: string) => {
+    setDropZoneMap((prev) => {
+      const next = { ...prev };
+      delete next[zoneId];
+      return next;
+    });
+  };
+
+  const assignPoolItemToDropZone = (zoneId: string) => {
+    if (!canEdit) return;
+
+    if (selectedPoolItemId) {
+      setDropZoneMap((prev) => {
+        const cleaned = Object.fromEntries(
+          Object.entries(prev).filter(
+            ([, value]) => value !== selectedPoolItemId,
+          ),
+        );
+        return { ...cleaned, [zoneId]: selectedPoolItemId };
+      });
+      setSelectedPoolItemId(null);
+    } else if (dropZoneMap[zoneId]) {
+      clearDropZone(zoneId);
+    }
+  };
+
+  const renderHardDropZone = (zoneId: string, compact = false) => {
+    if (!hardFillChallenge) return null;
+
+    const assignedItemId = activeDropZoneMap[zoneId];
+    const correctItemId = correctDropZoneMap?.[zoneId];
+    const isCorrect =
+      canRevealAnswerDetails &&
+      assignedItemId === correctItemId &&
+      !!correctItemId;
+    const isIncorrect =
+      canRevealAnswerDetails &&
+      !!assignedItemId &&
+      assignedItemId !== correctItemId;
+    const isReadyForSelection =
+      canEdit && !assignedItemId && !!selectedPoolItemId;
+
+    return (
+      <div
+        className={[
+          "group flex min-h-[52px] items-center gap-2 rounded-xl border px-3 py-2 transition-all",
+          compact ? "inline-flex min-w-[150px] align-middle" : "w-full",
+          isCorrect
+            ? "border-[#63f1e3] bg-[#10262c] text-[#63f1e3] shadow-[0_0_16px_rgba(99,241,227,0.18)]"
+            : isIncorrect
+              ? "border-red-400/80 bg-red-400/10 text-red-100"
+              : assignedItemId
+                ? "border-[#66b3ff]/75 bg-[#123052] text-blue-50 shadow-[0_0_16px_rgba(58,127,193,0.16)]"
+                : isReadyForSelection
+                  ? "border-[#66b3ff] bg-[#3a7fc1]/15 text-[#66b3ff] shadow-[0_0_18px_rgba(58,127,193,0.22)]"
+                  : "border-dashed border-slate-500/70 bg-[#071321] text-slate-300",
+        ].join(" ")}
+      >
+        <button
+          type="button"
+          onClick={() => assignPoolItemToDropZone(zoneId)}
+          disabled={!canEdit}
+          className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left disabled:cursor-default"
+        >
+          <span className="min-w-0">
+            <span className="block text-[10px] font-extrabold uppercase tracking-widest opacity-60">
+              {zoneId.replace(/_/g, " ")}
+            </span>
+            <span className="mt-0.5 block truncate text-[13px] font-extrabold">
+              {assignedItemId
+                ? getDropPoolItemText(assignedItemId)
+                : selectedPoolItemId
+                  ? "Place selected item"
+                  : "Choose item"}
+            </span>
+            {isIncorrect && correctItemId && (
+              <span className="mt-1 block truncate text-[11px] font-semibold text-[#63f1e3]">
+                Correct: {getDropPoolItemText(correctItemId)}
+              </span>
+            )}
+          </span>
+          <span className="material-symbols-outlined text-[18px] opacity-80">
+            {isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"}
+          </span>
+        </button>
+
+        {canEdit && assignedItemId && (
+          <button
+            type="button"
+            onClick={() => clearDropZone(zoneId)}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-red-400/15 hover:text-red-200"
+            aria-label={`Clear ${zoneId}`}
+          >
+            <span className="material-symbols-outlined text-[17px]">close</span>
+          </button>
+        )}
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (!nodeId) {
@@ -328,7 +543,7 @@ const HardNodeChallengePage = () => {
             response.challenge.type === "ranking"
           ) {
             setOrderedIds(
-              (response.challenge as HardOrderingChallenge).steps.map(
+              getOrderingItems(response.challenge as HardOrderingChallenge).map(
                 (s) => s.id,
               ),
             );
@@ -353,46 +568,71 @@ const HardNodeChallengePage = () => {
     };
   }, [nodeId, courseSlug]);
 
+  const goBackToRoadmap = () => {
+    navigate({
+      to: "/roadmap/$worldId",
+      params: { worldId: courseSlug || "python-basic" },
+    });
+  };
+
+  const goToNextChallenge = async () => {
+    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+
+    setNextChallengeLoading(true);
+    try {
+      const roadmap = await courseApi.getHardRoadmap(courseSlug);
+      const nodes = [...roadmap.chapters]
+        .sort((a, b) => a.order - b.order)
+        .flatMap((chapter) =>
+          [...chapter.nodes].sort((a, b) => a.order - b.order),
+        );
+      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
+      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
+
+      if (!nextNode) {
+        goBackToRoadmap();
+        return;
+      }
+
+      navigate({
+        to: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+        params: {
+          courseSlug,
+          nodeId: nextNode.id,
+        },
+      });
+    } catch (err) {
+      console.error("Unable to open next Hard challenge:", err);
+      goBackToRoadmap();
+    } finally {
+      setNextChallengeLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!challenge || !canEdit) return;
+    if (isSubmitDisabled || !challenge) return;
     setSubmitting(true);
     setSubmitError(null);
 
     let payload: SubmitHardNodeChallengePayload;
-    if (isOptionBased) {
-      if (!selectedOptionId) {
-        setSubmitting(false);
-        return;
-      }
+    if (isOptionBased && selectedOptionId) {
       payload = {
-        type: challenge.type as SubmitHardNodeChallengePayload["type"] & (
-          | "multiple_choice"
-          | "code_trace"
-          | "bug_hunt"
-          | "choose_better_algorithm"
-          | "simulation"
-          | "fill_missing_line"
-        ),
+        type: challenge.type as OptionPayload["type"],
         selectedOptionId,
       };
     } else if (isDragDropMatching) {
-      if (Object.keys(matchingMap).length === 0) {
-        setSubmitting(false);
-        return;
-      }
-      payload = { type: challenge.type as "drag_drop_matching", matchingMap };
+      payload = {
+        type: "drag_drop_matching",
+        matchingMap,
+      };
     } else if (isHardDragDrop) {
-      const filledMap = dropZoneIds.reduce<Record<string, string>>(
-        (acc, zoneId) => {
-          if (dropZoneMap[zoneId]) acc[zoneId] = dropZoneMap[zoneId];
-          return acc;
-        },
-        {},
-      );
-      payload = { type: "drag_drop", dropZoneMap: filledMap };
+      payload = {
+        type: "drag_drop",
+        dropZoneMap,
+      };
     } else if (isOrdering) {
       payload = {
-        type: challenge.type as "ordering_steps" | "ranking",
+        type: challenge.type as OrderingPayload["type"],
         orderedIds,
       };
     } else {
@@ -420,7 +660,10 @@ const HardNodeChallengePage = () => {
     !canEdit ||
     (isOptionBased && !selectedOptionId) ||
     (isDragDropMatching && Object.keys(matchingMap).length === 0) ||
-    (isHardDragDrop && dropZoneIds.length > 0 && Object.keys(dropZoneMap).length < dropZoneIds.length);
+    (isHardDragDrop &&
+      dropZoneIds.length > 0 &&
+      Object.keys(dropZoneMap).length < dropZoneIds.length) ||
+    (isOrdering && orderedIds.length < orderingItems.length);
 
   if (loading) {
     return (
@@ -462,12 +705,7 @@ const HardNodeChallengePage = () => {
       <header className="sticky top-0 z-50 flex items-center justify-between border-b border-on-surface/8 bg-surface/80 px-6 py-4 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <button
-            onClick={() =>
-              navigate({
-                to: "/roadmap/$worldId",
-                params: { worldId: courseSlug! },
-              })
-            }
+            onClick={goBackToRoadmap}
             className="flex h-10 w-10 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface transition-colors hover:bg-on-surface/10"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
@@ -662,134 +900,128 @@ const HardNodeChallengePage = () => {
           )}
 
           {isHardDragDrop && hardFillChallenge && (
-            <div className="flex flex-col gap-5">
-              {/* Template area */}
-              <div className="rounded-xl border border-[#1e3a5f] bg-[#0a1626] px-5 py-5 font-mono text-[14px] leading-8 text-[#dbeafe] whitespace-pre-wrap">
-                {renderTemplateParts(hardFillChallenge.template, (zoneId) => {
-                  const assignedItemId = activeDropZoneMap[zoneId];
-                  const assignedItem = hardFillChallenge.poolItems.find(
-                    (p) => p.id === assignedItemId,
-                  );
-                  const correctItemId = correctDropZoneMap?.[zoneId];
-                  const correctItem = hardFillChallenge.poolItems.find(
-                    (p) => p.id === correctItemId,
-                  );
-                  const isCorrect = canRevealAnswerDetails && assignedItemId === correctItemId && !!correctItemId;
-                  const isIncorrect = canRevealAnswerDetails && !!assignedItemId && assignedItemId !== correctItemId;
-                  const isActive = !assignedItemId && selectedPoolItemId !== null;
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
+              <div className="rounded-2xl border border-[#1e3a5f] bg-[#081624] p-4 shadow-[0_0_24px_rgba(58,127,193,0.08)] sm:p-5">
+                <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
+                      Match Board
+                    </p>
+                    <p className="mt-1 text-[12px] font-medium text-on-surface-variant">
+                      Pick an answer, then place it into the matching row.
+                    </p>
+                  </div>
 
-                  return (
+                  {canEdit && Object.keys(dropZoneMap).length > 0 && (
                     <button
-                      key={zoneId}
+                      type="button"
                       onClick={() => {
-                        if (!canEdit) return;
-                        if (selectedPoolItemId) {
-                          // assign selected pool item to this zone (overwriting previous selection)
-                          setDropZoneMap((prev) => {
-                            // remove previous zone using same item
-                            const cleaned = Object.fromEntries(
-                              Object.entries(prev).filter(
-                                ([, v]) => v !== selectedPoolItemId,
-                              ),
-                            );
-                            return { ...cleaned, [zoneId]: selectedPoolItemId };
-                          });
-                          setSelectedPoolItemId(null);
-                        } else if (assignedItemId) {
-                          // click on filled zone without selection → remove assignment
-                          setDropZoneMap((prev) => {
-                            const next = { ...prev };
-                            delete next[zoneId];
-                            return next;
-                          });
-                        }
+                        setDropZoneMap({});
+                        setSelectedPoolItemId(null);
                       }}
-                      className={[
-                        "inline-flex items-center justify-center rounded-lg border-2 px-3 py-0.5 mx-1 text-[13px] font-bold transition-all duration-150 min-w-[80px]",
-                        isCorrect
-                          ? "border-[#63f1e3] bg-[#10262c] text-[#63f1e3] shadow-[0_0_10px_rgba(99,241,227,0.3)]"
-                          : isIncorrect
-                            ? "border-red-400 bg-red-400/10 text-red-300"
-                            : assignedItemId
-                              ? "border-[#66b3ff] bg-[#1e3a5f] text-[#dbeafe]"
-                              : isActive
-                                ? "border-dashed border-[#3a7fc1] bg-[#3a7fc1]/10 text-[#66b3ff] animate-pulse"
-                                : "border-dashed border-on-surface/20 bg-transparent text-on-surface-variant",
-                      ].join(" ")}
+                      className="rounded-lg border border-on-surface/10 bg-black/10 px-3 py-2 text-[10px] font-extrabold uppercase tracking-widest text-on-surface-variant transition hover:border-red-400/35 hover:text-red-200"
                     >
-                      {assignedItem ? assignedItem.text : <span className="opacity-40 text-[11px]">drop here</span>}
-                      {isCorrect && <span className="ml-1 material-symbols-outlined text-[14px]">check</span>}
-                      {isIncorrect && (
-                        <span className="ml-1 material-symbols-outlined text-[14px]">close</span>
-                      )}
-                      {isIncorrect && correctItem && (
-                        <span className="ml-1 text-[11px] text-[#63f1e3]">→ {correctItem.text}</span>
-                      )}
-                      {canEdit && assignedItemId && (
-                        <span
-                          className="ml-1.5 hover:text-red-400 text-on-surface-variant/70 text-[14px] cursor-pointer material-symbols-outlined flex items-center justify-center"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDropZoneMap((prev) => {
-                              const next = { ...prev };
-                              delete next[zoneId];
-                              return next;
-                            });
-                          }}
-                        >
-                          cancel
-                        </span>
-                      )}
+                      Reset
                     </button>
-                  );
-                })}
+                  )}
+                </div>
+
+                {selectedPoolItemId && canEdit && (
+                  <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-[#66b3ff]/30 bg-[#3a7fc1]/12 px-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
+                        Selected
+                      </p>
+                      <p className="truncate text-[13px] font-bold text-blue-50">
+                        {getDropPoolItemText(selectedPoolItemId)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setSelectedPoolItemId(null)}
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-white/10 hover:text-white"
+                      aria-label="Clear selected item"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">
+                        close
+                      </span>
+                    </button>
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-3">
+                  {templateRows.map((row) =>
+                    row.kind === "match" ? (
+                      <div
+                        key={row.id}
+                        className="grid gap-3 rounded-xl border border-white/8 bg-[#0b1d2f] p-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center"
+                      >
+                        <div className="min-w-0 rounded-lg border border-white/8 bg-black/15 px-4 py-3">
+                          <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
+                            Prompt
+                          </p>
+                          <p className="mt-1 break-words font-mono text-[13px] font-bold leading-6 text-[#dbeafe]">
+                            {row.prompt}
+                          </p>
+                        </div>
+                        {renderHardDropZone(row.zoneId)}
+                      </div>
+                    ) : (
+                      <div
+                        key={row.id}
+                        className="rounded-xl border border-white/8 bg-[#0b1d2f] px-4 py-3 font-mono text-[13px] font-semibold leading-6 text-[#dbeafe]"
+                      >
+                        {renderTemplateParts(row.text, (zoneId) =>
+                          renderHardDropZone(zoneId, true),
+                        )}
+                      </div>
+                    ),
+                  )}
+                </div>
               </div>
 
-              {/* Pool */}
-              <div>
-                <p className="mb-3 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
-                  Available Items — click an item, then click a drop zone
+              <aside className="rounded-2xl border border-[#1e3a5f] bg-[#081624] p-4 lg:sticky lg:top-24 lg:self-start">
+                <p className="mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
+                  Answers
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-2">
                   {hardFillChallenge.poolItems.map((item) => {
-                    const isUsed = Object.values(activeDropZoneMap).includes(item.id);
+                    const isUsed = Object.values(activeDropZoneMap).includes(
+                      item.id,
+                    );
                     const isSelected = selectedPoolItemId === item.id;
+
                     return (
                       <button
                         key={item.id}
+                        type="button"
                         onClick={() => {
-                          if (!canEdit) return;
+                          if (!canEdit || isUsed) return;
                           setSelectedPoolItemId(isSelected ? null : item.id);
                         }}
                         disabled={!canEdit || isUsed}
                         className={[
-                          "rounded-lg border px-4 py-2 text-[13px] font-semibold transition-all duration-150",
+                          "flex min-h-[48px] items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left text-[13px] font-extrabold transition-all",
                           isUsed
-                            ? "opacity-30 cursor-not-allowed border-on-surface/10 bg-surface-container text-on-surface-variant"
+                            ? "cursor-not-allowed border-white/8 bg-white/5 text-slate-500"
                             : isSelected
-                              ? "border-[#3a7fc1] bg-[#3a7fc1]/20 text-[#66b3ff] shadow-[0_0_12px_rgba(58,127,193,0.35)] ring-2 ring-[#3a7fc1]/50"
-                              : "border-on-surface/15 bg-surface-container hover:border-[#3a7fc1]/50 hover:text-on-surface text-on-surface-variant",
+                              ? "border-[#66b3ff] bg-[#3a7fc1]/20 text-[#66b3ff] shadow-[0_0_18px_rgba(58,127,193,0.28)]"
+                              : "border-white/10 bg-[#0d2135] text-slate-200 hover:border-[#66b3ff]/60 hover:text-white",
                         ].join(" ")}
                       >
-                        {item.text}
+                        <span>{item.text}</span>
+                        <span className="material-symbols-outlined text-[17px] opacity-70">
+                          {isUsed
+                            ? "check"
+                            : isSelected
+                              ? "radio_button_checked"
+                              : "radio_button_unchecked"}
+                        </span>
                       </button>
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Reset zone button */}
-              {canEdit && Object.keys(dropZoneMap).length > 0 && (
-                <button
-                  onClick={() => {
-                    setDropZoneMap({});
-                    setSelectedPoolItemId(null);
-                  }}
-                  className="self-start rounded-lg border border-on-surface/10 bg-transparent px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-on-surface-variant transition-colors hover:border-red-400/30 hover:text-red-300"
-                >
-                  Reset All
-                </button>
-              )}
+              </aside>
             </div>
           )}
 
@@ -799,7 +1031,7 @@ const HardNodeChallengePage = () => {
                 Use the arrows to reorder the steps correctly.
               </p>
               {activeOrderedIds.map((id, index) => {
-                const step = orderingChallenge.steps.find((s) => s.id === id);
+                const step = orderingItems.find((s) => s.id === id);
                 if (!step) return null;
                 const isCorrect =
                   canRevealAnswerDetails && correctOrderedIds?.[index] === id;
@@ -876,16 +1108,19 @@ const HardNodeChallengePage = () => {
             </div>
           )}
 
-          {!isOptionBased && !isDragDropMatching && !isHardDragDrop && !isOrdering && (
-            <div className="rounded-xl border border-on-surface/10 bg-surface-container/60 px-5 py-6 text-center">
-              <p className="font-bold text-on-surface">
-                Unsupported Challenge Type
-              </p>
-              <p className="text-[13px] text-on-surface-variant mt-1">
-                Please return to the roadmap.
-              </p>
-            </div>
-          )}
+          {!isOptionBased &&
+            !isDragDropMatching &&
+            !isHardDragDrop &&
+            !isOrdering && (
+              <div className="rounded-xl border border-on-surface/10 bg-surface-container/60 px-5 py-6 text-center">
+                <p className="font-bold text-on-surface">
+                  Unsupported Challenge Type
+                </p>
+                <p className="text-[13px] text-on-surface-variant mt-1">
+                  Please return to the roadmap.
+                </p>
+              </div>
+            )}
         </div>
 
         {submitError && (
@@ -920,6 +1155,24 @@ const HardNodeChallengePage = () => {
           />
         )}
 
+        {result?.correct && !isReviewMode && (
+          <div className="mx-6 mb-6 grid gap-3 sm:grid-cols-2">
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="rounded-xl border border-[#3a7fc1]/25 bg-[#3a7fc1]/10 px-5 py-4 text-[12px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:border-[#66b3ff]/70 hover:bg-[#3a7fc1]/18"
+            >
+              Review Mission
+            </button>
+            <button
+              onClick={goToNextChallenge}
+              disabled={nextChallengeLoading}
+              className="rounded-xl bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-widest text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
+            >
+              {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+            </button>
+          </div>
+        )}
+
         <RoadmapAiHelper
           nodeId={nodeId!}
           nodeTitle={challenge.title}
@@ -936,12 +1189,7 @@ const HardNodeChallengePage = () => {
         <div className="mx-auto flex max-w-[800px] items-center justify-between">
           <div className="flex gap-4">
             <button
-              onClick={() =>
-                navigate({
-                  to: "/roadmap/$worldId",
-                  params: { worldId: courseSlug! },
-                })
-              }
+              onClick={goBackToRoadmap}
               className="rounded-xl border border-on-surface/10 bg-transparent px-6 py-3.5 text-[12px] font-extrabold uppercase tracking-wider text-on-surface transition-colors hover:bg-on-surface/5"
             >
               Back to Roadmap
@@ -955,7 +1203,7 @@ const HardNodeChallengePage = () => {
                   setDropZoneMap({});
                   setSelectedPoolItemId(null);
                   if (orderingChallenge)
-                    setOrderedIds(orderingChallenge.steps.map((s) => s.id));
+                    setOrderedIds(orderingItems.map((s) => s.id));
                 }}
                 className="rounded-xl border border-[#3a7fc1]/30 bg-[#3a7fc1]/10 px-6 py-3.5 text-[12px] font-extrabold uppercase tracking-wider text-[#66b3ff] transition-colors hover:bg-[#3a7fc1]/20"
               >
@@ -974,6 +1222,96 @@ const HardNodeChallengePage = () => {
           )}
         </div>
       </footer>
+
+      {showSuccessModal && result?.correct && challenge && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+          <div className="relative w-full max-w-[480px] rounded-3xl bg-[#24384b] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+              aria-label="Close result"
+            >
+              <span className="material-symbols-outlined text-[22px]">
+                close
+              </span>
+            </button>
+
+            <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
+              <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
+                <span className="material-symbols-outlined text-[46px]">
+                  workspace_premium
+                </span>
+              </div>
+
+              <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                Mission
+                <br />
+                Accomplished
+              </h2>
+
+              <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
+                    <span className="material-symbols-outlined text-[24px]">
+                      psychology
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                      “{result.message || "Correct. Nice work."}”
+                    </p>
+                    {result.explanation && (
+                      <p className="mt-2 line-clamp-4 text-[12px] leading-relaxed text-on-surface-variant/80">
+                        {result.explanation}
+                      </p>
+                    )}
+                    <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+                      Hard Mode Review
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-7 grid grid-cols-2 gap-4">
+                <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
+                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                    Reward
+                  </p>
+                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
+                    +{challenge.xp}
+                  </p>
+                  <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
+                </div>
+                <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
+                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                    Bonus
+                  </p>
+                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
+                    +10
+                  </p>
+                  <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
+                </div>
+              </div>
+
+              <button
+                onClick={goToNextChallenge}
+                disabled={nextChallengeLoading}
+                className="mt-7 w-full rounded-lg bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
+              >
+                {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                <span className="ml-2">→</span>
+              </button>
+
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
+              >
+                Review Mission
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
