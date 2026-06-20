@@ -227,6 +227,7 @@ export type HardChallengeType =
   | "simulation"
   | "fill_missing_line"
   | "drag_drop_matching"
+  | "drag_drop"
   | "ordering_steps"
   | "ranking";
 
@@ -324,10 +325,26 @@ export interface HardOrderingChallenge {
   estimatedMinutes: number;
 }
 
+export interface HardFillTemplateChallenge {
+  id: string;
+  type: "drag_drop";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
+  template: string;
+  poolItems: Array<{ id: string; text: string }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
 export type HardNodeChallenge =
   | HardMultipleChoiceChallenge
   | HardDragDropChallenge
-  | HardOrderingChallenge;
+  | HardOrderingChallenge
+  | HardFillTemplateChallenge;
 
 export type HardNodeChallengeReview = {
   correct: boolean;
@@ -342,6 +359,8 @@ export type HardNodeChallengeReview = {
   correctMatchingMap?: Record<string, string>;
   orderedIds?: string[];
   correctOrderedIds?: string[];
+  dropZoneMap?: Record<string, string>;
+  correctDropZoneMap?: Record<string, string>;
 };
 
 export interface HardNodeChallengeResponse {
@@ -362,6 +381,7 @@ export type SubmitHardNodeChallengePayload =
       selectedOptionId: string;
     }
   | { type: "drag_drop_matching"; matchingMap: Record<string, string> }
+  | { type: "drag_drop"; dropZoneMap: Record<string, string> }
   | { type: "ordering_steps" | "ranking"; orderedIds: string[] };
 
 export interface SubmitHardNodeChallengeResponse {
@@ -374,6 +394,7 @@ export interface SubmitHardNodeChallengeResponse {
   correctOptionId?: string;
   correctMatchingMap?: Record<string, string>;
   correctOrderedIds?: string[];
+  correctDropZoneMap?: Record<string, string>;
 }
 
 export const courseApi = {
