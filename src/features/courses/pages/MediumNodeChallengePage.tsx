@@ -308,7 +308,7 @@ const MediumNodeChallengePage = () => {
     return () => {
       alive = false;
     };
-  }, [nodeId]);
+  }, [nodeId, courseSlug]);
 
   const goBackToRoadmap = () => {
     navigate({

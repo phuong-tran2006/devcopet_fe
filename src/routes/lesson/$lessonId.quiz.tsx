@@ -1,5 +1,9 @@
 // @ts-nocheck
-import { createFileRoute, useParams, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  useParams,
+  useNavigate,
+} from "@tanstack/react-router";
 import LessonQuiz from "../../features/quizzes/components/LessonQuiz";
 
 export const Route = createFileRoute("/lesson/$lessonId/quiz")({
@@ -15,7 +19,9 @@ function LessonQuizRoutePage() {
       <div className="w-full max-w-[800px]">
         {/* Back Link */}
         <button
-          onClick={() => navigate({ to: "/lesson/$lessonId", params: { lessonId } })}
+          onClick={() =>
+            navigate({ to: "/lesson/$lessonId", params: { lessonId } })
+          }
           className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-on-surface transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
         >
           <span className="material-symbols-outlined text-[14px]">
@@ -23,13 +29,12 @@ function LessonQuizRoutePage() {
           </span>
           Back to Lesson
         </button>
-        
+
         <LessonQuiz
           lessonId={lessonId}
-          onQuizPassed={() => {
-            // When quiz passed, redirect back to lesson
-            navigate({ to: "/lesson/$lessonId", params: { lessonId } });
-          }}
+          onFinishReview={() =>
+            navigate({ to: "/lesson/$lessonId", params: { lessonId } })
+          }
         />
       </div>
     </main>

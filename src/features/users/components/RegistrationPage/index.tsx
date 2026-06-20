@@ -130,12 +130,8 @@ const RegistrationPage = () => {
           password: formData.password,
         });
 
-        if (loginResponse.accessToken) {
-          setAuth(
-            loginResponse.accessToken,
-            loginResponse.refreshToken,
-            loginResponse.user,
-          );
+        if (loginResponse.user) {
+          setAuth(null, null, loginResponse.user);
           setTimeout(() => {
             if (loginResponse.user && !loginResponse.user.onboardingCompleted) {
               navigate({ to: "/onboarding" });

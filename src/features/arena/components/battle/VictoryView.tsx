@@ -26,7 +26,7 @@ const VictoryView = () => {
       setSubmitted(true);
       try {
         const { api } = await import("../../../../services/axiosClient");
-        await api.post("/users/battle/submit", { expChange: 150 });
+        await api.post("/users/battle/submit");
         // Refresh player info (to update level, exp, etc. in global store)
         await checkAuth();
       } catch (err) {
@@ -56,7 +56,10 @@ const VictoryView = () => {
           <div className="w-[140px] h-[140px] rounded-full border border-dashed dark:border-white/50 border-outline/50 p-2 relative z-10 transition-colors duration-300">
             <div className="w-full h-full rounded-full overflow-hidden border-[4px] border-[#d69ba2] shadow-[0_0_20px_rgba(214,155,162,0.4)]">
               <img
-                src={(currentUser?.avatarUrl as string) || "https://i.pravatar.cc/150?u=a042581f4e29026704d"}
+                src={
+                  (currentUser?.avatarUrl as string) ||
+                  "https://i.pravatar.cc/150?u=a042581f4e29026704d"
+                }
                 alt="Player"
                 className="w-full h-full object-cover"
                 onError={(e) => {

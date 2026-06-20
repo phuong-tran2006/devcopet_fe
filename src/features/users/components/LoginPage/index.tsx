@@ -58,7 +58,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await authApi.login({ email, password });
-      setAuth(response.accessToken, response.refreshToken, response.user);
+      setAuth(null, null, response.user);
       const params = new URLSearchParams(window.location.search);
       const redirectUrl = params.get("redirect");
       if (!response.user?.onboardingCompleted) {

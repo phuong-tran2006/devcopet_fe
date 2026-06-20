@@ -15,6 +15,7 @@ import {
 } from "../api/course.api";
 import NodeDetailsModal from "../../../components/ui/NodeDetailsModal";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const DIFF_CONFIG = {
   easy: {
@@ -131,6 +132,7 @@ const getMediumTypeLabel = (type: MediumRoadmapNode["type"]) =>
 
 const WorldMapPage = () => {
   const { theme } = useTheme();
+  const currentUser = useAuthStore((state) => state.user);
   const isLight = theme === "light";
   const { worldId } = useParams({ strict: false });
   const courseSlug = worldId;
@@ -152,6 +154,8 @@ const WorldMapPage = () => {
   const [selectedChapterId, setSelectedChapterId] = useState<string | null>(
     null,
   );
+  const userLevel = currentUser?.level ?? 1;
+  const userTitle = userLevel >= 15 ? "Data Adept" : "Data Novice";
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mainScrollRef = useRef<HTMLElement>(null);
@@ -489,10 +493,10 @@ const WorldMapPage = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-[15px] font-extrabold text-on-surface">
-                  Level 12
+                  Level {userLevel}
                 </span>
                 <span className="text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
-                  Data Novice
+                  {userTitle}
                 </span>
               </div>
             </div>
@@ -698,7 +702,7 @@ const WorldMapPage = () => {
                     </button>
                   );
                 }),
-              [chapters, cfg, difficulty],
+              [chapters, cfg, difficulty, isLight],
             )}
           </div>
 

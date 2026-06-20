@@ -20,9 +20,10 @@ const OnboardingFlowPage = () => {
 
   useEffect(() => {
     document.title = "Welcome to Devcopet | Onboarding";
-    
+
     // Fetch questions from backend
-    onboardingApi.getQuestions()
+    onboardingApi
+      .getQuestions()
       .then((data) => {
         if (data && data.questions) {
           setQuestions(data.questions);
@@ -43,23 +44,23 @@ const OnboardingFlowPage = () => {
     setIsSubmitting(true);
     try {
       // Map frontend surveyAnswers (Record<index, optionId>) to backend payload (Array<{ questionNumber, selectedOption }>)
-      const payloadAnswers = Object.entries(surveyAnswers).map(([indexStr, optionId]) => {
-        const index = parseInt(indexStr, 10);
-        const question = questions[index];
-        return {
-          questionNumber: question ? question.questionNumber : (index + 1),
-          selectedOption: optionId,
-        };
-      });
+      const payloadAnswers = Object.entries(surveyAnswers).map(
+        ([indexStr, optionId]) => {
+          const index = parseInt(indexStr, 10);
+          const question = questions[index];
+          return {
+            questionNumber: question ? question.questionNumber : index + 1,
+            selectedOption: optionId,
+          };
+        },
+      );
 
       await onboardingApi.submitAnswers({
         answers: payloadAnswers,
       });
 
       if (user) {
-        const token = localStorage.getItem("accessToken") || "";
-        const refresh = localStorage.getItem("refreshToken") || "";
-        setAuth(token, refresh, { ...user, onboardingCompleted: true });
+        setAuth(null, null, { ...user, onboardingCompleted: true });
       }
       navigate({ to: "/" });
     } catch (err) {
@@ -76,7 +77,12 @@ const OnboardingFlowPage = () => {
       )}
 
       {step === "survey" && (
-        <SurveyModal isOpen embedded onComplete={handleCompleteSurvey} questions={questions} />
+        <SurveyModal
+          isOpen
+          embedded
+          onComplete={handleCompleteSurvey}
+          questions={questions}
+        />
       )}
 
       {step === "naming" && (

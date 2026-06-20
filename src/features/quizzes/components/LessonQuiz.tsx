@@ -7,7 +7,7 @@ import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
 // ─── States ────────────────────────────────────────────────────────────────
 // idle | loading | active | submitting | finished | not_found
 
-const LessonQuiz = ({ lessonId, onQuizPassed }) => {
+const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
   const [phase, setPhase] = useState("idle");
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
@@ -117,6 +117,22 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
     setCurrentQuestionIdx(0);
     setReviewQuestionIdx(0);
     setPhase("active");
+  };
+
+  const resetToIdle = () => {
+    setPhase("idle");
+    setQuiz(null);
+    setAnswers({});
+    setResult(null);
+    setSubmitError(null);
+    setCurrentQuestionIdx(0);
+    setReviewQuestionIdx(0);
+  };
+
+  const handleFinishReview = () => {
+    const finishedResult = result;
+    resetToIdle();
+    onFinishReview?.(finishedResult);
   };
 
   // ── Helpers ────────────────────────────────────────────────────────────
@@ -484,15 +500,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed }) => {
             ) : (
               <button
                 type="button"
-                onClick={() => {
-                  setPhase("idle");
-                  setQuiz(null);
-                  setAnswers({});
-                  setResult(null);
-                  setSubmitError(null);
-                  setCurrentQuestionIdx(0);
-                  setReviewQuestionIdx(0);
-                }}
+                onClick={handleFinishReview}
                 className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
               >
                 Finish Review
