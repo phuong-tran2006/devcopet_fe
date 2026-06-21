@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import PlayerCard from "../components/PlayerCard";
 import OpponentCard from "../components/OpponentCard";
@@ -6,10 +6,8 @@ import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
 import type { ArenaMode } from "../store/arena.store";
 
-const modes: ArenaMode[] = ["ranked", "casual", "practice"];
-
 const MatchmakingPage = () => {
-  const [mode, setMode] = useState<ArenaMode>("ranked");
+  const mode: ArenaMode = "ranked";
   const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
   const {
@@ -63,7 +61,7 @@ const MatchmakingPage = () => {
   };
 
   const subtitles = {
-    idle: "Choose a queue and find a fair Arena room.",
+    idle: "Find a fair Arena room and start climbing the ranks.",
     searching: "Waiting for an opponent...",
     found: matchTier
       ? `${matchTier} ranked room is ready.`
@@ -80,7 +78,7 @@ const MatchmakingPage = () => {
 
   return (
     <div className="w-full h-full flex flex-col items-center justify-center p-5 dark:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] dark:from-[#13222e] dark:to-[#081015] bg-surface-container-lowest transition-colors duration-300 overflow-hidden">
-      <div className="text-center mb-6 animate-fade-in transition-all duration-300">
+      <div className="text-center mb-10 animate-fade-in transition-all duration-300">
         <h1
           className={`text-[30px] font-extrabold tracking-[0.08em] dark:drop-shadow-[0_0_15px_rgba(244,236,244,0.3)] mb-2 transition-colors duration-300 ${visualStatus === "found" ? "dark:text-[#ff3b30] text-error" : "dark:text-[#f4ecf4] text-on-surface"}`}
         >
@@ -89,20 +87,6 @@ const MatchmakingPage = () => {
         <p className="dark:text-gray-400 text-on-surface-variant text-[14px] transition-colors duration-300">
           {subtitles[visualStatus]}
         </p>
-      </div>
-
-      <div className="flex rounded-xl dark:bg-[#111a22] bg-surface border dark:border-white/10 border-outline/20 p-1 mb-7">
-        {modes.map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setMode(item)}
-            disabled={status === "searching" || hasMatch}
-            className={`px-4 py-2 rounded-lg text-[12px] font-black capitalize transition-colors disabled:opacity-60 ${mode === item ? "dark:bg-[#29b6f6] bg-primary dark:text-[#081015] text-on-primary" : "dark:text-gray-400 text-on-surface-variant"}`}
-          >
-            {item}
-          </button>
-        ))}
       </div>
 
       <div className="relative flex items-center justify-center gap-4 sm:gap-6 lg:gap-10 w-full max-w-4xl">
@@ -199,7 +183,7 @@ const MatchmakingPage = () => {
             </button>
             <button
               type="button"
-              onClick={() => navigate({ to: "/dashboard/active" })}
+              onClick={() => navigate({ to: "/arena/active" })}
               className="dark:bg-[#ff3b30] bg-error dark:hover:bg-[#ff453a] hover:bg-error/90 text-white font-black text-[14px] tracking-wider py-3 px-10 rounded-full dark:shadow-[0_0_20px_rgba(255,59,48,0.35)] shadow-md transition-all transform hover:scale-105"
             >
               ACCEPT MATCH

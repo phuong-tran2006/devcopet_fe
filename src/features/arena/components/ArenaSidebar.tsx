@@ -39,13 +39,13 @@ const ArenaSidebar = () => {
   }, []);
 
   const navItems = [
-    { label: "Matchmaking", path: "/dashboard", icon: "swords" },
-    { label: "History", path: "/dashboard/history", icon: "history" },
-    { label: "Rankings", path: "/dashboard/rankings", icon: "emoji_events" },
+    { label: "Matchmaking", path: "/arena", icon: "swords" },
+    { label: "History", path: "/arena/history", icon: "history" },
+    { label: "Rankings", path: "/arena/rankings", icon: "emoji_events" },
   ];
 
   const handleQuickMatch = () => {
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/arena" });
     findMatch({ courseSlug: "python-basic", mode: "ranked" });
   };
 

@@ -319,68 +319,56 @@ const WorldMapPage = () => {
 
     const loadAllRoadmaps = async () => {
       try {
-        // 1. Fetch easy roadmap
         const easyData = await courseApi.getEasyRoadmap(courseSlug);
         if (!alive) return;
         setRoadmap(easyData);
 
-        // Calculate Easy completed count
-        const easyCompleted = easyData.chapters
-          .flatMap((c) => c.nodes)
-          .filter((n) => n.status === "completed").length;
-        const mediumUnlocked = easyCompleted >= 5;
-        setIsMediumUnlocked(mediumUnlocked);
-
+        let mediumUnlocked = false;
         let hardUnlocked = false;
         let activeChapters = easyData.chapters;
 
-        if (mediumUnlocked) {
-          // 2. Fetch medium roadmap
-          try {
-            const mediumData = await courseApi.getMediumRoadmap(courseSlug);
-            if (alive) {
-              setMediumRoadmap(mediumData);
-              const mediumCompleted = mediumData.chapters
-                .flatMap((c) => c.nodes)
-                .filter((n) => n.status === "completed").length;
-              hardUnlocked = mediumCompleted >= 5;
-              setIsHardUnlocked(hardUnlocked);
+        try {
+          const mediumData = await courseApi.getMediumRoadmap(courseSlug);
+          if (!alive) return;
+          mediumUnlocked = true;
+          setMediumRoadmap(mediumData);
 
-              if (difficulty === "medium") {
-                activeChapters = mediumData.chapters;
-              }
-            }
-          } catch (err) {
-            console.warn("Failed to fetch Medium roadmap (locked):", err);
+          if (difficulty === "medium") {
+            activeChapters = mediumData.chapters;
           }
-        } else {
-          setIsHardUnlocked(false);
+        } catch (err) {
+          if (!alive) return;
+          setMediumRoadmap(null);
+          console.warn("Medium roadmap is not available:", err);
         }
 
-        if (hardUnlocked && alive) {
-          // 3. Fetch hard roadmap
+        if (mediumUnlocked) {
           try {
             const hardData = await courseApi.getHardRoadmap(courseSlug);
-            if (alive) {
-              setHardRoadmap(hardData);
-              if (difficulty === "hard") {
-                activeChapters = hardData.chapters;
-              }
+            if (!alive) return;
+            hardUnlocked = true;
+            setHardRoadmap(hardData);
+
+            if (difficulty === "hard") {
+              activeChapters = hardData.chapters;
             }
           } catch (err) {
-            console.warn("Failed to fetch Hard roadmap:", err);
+            if (!alive) return;
+            setHardRoadmap(null);
+            console.warn("Hard roadmap is not available:", err);
           }
+        } else {
+          setHardRoadmap(null);
         }
 
-        // Set default difficulty if current is locked
-        let activeDifficulty = difficulty;
+        setIsMediumUnlocked(mediumUnlocked);
+        setIsHardUnlocked(hardUnlocked);
+
         if (difficulty === "medium" && !mediumUnlocked) {
           setDifficulty("easy");
-          activeDifficulty = "easy";
           activeChapters = easyData.chapters;
         } else if (difficulty === "hard" && !hardUnlocked) {
           setDifficulty("easy");
-          activeDifficulty = "easy";
           activeChapters = easyData.chapters;
         }
 
@@ -895,7 +883,12 @@ const WorldMapPage = () => {
 
               <div className="flex gap-0.5 rounded-xl border border-on-surface/10 bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
                 {(["easy", "medium", "hard"] as Difficulty[]).map((d) => {
-                  const isLocked = d === "medium" ? !isMediumUnlocked : d === "hard" ? !isHardUnlocked : false;
+                  const isLocked =
+                    d === "medium"
+                      ? !isMediumUnlocked
+                      : d === "hard"
+                        ? !isHardUnlocked
+                        : false;
                   const dCfg = getDiffConfig(d, isLight);
 
                   return (
@@ -920,7 +913,9 @@ const WorldMapPage = () => {
                       }
                     >
                       {isLocked && (
-                        <span className="material-symbols-outlined text-[14px]">lock</span>
+                        <span className="material-symbols-outlined text-[14px]">
+                          lock
+                        </span>
                       )}
                       {dCfg.label}
                     </button>

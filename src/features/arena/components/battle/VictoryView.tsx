@@ -32,19 +32,19 @@ const VictoryView = () => {
   const result = matchResult?.result || "draw";
   const title =
     result === "win" ? "VICTORY" : result === "lose" ? "DEFEAT" : "DRAW";
-  const titleColor =
+  const titleStyle =
     result === "win"
-      ? "text-[#0d9488]"
+      ? "bg-gradient-to-r from-[#ffe066] via-[#f5b041] to-[#f39c12] bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(243,156,18,0.7)]"
       : result === "lose"
-        ? "text-error"
-        : "dark:text-[#f4d8e8] text-primary";
+        ? "bg-gradient-to-r from-[#ff8a8a] via-[#ff4d4d] to-[#d63031] bg-clip-text text-transparent drop-shadow-[0_0_25px_rgba(214,48,49,0.7)]"
+        : "bg-gradient-to-r from-[#e2e8f0] via-[#94a3b8] to-[#64748b] bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(148,163,184,0.5)]";
   const avatarUrl =
     (currentUser?.avatarUrl as string) ||
     "https://i.pravatar.cc/150?u=arena-you";
 
   const goLobby = () => {
     resetArena();
-    navigate({ to: "/dashboard" });
+    navigate({ to: "/arena" });
   };
 
   return (
@@ -53,7 +53,7 @@ const VictoryView = () => {
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[300px] h-[150px] bg-[#00ffff]/20 blur-[60px] rounded-full pointer-events-none"></div>
 
         <h1
-          className={`text-[54px] font-black tracking-[0.2em] ${titleColor} drop-shadow-[0_0_15px_rgba(13,148,136,0.45)] leading-none mt-2 transition-colors duration-300`}
+          className={`text-[54px] font-black tracking-[0.2em] ${titleStyle} leading-none mt-2 transition-colors duration-300`}
         >
           {title}
         </h1>

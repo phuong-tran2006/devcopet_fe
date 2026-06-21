@@ -10,6 +10,40 @@ import CourseSidebar from "../components/CourseSidebar";
 import { courseApi } from "../api/course.api";
 import LessonQuiz from "../../quizzes/components/LessonQuiz";
 
+const markdownComponents = {
+  code({ node, inline, className, children, ...props }) {
+    const language = className ? className.replace("language-", "").trim() : "";
+
+    if (!inline && language) {
+      if (language === "python-run") {
+        return (
+          <CodeRunnerBlock initialCode={String(children).replace(/\n$/, "")} />
+        );
+      }
+
+      return (
+        <SyntaxHighlighter
+          {...props}
+          children={String(children).replace(/\n$/, "")}
+          style={atomDark}
+          language={language}
+          PreTag="div"
+          className="rounded-xl my-6 border border-outline/20 !bg-surface-container-low"
+        />
+      );
+    }
+
+    return (
+      <code
+        {...props}
+        className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+      >
+        {children}
+      </code>
+    );
+  },
+};
+
 const LessonDetailPage = () => {
   const { lessonId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -271,9 +305,7 @@ const LessonDetailPage = () => {
             onClick={() => setIsMobileSidebarOpen(true)}
             className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">
-              menu
-            </span>
+            <span className="material-symbols-outlined text-[20px]">menu</span>
             <span className="font-label-sm tracking-widest text-[11px] uppercase font-bold">
               Danh sách bài học
             </span>
@@ -347,43 +379,7 @@ const LessonDetailPage = () => {
           <article className="markdown-body font-body-md text-on-surface text-[15px] leading-relaxed mb-16">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const language = className
-                    ? className.replace("language-", "").trim()
-                    : "";
-
-                  if (!inline && language) {
-                    if (language === "python-run") {
-                      return (
-                        <CodeRunnerBlock
-                          initialCode={String(children).replace(/\n$/, "")}
-                        />
-                      );
-                    }
-
-                    return (
-                      <SyntaxHighlighter
-                        {...props}
-                        children={String(children).replace(/\n$/, "")}
-                        style={atomDark}
-                        language={language}
-                        PreTag="div"
-                        className="rounded-xl my-6 border border-outline/20 !bg-surface-container-low"
-                      />
-                    );
-                  }
-
-                  return (
-                    <code
-                      {...props}
-                      className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
-                    >
-                      {children}
-                    </code>
-                  );
-                },
-              }}
+              components={markdownComponents}
             >
               {lesson.content}
             </ReactMarkdown>
@@ -403,7 +399,9 @@ const LessonDetailPage = () => {
                   className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Next Lesson
-                  <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                  <span className="material-symbols-outlined text-[20px]">
+                    arrow_forward
+                  </span>
                 </button>
               ) : (
                 <Link
@@ -412,7 +410,9 @@ const LessonDetailPage = () => {
                   className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Back to Course Curriculum
-                  <span className="material-symbols-outlined text-[20px]">assignment</span>
+                  <span className="material-symbols-outlined text-[20px]">
+                    assignment
+                  </span>
                 </Link>
               )}
             </div>
@@ -444,7 +444,9 @@ const LessonDetailPage = () => {
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline/20 shadow-lg"
               >
-                <span className="material-symbols-outlined text-[20px]">close</span>
+                <span className="material-symbols-outlined text-[20px]">
+                  close
+                </span>
               </button>
             </div>
             <div className="flex-1 h-full overflow-hidden">

@@ -62,6 +62,12 @@ const Header = () => {
               />
 
               <NavLink
+                to="/arena"
+                label={t("arena")}
+                onClick={() => triggerHaptic(40)}
+              />
+
+              <NavLink
                 to="/leaderboard"
                 label={t("leaderboard")}
                 onClick={() => triggerHaptic(40)}
@@ -93,8 +99,6 @@ const Header = () => {
               </button>
               {!isOnboarding ? (
                 <>
-
-
                   {/* Profile Dropdown */}
                   <div className="relative group cursor-pointer ml-2 z-50">
                     <div className="w-9 h-9 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center text-primary-fixed-dim text-sm font-bold border border-primary-fixed-dim/30 group-hover:border-primary-fixed-dim transition-all duration-300 shadow-[0_0_10px_rgba(0,218,248,0.3)] overflow-hidden">

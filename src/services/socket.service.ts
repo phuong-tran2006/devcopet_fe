@@ -20,6 +20,7 @@ class SocketService {
     this.socket = io(ARENA_SOCKET_URL, {
       auth: { token },
       transports: ["websocket"],
+      withCredentials: true,
       autoConnect: true,
       reconnection: true,
     });

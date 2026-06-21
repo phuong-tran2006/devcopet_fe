@@ -18,7 +18,7 @@ const QuestionBoard = ({
   totalQuestions = 0,
 }: QuestionBoardProps) => {
   const tagText = [
-    totalQuestions ? `Question ${questionIndex + 1}/${totalQuestions}` : null,
+    totalQuestions ? `Question ${questionIndex}/${totalQuestions}` : null,
     difficulty,
     ...conceptTags.slice(0, 2),
   ]

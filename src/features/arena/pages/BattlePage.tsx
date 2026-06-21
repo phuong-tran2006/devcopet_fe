@@ -76,7 +76,9 @@ const BattlePage = () => {
 
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
-      if (shouldForfeitOnExit()) {
+      // Chỉ gửi sự kiện rời phòng khi thực sự chuyển hướng sang trang khác (tránh StrictMode giả lập unmount)
+      const isLeavingPage = window.location.pathname !== "/arena/active";
+      if (shouldForfeitOnExit() && isLeavingPage) {
         leaveRoomRef.current();
       }
     };
@@ -405,9 +407,17 @@ const DragDropAnswer = ({
     dropZones.length > 0 && dropZones.every((zone) => activeMap[zone.id]);
 
   const handleZoneClick = (zoneId: string) => {
-    if (disabled || !selectedItemId) return;
-    setDropZoneMap((current) => ({ ...current, [zoneId]: selectedItemId }));
-    setSelectedItemId(null);
+    if (disabled) return;
+    if (selectedItemId) {
+      setDropZoneMap((current) => ({ ...current, [zoneId]: selectedItemId }));
+      setSelectedItemId(null);
+    } else if (dropZoneMap[zoneId]) {
+      setDropZoneMap((current) => {
+        const copy = { ...current };
+        delete copy[zoneId];
+        return copy;
+      });
+    }
   };
 
   return (
@@ -444,13 +454,34 @@ const DragDropAnswer = ({
               ? correctMap[zone.id] === activeMap[zone.id]
               : false;
 
+            const isTargetHighlight = Boolean(
+              selectedItemId && !assigned && !disabled && !correctMap,
+            );
+            const isRemovable = Boolean(
+              !selectedItemId && assigned && !disabled && !correctMap,
+            );
+
+            let borderBgClass =
+              "dark:border-white/10 border-outline/20 dark:bg-[#16202a] bg-surface-container-high transition-all duration-300";
+            if (correctMap) {
+              borderBgClass = isCorrect
+                ? "border-[#4fd1c5] bg-tertiary-container/40"
+                : "border-error bg-error/10";
+            } else if (isTargetHighlight) {
+              borderBgClass =
+                "dark:border-[#4dd0d0] border-primary dark:bg-[#4dd0d0]/10 bg-primary/5 dark:shadow-[0_0_12px_rgba(77,208,208,0.25)] animate-pulse cursor-pointer";
+            } else if (isRemovable) {
+              borderBgClass =
+                "dark:border-white/10 border-outline/20 dark:bg-[#16202a] bg-surface-container-high hover:border-error/40 hover:bg-error/5 cursor-pointer";
+            }
+
             return (
               <button
                 key={zone.id}
                 type="button"
                 disabled={disabled && !correctMap}
                 onClick={() => handleZoneClick(zone.id)}
-                className={`min-h-[58px] rounded-xl border px-3 py-2 text-left transition-colors ${correctMap ? (isCorrect ? "border-[#4fd1c5] bg-tertiary-container/40" : "border-error bg-error/10") : "dark:border-white/10 border-outline/20 dark:bg-[#16202a] bg-surface-container-high"}`}
+                className={`min-h-[58px] rounded-xl border px-3 py-2 text-left ${borderBgClass}`}
               >
                 <div className="text-[10px] uppercase tracking-wider dark:text-gray-500 text-on-surface-variant font-black mb-1">
                   {zone.label}
