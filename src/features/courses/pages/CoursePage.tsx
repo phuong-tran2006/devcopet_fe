@@ -84,7 +84,7 @@ const CourseCard = ({
   const buttonLabel = stats.percent > 0 ? "Continue" : "Start Course";
 
   return (
-    <div className="bg-surface-container rounded-xl overflow-hidden border border-on-surface/10 flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-[280px] flex-shrink-0">
+    <div className="bg-surface-container rounded-xl overflow-hidden border border-on-surface/10 flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-full flex-shrink-0">
       <div className="h-[90px] bg-primary-container relative flex items-center justify-center">
         {featured && (
           <div className="absolute top-2 left-2 bg-primary-fixed-dim/20 border border-primary-fixed-dim/40 text-primary-fixed-dim text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase backdrop-blur-sm shadow-[0_0_10px_rgba(0,218,248,0.2)]">
@@ -341,12 +341,12 @@ const CoursePage = () => {
           </div>
         )}
 
-        <div className="flex flex-wrap gap-6 justify-center md:justify-start">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 w-full">
           {loading ? (
             Array.from({ length: 2 }).map((_, index) => (
               <div
                 key={index}
-                className="w-[280px] h-[330px] rounded-xl bg-surface-container border border-on-surface/10 overflow-hidden animate-pulse"
+                className="w-full h-[330px] rounded-xl bg-surface-container border border-on-surface/10 overflow-hidden animate-pulse"
               >
                 <div className="h-[90px] bg-primary-container/60" />
                 <div className="p-4 space-y-4">

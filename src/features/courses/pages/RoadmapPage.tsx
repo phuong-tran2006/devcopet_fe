@@ -376,59 +376,6 @@ const RoadmapPage = () => {
           </div>
         </section>
 
-        {/* Bottom Stats Footer Bar */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-6">
-          {/* Stat 1: Global Players */}
-          <div className="bg-surface-container/60 backdrop-blur-md border border-on-surface/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#008080]/30 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-[#008080]/15 flex items-center justify-center border border-[#008080]/30 shadow-[0_0_15px_rgba(0,128,128,0.15)] text-[#008080]">
-              <span className="material-symbols-outlined text-[24px]">
-                groups
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
-                Global Players
-              </span>
-              <span className="text-xl font-extrabold text-on-surface">
-                1.2M+
-              </span>
-            </div>
-          </div>
-
-          {/* Stat 2: Active Projects */}
-          <div className="bg-surface-container/60 backdrop-blur-md border border-on-surface/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#D8BFD8]/30 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-[#D8BFD8]/10 flex items-center justify-center border border-[#D8BFD8]/30 shadow-[0_0_15px_rgba(216,191,216,0.15)] text-secondary">
-              <span className="material-symbols-outlined text-[24px]">
-                database
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
-                Active Projects
-              </span>
-              <span className="text-xl font-extrabold text-on-surface">
-                45.8K
-              </span>
-            </div>
-          </div>
-
-          {/* Stat 3: XP Generated */}
-          <div className="bg-surface-container/60 backdrop-blur-md border border-on-surface/10 rounded-2xl p-5 flex items-center gap-4 hover:border-[#87A96B]/30 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-[#87A96B]/10 flex items-center justify-center border border-[#87A96B]/30 shadow-[0_0_15px_rgba(135,169,107,0.15)] text-[#87A96B]">
-              <span className="material-symbols-outlined text-[24px]">
-                bolt
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-xs text-on-surface-variant font-medium tracking-wide">
-                XP Generated
-              </span>
-              <span className="text-xl font-extrabold text-on-surface">
-                900B+
-              </span>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
   );

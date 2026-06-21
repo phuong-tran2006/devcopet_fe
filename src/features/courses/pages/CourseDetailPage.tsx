@@ -179,7 +179,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
       .then((data) => setLessons(data || []))
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
-  }, [chapter._id, chapter.id]);
+  }, [chapter]);
 
   const getRankLabel = () => {
     const ranks = [

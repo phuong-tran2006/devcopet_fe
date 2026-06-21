@@ -215,6 +215,14 @@ const WorldMapPage = () => {
     [hardRoadmap],
   );
 
+  const sidebarChapters = useMemo(() => {
+    return difficulty === "hard"
+      ? hardChapters
+      : difficulty === "medium"
+        ? mediumChapters
+        : chapters;
+  }, [difficulty, hardChapters, mediumChapters, chapters]);
+
   const flatNodes = useMemo(() => {
     const sorted = chapters.flatMap((chapter) =>
       [...chapter.nodes]
@@ -669,7 +677,7 @@ const WorldMapPage = () => {
             {/* Memoized chapter buttons */}
             {useMemo(
               () =>
-                chapters.map((chapter, idx) => {
+                sidebarChapters.map((chapter, idx) => {
                   const chapterStatus = getChapterStatus(chapter);
                   const isCompleted = chapterStatus === "completed";
                   const isInProgress = chapterStatus === "active";
@@ -771,7 +779,9 @@ const WorldMapPage = () => {
                         </span>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[9px] text-on-surface-variant/50">
-                            {chapter.lessonCount || "?"} lessons
+                            {difficulty === "easy"
+                              ? `${chapter.lessonCount || 0} lessons • ${chapter.nodeCount || 0} nodes`
+                              : `${chapter.nodeCount || 0} nodes`}
                           </span>
                           {isInProgress && (
                             <span
@@ -792,7 +802,7 @@ const WorldMapPage = () => {
                     </button>
                   );
                 }),
-              [chapters, cfg, difficulty, isLight],
+              [sidebarChapters, cfg, difficulty, isLight],
             )}
           </div>
 

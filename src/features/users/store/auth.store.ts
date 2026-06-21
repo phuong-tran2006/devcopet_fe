@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { socketService } from "../../../services/socket.service";
 
 interface User {
   id?: string;
@@ -47,7 +48,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({ isAuthenticated: true, user: mergedUser });
     } else {
       localStorage.removeItem("user");
-      set({ isAuthenticated: true, user: null });
+      set({ isAuthenticated: false, user: null });
     }
   },
 
@@ -55,6 +56,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     localStorage.removeItem("user");
+    socketService.disconnect();
     set({ isAuthenticated: false, user: null });
   },
 
