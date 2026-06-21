@@ -12,7 +12,10 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
   const [systemName, setSystemName] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState<{ text: string; isError: boolean } | null>(null);
+  const [message, setMessage] = useState<{
+    text: string;
+    isError: boolean;
+  } | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -34,9 +37,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
         bio: bio.trim(),
       });
       const updatedUser = response.data;
-      const token = localStorage.getItem("accessToken") || "";
-      const refresh = localStorage.getItem("refreshToken") || "";
-      setAuth(token, refresh, updatedUser);
+      setAuth(null, null, updatedUser);
       setMessage({ text: "Profile updated successfully!", isError: false });
     } catch (err: any) {
       console.error(err);
@@ -136,7 +137,9 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
 
         <div className="flex flex-col items-end gap-2 w-full md:w-auto">
           {message && (
-            <p className={`text-[12px] font-semibold ${message.isError ? "text-red-400" : "text-green-400"}`}>
+            <p
+              className={`text-[12px] font-semibold ${message.isError ? "text-red-400" : "text-green-400"}`}
+            >
               {message.text}
             </p>
           )}

@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState } from "react";
+import { useAuthStore } from "../../users/store/auth.store";
 
 // --- MOCK DATA ---
 const mockQuestions = [
@@ -62,6 +63,7 @@ const mockQuestions = [
 ];
 
 const QuizPage = () => {
+  const currentUser = useAuthStore((state) => state.user);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [placedBlocks, setPlacedBlocks] = useState<(string | null)[]>([
@@ -70,6 +72,10 @@ const QuizPage = () => {
   ]);
 
   const q = mockQuestions[currentIdx];
+  const userLevel = currentUser?.level ?? 1;
+  const userExp = currentUser?.exp ?? 0;
+  const userStars = currentUser?.coins ?? 0;
+  const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
 
   const handleNext = () => {
     if (currentIdx < mockQuestions.length - 1) {
@@ -102,7 +108,7 @@ const QuizPage = () => {
           </div>
           <div>
             <div className="text-[13px] text-on-surface font-bold">
-              Level 12
+              Level {userLevel}
             </div>
             <div className="text-[11px] text-on-surface-variant">
               Data Novice
@@ -116,7 +122,7 @@ const QuizPage = () => {
               add_circle
             </span>
             <span className="text-[13px] font-bold text-on-surface-variant">
-              2,450 XP
+              {userExp.toLocaleString()} XP
             </span>
           </div>
           <div className="bg-surface-container/50 border border-outline/10 rounded-full px-4 py-2 flex items-center gap-2 w-max">
@@ -124,17 +130,20 @@ const QuizPage = () => {
               star
             </span>
             <span className="text-[13px] font-bold text-on-surface-variant">
-              120
+              {userStars.toLocaleString()}
             </span>
           </div>
         </div>
 
         <div className="flex items-center gap-3 w-full">
           <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest whitespace-nowrap">
-            Level 12
+            Level {userLevel}
           </span>
           <div className="flex-1 h-2 bg-surface-container rounded-full overflow-hidden border border-outline/10">
-            <div className="h-full bg-gradient-to-r from-primary-fixed-dim to-[#D8BFD8] w-[80%] rounded-full shadow-[0_0_10px_rgba(216,191,216,0.5)]"></div>
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-primary-fixed-dim to-[#D8BFD8] shadow-[0_0_10px_rgba(216,191,216,0.5)]"
+              style={{ width: `${levelProgress}%` }}
+            ></div>
           </div>
         </div>
       </div>

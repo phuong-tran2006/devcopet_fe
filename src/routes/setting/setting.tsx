@@ -1,4 +1,3 @@
-/* eslint-disable react-refresh/only-export-components */
 import { createFileRoute } from "@tanstack/react-router";
 import React from "react";
 import { useTheme } from "../../contexts/ThemeContext";
@@ -16,7 +15,10 @@ import { useAuthStore } from "../../features/users/store/auth.store";
 export const Route = createFileRoute("/setting/setting")({
   beforeLoad: () => {
     if (!useAuthStore.getState().isAuthenticated) {
-      throw redirect({ to: "/login", search: { redirect: "/setting/setting" } });
+      throw redirect({
+        to: "/login",
+        search: { redirect: "/setting/setting" },
+      });
     }
   },
   component: SettingComponent,

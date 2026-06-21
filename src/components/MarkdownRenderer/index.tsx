@@ -134,7 +134,6 @@ const MarkdownRenderer = ({ content }) => {
             const language = className
               ? className.replace("language-", "").trim()
               : "";
-            console.log("MARKDOWN CODE BLOCK:", { className, language });
 
             if (!inline && language) {
               if (language === "python-run") {

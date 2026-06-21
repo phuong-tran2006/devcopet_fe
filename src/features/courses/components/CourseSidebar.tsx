@@ -10,24 +10,27 @@ const CourseSidebarChapter = ({
   currentLessonId,
   currentLessonProgress = 0,
   currentLessonCompleted = false,
+  refreshKey = 0,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     courseApi
       .getLessons(chapter._id)
       .then((data) => {
-        setLessons(data || []);
+        const nextLessons = data || [];
+        setLessons(nextLessons);
         // Nếu bài học hiện tại nằm trong chương này, tự động mở Accordion
-        if (data.some((l) => l._id === currentLessonId)) {
+        if (nextLessons.some((l) => l._id === currentLessonId)) {
           setIsOpen(true);
         }
       })
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
-  }, [chapter._id, currentLessonId]);
+  }, [chapter._id, currentLessonId, refreshKey]);
 
   return (
     <div className="border-b border-outline-variant last:border-b-0">
@@ -63,13 +66,17 @@ const CourseSidebarChapter = ({
             lessons.map((lesson, idx) => {
               const isActive = lesson._id === currentLessonId;
 
-              const progress = isActive
-                ? currentLessonProgress
-                : lesson.progress || 0;
-
               const isCompleted = isActive
-                ? currentLessonCompleted
-                : lesson.quizPassed || lesson.completed;
+                ? currentLessonCompleted || lesson.status === "completed"
+                : lesson.status === "completed" ||
+                  lesson.quizPassed ||
+                  lesson.completed;
+
+              const progress = isActive
+                ? isCompleted
+                  ? 100
+                  : currentLessonProgress
+                : lesson.progress || (isCompleted ? 100 : 0);
 
               const displayProgress = isCompleted
                 ? 100
@@ -87,7 +94,7 @@ const CourseSidebarChapter = ({
                   }`}
                 >
                   <LessonProgressCircle
-                    progress={progress}
+                    progress={displayProgress}
                     isActive={isActive}
                     isCompleted={isCompleted}
                   />
@@ -128,6 +135,7 @@ const CourseSidebar = ({
   currentLessonId,
   currentLessonProgress = 0,
   currentLessonCompleted = false,
+  refreshKey = 0,
 }) => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
@@ -135,6 +143,7 @@ const CourseSidebar = ({
 
   useEffect(() => {
     if (!courseId) return;
+    setLoading(true);
 
     // Lấy thông tin khoá học (để lấy tên) và danh sách chương
     Promise.all([
@@ -147,7 +156,24 @@ const CourseSidebar = ({
       })
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [courseId]);
+  }, [courseId, refreshKey]);
+
+  const totalLessons =
+    chapters.reduce(
+      (sum, chapter) => sum + (chapter.progress?.totalLessons || 0),
+      0,
+    ) ||
+    course?.totalLessons ||
+    0;
+  const completedLessons = Math.min(
+    totalLessons,
+    chapters.reduce(
+      (sum, chapter) => sum + (chapter.progress?.completedLessons || 0),
+      0,
+    ),
+  );
+  const progressPercent =
+    totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
     <div className="hidden lg:flex w-[380px] shrink-0 bg-surface-container-low border-r border-outline-variant h-full flex-col z-20">
@@ -161,17 +187,19 @@ const CourseSidebar = ({
           {course ? course.title : "Đang tải..."}
         </h2>
 
-        {/* Progress Bar (Demo) */}
         <div className="flex items-center justify-between mb-2">
           <span className="font-label-sm text-[11px] tracking-wider text-on-surface-variant/80 uppercase">
-            2 / {course ? course.totalLessons : "--"} lesson
+            {completedLessons} / {totalLessons || "--"} lesson
           </span>
           <span className="font-bold text-[12px] text-primary-fixed-dim">
-            4%
+            {progressPercent}%
           </span>
         </div>
         <div className="h-[4px] bg-surface-container-highest rounded-full overflow-hidden">
-          <div className="h-full bg-primary-fixed-dim w-[4%] rounded-full shadow-[0_0_10px_rgba(0,218,248,0.4)]" />
+          <div
+            className="h-full bg-primary-fixed-dim rounded-full shadow-[0_0_10px_rgba(0,218,248,0.4)] transition-all duration-500"
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
 
@@ -191,6 +219,7 @@ const CourseSidebar = ({
                 currentLessonId={currentLessonId}
                 currentLessonProgress={currentLessonProgress}
                 currentLessonCompleted={currentLessonCompleted}
+                refreshKey={refreshKey}
               />
             ))
           )}

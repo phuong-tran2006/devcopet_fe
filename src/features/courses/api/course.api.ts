@@ -320,7 +320,8 @@ export interface HardOrderingChallenge {
   hint?: string;
   hints?: Array<{ id: string; text: string }>;
   explanation?: string;
-  steps: Array<{ id: string; text: string }>;
+  steps?: Array<{ id: string; text: string }>;
+  poolItems?: Array<{ id: string; text: string }>;
   xp: number;
   estimatedMinutes: number;
 }

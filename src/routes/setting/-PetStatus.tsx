@@ -1,11 +1,16 @@
 import React from "react";
 import { mascotAxolotl } from "../../features/users/constants/authImages";
+import { useAuthStore } from "../../features/users/store/auth.store";
 
 interface PetStatusProps {
   theme: "light" | "dark";
 }
 
 export const PetStatus: React.FC<PetStatusProps> = ({ theme }) => {
+  const user = useAuthStore((state) => state.user);
+  const level = user?.level ?? 1;
+  const exp = user?.exp ?? 0;
+
   return (
     <div
       className={`border p-6 rounded-3xl space-y-4 shadow-xl transition-colors relative overflow-hidden ${
@@ -54,9 +59,9 @@ export const PetStatus: React.FC<PetStatusProps> = ({ theme }) => {
           <p
             className={`text-sm font-bold mt-1 ${theme === "dark" ? "text-white" : "text-slate-800"}`}
           >
-            Level 14{" "}
+            Level {level}{" "}
             <span className="text-on-surface-variant  font-normal">
-              (XP: 12,450)
+              (XP: {exp.toLocaleString()})
             </span>
           </p>
         </div>

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -12,12 +12,14 @@ import LessonQuiz from "../../quizzes/components/LessonQuiz";
 
 const LessonDetailPage = () => {
   const { lessonId } = useParams({ strict: false });
+  const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [readingProgress, setReadingProgress] = useState(0);
   const contentScrollRef = useRef(null);
   const [quizPassed, setQuizPassed] = useState(false);
+  const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
   const lastScrollRef = useRef({
     scrollTop: 0,
 
@@ -74,6 +76,64 @@ const LessonDetailPage = () => {
       time: Date.now(),
     };
   }, [lesson?._id]);
+
+  const getOrderedCourseLessons = async (courseId) => {
+    const chapters = await courseApi.getChapters(courseId);
+    const orderedChapters = [...(chapters || [])].sort(
+      (a, b) => (a.order || 0) - (b.order || 0),
+    );
+
+    const lessonsByChapter = await Promise.all(
+      orderedChapters.map(async (chapter) => {
+        const chapterId = chapter._id || chapter.id;
+        const lessons = await courseApi.getLessons(chapterId);
+
+        return [...(lessons || [])]
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map((item) => ({
+            ...item,
+            chapterOrder: chapter.order || 0,
+          }));
+      }),
+    );
+
+    return lessonsByChapter.flat();
+  };
+
+  const handleQuizPassed = () => {
+    setQuizPassed(true);
+    setReadingProgress(100);
+    setSidebarRefreshKey((prev) => prev + 1);
+  };
+
+  const handleFinishReview = async (quizResult) => {
+    if (!quizResult?.passed || !lesson?.courseId || !lesson?._id) return;
+
+    try {
+      const orderedLessons = await getOrderedCourseLessons(lesson.courseId);
+      const currentIndex = orderedLessons.findIndex(
+        (item) => String(item._id || item.id) === String(lesson._id),
+      );
+      const nextLesson =
+        currentIndex >= 0 ? orderedLessons[currentIndex + 1] : null;
+
+      if (nextLesson && nextLesson.canAccess !== false) {
+        navigate({
+          to: "/lesson/$lessonId",
+          params: { lessonId: nextLesson._id || nextLesson.id },
+        });
+        return;
+      }
+
+      navigate({
+        to: "/courses/$courseId",
+        params: { courseId: String(lesson.courseId) },
+      });
+    } catch (err) {
+      console.error("Failed to navigate to next lesson:", err);
+      setSidebarRefreshKey((prev) => prev + 1);
+    }
+  };
 
   useEffect(() => {
     const el = contentScrollRef.current;
@@ -169,6 +229,7 @@ const LessonDetailPage = () => {
               currentLessonId={lesson._id}
               currentLessonProgress={readingProgress}
               currentLessonCompleted={quizPassed}
+              refreshKey={sidebarRefreshKey}
             />
           </div>
         </aside>
@@ -324,10 +385,8 @@ const LessonDetailPage = () => {
           <LessonQuiz
             key={lesson._id}
             lessonId={lesson._id}
-            onQuizPassed={() => {
-              setQuizPassed(true);
-              setReadingProgress(100);
-            }}
+            onQuizPassed={handleQuizPassed}
+            onFinishReview={handleFinishReview}
           />
         </div>
       </main>

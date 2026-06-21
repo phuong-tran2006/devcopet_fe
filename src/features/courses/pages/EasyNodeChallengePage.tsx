@@ -9,6 +9,7 @@ import {
   type SubmitEasyNodeChallengeResponse,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
@@ -64,6 +65,7 @@ const normalizeChallengeResponse = (
 const EasyNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.user);
   const [data, setData] = useState<EasyNodeChallengeResponse | null>(null);
   const [selectedOptionId, setSelectedOptionId] =
     useState<EasyChallengeOptionId | null>(null);
@@ -89,6 +91,10 @@ const EasyNodeChallengePage = () => {
   const isReviewMode = data?.node.status === "completed" && !!review;
   const isLockedMode = data?.node.status === "locked";
   const canAnswer = data?.node.status === "available" && !!challenge;
+  const userLevel = currentUser?.level ?? 1;
+  const userExp = currentUser?.exp ?? 0;
+  const userStars = currentUser?.coins ?? 0;
+  const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
   const codeSnippet =
     challenge?.promptType === "code_mcq" ? challenge.codeSnippet : undefined;
 
@@ -154,7 +160,7 @@ const EasyNodeChallengePage = () => {
     return () => {
       alive = false;
     };
-  }, [nodeId]);
+  }, [nodeId, courseSlug]);
 
   const goBackToRoadmap = () => {
     navigate({
@@ -328,26 +334,29 @@ const EasyNodeChallengePage = () => {
               </span>
             </div>
             <div>
-              <p className="text-[14px] font-semibold">Level 12</p>
+              <p className="text-[14px] font-semibold">Level {userLevel}</p>
               <p className="text-[11px] text-on-surface-variant">Data Novice</p>
             </div>
           </div>
 
           <div className="flex flex-col gap-3">
             <div className="w-fit rounded-full border border-[#97CADB]/20 bg-[#97CADB]/10 px-4 py-2 text-[13px] font-bold">
-              ✹ 2,450 XP
+              ✹ {userExp.toLocaleString()} XP
             </div>
             <div className="w-fit rounded-full border border-[#97CADB]/20 bg-[#97CADB]/10 px-4 py-2 text-[13px] font-bold">
-              ★ 120
+              ★ {userStars.toLocaleString()}
             </div>
           </div>
 
           <div className="mt-8">
             <p className="mb-3 text-[13px] uppercase tracking-widest text-on-surface-variant">
-              Level 12
+              Level {userLevel}
             </p>
             <div className="h-2 overflow-hidden rounded-full bg-[#263944]">
-              <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-[#97CADB] to-[#d95dff]" />
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#97CADB] to-[#d95dff]"
+                style={{ width: `${levelProgress}%` }}
+              />
             </div>
           </div>
 
