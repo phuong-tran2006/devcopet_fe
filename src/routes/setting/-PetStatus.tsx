@@ -43,7 +43,7 @@ export const PetStatus: React.FC<PetStatusProps> = ({ theme }) => {
         <div className="w-[84px] h-[94px] bg-[#0a1b26] border border-[#193245] rounded-xl p-1 flex items-center justify-center shrink-0 shadow-inner">
           <img
             src={mascotAxolotl}
-            alt="Axo-Script Card"
+            alt={`${user?.petName || "Axo-Script"} Card`}
             className="w-full h-full object-contain animate-pulse"
           />
         </div>
@@ -51,7 +51,7 @@ export const PetStatus: React.FC<PetStatusProps> = ({ theme }) => {
         {/* Thông tin chi tiết của Pet */}
         <div className="space-y-0.5">
           <h4 className="text-base font-bold text-[#7fe3dd] tracking-wide">
-            Axo-Script
+            {user?.petName || "Axo-Script"}
           </h4>
           <p className="text-xs text-on-surface-variant font-medium">
             Type: Water / Logic

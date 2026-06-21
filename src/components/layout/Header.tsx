@@ -60,11 +60,7 @@ const Header = () => {
                 label={t("roadmap")}
                 onClick={() => triggerHaptic(40)}
               />
-              <NavLink
-                to="/dashboard"
-                label={t("arena")}
-                onClick={() => triggerHaptic(40)}
-              />
+
               <NavLink
                 to="/leaderboard"
                 label={t("leaderboard")}
@@ -97,15 +93,7 @@ const Header = () => {
               </button>
               {!isOnboarding ? (
                 <>
-                  <Link
-                    to="/setting/setting"
-                    onClick={() => triggerHaptic(40)}
-                    className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">
-                      settings
-                    </span>
-                  </Link>
+
 
                   {/* Profile Dropdown */}
                   <div className="relative group cursor-pointer ml-2 z-50">

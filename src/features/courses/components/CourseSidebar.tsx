@@ -136,6 +136,7 @@ const CourseSidebar = ({
   currentLessonProgress = 0,
   currentLessonCompleted = false,
   refreshKey = 0,
+  className = "hidden lg:flex w-[380px] shrink-0 bg-surface-container-low border-r border-outline-variant h-full flex-col z-20",
 }) => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
@@ -176,7 +177,7 @@ const CourseSidebar = ({
     totalLessons > 0 ? Math.round((completedLessons / totalLessons) * 100) : 0;
 
   return (
-    <div className="hidden lg:flex w-[380px] shrink-0 bg-surface-container-low border-r border-outline-variant h-full flex-col z-20">
+    <div className={className}>
       {/* Header Info */}
       <div className="p-5 border-b border-outline-variant bg-surface">
         {/* <Link to="/course" className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-white font-label-sm tracking-widest uppercase text-[10px] mb-3 transition-colors">

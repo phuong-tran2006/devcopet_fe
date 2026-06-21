@@ -45,6 +45,43 @@ const DIFF_CONFIG = {
 } as const;
 
 type Difficulty = keyof typeof DIFF_CONFIG;
+
+const getDiffConfig = (diff: Difficulty, isLight: boolean) => {
+  if (isLight) {
+    if (diff === "easy") {
+      return {
+        label: "Easy",
+        accent: "#0284c7",
+        glow: "rgba(2,132,199,0.65)",
+        glowWeak: "rgba(2,132,199,0.20)",
+        pathColor: "#0284c7",
+        gradient: "linear-gradient(90deg, #0284c7, #0369a1)",
+      };
+    }
+    if (diff === "medium") {
+      return {
+        label: "Medium",
+        accent: "#0369a1",
+        glow: "rgba(3,105,161,0.65)",
+        glowWeak: "rgba(3,105,161,0.20)",
+        pathColor: "#0369a1",
+        gradient: "linear-gradient(90deg, #0369a1, #075985)",
+      };
+    }
+    if (diff === "hard") {
+      return {
+        label: "Hard",
+        accent: "#1e3a8a",
+        glow: "rgba(30,58,138,0.80)",
+        glowWeak: "rgba(30,58,138,0.25)",
+        pathColor: "#1e3a8a",
+        gradient: "linear-gradient(90deg, #1e3a8a, #1d4ed8)",
+      };
+    }
+  }
+  return DIFF_CONFIG[diff];
+};
+
 type ChapterStatus = "completed" | "active" | "locked";
 type SelectedRoadmapNode =
   | (EasyRoadmapNode & { difficulty?: "easy" })
@@ -137,6 +174,8 @@ const WorldMapPage = () => {
   const { worldId } = useParams({ strict: false });
   const courseSlug = worldId;
   const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [isMediumUnlocked, setIsMediumUnlocked] = useState(false);
+  const [isHardUnlocked, setIsHardUnlocked] = useState(false);
   const [roadmap, setRoadmap] = useState<EasyRoadmapResponse | null>(null);
   const [mediumRoadmap, setMediumRoadmap] =
     useState<MediumRoadmapResponse | null>(null);
@@ -161,7 +200,7 @@ const WorldMapPage = () => {
   const mainScrollRef = useRef<HTMLElement>(null);
   const activeNodeRef = useRef<HTMLDivElement>(null);
 
-  const cfg = DIFF_CONFIG[difficulty];
+  const cfg = getDiffConfig(difficulty, isLight);
 
   const chapters = useMemo(
     () => normalizeOrder(roadmap?.chapters ?? []),
@@ -270,37 +309,88 @@ const WorldMapPage = () => {
     setSelectedChapterId(null);
     setSelectedNode(null);
 
-    const request =
-      difficulty === "hard"
-        ? courseApi.getHardRoadmap(courseSlug)
-        : difficulty === "medium"
-          ? courseApi.getMediumRoadmap(courseSlug)
-          : courseApi.getEasyRoadmap(courseSlug);
-
-    request
-      .then((data) => {
+    const loadAllRoadmaps = async () => {
+      try {
+        // 1. Fetch easy roadmap
+        const easyData = await courseApi.getEasyRoadmap(courseSlug);
         if (!alive) return;
-        if (data.mode === "hard") {
-          setHardRoadmap(data);
-        } else if (data.mode === "medium") {
-          setMediumRoadmap(data);
+        setRoadmap(easyData);
+
+        // Calculate Easy completed count
+        const easyCompleted = easyData.chapters
+          .flatMap((c) => c.nodes)
+          .filter((n) => n.status === "completed").length;
+        const mediumUnlocked = easyCompleted >= 5;
+        setIsMediumUnlocked(mediumUnlocked);
+
+        let hardUnlocked = false;
+        let activeChapters = easyData.chapters;
+
+        if (mediumUnlocked) {
+          // 2. Fetch medium roadmap
+          try {
+            const mediumData = await courseApi.getMediumRoadmap(courseSlug);
+            if (alive) {
+              setMediumRoadmap(mediumData);
+              const mediumCompleted = mediumData.chapters
+                .flatMap((c) => c.nodes)
+                .filter((n) => n.status === "completed").length;
+              hardUnlocked = mediumCompleted >= 5;
+              setIsHardUnlocked(hardUnlocked);
+
+              if (difficulty === "medium") {
+                activeChapters = mediumData.chapters;
+              }
+            }
+          } catch (err) {
+            console.warn("Failed to fetch Medium roadmap (locked):", err);
+          }
         } else {
-          setRoadmap(data);
+          setIsHardUnlocked(false);
         }
-        setSelectedChapterId(data.chapters[0]?.id ?? null);
-        document.title = `${data.course.title} Roadmap | Devcopet Learn`;
-      })
-      .catch((err) => {
+
+        if (hardUnlocked && alive) {
+          // 3. Fetch hard roadmap
+          try {
+            const hardData = await courseApi.getHardRoadmap(courseSlug);
+            if (alive) {
+              setHardRoadmap(hardData);
+              if (difficulty === "hard") {
+                activeChapters = hardData.chapters;
+              }
+            }
+          } catch (err) {
+            console.warn("Failed to fetch Hard roadmap:", err);
+          }
+        }
+
+        // Set default difficulty if current is locked
+        let activeDifficulty = difficulty;
+        if (difficulty === "medium" && !mediumUnlocked) {
+          setDifficulty("easy");
+          activeDifficulty = "easy";
+          activeChapters = easyData.chapters;
+        } else if (difficulty === "hard" && !hardUnlocked) {
+          setDifficulty("easy");
+          activeDifficulty = "easy";
+          activeChapters = easyData.chapters;
+        }
+
+        setSelectedChapterId(activeChapters[0]?.id ?? null);
+        document.title = `${easyData.course.title} Roadmap | Devcopet Learn`;
+      } catch (err: any) {
         if (!alive) return;
         setError(
           err?.response?.data?.message ||
             err?.message ||
-            `Unable to load ${DIFF_CONFIG[difficulty].label} roadmap.`,
+            "Unable to load roadmap path.",
         );
-      })
-      .finally(() => {
+      } finally {
         if (alive) setLoading(false);
-      });
+      }
+    };
+
+    loadAllRoadmaps();
 
     return () => {
       alive = false;
@@ -794,27 +884,38 @@ const WorldMapPage = () => {
               </div>
 
               <div className="flex gap-0.5 rounded-xl border border-on-surface/10 bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
-                {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => setDifficulty(d)}
-                    className={`rounded-lg px-5 py-2 transition-all duration-200 ${
-                      difficulty === d
-                        ? "text-[#0d1117] shadow-md"
-                        : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
-                    }`}
-                    style={
-                      difficulty === d
-                        ? {
-                            background: DIFF_CONFIG[d].gradient,
-                            boxShadow: `0 2px 12px ${DIFF_CONFIG[d].glowWeak}`,
-                          }
-                        : {}
-                    }
-                  >
-                    {DIFF_CONFIG[d].label}
-                  </button>
-                ))}
+                {(["easy", "medium", "hard"] as Difficulty[]).map((d) => {
+                  const isLocked = d === "medium" ? !isMediumUnlocked : d === "hard" ? !isHardUnlocked : false;
+                  const dCfg = getDiffConfig(d, isLight);
+
+                  return (
+                    <button
+                      key={d}
+                      disabled={isLocked}
+                      onClick={() => !isLocked && setDifficulty(d)}
+                      className={`rounded-lg px-5 py-2 transition-all duration-200 flex items-center gap-1.5 ${
+                        difficulty === d
+                          ? "text-[#0d1117] shadow-md font-extrabold"
+                          : isLocked
+                            ? "text-on-surface-variant/30 cursor-not-allowed opacity-50"
+                            : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
+                      }`}
+                      style={
+                        difficulty === d
+                          ? {
+                              background: dCfg.gradient,
+                              boxShadow: `0 2px 12px ${dCfg.glowWeak}`,
+                            }
+                          : {}
+                      }
+                    >
+                      {isLocked && (
+                        <span className="material-symbols-outlined text-[14px]">lock</span>
+                      )}
+                      {dCfg.label}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -964,7 +1065,7 @@ const WorldMapPage = () => {
                       <path
                         d={completedD}
                         fill="none"
-                        stroke={DIFF_CONFIG.easy.pathColor}
+                        stroke={getDiffConfig("easy", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
                         filter="url(#glow-easy-roadmap)"
@@ -1164,7 +1265,7 @@ const WorldMapPage = () => {
                       <path
                         d={completedD}
                         fill="none"
-                        stroke={DIFF_CONFIG.medium.pathColor}
+                        stroke={getDiffConfig("medium", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
                         filter="url(#glow-medium-roadmap)"
@@ -1335,7 +1436,7 @@ const WorldMapPage = () => {
                       <path
                         d={completedD}
                         fill="none"
-                        stroke={DIFF_CONFIG.hard.pathColor}
+                        stroke={getDiffConfig("hard", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
                         filter="url(#glow-hard-roadmap)"

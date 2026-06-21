@@ -59,8 +59,9 @@ const OnboardingFlowPage = () => {
         answers: payloadAnswers,
       });
 
+      localStorage.setItem("petName", petName);
       if (user) {
-        setAuth(null, null, { ...user, onboardingCompleted: true });
+        setAuth(null, null, { ...user, petName, onboardingCompleted: true });
       }
       navigate({ to: "/" });
     } catch (err) {

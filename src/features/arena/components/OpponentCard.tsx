@@ -4,75 +4,70 @@ interface OpponentCardProps {
     username?: string;
     level?: number;
     avatarUrl?: string;
+    arenaRank?: string;
+    arenaRating?: number;
   } | null;
 }
 
 const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
   return (
     <div
-      className={`relative w-full max-w-[340px] aspect-[4/3] rounded-3xl dark:bg-[#1e262f] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${status === "idle" ? "opacity-70" : "opacity-90"}`}
+      className={`relative w-full max-w-[280px] aspect-[4/3] rounded-2xl dark:bg-[#1e262f] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${status === "idle" ? "opacity-70" : "opacity-90"}`}
     >
-      {/* OPPONENT tag */}
-      <div className="absolute top-4 left-4 dark:bg-[#3d2a32] bg-error/20 dark:text-[#d69ba2] text-error text-[10px] font-bold px-3 py-1.5 rounded-lg tracking-wider transition-colors duration-300">
-        OPPONENT
+      <div className="absolute top-3 left-3 dark:bg-[#3d2a32] bg-error/20 dark:text-[#d69ba2] text-error text-[10px] font-black px-2.5 py-1 rounded-lg tracking-wider transition-colors duration-300">
+        RIVAL
       </div>
 
       {status === "idle" && (
         <>
-          <div className="relative mb-6">
-            <div className="w-[100px] h-[100px] rounded-full border-2 border-dashed dark:border-gray-600/30 border-outline/30 flex items-center justify-center transition-colors duration-300">
-              <span className="material-symbols-outlined text-[32px] dark:text-gray-600/50 text-on-surface-variant/50">
+          <div className="relative mb-4">
+            <div className="w-[78px] h-[78px] rounded-full border-2 border-dashed dark:border-gray-600/30 border-outline/30 flex items-center justify-center transition-colors duration-300">
+              <span className="material-symbols-outlined text-[28px] dark:text-gray-600/50 text-on-surface-variant/50">
                 help
               </span>
             </div>
           </div>
-          <h3 className="text-[24px] font-extrabold dark:text-gray-400 text-on-surface-variant mb-2 transition-colors duration-300">
+          <h3 className="text-[20px] font-extrabold dark:text-gray-400 text-on-surface-variant mb-1 transition-colors duration-300">
             Unknown
           </h3>
-          <p className="text-[13px] dark:text-gray-500 text-on-surface-variant/70 transition-colors duration-300">
-            Waiting for matchmaking...
+          <p className="text-[12px] dark:text-gray-500 text-on-surface-variant/70 transition-colors duration-300">
+            Waiting...
           </p>
         </>
       )}
 
       {status === "searching" && (
         <>
-          <div className="relative mb-6">
-            <div className="w-[100px] h-[100px] rounded-full border-2 border-dashed dark:border-gray-500/50 border-outline/50 flex items-center justify-center animate-[spin_10s_linear_infinite] transition-colors duration-300"></div>
+          <div className="relative mb-4">
+            <div className="w-[78px] h-[78px] rounded-full border-2 border-dashed dark:border-gray-500/50 border-outline/50 flex items-center justify-center animate-[spin_10s_linear_infinite] transition-colors duration-300"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[32px] dark:text-gray-500/80 text-on-surface-variant/80 transition-colors duration-300">
+              <span className="material-symbols-outlined text-[28px] dark:text-gray-500/80 text-on-surface-variant/80 transition-colors duration-300">
                 person_search
               </span>
             </div>
           </div>
-          <h3 className="text-[24px] font-extrabold dark:text-gray-300 text-on-surface mb-2 transition-colors duration-300">
-            Searching...
+          <h3 className="text-[20px] font-extrabold dark:text-gray-300 text-on-surface mb-1 transition-colors duration-300">
+            Searching
           </h3>
-          <div className="flex items-center gap-2 dark:text-gray-500 text-on-surface-variant transition-colors duration-300">
-            <div className="flex gap-1">
-              <span
-                className="w-1.5 h-1.5 rounded-full dark:bg-gray-500/50 bg-outline/50 animate-bounce"
-                style={{ animationDelay: "0ms" }}
-              />
-              <span
-                className="w-1.5 h-1.5 rounded-full dark:bg-gray-500/50 bg-outline/50 animate-bounce"
-                style={{ animationDelay: "150ms" }}
-              />
-              <span
-                className="w-1.5 h-1.5 rounded-full dark:bg-gray-500/50 bg-outline/50 animate-bounce"
-                style={{ animationDelay: "300ms" }}
-              />
-            </div>
-            <span className="text-[13px] ml-1">Matchmaking</span>
+          <div className="flex items-center gap-1 dark:text-gray-500 text-on-surface-variant transition-colors duration-300">
+            <span className="w-1.5 h-1.5 rounded-full dark:bg-gray-500/50 bg-outline/50 animate-bounce" />
+            <span
+              className="w-1.5 h-1.5 rounded-full dark:bg-gray-500/50 bg-outline/50 animate-bounce"
+              style={{ animationDelay: "150ms" }}
+            />
+            <span
+              className="w-1.5 h-1.5 rounded-full dark:bg-gray-500/50 bg-outline/50 animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            />
           </div>
         </>
       )}
 
       {status === "found" && (
         <>
-          <div className="relative mb-4">
+          <div className="relative mb-3">
             <div className="absolute inset-0 rounded-full border-2 border-[#ff3b30] blur-[4px] animate-pulse" />
-            <div className="w-[100px] h-[100px] rounded-full border-2 border-[#ff3b30] overflow-hidden p-0.5 relative z-10 dark:bg-[#0e141a] bg-surface transition-colors duration-300">
+            <div className="w-[78px] h-[78px] rounded-full border-2 border-[#ff3b30] overflow-hidden p-0.5 relative z-10 dark:bg-[#0e141a] bg-surface transition-colors duration-300">
               <img
                 src={opponent?.avatarUrl || "https://i.pravatar.cc/150?u=byte"}
                 alt="Opponent"
@@ -84,15 +79,15 @@ const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
               />
             </div>
           </div>
-          <h3 className="text-[24px] font-extrabold dark:text-white text-on-surface mb-2 transition-colors duration-300">
-            {opponent?.username || "ByteMaster"}
+          <h3 className="text-[20px] font-extrabold dark:text-white text-on-surface mb-2 transition-colors duration-300 truncate max-w-[210px]">
+            {opponent?.username || "Rival"}
           </h3>
-          <div className="flex items-center gap-2">
-            <div className="dark:bg-[#7e4141]/40 bg-error/10 border dark:border-[#7e4141] border-error/30 dark:text-[#f5b8b8] text-error text-[11px] font-bold px-2 py-0.5 rounded uppercase transition-colors duration-300">
-              LVL {opponent?.level || 40}
+          <div className="flex items-center gap-2 flex-wrap justify-center px-4">
+            <div className="dark:bg-[#7e4141]/40 bg-error/10 border dark:border-[#7e4141] border-error/30 dark:text-[#f5b8b8] text-error text-[11px] font-black px-2.5 py-1 rounded uppercase transition-colors duration-300">
+              {opponent?.arenaRank || "Beginner"}
             </div>
-            <span className="dark:text-gray-400 text-on-surface-variant text-[13px] transition-colors duration-300">
-              {(opponent?.level || 40) >= 15 ? "Elite" : "Novice"}
+            <span className="dark:text-gray-400 text-on-surface-variant text-[12px] font-semibold transition-colors duration-300">
+              {opponent?.arenaRating ? `${opponent.arenaRating} RP` : "Ready"}
             </span>
           </div>
         </>

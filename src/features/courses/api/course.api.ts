@@ -513,4 +513,42 @@ export const courseApi = {
     );
     return response.data;
   },
+
+  resetCourseProgress: async (courseId: string): Promise<any> => {
+    const response = await api.post(`/courses/${courseId}/reset-progress`);
+    return response.data;
+  },
 };
+
+export async function checkDifficultyUnlock(
+  courseSlug: string,
+  targetMode: "easy" | "medium" | "hard",
+): Promise<boolean> {
+  if (targetMode === "easy") return true;
+
+  try {
+    const easyData = await courseApi.getEasyRoadmap(courseSlug);
+    const easyCompleted = easyData.chapters
+      .flatMap((c) => c.nodes)
+      .filter((n) => n.status === "completed").length;
+
+    if (targetMode === "medium") {
+      return easyCompleted >= 5;
+    }
+
+    if (targetMode === "hard") {
+      if (easyCompleted < 5) return false;
+      const mediumData = await courseApi.getMediumRoadmap(courseSlug);
+      const mediumCompleted = mediumData.chapters
+        .flatMap((c) => c.nodes)
+        .filter((n) => n.status === "completed").length;
+      return mediumCompleted >= 5;
+    }
+  } catch (err) {
+    console.error("Error checking difficulty unlock:", err);
+    return false;
+  }
+  return false;
+}
+
+

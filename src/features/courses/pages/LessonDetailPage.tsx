@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -16,6 +16,7 @@ const LessonDetailPage = () => {
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const contentScrollRef = useRef(null);
   const [quizPassed, setQuizPassed] = useState(false);
@@ -49,6 +50,10 @@ const LessonDetailPage = () => {
         .getLessonDetail(lessonId)
         .then((data) => {
           setLesson(data);
+          setQuizPassed(data.status === "completed");
+          if (data.status === "completed") {
+            setReadingProgress(100);
+          }
           document.title = `${data.title} - Devcopet`;
         })
         .catch((err) => console.error(err))
@@ -260,13 +265,16 @@ const LessonDetailPage = () => {
         ref={contentScrollRef}
         className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar"
       >
-        {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
+        {/* Mobile Hamburger menu */}
         <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-outline-variant pb-4">
-          <button className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface">
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
+          >
             <span className="material-symbols-outlined text-[20px]">
-              menu_open
+              menu
             </span>
-            <span className="font-label-sm tracking-widest text-[11px] uppercase">
+            <span className="font-label-sm tracking-widest text-[11px] uppercase font-bold">
               Danh sách bài học
             </span>
           </button>
@@ -381,6 +389,35 @@ const LessonDetailPage = () => {
             </ReactMarkdown>
           </article>
 
+          {/* Next Lesson Button */}
+          {(lesson.status === "completed" || quizPassed) && (
+            <div className="mt-8 flex justify-end gap-4 border-t border-outline/20 pt-6">
+              {lesson.nextLessonId ? (
+                <button
+                  onClick={() => {
+                    navigate({
+                      to: "/lesson/$lessonId",
+                      params: { lessonId: lesson.nextLessonId },
+                    });
+                  }}
+                  className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                >
+                  Next Lesson
+                  <span className="material-symbols-outlined text-[20px]">arrow_forward</span>
+                </button>
+              ) : (
+                <Link
+                  to="/courses/$courseId"
+                  params={{ courseId: String(lesson.courseId) }}
+                  className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                >
+                  Back to Course Curriculum
+                  <span className="material-symbols-outlined text-[20px]">assignment</span>
+                </Link>
+              )}
+            </div>
+          )}
+
           {/* Quiz Section */}
           <LessonQuiz
             key={lesson._id}
@@ -390,6 +427,39 @@ const LessonDetailPage = () => {
           />
         </div>
       </main>
+
+      {/* Mobile Drawer Overlay */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          {/* Drawer Panel */}
+          <div className="relative flex-1 flex flex-col max-w-[320px] w-full bg-surface-container-low h-full shadow-2xl transition-transform duration-300">
+            <div className="absolute top-4 right-4 z-50">
+              <button
+                type="button"
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline/20 shadow-lg"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
+              </button>
+            </div>
+            <div className="flex-1 h-full overflow-hidden">
+              <CourseSidebar
+                courseId={lesson.courseId}
+                currentLessonId={lesson._id}
+                currentLessonProgress={readingProgress}
+                currentLessonCompleted={quizPassed}
+                refreshKey={sidebarRefreshKey}
+                className="flex w-full h-full flex-col z-20 bg-surface-container-low"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

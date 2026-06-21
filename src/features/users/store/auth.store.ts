@@ -11,6 +11,7 @@ interface User {
   exp?: number;
   onboardingCompleted?: boolean;
   petProfileInitialized?: boolean;
+  petName?: string;
   [key: string]: unknown;
 }
 
@@ -34,11 +35,15 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     if (user) {
-      localStorage.setItem("user", JSON.stringify(user));
+      const petName = (user.petName as string) || localStorage.getItem("petName") || "Axo-Script";
+      const mergedUser = { ...user, petName };
+      localStorage.setItem("user", JSON.stringify(mergedUser));
+      localStorage.setItem("petName", petName);
+      set({ isAuthenticated: true, user: mergedUser });
     } else {
       localStorage.removeItem("user");
+      set({ isAuthenticated: true, user: null });
     }
-    set({ isAuthenticated: true, user: user || null });
   },
 
   logout: () => {
@@ -53,7 +58,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     let user: User | null = null;
     try {
       const stored = localStorage.getItem("user");
-      if (stored) user = JSON.parse(stored);
+      if (stored) {
+        user = JSON.parse(stored);
+        if (user && !user.petName) {
+          user.petName = localStorage.getItem("petName") || "Axo-Script";
+        }
+      }
     } catch {
       // ignore parse errors
     }
@@ -68,8 +78,10 @@ export const useAuthStore = create<AuthState>((set) => ({
         _skipAuthRedirect: true,
       } as any);
       const freshUser = response.data;
-      localStorage.setItem("user", JSON.stringify(freshUser));
-      set({ isAuthenticated: true, user: freshUser });
+      const petName = localStorage.getItem("petName") || "Axo-Script";
+      const mergedUser = { ...freshUser, petName };
+      localStorage.setItem("user", JSON.stringify(mergedUser));
+      set({ isAuthenticated: true, user: mergedUser });
     } catch {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");

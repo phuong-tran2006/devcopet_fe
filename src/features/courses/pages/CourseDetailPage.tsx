@@ -274,10 +274,11 @@ const CourseDetailPage = () => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [resetting, setResetting] = useState(false);
 
-  useEffect(() => {
+  const loadData = () => {
     if (!courseId) return;
-
+    setLoading(true);
     courseApi
       .getCourses()
       .then((courses) => {
@@ -291,7 +292,29 @@ const CourseDetailPage = () => {
       .then((data) => setChapters(data || []))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadData();
   }, [courseId]);
+
+  const handleResetProgress = async () => {
+    if (!course?._id) return;
+    if (!window.confirm("Are you sure you want to reset your progress for this course? This action cannot be undone.")) {
+      return;
+    }
+    setResetting(true);
+    try {
+      await courseApi.resetCourseProgress(course._id);
+      loadData();
+    } catch (err) {
+      console.error("Failed to reset course progress:", err);
+      alert("Failed to reset progress. Please try again.");
+    } finally {
+      setResetting(false);
+    }
+  };
+
 
   useEffect(() => {
     document.title = course
@@ -435,6 +458,15 @@ const CourseDetailPage = () => {
                   </div>
                 </div>
               </div>
+
+              <button
+                onClick={handleResetProgress}
+                disabled={resetting}
+                className="w-full mt-5 bg-red-950/25 text-red-400 hover:bg-red-950/45 hover:text-red-300 border border-red-900/40 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                {resetting ? "Resetting..." : "Reset Course Progress"}
+              </button>
             </div>
           </div>
         </section>

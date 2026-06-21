@@ -80,7 +80,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
             >
               <img
                 src={mascotAxolotl}
-                alt="Axo-Script Avatar"
+                alt={`${user?.petName || "Axo-Script"} Avatar`}
                 className="w-12 h-12 object-contain"
               />
             </div>
