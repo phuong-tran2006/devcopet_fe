@@ -10,6 +10,7 @@ type OnboardingStep = "intro" | "survey" | "naming";
 
 const OnboardingFlowPage = () => {
   const [step, setStep] = useState<OnboardingStep>("intro");
+  const [questions, setQuestions] = useState<any[]>([]);
   const [surveyAnswers, setSurveyAnswers] = useState<Record<number, string>>(
     {},
   );
@@ -19,6 +20,18 @@ const OnboardingFlowPage = () => {
 
   useEffect(() => {
     document.title = "Welcome to Devcopet | Onboarding";
+
+    // Fetch questions from backend
+    onboardingApi
+      .getQuestions()
+      .then((data) => {
+        if (data && data.questions) {
+          setQuestions(data.questions);
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to load onboarding questions from backend", err);
+      });
   }, []);
 
   const handleCompleteSurvey = (answers: Record<number, string>) => {
@@ -30,63 +43,26 @@ const OnboardingFlowPage = () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
     try {
-      const scores = {
-        disciplined: 0,
-        curious: 0,
-        competitive: 0,
-        analytical: 0,
-        social: 0,
-        empathetic: 0,
-        adaptable: 0,
-        creative: 0,
-        leader: 0,
-        independent: 0,
-      };
+      // Map frontend surveyAnswers (Record<index, optionId>) to backend payload (Array<{ questionNumber, selectedOption }>)
+      const payloadAnswers = Object.entries(surveyAnswers).map(
+        ([indexStr, optionId]) => {
+          const index = parseInt(indexStr, 10);
+          const question = questions[index];
+          return {
+            questionNumber: question ? question.questionNumber : index + 1,
+            selectedOption: optionId,
+          };
+        },
+      );
 
-      Object.entries(surveyAnswers).forEach(([qIdxStr, optionId]) => {
-        const qIdx = parseInt(qIdxStr);
-        const question = surveyQuestions[qIdx];
-        if (!question) return;
-        const option = question.options.find((o) => o.id === optionId);
-        if (option && option.scores) {
-          Object.entries(option.scores).forEach(([trait, val]) => {
-            if (trait in scores) {
-              scores[trait as keyof typeof scores] += val;
-            }
-          });
-        }
+      await onboardingApi.submitAnswers({
+        answers: payloadAnswers,
+        petName,
       });
 
-      const mappedTraits = {
-        guidanceNeed: Math.max(
-          0,
-          scores.social + scores.empathetic - scores.independent,
-        ),
-        decisiveness: Math.max(
-          0,
-          scores.leader + scores.disciplined - scores.adaptable,
-        ),
-        failureSensitivity: Math.max(
-          0,
-          scores.competitive + scores.analytical - scores.adaptable,
-        ),
-        exploration: Math.max(0, scores.curious + scores.creative),
-        precision: Math.max(0, scores.analytical + scores.disciplined),
-        motivationStyle: Math.max(
-          0,
-          scores.competitive + scores.social + scores.leader,
-        ),
-      };
-
-      await onboardingApi.completeOnboarding({
-        petName: petName.trim(),
-        surveyAnswers: mappedTraits,
-      });
-
+      localStorage.setItem("petName", petName);
       if (user) {
-        const token = localStorage.getItem("accessToken") || "";
-        const refresh = localStorage.getItem("refreshToken") || "";
-        setAuth(token, refresh, { ...user, onboardingCompleted: true });
+        setAuth(null, null, { ...user, petName, onboardingCompleted: true });
       }
       navigate({ to: "/" });
     } catch (err) {
@@ -103,7 +79,12 @@ const OnboardingFlowPage = () => {
       )}
 
       {step === "survey" && (
-        <SurveyModal isOpen embedded onComplete={handleCompleteSurvey} />
+        <SurveyModal
+          isOpen
+          embedded
+          onComplete={handleCompleteSurvey}
+          questions={questions}
+        />
       )}
 
       {step === "naming" && (

@@ -1,16 +1,54 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { mascotAxolotl } from "../../features/users/constants/authImages";
+import { useAuthStore } from "../../features/users/store/auth.store";
+import { api } from "../../services/axiosClient";
 
 interface ProfileSettingsProps {
   theme: "light" | "dark";
 }
 
 export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
-  // State quản lý thông tin chỉnh sửa profile
-  const [systemName, setSystemName] = useState("DevAdmin_01");
-  const [bio, setBio] = useState(
-    "Architect of digital pets and master of the Python World. Level 14 and counting.",
-  );
+  const { user, setAuth } = useAuthStore();
+  const [systemName, setSystemName] = useState("");
+  const [bio, setBio] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{
+    text: string;
+    isError: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      setSystemName(user.username || "");
+      setBio(user.bio || "");
+    }
+  }, [user]);
+
+  const handleSave = async () => {
+    if (!systemName.trim()) {
+      setMessage({ text: "System Name cannot be empty.", isError: true });
+      return;
+    }
+    setSaving(true);
+    setMessage(null);
+    try {
+      const response = await api.patch("/users/profile", {
+        username: systemName.trim(),
+        bio: bio.trim(),
+      });
+      const updatedUser = response.data;
+      setAuth(null, null, updatedUser);
+      setMessage({ text: "Profile updated successfully!", isError: false });
+    } catch (err: any) {
+      console.error(err);
+      setMessage({
+        text: err?.response?.data?.message || "Failed to update profile",
+        isError: true,
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div
@@ -42,7 +80,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
             >
               <img
                 src={mascotAxolotl}
-                alt="Axo-Script Avatar"
+                alt={`${user?.petName || "Axo-Script"} Avatar`}
                 className="w-12 h-12 object-contain"
               />
             </div>
@@ -68,6 +106,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
+            disabled={saving}
             className={`w-full h-[84px] border rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#76d6d5] resize-none transition-all ${
               theme === "dark"
                 ? "bg-[#040d14] border-[#14232e] text-slate-300"
@@ -87,6 +126,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
             type="text"
             value={systemName}
             onChange={(e) => setSystemName(e.target.value)}
+            disabled={saving}
             className={`w-full border rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#76d6d5] transition-all ${
               theme === "dark"
                 ? "bg-[#040d14] border-[#14232e] text-slate-300"
@@ -95,9 +135,22 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
           />
         </div>
 
-        <button className="w-full md:w-auto px-6 py-2.5 bg-[#7fe3dd] hover:bg-[#6bd2cc] text-[#040d14] text-sm font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(127,227,221,0.2)] active:scale-95 md:mt-0 mt-2">
-          Save Profile Changes
-        </button>
+        <div className="flex flex-col items-end gap-2 w-full md:w-auto">
+          {message && (
+            <p
+              className={`text-[12px] font-semibold ${message.isError ? "text-red-400" : "text-green-400"}`}
+            >
+              {message.text}
+            </p>
+          )}
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full md:w-auto px-6 py-2.5 bg-[#7fe3dd] hover:bg-[#6bd2cc] text-[#040d14] text-sm font-bold rounded-xl transition-all shadow-[0_0_15px_rgba(127,227,221,0.2)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed md:mt-0 mt-2"
+          >
+            {saving ? "Saving..." : "Save Profile Changes"}
+          </button>
+        </div>
       </div>
     </div>
   );

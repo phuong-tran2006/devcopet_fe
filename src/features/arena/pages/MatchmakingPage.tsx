@@ -1,68 +1,119 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import PlayerCard from "../components/PlayerCard";
 import OpponentCard from "../components/OpponentCard";
+import { useAuthStore } from "../../users/store/auth.store";
+import { useArenaStore } from "../store/arena.store";
+import type { ArenaMode } from "../store/arena.store";
 
 const MatchmakingPage = () => {
-  const [status, setStatus] = useState<"idle" | "searching" | "found">("idle");
+  const mode: ArenaMode = "ranked";
   const navigate = useNavigate();
+  const { user: currentUser } = useAuthStore();
+  const {
+    status,
+    players,
+    matchTier,
+    waitingSeconds,
+    errorMessage,
+    connectArenaSocket,
+    findMatch,
+    cancelFindMatch,
+    leaveRoom,
+  } = useArenaStore();
 
   useEffect(() => {
-    let timeoutId: ReturnType<typeof setTimeout>;
-    if (status === "searching") {
-      // Simulate finding an opponent after 3 seconds
-      timeoutId = setTimeout(() => {
-        setStatus("found");
-      }, 3000);
-    }
-    return () => clearTimeout(timeoutId);
-  }, [status]);
+    connectArenaSocket();
+  }, [connectArenaSocket]);
 
-  const handleStartSearch = () => setStatus("searching");
-  const handleCancelSearch = () => setStatus("idle");
-  const handleReady = () => {
-    navigate({ to: "/dashboard/active" });
-  };
+  const currentUserId = useMemo(() => {
+    const rawId = currentUser?.id || currentUser?._id;
+    return rawId ? String(rawId) : undefined;
+  }, [currentUser]);
+
+  const me = useMemo(() => {
+    return (
+      players.find(
+        (player) => currentUserId && player.userId === currentUserId,
+      ) ||
+      players.find((player) => !player.isBot) ||
+      players[0]
+    );
+  }, [currentUserId, players]);
+
+  const opponent = useMemo(() => {
+    return (
+      players.find((player) => me && player.userId !== me.userId) ||
+      players.find((player) => player.isBot) ||
+      players[1] ||
+      null
+    );
+  }, [me, players]);
+
+  const hasMatch = players.length > 0;
+  const visualStatus =
+    status === "searching" ? "searching" : hasMatch ? "found" : "idle";
 
   const titles = {
-    idle: "ARENA MATCHMAKING",
-    searching: "FINDING OPPONENT",
-    found: "OPPONENT FOUND!",
+    idle: "ARENA QUEUE",
+    searching: "FINDING ROOM",
+    found: "MATCH FOUND",
   };
 
   const subtitles = {
-    idle: "Find an opponent of your skill level to battle.",
-    searching: "Searching global elite developer ranks...",
-    found: "Prepare for battle!",
+    idle: "Find a fair Arena room and start climbing the ranks.",
+    searching: "Waiting for an opponent...",
+    found: matchTier
+      ? `${matchTier} ranked room is ready.`
+      : "Confirm to enter the battle room.",
+  };
+
+  const handleStartSearch = () => {
+    findMatch({ courseSlug: "python-basic", mode });
+  };
+
+  const handleDecline = () => {
+    leaveRoom();
   };
 
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center p-8 dark:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] dark:from-[#13222e] dark:to-[#081015] bg-surface-container-lowest transition-colors duration-300">
-      {/* Header */}
-      <div className="text-center mb-16 animate-fade-in transition-all duration-300">
+    <div className="w-full h-full flex flex-col items-center justify-center p-5 dark:bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] dark:from-[#13222e] dark:to-[#081015] bg-surface-container-lowest transition-colors duration-300 overflow-hidden">
+      <div className="text-center mb-10 animate-fade-in transition-all duration-300">
         <h1
-          className={`text-[36px] font-extrabold tracking-[0.1em] dark:drop-shadow-[0_0_15px_rgba(244,236,244,0.3)] mb-3 transition-colors duration-300 ${status === "found" ? "dark:text-[#ff3b30] text-error" : "dark:text-[#f4ecf4] text-on-surface"}`}
+          className={`text-[30px] font-extrabold tracking-[0.08em] dark:drop-shadow-[0_0_15px_rgba(244,236,244,0.3)] mb-2 transition-colors duration-300 ${visualStatus === "found" ? "dark:text-[#ff3b30] text-error" : "dark:text-[#f4ecf4] text-on-surface"}`}
         >
-          {titles[status]}
+          {titles[visualStatus]}
         </h1>
-        <p className="dark:text-gray-400 text-on-surface-variant text-[15px] transition-colors duration-300">
-          {subtitles[status]}
+        <p className="dark:text-gray-400 text-on-surface-variant text-[14px] transition-colors duration-300">
+          {subtitles[visualStatus]}
         </p>
       </div>
 
-      {/* VS Container */}
-      <div className="relative flex items-center justify-center gap-4 sm:gap-8 lg:gap-16 w-full max-w-5xl">
-        {/* Left Card */}
+      <div className="relative flex items-center justify-center gap-4 sm:gap-6 lg:gap-10 w-full max-w-4xl">
         <div className="flex-1 flex justify-end">
-          <PlayerCard />
+          <PlayerCard
+            name={
+              me?.username ||
+              currentUser?.username ||
+              currentUser?.name ||
+              "You"
+            }
+            level={Number(currentUser?.level) || 1}
+            rank={me?.arenaRank || matchTier || "Beginner"}
+            rating={me?.arenaRating}
+            avatarUrl={
+              me?.avatarUrl ||
+              (currentUser?.avatarUrl as string) ||
+              "https://i.pravatar.cc/150?u=a04258114e29026702d"
+            }
+          />
         </div>
 
-        {/* VS Badge */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-2">
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5 pointer-events-none">
           <div
-            className="w-16 h-16 rounded-full dark:bg-[#1e2e38] bg-surface-container-high border-4 dark:border-[#081015] border-surface shadow-2xl flex items-center justify-center transition-colors duration-300"
+            className="w-12 h-12 rounded-full dark:bg-[#1e2e38] bg-surface-container-high border-4 dark:border-[#081015] border-surface shadow-2xl flex items-center justify-center transition-colors duration-300"
             style={
-              status === "found"
+              visualStatus === "found"
                 ? {
                     color: "#ff3b30",
                     borderColor: "var(--md-sys-color-error-container)",
@@ -71,52 +122,73 @@ const MatchmakingPage = () => {
             }
           >
             <span
-              className="material-symbols-outlined text-[32px] dark:text-[#4dd0d0]"
-              style={status === "found" ? { color: "inherit" } : {}}
+              className="material-symbols-outlined text-[26px] dark:text-[#4dd0d0]"
+              style={visualStatus === "found" ? { color: "inherit" } : {}}
             >
               bolt
             </span>
           </div>
           <span
-            className={`font-black text-[20px] tracking-widest transition-colors duration-300 ${status === "found" ? "dark:text-[#ff3b30] text-error dark:drop-shadow-[0_0_8px_rgba(255,59,48,0.5)]" : "dark:text-[#4dd0d0] text-primary dark:drop-shadow-[0_0_8px_rgba(77,208,208,0.5)]"}`}
+            className={`font-black text-[16px] tracking-widest transition-colors duration-300 ${visualStatus === "found" ? "dark:text-[#ff3b30] text-error" : "dark:text-[#4dd0d0] text-primary"}`}
           >
             VS
           </span>
         </div>
 
-        {/* Right Card */}
         <div className="flex-1 flex justify-start">
-          <OpponentCard status={status} />
+          <OpponentCard status={visualStatus} opponent={opponent} />
         </div>
       </div>
 
-      {/* Bottom Button */}
-      <div className="mt-20 h-16">
-        {status === "idle" && (
+      <div className="mt-7 min-h-20 flex flex-col items-center gap-3">
+        {status === "searching" && (
+          <div className="text-[14px] dark:text-gray-300 text-on-surface-variant font-black tabular-nums">
+            Waiting {waitingSeconds}s
+          </div>
+        )}
+        {errorMessage && (
+          <div className="text-[13px] text-error font-semibold">
+            {errorMessage}
+          </div>
+        )}
+
+        {!hasMatch && status !== "searching" && (
           <button
+            type="button"
             onClick={handleStartSearch}
-            className="dark:bg-[#29b6f6] bg-primary dark:hover:bg-[#4fc3f7] hover:bg-primary/90 dark:text-[#081015] text-on-primary font-extrabold text-[18px] tracking-[0.1em] py-4 px-12 rounded-full dark:shadow-[0_0_20px_rgba(41,182,246,0.4)] shadow-md transition-all transform hover:scale-105"
+            className="dark:bg-[#29b6f6] bg-primary dark:hover:bg-[#4fc3f7] hover:bg-primary/90 dark:text-[#081015] text-on-primary font-extrabold text-[16px] tracking-[0.08em] py-3.5 px-10 rounded-full dark:shadow-[0_0_20px_rgba(41,182,246,0.4)] shadow-md transition-all transform hover:scale-105"
           >
-            FIND MATCH
+            FIND ROOM
           </button>
         )}
 
         {status === "searching" && (
           <button
-            onClick={handleCancelSearch}
-            className="dark:bg-[#3a4450] bg-surface-container-highest dark:hover:bg-[#4a5563] hover:bg-outline/20 dark:text-gray-200 text-on-surface font-extrabold text-[16px] tracking-[0.1em] py-4 px-12 rounded-full shadow-inner transition-all"
+            type="button"
+            onClick={cancelFindMatch}
+            className="dark:bg-[#3a4450] bg-surface-container-highest dark:hover:bg-[#4a5563] hover:bg-outline/20 dark:text-gray-200 text-on-surface font-extrabold text-[14px] tracking-[0.08em] py-3 px-10 rounded-full shadow-inner transition-all"
           >
             CANCEL
           </button>
         )}
 
-        {status === "found" && (
-          <button
-            onClick={handleReady}
-            className="dark:bg-[#ff3b30] bg-error dark:hover:bg-[#ff453a] hover:bg-error/90 text-white font-extrabold text-[18px] tracking-[0.15em] py-4 px-16 rounded-full dark:shadow-[0_0_20px_rgba(255,59,48,0.4)] shadow-md transition-all transform hover:scale-105 animate-pulse"
-          >
-            READY
-          </button>
+        {hasMatch && (
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={handleDecline}
+              className="dark:bg-[#3a4450] bg-surface-container-highest hover:bg-outline/20 dark:text-gray-200 text-on-surface font-black text-[13px] tracking-wider py-3 px-8 rounded-full transition-all"
+            >
+              DECLINE
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate({ to: "/arena/active" })}
+              className="dark:bg-[#ff3b30] bg-error dark:hover:bg-[#ff453a] hover:bg-error/90 text-white font-black text-[14px] tracking-wider py-3 px-10 rounded-full dark:shadow-[0_0_20px_rgba(255,59,48,0.35)] shadow-md transition-all transform hover:scale-105"
+            >
+              ACCEPT MATCH
+            </button>
+          </div>
         )}
       </div>
     </div>

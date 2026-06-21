@@ -1,24 +1,23 @@
-// @ts-nocheck
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import HomePage from "../features/users/components/HomePage";
 
 export const Route = createFileRoute("/onboarding")({
   beforeLoad: () => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
+    const stored = localStorage.getItem("user");
+    if (!stored) {
       throw redirect({ to: "/login" });
     }
 
+    let user: { onboardingCompleted?: boolean } | null = null;
     try {
-      const stored = localStorage.getItem("user");
-      if (stored) {
-        const user = JSON.parse(stored);
-        if (user?.onboardingCompleted) {
-          throw redirect({ to: "/course" });
-        }
-      }
+      user = JSON.parse(stored);
     } catch {
-      // ignore parse errors
+      localStorage.removeItem("user");
+      throw redirect({ to: "/login" });
+    }
+
+    if (user?.onboardingCompleted) {
+      throw redirect({ to: "/course" });
     }
   },
   component: HomePage,

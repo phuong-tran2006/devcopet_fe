@@ -227,6 +227,7 @@ export type HardChallengeType =
   | "simulation"
   | "fill_missing_line"
   | "drag_drop_matching"
+  | "drag_drop"
   | "ordering_steps"
   | "ranking";
 
@@ -319,7 +320,23 @@ export interface HardOrderingChallenge {
   hint?: string;
   hints?: Array<{ id: string; text: string }>;
   explanation?: string;
-  steps: Array<{ id: string; text: string }>;
+  steps?: Array<{ id: string; text: string }>;
+  poolItems?: Array<{ id: string; text: string }>;
+  xp: number;
+  estimatedMinutes: number;
+}
+
+export interface HardFillTemplateChallenge {
+  id: string;
+  type: "drag_drop";
+  title: string;
+  question: string;
+  codeSnippet?: MediumCodeSnippet | null;
+  hint?: string;
+  hints?: Array<{ id: string; text: string }>;
+  explanation?: string;
+  template: string;
+  poolItems: Array<{ id: string; text: string }>;
   xp: number;
   estimatedMinutes: number;
 }
@@ -327,7 +344,8 @@ export interface HardOrderingChallenge {
 export type HardNodeChallenge =
   | HardMultipleChoiceChallenge
   | HardDragDropChallenge
-  | HardOrderingChallenge;
+  | HardOrderingChallenge
+  | HardFillTemplateChallenge;
 
 export type HardNodeChallengeReview = {
   correct: boolean;
@@ -342,6 +360,8 @@ export type HardNodeChallengeReview = {
   correctMatchingMap?: Record<string, string>;
   orderedIds?: string[];
   correctOrderedIds?: string[];
+  dropZoneMap?: Record<string, string>;
+  correctDropZoneMap?: Record<string, string>;
 };
 
 export interface HardNodeChallengeResponse {
@@ -350,19 +370,37 @@ export interface HardNodeChallengeResponse {
   review?: HardNodeChallengeReview;
 }
 
+export interface OptionPayload {
+  type:
+    | "multiple_choice"
+    | "code_trace"
+    | "bug_hunt"
+    | "choose_better_algorithm"
+    | "simulation"
+    | "fill_missing_line";
+  selectedOptionId: string;
+}
+
+export interface MatchingPayload {
+  type: "drag_drop_matching";
+  matchingMap: Record<string, string>;
+}
+
+export interface DragDropPayload {
+  type: "drag_drop";
+  dropZoneMap: Record<string, string>;
+}
+
+export interface OrderingPayload {
+  type: "ordering_steps" | "ranking";
+  orderedIds: string[];
+}
+
 export type SubmitHardNodeChallengePayload =
-  | {
-      type:
-        | "multiple_choice"
-        | "code_trace"
-        | "bug_hunt"
-        | "choose_better_algorithm"
-        | "simulation"
-        | "fill_missing_line";
-      selectedOptionId: string;
-    }
-  | { type: "drag_drop_matching"; matchingMap: Record<string, string> }
-  | { type: "ordering_steps" | "ranking"; orderedIds: string[] };
+  | OptionPayload
+  | MatchingPayload
+  | DragDropPayload
+  | OrderingPayload;
 
 export interface SubmitHardNodeChallengeResponse {
   correct: boolean;
@@ -374,6 +412,7 @@ export interface SubmitHardNodeChallengeResponse {
   correctOptionId?: string;
   correctMatchingMap?: Record<string, string>;
   correctOrderedIds?: string[];
+  correctDropZoneMap?: Record<string, string>;
 }
 
 export const courseApi = {
@@ -472,6 +511,11 @@ export const courseApi = {
       `/roadmaps/hard/nodes/${nodeId}/challenge/submit`,
       payload,
     );
+    return response.data;
+  },
+
+  resetCourseProgress: async (courseId: string): Promise<any> => {
+    const response = await api.post(`/courses/${courseId}/reset-progress`);
     return response.data;
   },
 };

@@ -27,7 +27,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
 
-  const { setAuth, isAuthenticated } = useAuthStore();
+  const { setAuth, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,9 +36,15 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate({ to: "/course" });
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect");
+      if (!user?.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: redirectUrl || "/course" });
+      }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogin = async (e: any) => {
     if (e) e.preventDefault();
@@ -52,8 +58,14 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await authApi.login({ email, password });
-      setAuth(response.accessToken, response.refreshToken, response.user);
-      navigate({ to: "/course" });
+      setAuth(null, null, response.user);
+      const params = new URLSearchParams(window.location.search);
+      const redirectUrl = params.get("redirect");
+      if (!response.user?.onboardingCompleted) {
+        navigate({ to: "/onboarding" });
+      } else {
+        navigate({ to: redirectUrl || "/course" });
+      }
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||

@@ -3,19 +3,16 @@ import { api } from "../../../services/axiosClient";
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const onboardingApi = {
-  completeOnboarding: async (data: {
-    petName: string;
-    surveyAnswers: Record<string, number>;
-  }) => {
-    // const response = await api.post("/onboarding/complete", data);
-    // return response.data;
+  getQuestions: async () => {
+    const response = await api.get("/onboarding/questions");
+    return response.data;
+  },
 
-    // Mock implementation
-    await delay(800);
-    return {
-      success: true,
-      petName: data.petName,
-      surveyAnswers: data.surveyAnswers,
-    };
+  submitAnswers: async (data: {
+    answers: Array<{ questionNumber: number; selectedOption: string }>;
+    petName?: string;
+  }) => {
+    const response = await api.post("/onboarding/submit", data);
+    return response.data;
   },
 };

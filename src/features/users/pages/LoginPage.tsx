@@ -18,6 +18,8 @@ import {
   socialIconClassName,
 } from "../constants/authImages";
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,7 +53,7 @@ const Login = () => {
     setLoading(true);
     try {
       const response = await authApi.login({ email, password });
-      setAuth(response.accessToken, response.refreshToken, response.user);
+      setAuth(null, null, response.user);
       navigate({ to: "/course" });
     } catch (err: any) {
       setError(err?.message || "Login failed. Please check your credentials.");
@@ -61,7 +63,7 @@ const Login = () => {
   };
 
   const handleSocialLogin = (provider: string) => {
-    window.location.href = `http://localhost:3000/auth/${provider}`;
+    window.location.href = `${API_URL}/auth/${provider}`;
   };
 
   const handleInputChange = (setter: any) => (e: any) => {

@@ -9,6 +9,7 @@ import {
   type SubmitEasyNodeChallengeResponse,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
@@ -64,6 +65,8 @@ const normalizeChallengeResponse = (
 const EasyNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
+  const currentUser = useAuthStore((state) => state.user);
+  const petName = (currentUser?.petName as string) || "Axo-Script";
   const [data, setData] = useState<EasyNodeChallengeResponse | null>(null);
   const [selectedOptionId, setSelectedOptionId] =
     useState<EasyChallengeOptionId | null>(null);
@@ -89,6 +92,10 @@ const EasyNodeChallengePage = () => {
   const isReviewMode = data?.node.status === "completed" && !!review;
   const isLockedMode = data?.node.status === "locked";
   const canAnswer = data?.node.status === "available" && !!challenge;
+  const userLevel = currentUser?.level ?? 1;
+  const userExp = currentUser?.exp ?? 0;
+  const userStars = currentUser?.coins ?? 0;
+  const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
   const codeSnippet =
     challenge?.promptType === "code_mcq" ? challenge.codeSnippet : undefined;
 
@@ -154,7 +161,7 @@ const EasyNodeChallengePage = () => {
     return () => {
       alive = false;
     };
-  }, [nodeId]);
+  }, [nodeId, courseSlug]);
 
   const goBackToRoadmap = () => {
     navigate({
@@ -318,53 +325,32 @@ const EasyNodeChallengePage = () => {
   };
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface">
-      <div className="flex min-h-[calc(100vh-80px)]">
-        <aside className="hidden w-[246px] shrink-0 flex-col bg-[#0b171e] px-6 py-8 lg:flex">
-          <div className="mb-9 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#63f1e3]/20 bg-[#63f1e3]/10 text-[#63f1e3]">
-              <span className="material-symbols-outlined text-[22px]">
-                pets
-              </span>
-            </div>
-            <div>
-              <p className="text-[14px] font-semibold">Level 12</p>
-              <p className="text-[11px] text-on-surface-variant">Data Novice</p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <div className="w-fit rounded-full border border-[#97CADB]/20 bg-[#97CADB]/10 px-4 py-2 text-[13px] font-bold">
-              ✹ 2,450 XP
-            </div>
-            <div className="w-fit rounded-full border border-[#97CADB]/20 bg-[#97CADB]/10 px-4 py-2 text-[13px] font-bold">
-              ★ 120
-            </div>
-          </div>
-
-          <div className="mt-8">
-            <p className="mb-3 text-[13px] uppercase tracking-widest text-on-surface-variant">
-              Level 12
-            </p>
-            <div className="h-2 overflow-hidden rounded-full bg-[#263944]">
-              <div className="h-full w-[72%] rounded-full bg-gradient-to-r from-[#97CADB] to-[#d95dff]" />
-            </div>
-          </div>
-
-          <button className="mt-auto rounded-xl bg-gradient-to-r from-[#00a99d] to-[#223746] px-4 py-3 text-[12px] font-extrabold uppercase tracking-widest text-white">
-            Upgrade to Pro
+    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
+      <div className="w-full max-w-[800px] flex flex-col">
+        {/* Back navigation */}
+        <div className="flex justify-between items-center mb-6 w-full">
+          <button
+            onClick={goBackToRoadmap}
+            className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
+          >
+            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            Back to Roadmap
           </button>
-        </aside>
+          
+          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+            <span>Easy Checkpoint</span>
+          </div>
+        </div>
 
-        <section className="flex min-w-0 flex-1 flex-col px-5 py-9 md:px-8">
+        <section className="w-full flex flex-col">
           {loading && (
-            <div className="flex min-h-[520px] items-center justify-center">
+            <div className="flex min-h-[400px] items-center justify-center">
               <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#63f1e3]/45 border-t-transparent" />
             </div>
           )}
 
           {!loading && error && (
-            <div className="mx-auto mt-16 max-w-[560px] rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
+            <div className="mx-auto mt-12 w-full rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
               <h1 className="text-[24px] font-extrabold">
                 Challenge could not load
               </h1>
@@ -373,7 +359,7 @@ const EasyNodeChallengePage = () => {
           )}
 
           {!loading && !error && data && isLockedMode && (
-            <div className="mx-auto mt-16 max-w-[600px] rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
+            <div className="mx-auto mt-12 w-full rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
                 <span className="material-symbols-outlined text-[32px]">
                   lock
@@ -396,30 +382,12 @@ const EasyNodeChallengePage = () => {
           )}
 
           {!loading && !error && data && !isLockedMode && challenge && (
-            <div className="mx-auto grid w-full max-w-[1080px] gap-6 xl:grid-cols-[minmax(0,1fr)_282px]">
-              <section>
-                <div className="mb-9 flex items-start justify-between gap-4">
-                  <div>
-                    <h1 className="text-[40px] font-extrabold leading-none md:text-[48px]">
-                      {isReviewMode || result
-                        ? "Review Mission"
-                        : "Roadmap Challenge"}
-                    </h1>
-                    <p className="mt-3 text-[15px] text-on-surface-variant">
-                      {data.node.label} • {data.node.title}
-                    </p>
-                  </div>
-
-                  {(isReviewMode || result) && (
-                    <div className="text-right">
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                        Accuracy
-                      </p>
-                      <p className="mt-2 text-[28px] font-extrabold text-[#63f1e3]">
-                        {(review?.correct ?? result?.correct) ? "100%" : "0%"}
-                      </p>
-                    </div>
-                  )}
+            <div className="w-full flex flex-col gap-6">
+              <section className="w-full">
+                <div className="mb-6 flex flex-col gap-2">
+                  <p className="text-[14px] text-on-surface-variant font-medium">
+                    {data.node.label} • {data.node.title}
+                  </p>
                 </div>
 
                 <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#111c23] shadow-[0_0_28px_rgba(99,241,227,0.08)]">
@@ -525,23 +493,6 @@ const EasyNodeChallengePage = () => {
                     </p>
                   )}
 
-                  {isReviewMode && review && (
-                    <div className="mx-6 mb-6 rounded-lg border border-[#63f1e3]/25 bg-[#10262c] px-5 py-4">
-                      <p className="text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                        Explanation
-                      </p>
-                      <p className="mt-2 text-[14px] leading-relaxed text-on-surface-variant">
-                        {review.explanation}
-                      </p>
-                      {review.completedAt && (
-                        <p className="mt-3 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/70">
-                          Completed{" "}
-                          {new Date(review.completedAt).toLocaleDateString()}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
                   {wrongAttempt && (
                     <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
                       <div className="flex items-start gap-3">
@@ -557,12 +508,6 @@ const EasyNodeChallengePage = () => {
                               "Pick another answer, then submit again."}
                           </p>
                         </div>
-                        <button
-                          onClick={retryAfterWrongAnswer}
-                          className="shrink-0 rounded-lg border border-red-300/25 px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-red-100 transition hover:bg-red-300/10"
-                        >
-                          Retry
-                        </button>
                       </div>
                     </div>
                   )}
@@ -576,104 +521,50 @@ const EasyNodeChallengePage = () => {
                       {submitting ? "Submitting..." : "Submit Answer"}
                     </button>
                   )}
+
+                  {/* Inline Explanation and Navigation Section */}
+                  {(isReviewMode || result) && (
+                    <div className="mx-6 mb-6 border-t border-[#263b44] pt-6 flex flex-col gap-4">
+                      {/* Explanation box */}
+                      <div className="rounded-xl border border-[#63f1e3]/30 bg-[#10262c] p-6 shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
+                        <div className="mb-4 flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
+                            <span className="material-symbols-outlined text-[20px]">
+                              pets
+                            </span>
+                          </div>
+                          <div>
+                            <p className="font-bold text-on-surface text-[14px] tracking-wide">
+                              {petName} Companion Says
+                            </p>
+                          </div>
+                        </div>
+
+                        <p className="text-[14px] leading-relaxed text-on-surface-variant">
+                          {isReviewMode && review ? review.explanation : result?.explanation}
+                        </p>
+                      </div>
+
+                      {/* Navigation buttons */}
+                      <div className="flex flex-wrap gap-4 mt-2">
+                        <button
+                          onClick={goBackToRoadmap}
+                          className="flex-1 min-w-[150px] rounded-xl border border-[#263b44] bg-[#1a2b36] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#203442] transition-colors"
+                        >
+                          Back to Roadmap
+                        </button>
+                        <button
+                          onClick={goToNextChallenge}
+                          disabled={nextChallengeLoading}
+                          className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </section>
-
-              <aside className="flex flex-col gap-5 xl:pt-[104px]">
-                {(isReviewMode || result) && (
-                  <div className="self-end rounded-lg border border-[#63f1e3] px-4 py-3 text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
-                    {(review?.correct ?? result?.correct)
-                      ? "Mission Accomplished"
-                      : "Mission Review"}
-                  </div>
-                )}
-
-                <div className="rounded-xl border border-[#63f1e3]/70 bg-[#111c23] p-6 shadow-[0_0_24px_rgba(99,241,227,0.08)]">
-                  <div className="mb-5 flex items-center gap-4">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full border-4 border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
-                      <span className="material-symbols-outlined text-[30px]">
-                        pets
-                      </span>
-                    </div>
-                    <p className="font-semibold text-on-surface">
-                      Personal Explanation
-                    </p>
-                  </div>
-
-                  {isReviewMode && review ? (
-                    <>
-                      <p className="text-[15px] font-bold italic leading-relaxed text-[#63f1e3]">
-                        “Previous answer loaded for review.”
-                      </p>
-                      <p className="mt-4 text-[14px] leading-relaxed text-on-surface-variant">
-                        {review.explanation}
-                      </p>
-                    </>
-                  ) : result ? (
-                    <>
-                      <p className="text-[15px] font-bold italic leading-relaxed text-[#63f1e3]">
-                        “{result.message}”
-                      </p>
-                      {result.explanation && (
-                        <p className="mt-4 text-[14px] leading-relaxed text-on-surface-variant">
-                          {result.explanation}
-                        </p>
-                      )}
-                    </>
-                  ) : (
-                    <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                      Select one answer, then submit to see your personalized
-                      explanation.
-                    </p>
-                  )}
-
-                  <div className="mt-6">
-                    <div className="mb-2 flex justify-between text-[11px] text-on-surface-variant">
-                      <span>Mastery of Checkpoint</span>
-                      <span>
-                        {(review?.correct ?? result?.correct) ? "85%" : "0%"}
-                      </span>
-                    </div>
-                    <div className="h-2 overflow-hidden rounded-full bg-[#263944]">
-                      <div
-                        className="h-full rounded-full bg-[#63f1e3]"
-                        style={{
-                          width:
-                            (review?.correct ?? result?.correct) ? "85%" : "0%",
-                        }}
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {isReviewMode && (
-                  <button
-                    onClick={goBackToRoadmap}
-                    className="rounded-xl border border-[#263b44] bg-[#111c23] px-5 py-5 text-[14px] font-bold uppercase tracking-wide text-on-surface-variant transition hover:text-on-surface"
-                  >
-                    Back to Roadmap
-                  </button>
-                )}
-
-                {result && (
-                  <>
-                    <button
-                      onClick={goToNextChallenge}
-                      disabled={nextChallengeLoading}
-                      className="rounded-xl bg-[#63f1e3] px-5 py-5 text-[14px] font-extrabold uppercase tracking-wide text-[#052023] transition hover:bg-[#86fff4]"
-                    >
-                      {nextChallengeLoading ? "Loading..." : "Next Challenge"}
-                      <span className="ml-2 text-[20px]">→</span>
-                    </button>
-                    <button
-                      onClick={goBackToRoadmap}
-                      className="rounded-xl border border-[#263b44] bg-[#111c23] px-5 py-5 text-[14px] font-bold uppercase tracking-wide text-on-surface-variant transition hover:text-on-surface"
-                    >
-                      Back to Results
-                    </button>
-                  </>
-                )}
-              </aside>
 
               {showSuccessModal && result?.correct && challenge && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
@@ -718,7 +609,7 @@ const EasyNodeChallengePage = () => {
                               </p>
                             )}
                             <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                              Axo-Script
+                              {petName}
                             </p>
                           </div>
                         </div>

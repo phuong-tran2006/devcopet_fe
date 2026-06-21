@@ -11,14 +11,6 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   const currentRunId = useRef(0);
   const textareaRef = useRef(null);
 
-  // Auto-resize textarea on initial load to fit all code
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [initialCode]);
-
   // Initialize the worker on component mount
   useEffect(() => {
     initWorker();
@@ -183,25 +175,32 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck="false"
-          className="custom-scrollbar w-full bg-transparent text-[#e2e8f0] font-mono text-[14px] leading-relaxed resize-y min-h-[120px] outline-none"
+          className="custom-scrollbar w-full bg-transparent text-[#e2e8f0] font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none"
           style={{ fontFamily: "Roboto Mono, monospace" }}
         />
       </div>
 
       {/* Output Panel */}
-      <div className="bg-[#121c25] p-4">
-        <div className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest mb-2">
-          Output
+      <div className="bg-[#121c25] p-4 relative">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+            Output
+          </span>
+          {status === "loading" && (
+            <div className="w-3 h-3 border-2 border-primary-fixed-dim border-t-transparent rounded-full animate-spin" />
+          )}
         </div>
         <pre
           className={`font-mono text-[13.5px] leading-relaxed whitespace-pre-wrap ${
-            output.includes("timed out")
-              ? "text-[#FBBF24]"
-              : status === "error"
-                ? "text-[#F87171]"
-                : status === "done"
-                  ? "text-[#10B981]"
-                  : "text-[#94A3B8]"
+            status === "loading"
+              ? "animate-pulse text-[#7fe3dd]"
+              : output.includes("timed out")
+                ? "text-[#FBBF24]"
+                : status === "error"
+                  ? "text-[#F87171]"
+                  : status === "done"
+                    ? "text-[#10B981]"
+                    : "text-[#94A3B8]"
           }`}
         >
           {output}

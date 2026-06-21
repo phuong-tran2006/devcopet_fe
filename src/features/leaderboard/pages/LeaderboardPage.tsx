@@ -1,179 +1,114 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { useAuthStore } from "../../users/store/auth.store";
 
 const LeaderboardPage = () => {
   const [activeTab, setActiveTab] = useState("Python World");
   const [showAll, setShowAll] = useState(false);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { user: currentUser } = useAuthStore();
 
-  // Mock data based on the design
-  const podium = [
-    {
-      rank: 2,
-      name: "PixelWizard",
-      levelTitle: "Level 42 Architect",
-      stars: "14.2k",
-      xp: "89k",
-      color: "#4FD1C5", // Teal
-      avatarColor: "bg-[#234E52]",
-    },
-    {
+  useEffect(() => {
+    const fetchLeaderboard = async () => {
+      try {
+        const { api } = await import("../../../services/axiosClient");
+        const response = await api.get("/users/leaderboard");
+        setUsers(response.data || []);
+      } catch (err) {
+        console.error("Failed to load leaderboard from backend", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLeaderboard();
+  }, []);
+
+  const podium = useMemo(() => {
+    if (users.length === 0) {
+      return [
+        { rank: 2, name: "PixelWizard", levelTitle: "Lvl 42 Architect", stars: "14,200", xp: "89k", avatarColor: "bg-[#234E52]", color: "#4FD1C5" },
+        { rank: 1, name: "KernelOverlord", levelTitle: "Lvl 50 System God", stars: "21,800", xp: "142k", avatarColor: "bg-[#702459]", color: "#F687B3", isCenter: true },
+        { rank: 3, name: "LogicLassie", levelTitle: "Lvl 38 Engineer", stars: "11,500", xp: "67k", avatarColor: "bg-[#2D3748]", color: "#A0AEC0" },
+      ];
+    }
+
+    const sorted = [...users].sort((a, b) => (b.exp || 0) - (a.exp || 0));
+
+    const p1 = sorted[0] ? {
       rank: 1,
-      name: "KernelOverlord",
-      levelTitle: "Level 50 System God",
-      stars: "21.8k",
-      xp: "142k",
-      color: "#F687B3", // Pink
+      name: sorted[0].username,
+      levelTitle: `Lvl ${sorted[0].level} Coder`,
+      stars: String(sorted[0].exp || 0),
+      xp: `${Math.round((sorted[0].exp || 0) / 100) / 10}k`,
       avatarColor: "bg-[#702459]",
+      color: "#F687B3",
       isCenter: true,
-    },
-    {
-      rank: 3,
-      name: "LogicLassie",
-      levelTitle: "Level 38 Engineer",
-      stars: "11.5k",
-      xp: "67k",
-      color: "#A0AEC0", // Gray
-      avatarColor: "bg-[#2D3748]",
-    },
-  ];
+    } : { rank: 1, name: "KernelOverlord", levelTitle: "Lvl 50 System God", stars: "21,800", xp: "142k", avatarColor: "bg-[#702459]", color: "#F687B3", isCenter: true };
 
-  const rankings = [
-    {
-      rank: "04",
-      name: "BinaryBardo",
-      level: "Lvl 35",
-      badge: "PYTHON EXPERT",
-      stars: "9,420",
-      progress: 80,
-    },
-    {
-      rank: "05",
-      name: "ScriptSiren",
-      level: "Lvl 34",
-      badge: "CODE NINJA",
-      stars: "8,815",
-      progress: 75,
-    },
-    {
-      rank: "06",
-      name: "BugHunterX",
-      level: "Lvl 31",
-      badge: "DEBUGGER",
-      stars: "7,240",
-      progress: 60,
-    },
-    {
-      rank: "07",
-      name: "AsyncAbby",
-      level: "Lvl 29",
-      badge: "DEV OPS",
-      stars: "6,920",
-      progress: 55,
-    },
-    {
-      rank: "08",
-      name: "CyberSamurai",
-      level: "Lvl 28",
-      badge: "HACKER",
-      stars: "6,100",
-      progress: 50,
-    },
-    {
-      rank: "09",
-      name: "DataDruid",
-      level: "Lvl 27",
-      badge: "DATA MAGE",
-      stars: "5,800",
-      progress: 48,
-    },
-    {
-      rank: "10",
-      name: "NullPointer",
-      level: "Lvl 25",
-      badge: "DEBUGGER",
-      stars: "5,200",
-      progress: 42,
-    },
-    {
-      rank: "11",
-      name: "StackOverflowed",
-      level: "Lvl 24",
-      badge: "OVERFLOW",
-      stars: "4,950",
-      progress: 40,
-    },
-    {
-      rank: "12",
-      name: "CodeMonkey",
-      level: "Lvl 22",
-      badge: "JUNIOR",
-      stars: "4,100",
-      progress: 35,
-    },
-    {
-      rank: "13",
-      name: "ArrayMaster",
-      level: "Lvl 21",
-      badge: "ALGO EXPERT",
-      stars: "3,800",
-      progress: 32,
-    },
-    {
-      rank: "14",
-      name: "SyntaxTerror",
-      level: "Lvl 20",
-      badge: "CHAOS",
-      stars: "3,500",
-      progress: 30,
-    },
-    {
-      rank: "15",
-      name: "GitGud",
-      level: "Lvl 19",
-      badge: "VERSION CTL",
-      stars: "3,100",
-      progress: 28,
-    },
-    {
-      rank: "16",
-      name: "BooleanBandit",
-      level: "Lvl 18",
-      badge: "LOGIC",
-      stars: "2,800",
-      progress: 25,
-    },
-    {
-      rank: "17",
-      name: "LoopHole",
-      level: "Lvl 17",
-      badge: "ITERATOR",
-      stars: "2,500",
-      progress: 22,
-    },
-    {
-      rank: "18",
-      name: "VariableVanguard",
-      level: "Lvl 15",
-      badge: "STATE MGR",
-      stars: "2,100",
-      progress: 18,
-    },
-    {
-      rank: "19",
-      name: "FunctionFanatic",
-      level: "Lvl 14",
-      badge: "FUNCTIONAL",
-      stars: "1,800",
-      progress: 15,
-    },
-    {
-      rank: "20",
-      name: "ClassClown",
-      level: "Lvl 13",
-      badge: "OOP",
-      stars: "1,500",
-      progress: 12,
-    },
-  ];
+    const p2 = sorted[1] ? {
+      rank: 2,
+      name: sorted[1].username,
+      levelTitle: `Lvl ${sorted[1].level} Coder`,
+      stars: String(sorted[1].exp || 0),
+      xp: `${Math.round((sorted[1].exp || 0) / 100) / 10}k`,
+      avatarColor: "bg-[#234E52]",
+      color: "#4FD1C5",
+    } : { rank: 2, name: "PixelWizard", levelTitle: "Lvl 42 Architect", stars: "14,200", xp: "89k", avatarColor: "bg-[#234E52]", color: "#4FD1C5" };
+
+    const p3 = sorted[2] ? {
+      rank: 3,
+      name: sorted[2].username,
+      levelTitle: `Lvl ${sorted[2].level} Coder`,
+      stars: String(sorted[2].exp || 0),
+      xp: `${Math.round((sorted[2].exp || 0) / 100) / 10}k`,
+      avatarColor: "bg-[#2D3748]",
+      color: "#A0AEC0",
+    } : { rank: 3, name: "LogicLassie", levelTitle: "Lvl 38 Engineer", stars: "11,500", xp: "67k", avatarColor: "bg-[#2D3748]", color: "#A0AEC0" };
+
+    return [p2, p1, p3];
+  }, [users]);
+
+  const rankings = useMemo(() => {
+    if (users.length === 0) {
+      return [
+        { rank: "04", name: "BinaryBardo", level: "Lvl 35", badge: "PYTHON EXPERT", stars: "9,420", progress: 80 },
+        { rank: "05", name: "ScriptSiren", level: "Lvl 34", badge: "CODE NINJA", stars: "8,815", progress: 75 },
+        { rank: "06", name: "BugHunterX", level: "Lvl 31", badge: "DEBUGGER", stars: "7,240", progress: 60 },
+        { rank: "07", name: "AsyncAbby", level: "Lvl 29", badge: "DEV OPS", stars: "6,920", progress: 55 },
+        { rank: "08", name: "CyberSamurai", level: "Lvl 28", badge: "HACKER", stars: "6,100", progress: 50 },
+        { rank: "09", name: "DataDruid", level: "Lvl 27", badge: "DATA MAGE", stars: "5,800", progress: 48 },
+        { rank: "10", name: "NullPointer", level: "Lvl 25", badge: "DEBUGGER", stars: "5,200", progress: 42 },
+      ];
+    }
+
+    const sorted = [...users].sort((a, b) => (b.exp || 0) - (a.exp || 0));
+    return sorted.slice(3).map((u, index) => {
+      const rankNum = index + 4;
+      return {
+        rank: rankNum < 10 ? `0${rankNum}` : String(rankNum),
+        name: u.username,
+        level: `Lvl ${u.level}`,
+        badge: u.level >= 30 ? "CODE NINJA" : "DATA MAGE",
+        stars: String(u.exp || 0),
+        progress: Math.min(100, Math.round((((u.exp || 0) % 1000) / 1000) * 100)),
+      };
+    });
+  }, [users]);
+
+  const currentUserRank = useMemo(() => {
+    if (!currentUser) return null;
+    const sorted = [...users].sort((a, b) => (b.exp || 0) - (a.exp || 0));
+    const index = sorted.findIndex((u) => u._id === currentUser.id || u.username === currentUser.username);
+    const rankNum = index !== -1 ? index + 1 : 142;
+    return {
+      rank: String(rankNum),
+      name: currentUser.username || "You",
+      level: `Lvl ${currentUser.level || 1}`,
+      badge: (currentUser.level || 1) >= 15 ? "DATA NOVICE" : "NOVICE",
+      stars: String(currentUser.exp || 0),
+      progress: Math.min(100, Math.round((((currentUser.exp || 0) % 1000) / 1000) * 100)),
+    };
+  }, [users, currentUser]);
 
   return (
     <main className="min-h-[calc(100vh-80px)] w-full bg-background relative overflow-x-hidden font-sans pb-24 text-on-surface">
@@ -444,52 +379,54 @@ const LeaderboardPage = () => {
           </div>
 
           {/* User's current rank */}
-          <div className="mt-8 -mx-4 px-4 py-4 rounded-xl border-2 border-primary-fixed-dim/50 bg-primary-fixed-dim/5 shadow-[0_0_20px_rgba(0,128,128,0.1)] flex items-center gap-4 relative overflow-hidden group">
-            <div className="absolute top-0 left-0 w-1 h-full bg-primary-fixed-dim"></div>
-            <div className="w-8 text-[15px] font-mono font-extrabold text-primary-fixed-dim transition-colors">
-              142
-            </div>
-            <div className="w-10 h-10 rounded-full bg-surface border-2 border-primary-fixed-dim/40 flex items-center justify-center text-[18px]">
-              🦖
-            </div>
-            <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-              <div className="flex items-center gap-3">
-                <span className="text-[15px] font-extrabold text-on-surface truncate">
-                  You
-                </span>
-                <span className="hidden sm:inline-flex px-2 py-0.5 rounded bg-[#D8BFD8]/10 text-secondary border border-[#D8BFD8]/30 text-[9px] font-extrabold uppercase tracking-widest whitespace-nowrap">
-                  DATA NOVICE
-                </span>
+          {currentUserRank && (
+            <div className="mt-8 -mx-4 px-4 py-4 rounded-xl border-2 border-primary-fixed-dim/50 bg-primary-fixed-dim/5 shadow-[0_0_20px_rgba(0,128,128,0.1)] flex items-center gap-4 relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-1 h-full bg-primary-fixed-dim"></div>
+              <div className="w-8 text-[15px] font-mono font-extrabold text-primary-fixed-dim transition-colors">
+                {currentUserRank.rank}
               </div>
-              <span className="text-[12px] text-on-surface-variant font-medium">
-                Lvl 12
-              </span>
-            </div>
-
-            <div className="flex items-center gap-8 ml-auto pl-4">
-              <div className="hidden md:flex flex-col items-end">
-                <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  Stars
-                </span>
-                <span className="text-[13px] font-mono font-bold text-on-surface">
-                  120
-                </span>
+              <div className="w-10 h-10 rounded-full bg-surface border-2 border-primary-fixed-dim/40 flex items-center justify-center text-[18px]">
+                🦖
               </div>
-              <div className="w-24 lg:w-32 flex flex-col gap-1.5">
-                <div className="flex justify-between">
-                  <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                    Progress
+              <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-[15px] font-extrabold text-on-surface truncate">
+                    {currentUserRank.name}
+                  </span>
+                  <span className="hidden sm:inline-flex px-2 py-0.5 rounded bg-[#D8BFD8]/10 text-secondary border border-[#D8BFD8]/30 text-[9px] font-extrabold uppercase tracking-widest whitespace-nowrap">
+                    {currentUserRank.badge}
                   </span>
                 </div>
-                <div className="h-1.5 bg-surface-variant rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary-fixed-dim to-[#D8BFD8] rounded-full"
-                    style={{ width: `8%` }}
-                  ></div>
+                <span className="text-[12px] text-on-surface-variant font-medium">
+                  {currentUserRank.level}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-8 ml-auto pl-4">
+                <div className="hidden md:flex flex-col items-end">
+                  <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
+                    Stars
+                  </span>
+                  <span className="text-[13px] font-mono font-bold text-on-surface">
+                    {currentUserRank.stars}
+                  </span>
+                </div>
+                <div className="w-24 lg:w-32 flex flex-col gap-1.5">
+                  <div className="flex justify-between">
+                    <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
+                      Progress
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-surface-variant rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-primary-fixed-dim to-[#D8BFD8] rounded-full"
+                      style={{ width: `${currentUserRank.progress}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-8 flex justify-center">
             <button

@@ -1,6 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -10,14 +10,51 @@ import CourseSidebar from "../components/CourseSidebar";
 import { courseApi } from "../api/course.api";
 import LessonQuiz from "../../quizzes/components/LessonQuiz";
 
+const markdownComponents = {
+  code({ node, inline, className, children, ...props }) {
+    const language = className ? className.replace("language-", "").trim() : "";
+
+    if (!inline && language) {
+      if (language === "python-run") {
+        return (
+          <CodeRunnerBlock initialCode={String(children).replace(/\n$/, "")} />
+        );
+      }
+
+      return (
+        <SyntaxHighlighter
+          {...props}
+          children={String(children).replace(/\n$/, "")}
+          style={atomDark}
+          language={language}
+          PreTag="div"
+          className="rounded-xl my-6 border border-outline/20 !bg-surface-container-low"
+        />
+      );
+    }
+
+    return (
+      <code
+        {...props}
+        className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+      >
+        {children}
+      </code>
+    );
+  },
+};
+
 const LessonDetailPage = () => {
   const { lessonId } = useParams({ strict: false });
+  const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
   const contentScrollRef = useRef(null);
   const [quizPassed, setQuizPassed] = useState(false);
+  const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
   const lastScrollRef = useRef({
     scrollTop: 0,
 
@@ -47,6 +84,10 @@ const LessonDetailPage = () => {
         .getLessonDetail(lessonId)
         .then((data) => {
           setLesson(data);
+          setQuizPassed(data.status === "completed");
+          if (data.status === "completed") {
+            setReadingProgress(100);
+          }
           document.title = `${data.title} - Devcopet`;
         })
         .catch((err) => console.error(err))
@@ -74,6 +115,64 @@ const LessonDetailPage = () => {
       time: Date.now(),
     };
   }, [lesson?._id]);
+
+  const getOrderedCourseLessons = async (courseId) => {
+    const chapters = await courseApi.getChapters(courseId);
+    const orderedChapters = [...(chapters || [])].sort(
+      (a, b) => (a.order || 0) - (b.order || 0),
+    );
+
+    const lessonsByChapter = await Promise.all(
+      orderedChapters.map(async (chapter) => {
+        const chapterId = chapter._id || chapter.id;
+        const lessons = await courseApi.getLessons(chapterId);
+
+        return [...(lessons || [])]
+          .sort((a, b) => (a.order || 0) - (b.order || 0))
+          .map((item) => ({
+            ...item,
+            chapterOrder: chapter.order || 0,
+          }));
+      }),
+    );
+
+    return lessonsByChapter.flat();
+  };
+
+  const handleQuizPassed = () => {
+    setQuizPassed(true);
+    setReadingProgress(100);
+    setSidebarRefreshKey((prev) => prev + 1);
+  };
+
+  const handleFinishReview = async (quizResult) => {
+    if (!quizResult?.passed || !lesson?.courseId || !lesson?._id) return;
+
+    try {
+      const orderedLessons = await getOrderedCourseLessons(lesson.courseId);
+      const currentIndex = orderedLessons.findIndex(
+        (item) => String(item._id || item.id) === String(lesson._id),
+      );
+      const nextLesson =
+        currentIndex >= 0 ? orderedLessons[currentIndex + 1] : null;
+
+      if (nextLesson && nextLesson.canAccess !== false) {
+        navigate({
+          to: "/lesson/$lessonId",
+          params: { lessonId: nextLesson._id || nextLesson.id },
+        });
+        return;
+      }
+
+      navigate({
+        to: "/courses/$courseId",
+        params: { courseId: String(lesson.courseId) },
+      });
+    } catch (err) {
+      console.error("Failed to navigate to next lesson:", err);
+      setSidebarRefreshKey((prev) => prev + 1);
+    }
+  };
 
   useEffect(() => {
     const el = contentScrollRef.current;
@@ -169,6 +268,7 @@ const LessonDetailPage = () => {
               currentLessonId={lesson._id}
               currentLessonProgress={readingProgress}
               currentLessonCompleted={quizPassed}
+              refreshKey={sidebarRefreshKey}
             />
           </div>
         </aside>
@@ -199,13 +299,14 @@ const LessonDetailPage = () => {
         ref={contentScrollRef}
         className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar"
       >
-        {/* Nút Hamburger menu trên mobile (chỉ là nút giữ chỗ, chưa làm overlay drawer vì phức tạp) */}
+        {/* Mobile Hamburger menu */}
         <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-outline-variant pb-4">
-          <button className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface">
-            <span className="material-symbols-outlined text-[20px]">
-              menu_open
-            </span>
-            <span className="font-label-sm tracking-widest text-[11px] uppercase">
+          <button
+            onClick={() => setIsMobileSidebarOpen(true)}
+            className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
+          >
+            <span className="material-symbols-outlined text-[20px]">menu</span>
+            <span className="font-label-sm tracking-widest text-[11px] uppercase font-bold">
               Danh sách bài học
             </span>
           </button>
@@ -278,59 +379,89 @@ const LessonDetailPage = () => {
           <article className="markdown-body font-body-md text-on-surface text-[15px] leading-relaxed mb-16">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
-              components={{
-                code({ node, inline, className, children, ...props }) {
-                  const language = className
-                    ? className.replace("language-", "").trim()
-                    : "";
-
-                  if (!inline && language) {
-                    if (language === "python-run") {
-                      return (
-                        <CodeRunnerBlock
-                          initialCode={String(children).replace(/\n$/, "")}
-                        />
-                      );
-                    }
-
-                    return (
-                      <SyntaxHighlighter
-                        {...props}
-                        children={String(children).replace(/\n$/, "")}
-                        style={atomDark}
-                        language={language}
-                        PreTag="div"
-                        className="rounded-xl my-6 border border-outline/20 !bg-surface-container-low"
-                      />
-                    );
-                  }
-
-                  return (
-                    <code
-                      {...props}
-                      className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
-                    >
-                      {children}
-                    </code>
-                  );
-                },
-              }}
+              components={markdownComponents}
             >
               {lesson.content}
             </ReactMarkdown>
           </article>
 
+          {/* Next Lesson Button */}
+          {(lesson.status === "completed" || quizPassed) && (
+            <div className="mt-8 flex justify-end gap-4 border-t border-outline/20 pt-6">
+              {lesson.nextLessonId ? (
+                <button
+                  onClick={() => {
+                    navigate({
+                      to: "/lesson/$lessonId",
+                      params: { lessonId: lesson.nextLessonId },
+                    });
+                  }}
+                  className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                >
+                  Next Lesson
+                  <span className="material-symbols-outlined text-[20px]">
+                    arrow_forward
+                  </span>
+                </button>
+              ) : (
+                <Link
+                  to="/courses/$courseId"
+                  params={{ courseId: String(lesson.courseId) }}
+                  className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                >
+                  Back to Course Curriculum
+                  <span className="material-symbols-outlined text-[20px]">
+                    assignment
+                  </span>
+                </Link>
+              )}
+            </div>
+          )}
+
           {/* Quiz Section */}
           <LessonQuiz
             key={lesson._id}
             lessonId={lesson._id}
-            onQuizPassed={() => {
-              setQuizPassed(true);
-              setReadingProgress(100);
-            }}
+            onQuizPassed={handleQuizPassed}
+            onFinishReview={handleFinishReview}
           />
         </div>
       </main>
+
+      {/* Mobile Drawer Overlay */}
+      {isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex">
+          {/* Backdrop overlay */}
+          <div
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm transition-opacity"
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          {/* Drawer Panel */}
+          <div className="relative flex-1 flex flex-col max-w-[320px] w-full bg-surface-container-low h-full shadow-2xl transition-transform duration-300">
+            <div className="absolute top-4 right-4 z-50">
+              <button
+                type="button"
+                onClick={() => setIsMobileSidebarOpen(false)}
+                className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline/20 shadow-lg"
+              >
+                <span className="material-symbols-outlined text-[20px]">
+                  close
+                </span>
+              </button>
+            </div>
+            <div className="flex-1 h-full overflow-hidden">
+              <CourseSidebar
+                courseId={lesson.courseId}
+                currentLessonId={lesson._id}
+                currentLessonProgress={readingProgress}
+                currentLessonCompleted={quizPassed}
+                refreshKey={sidebarRefreshKey}
+                className="flex w-full h-full flex-col z-20 bg-surface-container-low"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

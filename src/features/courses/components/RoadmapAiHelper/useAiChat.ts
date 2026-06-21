@@ -53,7 +53,7 @@ export function useAiChat(
   // Fetch prompts only when panel is explicitly opened by user
   useEffect(() => {
     if (panelState !== "expanded") return;
-    if (!nodeId || nodeStatus === "locked" || mode === "hard") return;
+    if (!nodeId || nodeStatus === "locked") return;
     if (prompts.length > 0 || errorCode) return;
 
     let alive = true;

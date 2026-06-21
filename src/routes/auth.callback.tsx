@@ -1,4 +1,3 @@
-// @ts-nocheck
 import {
   createFileRoute,
   useNavigate,
@@ -14,30 +13,27 @@ export const Route = createFileRoute("/auth/callback")({
 
 function AuthCallbackPage() {
   const navigate = useNavigate();
-  const search = useSearch({ from: "/auth/callback" });
+  const search = useSearch({ from: "/auth/callback" }) as {
+    redirect?: string;
+  };
   const { setAuth } = useAuthStore();
 
   useEffect(() => {
     const handleCallback = async () => {
-      const { accessToken, refreshToken } = search;
-
-      if (!accessToken) {
-        navigate({
-          to: "/login",
-          search: { error: "social_login_failed" },
-        });
-        return;
-      }
-
-      setAuth(accessToken, refreshToken || "", null);
-
       try {
         const response = await api.get("/users/me");
         const user = response.data;
 
-        setAuth(accessToken, refreshToken || "", user);
+        setAuth(null, null, user);
 
-        navigate({ to: "/course" });
+        const redirectUrl =
+          search.redirect ||
+          new URLSearchParams(window.location.search).get("redirect");
+        if (!user?.onboardingCompleted) {
+          navigate({ to: "/onboarding" });
+        } else {
+          navigate({ to: redirectUrl || "/course" });
+        }
       } catch (error) {
         navigate({
           to: "/login",
