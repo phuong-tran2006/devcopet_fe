@@ -57,6 +57,7 @@ const OnboardingFlowPage = () => {
 
       await onboardingApi.submitAnswers({
         answers: payloadAnswers,
+        petName,
       });
 
       localStorage.setItem("petName", petName);

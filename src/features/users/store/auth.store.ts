@@ -35,7 +35,12 @@ export const useAuthStore = create<AuthState>((set) => ({
     localStorage.removeItem("accessToken");
     localStorage.removeItem("refreshToken");
     if (user) {
-      const petName = (user.petName as string) || localStorage.getItem("petName") || "Axo-Script";
+      const petName =
+        user.petProfileInitialized && user.petName
+          ? (user.petName as string)
+          : localStorage.getItem("petName") ||
+            (user.petName as string) ||
+            "Axo-Script";
       const mergedUser = { ...user, petName };
       localStorage.setItem("user", JSON.stringify(mergedUser));
       localStorage.setItem("petName", petName);
@@ -78,8 +83,14 @@ export const useAuthStore = create<AuthState>((set) => ({
         _skipAuthRedirect: true,
       } as any);
       const freshUser = response.data;
-      const petName = localStorage.getItem("petName") || "Axo-Script";
+      const petName =
+        freshUser.petProfileInitialized && freshUser.petName
+          ? (freshUser.petName as string)
+          : localStorage.getItem("petName") ||
+            (freshUser.petName as string) ||
+            "Axo-Script";
       const mergedUser = { ...freshUser, petName };
+      localStorage.setItem("petName", petName);
       localStorage.setItem("user", JSON.stringify(mergedUser));
       set({ isAuthenticated: true, user: mergedUser });
     } catch {

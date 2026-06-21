@@ -10,6 +10,7 @@ export const onboardingApi = {
 
   submitAnswers: async (data: {
     answers: Array<{ questionNumber: number; selectedOption: string }>;
+    petName?: string;
   }) => {
     const response = await api.post("/onboarding/submit", data);
     return response.data;

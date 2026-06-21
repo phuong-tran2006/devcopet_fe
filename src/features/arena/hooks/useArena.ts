@@ -3,10 +3,11 @@ import { useArenaStore } from "../store/arena.store";
 
 export const useArena = () => {
   const arena = useArenaStore();
+  const connectArenaSocket = useArenaStore((state) => state.connectArenaSocket);
 
   useEffect(() => {
-    arena.connectArenaSocket();
-  }, [arena.connectArenaSocket]);
+    connectArenaSocket();
+  }, [connectArenaSocket]);
 
   return arena;
 };

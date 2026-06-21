@@ -1,5 +1,5 @@
 // @ts-nocheck
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
 
@@ -276,7 +276,7 @@ const CourseDetailPage = () => {
   const [loading, setLoading] = useState(true);
   const [resetting, setResetting] = useState(false);
 
-  const loadData = () => {
+  const loadData = useCallback(() => {
     if (!courseId) return;
     setLoading(true);
     courseApi
@@ -292,11 +292,11 @@ const CourseDetailPage = () => {
       .then((data) => setChapters(data || []))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
-  };
+  }, [courseId]);
 
   useEffect(() => {
     loadData();
-  }, [courseId]);
+  }, [loadData]);
 
   const handleResetProgress = async () => {
     if (!course?._id) return;
