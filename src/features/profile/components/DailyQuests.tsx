@@ -31,7 +31,12 @@ function resolveDailyMissionRedirect(
     case "QUIZ":
       return {
         to: "/courses/$courseId" as any,
-        params: { courseId: redirect.targetId || "python-basic" },
+        params: {
+          courseId:
+            !redirect.targetId || redirect.targetId === "python"
+              ? "python-basic"
+              : redirect.targetId,
+        },
       };
     case "ARENA":
       return { to: "/arena" };
