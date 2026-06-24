@@ -66,6 +66,10 @@ const NotificationDropdown = () => {
       setItems(response.items);
       setUnreadCount(response.unreadCount);
 
+      if (response.debug && import.meta.env.DEV) {
+        console.debug("[DailyMissionNotifications]", response.debug);
+      }
+
       if (
         response.items.length > 0 &&
         response.items[0].status === "generating" &&

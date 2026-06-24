@@ -52,6 +52,7 @@ export type DailyMissionNotificationItem = {
 export interface DailyMissionNotificationsResponse {
   unreadCount: number;
   items: DailyMissionNotificationItem[];
+  debug?: any;
 }
 
 // ─── Legacy Single Notification Type (for fallback) ──────────────────────────
