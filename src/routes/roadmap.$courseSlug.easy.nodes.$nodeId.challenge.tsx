@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import EasyNodeChallengePage from "../features/courses/pages/EasyNodeChallengePage";
+import EasyNodeChallengePage from "../features/roadmap/pages/challenges/EasyNodeChallengePage";
 import { useAuthStore } from "../features/users/store/auth.store";
 
 export const Route = createFileRoute(

@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import HomePage from "../features/users/components/HomePage";
+import HomePage from "../features/users/pages/onboarding/OnboardingFlowPage";
 
 export const Route = createFileRoute("/onboarding")({
   beforeLoad: () => {

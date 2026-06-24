@@ -1,6 +1,6 @@
 // @ts-nocheck
 import { createFileRoute } from "@tanstack/react-router";
-import CourseDetailPage from "../../features/courses/pages/CourseDetailPage";
+import CourseDetailPage from "../../features/courses/pages/course/CourseDetailPage";
 
 export const Route = createFileRoute("/courses/$courseId")({
   component: CourseDetailPage,

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
-import Button from "../../../../components/ui/Button";
-import { changePassword, retryPassword } from "../../api/auth.api";
+import Button from "src/components/ui/Button";
+import { changePassword, retryPassword } from "src/features/users/api/auth.api";
 
 type ForgotPasswordModalProps = {
   isOpen: boolean;

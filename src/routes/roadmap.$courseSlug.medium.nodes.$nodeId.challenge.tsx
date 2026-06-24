@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import MediumNodeChallengePage from "../features/courses/pages/MediumNodeChallengePage";
+import MediumNodeChallengePage from "../features/roadmap/pages/challenges/MediumNodeChallengePage";
 import { useAuthStore } from "../features/users/store/auth.store";
 
 export const Route = createFileRoute(

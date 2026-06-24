@@ -5,7 +5,7 @@ import {
   useNavigate,
 } from "@tanstack/react-router";
 import { ArrowLeft } from "lucide-react";
-import LessonQuiz from "../../features/quizzes/components/LessonQuiz";
+import LessonQuiz from "../../features/courses/components/lesson/LessonQuiz";
 
 export const Route = createFileRoute("/lesson/$lessonId/quiz")({
   component: LessonQuizRoutePage,

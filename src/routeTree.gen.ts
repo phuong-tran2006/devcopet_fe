@@ -8,581 +8,581 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as RoadmapRouteImport } from "./routes/roadmap";
-import { Route as RegisterRouteImport } from "./routes/register";
-import { Route as ProfileRouteImport } from "./routes/profile";
-import { Route as OnboardingRouteImport } from "./routes/onboarding";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as LeaderboardRouteImport } from "./routes/leaderboard";
-import { Route as DashboardRouteImport } from "./routes/dashboard";
-import { Route as CourseRouteImport } from "./routes/course";
-import { Route as ArenaRouteImport } from "./routes/arena";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as RoadmapIndexRouteImport } from "./routes/roadmap.index";
-import { Route as DashboardIndexRouteImport } from "./routes/dashboard.index";
-import { Route as ArenaIndexRouteImport } from "./routes/arena.index";
-import { Route as SettingSettingRouteImport } from "./routes/setting/setting";
-import { Route as RoadmapWorldIdRouteImport } from "./routes/roadmap.$worldId";
-import { Route as LessonLessonIdRouteImport } from "./routes/lesson/$lessonId";
-import { Route as DashboardRankingsRouteImport } from "./routes/dashboard.rankings";
-import { Route as DashboardHistoryRouteImport } from "./routes/dashboard.history";
-import { Route as DashboardActiveRouteImport } from "./routes/dashboard.active";
-import { Route as CoursesCourseIdRouteImport } from "./routes/courses/$courseId";
-import { Route as AuthCallbackRouteImport } from "./routes/auth.callback";
-import { Route as ArenaRankingsRouteImport } from "./routes/arena.rankings";
-import { Route as ArenaHistoryRouteImport } from "./routes/arena.history";
-import { Route as ArenaActiveRouteImport } from "./routes/arena.active";
-import { Route as LessonLessonIdQuizRouteImport } from "./routes/lesson/$lessonId.quiz";
-import { Route as RoadmapCourseSlugMediumNodesNodeIdChallengeRouteImport } from "./routes/roadmap.$courseSlug.medium.nodes.$nodeId.challenge";
-import { Route as RoadmapCourseSlugHardNodesNodeIdChallengeRouteImport } from "./routes/roadmap.$courseSlug.hard.nodes.$nodeId.challenge";
-import { Route as RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport } from "./routes/roadmap.$courseSlug.easy.nodes.$nodeId.challenge";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as RoadmapRouteImport } from './routes/roadmap'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LeaderboardRouteImport } from './routes/leaderboard'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CourseRouteImport } from './routes/course'
+import { Route as ArenaRouteImport } from './routes/arena'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as RoadmapIndexRouteImport } from './routes/roadmap.index'
+import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as ArenaIndexRouteImport } from './routes/arena.index'
+import { Route as SettingSettingRouteImport } from './routes/setting/setting'
+import { Route as RoadmapWorldIdRouteImport } from './routes/roadmap.$worldId'
+import { Route as LessonLessonIdRouteImport } from './routes/lesson/$lessonId'
+import { Route as DashboardRankingsRouteImport } from './routes/dashboard.rankings'
+import { Route as DashboardHistoryRouteImport } from './routes/dashboard.history'
+import { Route as DashboardActiveRouteImport } from './routes/dashboard.active'
+import { Route as CoursesCourseIdRouteImport } from './routes/courses/$courseId'
+import { Route as AuthCallbackRouteImport } from './routes/auth.callback'
+import { Route as ArenaRankingsRouteImport } from './routes/arena.rankings'
+import { Route as ArenaHistoryRouteImport } from './routes/arena.history'
+import { Route as ArenaActiveRouteImport } from './routes/arena.active'
+import { Route as LessonLessonIdQuizRouteImport } from './routes/lesson/$lessonId.quiz'
+import { Route as RoadmapCourseSlugMediumNodesNodeIdChallengeRouteImport } from './routes/roadmap.$courseSlug.medium.nodes.$nodeId.challenge'
+import { Route as RoadmapCourseSlugHardNodesNodeIdChallengeRouteImport } from './routes/roadmap.$courseSlug.hard.nodes.$nodeId.challenge'
+import { Route as RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport } from './routes/roadmap.$courseSlug.easy.nodes.$nodeId.challenge'
 
 const RoadmapRoute = RoadmapRouteImport.update({
-  id: "/roadmap",
-  path: "/roadmap",
+  id: '/roadmap',
+  path: '/roadmap',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const RegisterRoute = RegisterRouteImport.update({
-  id: "/register",
-  path: "/register",
+  id: '/register',
+  path: '/register',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
-  id: "/profile",
-  path: "/profile",
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
-  id: "/onboarding",
-  path: "/onboarding",
+  id: '/onboarding',
+  path: '/onboarding',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LeaderboardRoute = LeaderboardRouteImport.update({
-  id: "/leaderboard",
-  path: "/leaderboard",
+  id: '/leaderboard',
+  path: '/leaderboard',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const CourseRoute = CourseRouteImport.update({
-  id: "/course",
-  path: "/course",
+  id: '/course',
+  path: '/course',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ArenaRoute = ArenaRouteImport.update({
-  id: "/arena",
-  path: "/arena",
+  id: '/arena',
+  path: '/arena',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const RoadmapIndexRoute = RoadmapIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => RoadmapRoute,
-} as any);
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => DashboardRoute,
-} as any);
+} as any)
 const ArenaIndexRoute = ArenaIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => ArenaRoute,
-} as any);
+} as any)
 const SettingSettingRoute = SettingSettingRouteImport.update({
-  id: "/setting/setting",
-  path: "/setting/setting",
+  id: '/setting/setting',
+  path: '/setting/setting',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const RoadmapWorldIdRoute = RoadmapWorldIdRouteImport.update({
-  id: "/$worldId",
-  path: "/$worldId",
+  id: '/$worldId',
+  path: '/$worldId',
   getParentRoute: () => RoadmapRoute,
-} as any);
+} as any)
 const LessonLessonIdRoute = LessonLessonIdRouteImport.update({
-  id: "/lesson/$lessonId",
-  path: "/lesson/$lessonId",
+  id: '/lesson/$lessonId',
+  path: '/lesson/$lessonId',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DashboardRankingsRoute = DashboardRankingsRouteImport.update({
-  id: "/rankings",
-  path: "/rankings",
+  id: '/rankings',
+  path: '/rankings',
   getParentRoute: () => DashboardRoute,
-} as any);
+} as any)
 const DashboardHistoryRoute = DashboardHistoryRouteImport.update({
-  id: "/history",
-  path: "/history",
+  id: '/history',
+  path: '/history',
   getParentRoute: () => DashboardRoute,
-} as any);
+} as any)
 const DashboardActiveRoute = DashboardActiveRouteImport.update({
-  id: "/active",
-  path: "/active",
+  id: '/active',
+  path: '/active',
   getParentRoute: () => DashboardRoute,
-} as any);
+} as any)
 const CoursesCourseIdRoute = CoursesCourseIdRouteImport.update({
-  id: "/courses/$courseId",
-  path: "/courses/$courseId",
+  id: '/courses/$courseId',
+  path: '/courses/$courseId',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AuthCallbackRoute = AuthCallbackRouteImport.update({
-  id: "/auth/callback",
-  path: "/auth/callback",
+  id: '/auth/callback',
+  path: '/auth/callback',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const ArenaRankingsRoute = ArenaRankingsRouteImport.update({
-  id: "/rankings",
-  path: "/rankings",
+  id: '/rankings',
+  path: '/rankings',
   getParentRoute: () => ArenaRoute,
-} as any);
+} as any)
 const ArenaHistoryRoute = ArenaHistoryRouteImport.update({
-  id: "/history",
-  path: "/history",
+  id: '/history',
+  path: '/history',
   getParentRoute: () => ArenaRoute,
-} as any);
+} as any)
 const ArenaActiveRoute = ArenaActiveRouteImport.update({
-  id: "/active",
-  path: "/active",
+  id: '/active',
+  path: '/active',
   getParentRoute: () => ArenaRoute,
-} as any);
+} as any)
 const LessonLessonIdQuizRoute = LessonLessonIdQuizRouteImport.update({
-  id: "/quiz",
-  path: "/quiz",
+  id: '/quiz',
+  path: '/quiz',
   getParentRoute: () => LessonLessonIdRoute,
-} as any);
+} as any)
 const RoadmapCourseSlugMediumNodesNodeIdChallengeRoute =
   RoadmapCourseSlugMediumNodesNodeIdChallengeRouteImport.update({
-    id: "/$courseSlug/medium/nodes/$nodeId/challenge",
-    path: "/$courseSlug/medium/nodes/$nodeId/challenge",
+    id: '/$courseSlug/medium/nodes/$nodeId/challenge',
+    path: '/$courseSlug/medium/nodes/$nodeId/challenge',
     getParentRoute: () => RoadmapRoute,
-  } as any);
+  } as any)
 const RoadmapCourseSlugHardNodesNodeIdChallengeRoute =
   RoadmapCourseSlugHardNodesNodeIdChallengeRouteImport.update({
-    id: "/$courseSlug/hard/nodes/$nodeId/challenge",
-    path: "/$courseSlug/hard/nodes/$nodeId/challenge",
+    id: '/$courseSlug/hard/nodes/$nodeId/challenge',
+    path: '/$courseSlug/hard/nodes/$nodeId/challenge',
     getParentRoute: () => RoadmapRoute,
-  } as any);
+  } as any)
 const RoadmapCourseSlugEasyNodesNodeIdChallengeRoute =
   RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport.update({
-    id: "/$courseSlug/easy/nodes/$nodeId/challenge",
-    path: "/$courseSlug/easy/nodes/$nodeId/challenge",
+    id: '/$courseSlug/easy/nodes/$nodeId/challenge',
+    path: '/$courseSlug/easy/nodes/$nodeId/challenge',
     getParentRoute: () => RoadmapRoute,
-  } as any);
+  } as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
-  "/arena": typeof ArenaRouteWithChildren;
-  "/course": typeof CourseRoute;
-  "/dashboard": typeof DashboardRouteWithChildren;
-  "/leaderboard": typeof LeaderboardRoute;
-  "/login": typeof LoginRoute;
-  "/onboarding": typeof OnboardingRoute;
-  "/profile": typeof ProfileRoute;
-  "/register": typeof RegisterRoute;
-  "/roadmap": typeof RoadmapRouteWithChildren;
-  "/arena/active": typeof ArenaActiveRoute;
-  "/arena/history": typeof ArenaHistoryRoute;
-  "/arena/rankings": typeof ArenaRankingsRoute;
-  "/auth/callback": typeof AuthCallbackRoute;
-  "/courses/$courseId": typeof CoursesCourseIdRoute;
-  "/dashboard/active": typeof DashboardActiveRoute;
-  "/dashboard/history": typeof DashboardHistoryRoute;
-  "/dashboard/rankings": typeof DashboardRankingsRoute;
-  "/lesson/$lessonId": typeof LessonLessonIdRouteWithChildren;
-  "/roadmap/$worldId": typeof RoadmapWorldIdRoute;
-  "/setting/setting": typeof SettingSettingRoute;
-  "/arena/": typeof ArenaIndexRoute;
-  "/dashboard/": typeof DashboardIndexRoute;
-  "/roadmap/": typeof RoadmapIndexRoute;
-  "/lesson/$lessonId/quiz": typeof LessonLessonIdQuizRoute;
-  "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge": typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute;
-  "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge": typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute;
-  "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge": typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute;
+  '/': typeof IndexRoute
+  '/arena': typeof ArenaRouteWithChildren
+  '/course': typeof CourseRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/roadmap': typeof RoadmapRouteWithChildren
+  '/arena/active': typeof ArenaActiveRoute
+  '/arena/history': typeof ArenaHistoryRoute
+  '/arena/rankings': typeof ArenaRankingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dashboard/active': typeof DashboardActiveRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/rankings': typeof DashboardRankingsRoute
+  '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/roadmap/$worldId': typeof RoadmapWorldIdRoute
+  '/setting/setting': typeof SettingSettingRoute
+  '/arena/': typeof ArenaIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/roadmap/': typeof RoadmapIndexRoute
+  '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
+  '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge': typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute
+  '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge': typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
-  "/course": typeof CourseRoute;
-  "/leaderboard": typeof LeaderboardRoute;
-  "/login": typeof LoginRoute;
-  "/onboarding": typeof OnboardingRoute;
-  "/profile": typeof ProfileRoute;
-  "/register": typeof RegisterRoute;
-  "/arena/active": typeof ArenaActiveRoute;
-  "/arena/history": typeof ArenaHistoryRoute;
-  "/arena/rankings": typeof ArenaRankingsRoute;
-  "/auth/callback": typeof AuthCallbackRoute;
-  "/courses/$courseId": typeof CoursesCourseIdRoute;
-  "/dashboard/active": typeof DashboardActiveRoute;
-  "/dashboard/history": typeof DashboardHistoryRoute;
-  "/dashboard/rankings": typeof DashboardRankingsRoute;
-  "/lesson/$lessonId": typeof LessonLessonIdRouteWithChildren;
-  "/roadmap/$worldId": typeof RoadmapWorldIdRoute;
-  "/setting/setting": typeof SettingSettingRoute;
-  "/arena": typeof ArenaIndexRoute;
-  "/dashboard": typeof DashboardIndexRoute;
-  "/roadmap": typeof RoadmapIndexRoute;
-  "/lesson/$lessonId/quiz": typeof LessonLessonIdQuizRoute;
-  "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge": typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute;
-  "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge": typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute;
-  "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge": typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute;
+  '/': typeof IndexRoute
+  '/course': typeof CourseRoute
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/arena/active': typeof ArenaActiveRoute
+  '/arena/history': typeof ArenaHistoryRoute
+  '/arena/rankings': typeof ArenaRankingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dashboard/active': typeof DashboardActiveRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/rankings': typeof DashboardRankingsRoute
+  '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/roadmap/$worldId': typeof RoadmapWorldIdRoute
+  '/setting/setting': typeof SettingSettingRoute
+  '/arena': typeof ArenaIndexRoute
+  '/dashboard': typeof DashboardIndexRoute
+  '/roadmap': typeof RoadmapIndexRoute
+  '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
+  '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge': typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute
+  '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge': typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
-  "/arena": typeof ArenaRouteWithChildren;
-  "/course": typeof CourseRoute;
-  "/dashboard": typeof DashboardRouteWithChildren;
-  "/leaderboard": typeof LeaderboardRoute;
-  "/login": typeof LoginRoute;
-  "/onboarding": typeof OnboardingRoute;
-  "/profile": typeof ProfileRoute;
-  "/register": typeof RegisterRoute;
-  "/roadmap": typeof RoadmapRouteWithChildren;
-  "/arena/active": typeof ArenaActiveRoute;
-  "/arena/history": typeof ArenaHistoryRoute;
-  "/arena/rankings": typeof ArenaRankingsRoute;
-  "/auth/callback": typeof AuthCallbackRoute;
-  "/courses/$courseId": typeof CoursesCourseIdRoute;
-  "/dashboard/active": typeof DashboardActiveRoute;
-  "/dashboard/history": typeof DashboardHistoryRoute;
-  "/dashboard/rankings": typeof DashboardRankingsRoute;
-  "/lesson/$lessonId": typeof LessonLessonIdRouteWithChildren;
-  "/roadmap/$worldId": typeof RoadmapWorldIdRoute;
-  "/setting/setting": typeof SettingSettingRoute;
-  "/arena/": typeof ArenaIndexRoute;
-  "/dashboard/": typeof DashboardIndexRoute;
-  "/roadmap/": typeof RoadmapIndexRoute;
-  "/lesson/$lessonId/quiz": typeof LessonLessonIdQuizRoute;
-  "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge": typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute;
-  "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge": typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute;
-  "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge": typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute;
+  __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
+  '/arena': typeof ArenaRouteWithChildren
+  '/course': typeof CourseRoute
+  '/dashboard': typeof DashboardRouteWithChildren
+  '/leaderboard': typeof LeaderboardRoute
+  '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
+  '/profile': typeof ProfileRoute
+  '/register': typeof RegisterRoute
+  '/roadmap': typeof RoadmapRouteWithChildren
+  '/arena/active': typeof ArenaActiveRoute
+  '/arena/history': typeof ArenaHistoryRoute
+  '/arena/rankings': typeof ArenaRankingsRoute
+  '/auth/callback': typeof AuthCallbackRoute
+  '/courses/$courseId': typeof CoursesCourseIdRoute
+  '/dashboard/active': typeof DashboardActiveRoute
+  '/dashboard/history': typeof DashboardHistoryRoute
+  '/dashboard/rankings': typeof DashboardRankingsRoute
+  '/lesson/$lessonId': typeof LessonLessonIdRouteWithChildren
+  '/roadmap/$worldId': typeof RoadmapWorldIdRoute
+  '/setting/setting': typeof SettingSettingRoute
+  '/arena/': typeof ArenaIndexRoute
+  '/dashboard/': typeof DashboardIndexRoute
+  '/roadmap/': typeof RoadmapIndexRoute
+  '/lesson/$lessonId/quiz': typeof LessonLessonIdQuizRoute
+  '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
+  '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge': typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute
+  '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge': typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/arena"
-    | "/course"
-    | "/dashboard"
-    | "/leaderboard"
-    | "/login"
-    | "/onboarding"
-    | "/profile"
-    | "/register"
-    | "/roadmap"
-    | "/arena/active"
-    | "/arena/history"
-    | "/arena/rankings"
-    | "/auth/callback"
-    | "/courses/$courseId"
-    | "/dashboard/active"
-    | "/dashboard/history"
-    | "/dashboard/rankings"
-    | "/lesson/$lessonId"
-    | "/roadmap/$worldId"
-    | "/setting/setting"
-    | "/arena/"
-    | "/dashboard/"
-    | "/roadmap/"
-    | "/lesson/$lessonId/quiz"
-    | "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge"
-    | "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge"
-    | "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/arena'
+    | '/course'
+    | '/dashboard'
+    | '/leaderboard'
+    | '/login'
+    | '/onboarding'
+    | '/profile'
+    | '/register'
+    | '/roadmap'
+    | '/arena/active'
+    | '/arena/history'
+    | '/arena/rankings'
+    | '/auth/callback'
+    | '/courses/$courseId'
+    | '/dashboard/active'
+    | '/dashboard/history'
+    | '/dashboard/rankings'
+    | '/lesson/$lessonId'
+    | '/roadmap/$worldId'
+    | '/setting/setting'
+    | '/arena/'
+    | '/dashboard/'
+    | '/roadmap/'
+    | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+    | '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge'
+    | '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/"
-    | "/course"
-    | "/leaderboard"
-    | "/login"
-    | "/onboarding"
-    | "/profile"
-    | "/register"
-    | "/arena/active"
-    | "/arena/history"
-    | "/arena/rankings"
-    | "/auth/callback"
-    | "/courses/$courseId"
-    | "/dashboard/active"
-    | "/dashboard/history"
-    | "/dashboard/rankings"
-    | "/lesson/$lessonId"
-    | "/roadmap/$worldId"
-    | "/setting/setting"
-    | "/arena"
-    | "/dashboard"
-    | "/roadmap"
-    | "/lesson/$lessonId/quiz"
-    | "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge"
-    | "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge"
-    | "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge";
+    | '/'
+    | '/course'
+    | '/leaderboard'
+    | '/login'
+    | '/onboarding'
+    | '/profile'
+    | '/register'
+    | '/arena/active'
+    | '/arena/history'
+    | '/arena/rankings'
+    | '/auth/callback'
+    | '/courses/$courseId'
+    | '/dashboard/active'
+    | '/dashboard/history'
+    | '/dashboard/rankings'
+    | '/lesson/$lessonId'
+    | '/roadmap/$worldId'
+    | '/setting/setting'
+    | '/arena'
+    | '/dashboard'
+    | '/roadmap'
+    | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+    | '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge'
+    | '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge'
   id:
-    | "__root__"
-    | "/"
-    | "/arena"
-    | "/course"
-    | "/dashboard"
-    | "/leaderboard"
-    | "/login"
-    | "/onboarding"
-    | "/profile"
-    | "/register"
-    | "/roadmap"
-    | "/arena/active"
-    | "/arena/history"
-    | "/arena/rankings"
-    | "/auth/callback"
-    | "/courses/$courseId"
-    | "/dashboard/active"
-    | "/dashboard/history"
-    | "/dashboard/rankings"
-    | "/lesson/$lessonId"
-    | "/roadmap/$worldId"
-    | "/setting/setting"
-    | "/arena/"
-    | "/dashboard/"
-    | "/roadmap/"
-    | "/lesson/$lessonId/quiz"
-    | "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge"
-    | "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge"
-    | "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/'
+    | '/arena'
+    | '/course'
+    | '/dashboard'
+    | '/leaderboard'
+    | '/login'
+    | '/onboarding'
+    | '/profile'
+    | '/register'
+    | '/roadmap'
+    | '/arena/active'
+    | '/arena/history'
+    | '/arena/rankings'
+    | '/auth/callback'
+    | '/courses/$courseId'
+    | '/dashboard/active'
+    | '/dashboard/history'
+    | '/dashboard/rankings'
+    | '/lesson/$lessonId'
+    | '/roadmap/$worldId'
+    | '/setting/setting'
+    | '/arena/'
+    | '/dashboard/'
+    | '/roadmap/'
+    | '/lesson/$lessonId/quiz'
+    | '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+    | '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge'
+    | '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
-  ArenaRoute: typeof ArenaRouteWithChildren;
-  CourseRoute: typeof CourseRoute;
-  DashboardRoute: typeof DashboardRouteWithChildren;
-  LeaderboardRoute: typeof LeaderboardRoute;
-  LoginRoute: typeof LoginRoute;
-  OnboardingRoute: typeof OnboardingRoute;
-  ProfileRoute: typeof ProfileRoute;
-  RegisterRoute: typeof RegisterRoute;
-  RoadmapRoute: typeof RoadmapRouteWithChildren;
-  AuthCallbackRoute: typeof AuthCallbackRoute;
-  CoursesCourseIdRoute: typeof CoursesCourseIdRoute;
-  LessonLessonIdRoute: typeof LessonLessonIdRouteWithChildren;
-  SettingSettingRoute: typeof SettingSettingRoute;
+  IndexRoute: typeof IndexRoute
+  ArenaRoute: typeof ArenaRouteWithChildren
+  CourseRoute: typeof CourseRoute
+  DashboardRoute: typeof DashboardRouteWithChildren
+  LeaderboardRoute: typeof LeaderboardRoute
+  LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
+  ProfileRoute: typeof ProfileRoute
+  RegisterRoute: typeof RegisterRoute
+  RoadmapRoute: typeof RoadmapRouteWithChildren
+  AuthCallbackRoute: typeof AuthCallbackRoute
+  CoursesCourseIdRoute: typeof CoursesCourseIdRoute
+  LessonLessonIdRoute: typeof LessonLessonIdRouteWithChildren
+  SettingSettingRoute: typeof SettingSettingRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/roadmap": {
-      id: "/roadmap";
-      path: "/roadmap";
-      fullPath: "/roadmap";
-      preLoaderRoute: typeof RoadmapRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/register": {
-      id: "/register";
-      path: "/register";
-      fullPath: "/register";
-      preLoaderRoute: typeof RegisterRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/profile": {
-      id: "/profile";
-      path: "/profile";
-      fullPath: "/profile";
-      preLoaderRoute: typeof ProfileRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/onboarding": {
-      id: "/onboarding";
-      path: "/onboarding";
-      fullPath: "/onboarding";
-      preLoaderRoute: typeof OnboardingRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/leaderboard": {
-      id: "/leaderboard";
-      path: "/leaderboard";
-      fullPath: "/leaderboard";
-      preLoaderRoute: typeof LeaderboardRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/dashboard": {
-      id: "/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof DashboardRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/course": {
-      id: "/course";
-      path: "/course";
-      fullPath: "/course";
-      preLoaderRoute: typeof CourseRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/arena": {
-      id: "/arena";
-      path: "/arena";
-      fullPath: "/arena";
-      preLoaderRoute: typeof ArenaRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/roadmap/": {
-      id: "/roadmap/";
-      path: "/";
-      fullPath: "/roadmap/";
-      preLoaderRoute: typeof RoadmapIndexRouteImport;
-      parentRoute: typeof RoadmapRoute;
-    };
-    "/dashboard/": {
-      id: "/dashboard/";
-      path: "/";
-      fullPath: "/dashboard/";
-      preLoaderRoute: typeof DashboardIndexRouteImport;
-      parentRoute: typeof DashboardRoute;
-    };
-    "/arena/": {
-      id: "/arena/";
-      path: "/";
-      fullPath: "/arena/";
-      preLoaderRoute: typeof ArenaIndexRouteImport;
-      parentRoute: typeof ArenaRoute;
-    };
-    "/setting/setting": {
-      id: "/setting/setting";
-      path: "/setting/setting";
-      fullPath: "/setting/setting";
-      preLoaderRoute: typeof SettingSettingRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/roadmap/$worldId": {
-      id: "/roadmap/$worldId";
-      path: "/$worldId";
-      fullPath: "/roadmap/$worldId";
-      preLoaderRoute: typeof RoadmapWorldIdRouteImport;
-      parentRoute: typeof RoadmapRoute;
-    };
-    "/lesson/$lessonId": {
-      id: "/lesson/$lessonId";
-      path: "/lesson/$lessonId";
-      fullPath: "/lesson/$lessonId";
-      preLoaderRoute: typeof LessonLessonIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/dashboard/rankings": {
-      id: "/dashboard/rankings";
-      path: "/rankings";
-      fullPath: "/dashboard/rankings";
-      preLoaderRoute: typeof DashboardRankingsRouteImport;
-      parentRoute: typeof DashboardRoute;
-    };
-    "/dashboard/history": {
-      id: "/dashboard/history";
-      path: "/history";
-      fullPath: "/dashboard/history";
-      preLoaderRoute: typeof DashboardHistoryRouteImport;
-      parentRoute: typeof DashboardRoute;
-    };
-    "/dashboard/active": {
-      id: "/dashboard/active";
-      path: "/active";
-      fullPath: "/dashboard/active";
-      preLoaderRoute: typeof DashboardActiveRouteImport;
-      parentRoute: typeof DashboardRoute;
-    };
-    "/courses/$courseId": {
-      id: "/courses/$courseId";
-      path: "/courses/$courseId";
-      fullPath: "/courses/$courseId";
-      preLoaderRoute: typeof CoursesCourseIdRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/auth/callback": {
-      id: "/auth/callback";
-      path: "/auth/callback";
-      fullPath: "/auth/callback";
-      preLoaderRoute: typeof AuthCallbackRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/arena/rankings": {
-      id: "/arena/rankings";
-      path: "/rankings";
-      fullPath: "/arena/rankings";
-      preLoaderRoute: typeof ArenaRankingsRouteImport;
-      parentRoute: typeof ArenaRoute;
-    };
-    "/arena/history": {
-      id: "/arena/history";
-      path: "/history";
-      fullPath: "/arena/history";
-      preLoaderRoute: typeof ArenaHistoryRouteImport;
-      parentRoute: typeof ArenaRoute;
-    };
-    "/arena/active": {
-      id: "/arena/active";
-      path: "/active";
-      fullPath: "/arena/active";
-      preLoaderRoute: typeof ArenaActiveRouteImport;
-      parentRoute: typeof ArenaRoute;
-    };
-    "/lesson/$lessonId/quiz": {
-      id: "/lesson/$lessonId/quiz";
-      path: "/quiz";
-      fullPath: "/lesson/$lessonId/quiz";
-      preLoaderRoute: typeof LessonLessonIdQuizRouteImport;
-      parentRoute: typeof LessonLessonIdRoute;
-    };
-    "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge": {
-      id: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge";
-      path: "/$courseSlug/medium/nodes/$nodeId/challenge";
-      fullPath: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge";
-      preLoaderRoute: typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRouteImport;
-      parentRoute: typeof RoadmapRoute;
-    };
-    "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge": {
-      id: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge";
-      path: "/$courseSlug/hard/nodes/$nodeId/challenge";
-      fullPath: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge";
-      preLoaderRoute: typeof RoadmapCourseSlugHardNodesNodeIdChallengeRouteImport;
-      parentRoute: typeof RoadmapRoute;
-    };
-    "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge": {
-      id: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge";
-      path: "/$courseSlug/easy/nodes/$nodeId/challenge";
-      fullPath: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge";
-      preLoaderRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport;
-      parentRoute: typeof RoadmapRoute;
-    };
+    '/roadmap': {
+      id: '/roadmap'
+      path: '/roadmap'
+      fullPath: '/roadmap'
+      preLoaderRoute: typeof RoadmapRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leaderboard': {
+      id: '/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof LeaderboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course': {
+      id: '/course'
+      path: '/course'
+      fullPath: '/course'
+      preLoaderRoute: typeof CourseRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arena': {
+      id: '/arena'
+      path: '/arena'
+      fullPath: '/arena'
+      preLoaderRoute: typeof ArenaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap/': {
+      id: '/roadmap/'
+      path: '/'
+      fullPath: '/roadmap/'
+      preLoaderRoute: typeof RoadmapIndexRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
+    '/dashboard/': {
+      id: '/dashboard/'
+      path: '/'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof DashboardIndexRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/arena/': {
+      id: '/arena/'
+      path: '/'
+      fullPath: '/arena/'
+      preLoaderRoute: typeof ArenaIndexRouteImport
+      parentRoute: typeof ArenaRoute
+    }
+    '/setting/setting': {
+      id: '/setting/setting'
+      path: '/setting/setting'
+      fullPath: '/setting/setting'
+      preLoaderRoute: typeof SettingSettingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/roadmap/$worldId': {
+      id: '/roadmap/$worldId'
+      path: '/$worldId'
+      fullPath: '/roadmap/$worldId'
+      preLoaderRoute: typeof RoadmapWorldIdRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
+    '/lesson/$lessonId': {
+      id: '/lesson/$lessonId'
+      path: '/lesson/$lessonId'
+      fullPath: '/lesson/$lessonId'
+      preLoaderRoute: typeof LessonLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/rankings': {
+      id: '/dashboard/rankings'
+      path: '/rankings'
+      fullPath: '/dashboard/rankings'
+      preLoaderRoute: typeof DashboardRankingsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/history': {
+      id: '/dashboard/history'
+      path: '/history'
+      fullPath: '/dashboard/history'
+      preLoaderRoute: typeof DashboardHistoryRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/active': {
+      id: '/dashboard/active'
+      path: '/active'
+      fullPath: '/dashboard/active'
+      preLoaderRoute: typeof DashboardActiveRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/courses/$courseId': {
+      id: '/courses/$courseId'
+      path: '/courses/$courseId'
+      fullPath: '/courses/$courseId'
+      preLoaderRoute: typeof CoursesCourseIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth/callback': {
+      id: '/auth/callback'
+      path: '/auth/callback'
+      fullPath: '/auth/callback'
+      preLoaderRoute: typeof AuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arena/rankings': {
+      id: '/arena/rankings'
+      path: '/rankings'
+      fullPath: '/arena/rankings'
+      preLoaderRoute: typeof ArenaRankingsRouteImport
+      parentRoute: typeof ArenaRoute
+    }
+    '/arena/history': {
+      id: '/arena/history'
+      path: '/history'
+      fullPath: '/arena/history'
+      preLoaderRoute: typeof ArenaHistoryRouteImport
+      parentRoute: typeof ArenaRoute
+    }
+    '/arena/active': {
+      id: '/arena/active'
+      path: '/active'
+      fullPath: '/arena/active'
+      preLoaderRoute: typeof ArenaActiveRouteImport
+      parentRoute: typeof ArenaRoute
+    }
+    '/lesson/$lessonId/quiz': {
+      id: '/lesson/$lessonId/quiz'
+      path: '/quiz'
+      fullPath: '/lesson/$lessonId/quiz'
+      preLoaderRoute: typeof LessonLessonIdQuizRouteImport
+      parentRoute: typeof LessonLessonIdRoute
+    }
+    '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge': {
+      id: '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge'
+      path: '/$courseSlug/medium/nodes/$nodeId/challenge'
+      fullPath: '/roadmap/$courseSlug/medium/nodes/$nodeId/challenge'
+      preLoaderRoute: typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
+    '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge': {
+      id: '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge'
+      path: '/$courseSlug/hard/nodes/$nodeId/challenge'
+      fullPath: '/roadmap/$courseSlug/hard/nodes/$nodeId/challenge'
+      preLoaderRoute: typeof RoadmapCourseSlugHardNodesNodeIdChallengeRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
+    '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge': {
+      id: '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+      path: '/$courseSlug/easy/nodes/$nodeId/challenge'
+      fullPath: '/roadmap/$courseSlug/easy/nodes/$nodeId/challenge'
+      preLoaderRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRouteImport
+      parentRoute: typeof RoadmapRoute
+    }
   }
 }
 
 interface ArenaRouteChildren {
-  ArenaActiveRoute: typeof ArenaActiveRoute;
-  ArenaHistoryRoute: typeof ArenaHistoryRoute;
-  ArenaRankingsRoute: typeof ArenaRankingsRoute;
-  ArenaIndexRoute: typeof ArenaIndexRoute;
+  ArenaActiveRoute: typeof ArenaActiveRoute
+  ArenaHistoryRoute: typeof ArenaHistoryRoute
+  ArenaRankingsRoute: typeof ArenaRankingsRoute
+  ArenaIndexRoute: typeof ArenaIndexRoute
 }
 
 const ArenaRouteChildren: ArenaRouteChildren = {
@@ -590,15 +590,15 @@ const ArenaRouteChildren: ArenaRouteChildren = {
   ArenaHistoryRoute: ArenaHistoryRoute,
   ArenaRankingsRoute: ArenaRankingsRoute,
   ArenaIndexRoute: ArenaIndexRoute,
-};
+}
 
-const ArenaRouteWithChildren = ArenaRoute._addFileChildren(ArenaRouteChildren);
+const ArenaRouteWithChildren = ArenaRoute._addFileChildren(ArenaRouteChildren)
 
 interface DashboardRouteChildren {
-  DashboardActiveRoute: typeof DashboardActiveRoute;
-  DashboardHistoryRoute: typeof DashboardHistoryRoute;
-  DashboardRankingsRoute: typeof DashboardRankingsRoute;
-  DashboardIndexRoute: typeof DashboardIndexRoute;
+  DashboardActiveRoute: typeof DashboardActiveRoute
+  DashboardHistoryRoute: typeof DashboardHistoryRoute
+  DashboardRankingsRoute: typeof DashboardRankingsRoute
+  DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -606,18 +606,18 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardHistoryRoute: DashboardHistoryRoute,
   DashboardRankingsRoute: DashboardRankingsRoute,
   DashboardIndexRoute: DashboardIndexRoute,
-};
+}
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
-);
+)
 
 interface RoadmapRouteChildren {
-  RoadmapWorldIdRoute: typeof RoadmapWorldIdRoute;
-  RoadmapIndexRoute: typeof RoadmapIndexRoute;
-  RoadmapCourseSlugEasyNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute;
-  RoadmapCourseSlugHardNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute;
-  RoadmapCourseSlugMediumNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute;
+  RoadmapWorldIdRoute: typeof RoadmapWorldIdRoute
+  RoadmapIndexRoute: typeof RoadmapIndexRoute
+  RoadmapCourseSlugEasyNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugEasyNodesNodeIdChallengeRoute
+  RoadmapCourseSlugHardNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugHardNodesNodeIdChallengeRoute
+  RoadmapCourseSlugMediumNodesNodeIdChallengeRoute: typeof RoadmapCourseSlugMediumNodesNodeIdChallengeRoute
 }
 
 const RoadmapRouteChildren: RoadmapRouteChildren = {
@@ -629,22 +629,22 @@ const RoadmapRouteChildren: RoadmapRouteChildren = {
     RoadmapCourseSlugHardNodesNodeIdChallengeRoute,
   RoadmapCourseSlugMediumNodesNodeIdChallengeRoute:
     RoadmapCourseSlugMediumNodesNodeIdChallengeRoute,
-};
+}
 
 const RoadmapRouteWithChildren =
-  RoadmapRoute._addFileChildren(RoadmapRouteChildren);
+  RoadmapRoute._addFileChildren(RoadmapRouteChildren)
 
 interface LessonLessonIdRouteChildren {
-  LessonLessonIdQuizRoute: typeof LessonLessonIdQuizRoute;
+  LessonLessonIdQuizRoute: typeof LessonLessonIdQuizRoute
 }
 
 const LessonLessonIdRouteChildren: LessonLessonIdRouteChildren = {
   LessonLessonIdQuizRoute: LessonLessonIdQuizRoute,
-};
+}
 
 const LessonLessonIdRouteWithChildren = LessonLessonIdRoute._addFileChildren(
   LessonLessonIdRouteChildren,
-);
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -661,7 +661,7 @@ const rootRouteChildren: RootRouteChildren = {
   CoursesCourseIdRoute: CoursesCourseIdRoute,
   LessonLessonIdRoute: LessonLessonIdRouteWithChildren,
   SettingSettingRoute: SettingSettingRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()

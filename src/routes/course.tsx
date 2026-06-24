@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import CoursePage from "../features/courses/pages/CoursePage";
+import CoursePage from "../features/courses/pages/course/CoursePage";
 import { useAuthStore } from "../features/users/store/auth.store";
 
 export const Route = createFileRoute("/course")({
