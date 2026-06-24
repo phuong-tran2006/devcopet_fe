@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Flame, Star } from "lucide-react";
 import MiniPlayerCard from "../components/battle/MiniPlayerCard";
 import TimerRing from "../components/battle/TimerRing";
 import QuestionBoard from "../components/battle/QuestionBoard";
@@ -158,7 +159,7 @@ const BattlePage = () => {
               100,
           )}
           hpColor="#ff8a8a"
-          icon="local_fire_department"
+          icon={<Flame size={18} />}
           iconColor="#ff8a8a"
           rank={opponent?.arenaRank}
           score={opponentScore?.score || 0}
@@ -184,7 +185,7 @@ const BattlePage = () => {
             ((myScore?.score || 0) / Math.max(1, totalQuestions * 100)) * 100,
           )}
           hpColor="#4dd0d0"
-          icon="star"
+          icon={<Star size={18} />}
           iconColor="#4dd0d0"
           isRightAlign={true}
           rank={me?.arenaRank}

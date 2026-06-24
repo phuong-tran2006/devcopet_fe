@@ -1,4 +1,5 @@
 import React from "react";
+import { Utensils, ChevronsUp } from "lucide-react";
 import { mascotAxolotl } from "../../users/constants/authImages";
 
 const PetCard = () => {
@@ -31,15 +32,11 @@ const PetCard = () => {
       {/* Actions */}
       <div className="flex gap-4 mb-8">
         <button className="flex-1 bg-primary-fixed-dim text-on-primary font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-primary transition-colors duration-300">
-          <span className="material-symbols-outlined text-[18px]">
-            restaurant
-          </span>
+          <Utensils size={18} />
           Feed Logic
         </button>
         <button className="flex-1 bg-transparent border border-outline text-on-surface font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-on-surface/5 transition-colors duration-300">
-          <span className="material-symbols-outlined text-[18px]">
-            keyboard_double_arrow_up
-          </span>
+          <ChevronsUp size={18} />
           Evolve
         </button>
       </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Pencil } from "lucide-react";
 import heroMascotVideo from "../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../components/ui/TransparentVideo";
 
@@ -98,9 +99,9 @@ const NamePetModal = ({ isOpen, onConfirm }: NamePetModalProps) => {
                 type="button"
                 onClick={handleRandomName}
                 title="Generate random name"
-                className="absolute left-4 z-10 text-gray-400 dark:text-[#64748b] hover:text-purple-500 dark:hover:text-[#d4a8d4] material-symbols-outlined text-[18px] transition-colors"
+                className="absolute left-4 z-10 text-gray-400 dark:text-[#64748b] hover:text-purple-500 dark:hover:text-[#d4a8d4] transition-colors"
               >
-                edit
+                <Pencil size={18} strokeWidth={1.5} />
               </button>
               <input
                 type="text"

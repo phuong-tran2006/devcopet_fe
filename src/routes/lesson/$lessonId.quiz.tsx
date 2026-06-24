@@ -4,6 +4,7 @@ import {
   useParams,
   useNavigate,
 } from "@tanstack/react-router";
+import { ArrowLeft } from "lucide-react";
 import LessonQuiz from "../../features/quizzes/components/LessonQuiz";
 
 export const Route = createFileRoute("/lesson/$lessonId/quiz")({
@@ -24,9 +25,7 @@ function LessonQuizRoutePage() {
           }
           className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-on-surface transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
         >
-          <span className="material-symbols-outlined text-[14px]">
-            arrow_back
-          </span>
+          <ArrowLeft size={14} strokeWidth={2} />
           Back to Lesson
         </button>
 

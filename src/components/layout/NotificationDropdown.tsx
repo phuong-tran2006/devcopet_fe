@@ -1,4 +1,11 @@
 import { useState, useRef, useEffect } from "react";
+import { Bell, ArrowUp, BookOpen, Medal } from "lucide-react";
+
+const iconMap: Record<string, React.ReactNode> = {
+  arrow_upward: <ArrowUp className="w-6 h-6" />,
+  menu_book: <BookOpen className="w-6 h-6" />,
+  military_tech: <Medal className="w-6 h-6" />,
+};
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,9 +63,7 @@ const NotificationDropdown = () => {
           isOpen ? "bg-on-surface/10" : "hover:bg-on-surface/10"
         }`}
       >
-        <span className="material-symbols-outlined text-[20px]">
-          notifications
-        </span>
+        <Bell className="w-5 h-5" strokeWidth={1.5} />
         {/* Unread Badge */}
         {notifications.some((n) => n.unread) && (
           <span className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-[#4ade80]"></span>
@@ -106,9 +111,7 @@ const NotificationDropdown = () => {
                       : "bg-primary-fixed-dim/20 text-primary-fixed-dim"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[24px]">
-                    {notif.icon}
-                  </span>
+                  {iconMap[notif.icon] || <Bell className="w-6 h-6" />}
                 </div>
 
                 {/* Content */}

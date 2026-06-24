@@ -1,6 +1,18 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "@tanstack/react-router";
+import {
+  AlertCircle,
+  ChevronLeft,
+  Menu,
+  ArrowLeft,
+  PlayCircle,
+  Medal,
+  Flame,
+  ArrowRight,
+  ClipboardList,
+  X,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -228,9 +240,7 @@ const LessonDetailPage = () => {
   if (!lesson) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
-          error
-        </span>
+        <AlertCircle size={48} className="text-on-surface-variant mb-4" />
         <h2 className="font-headline-md text-on-surface mb-2">
           Lesson Not Found
         </h2>
@@ -289,9 +299,7 @@ const LessonDetailPage = () => {
     `}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <span className="material-symbols-outlined text-[22px]">
-            {isSidebarOpen ? "chevron_left" : "menu"}
-          </span>
+          {isSidebarOpen ? <ChevronLeft size={22} /> : <Menu size={22} />}
         </button>
       )}
       {/* Cột phải: Nội dung bài học */}
@@ -305,7 +313,7 @@ const LessonDetailPage = () => {
             onClick={() => setIsMobileSidebarOpen(true)}
             className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">menu</span>
+            <Menu size={20} />
             <span className="font-label-sm tracking-widest text-[11px] uppercase font-bold">
               Danh sách bài học
             </span>
@@ -321,18 +329,17 @@ const LessonDetailPage = () => {
             onClick={() => window.history.back()}
             className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
+            <ArrowLeft size={16} />
             Back to Modules
           </button>
 
           {/* Current Lesson Dashboard Info */}
           <div className="bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-lg">
             <div className="p-4 bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
-              <span className="material-symbols-outlined text-4xl text-primary-fixed-dim">
-                play_lesson
-              </span>
+              <PlayCircle
+                className="text-4xl text-primary-fixed-dim"
+                size={36}
+              />
             </div>
             <div className="flex-1">
               <div className="text-[12px] font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">
@@ -348,15 +355,11 @@ const LessonDetailPage = () => {
             </div>
             <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
               <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px] text-[#4ade80]">
-                  military_tech
-                </span>
+                <Medal size={18} className="text-[#4ade80]" />
                 XP Reward: {lesson.points || 100}
               </div>
               <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px] text-[#f87171]">
-                  local_fire_department
-                </span>
+                <Flame size={18} className="text-[#f87171]" />
                 Difficulty:{" "}
                 <span className="capitalize">
                   {lesson.difficulty || "Normal"}
@@ -399,9 +402,7 @@ const LessonDetailPage = () => {
                   className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Next Lesson
-                  <span className="material-symbols-outlined text-[20px]">
-                    arrow_forward
-                  </span>
+                  <ArrowRight size={20} />
                 </button>
               ) : (
                 <Link
@@ -410,9 +411,7 @@ const LessonDetailPage = () => {
                   className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Back to Course Curriculum
-                  <span className="material-symbols-outlined text-[20px]">
-                    assignment
-                  </span>
+                  <ClipboardList size={20} />
                 </Link>
               )}
             </div>
@@ -444,9 +443,7 @@ const LessonDetailPage = () => {
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline/20 shadow-lg"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  close
-                </span>
+                <X size={20} />
               </button>
             </div>
             <div className="flex-1 h-full overflow-hidden">

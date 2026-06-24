@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { cva } from "class-variance-authority";
 import { twMerge } from "tailwind-merge";
+import { Check } from "lucide-react";
 
 const checkboxClasses = cva(
   "flex items-center cursor-pointer transition-all duration-200",
@@ -152,29 +153,17 @@ const CheckBox = ({
         <div
           className={twMerge(
             "w-5 h-5 border-2 rounded transition-all duration-200 flex items-center justify-center",
-            "peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-primary-teal-light",
+            "peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-primary",
             isChecked
-              ? "bg-primary-teal border-primary-teal"
-              : "bg-transparent border-border-primary",
+              ? "bg-white border-primary"
+              : "bg-transparent border-outline",
             error && "border-red-500",
             disabled && "cursor-not-allowed",
+            className,
           )}
         >
           {isChecked && (
-            <svg
-              className="w-3 h-3 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={3}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+            <Check className="w-3 h-3" stroke="#000000" strokeWidth={3.5} />
           )}
         </div>
       </div>

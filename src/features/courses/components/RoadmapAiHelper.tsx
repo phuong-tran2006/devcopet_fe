@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useEffect, useRef, useState, useCallback } from "react";
+import { Brain, Sparkles } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "../../users/store/auth.store";
 import type { AiChatMode } from "../api/aiChat.api";
@@ -155,9 +156,10 @@ const RoadmapAiHelper = ({
 
           {!loadingPrompts && !errorCode && prompts.length === 0 && (
             <div className="py-6 text-center">
-              <span className="material-symbols-outlined mb-2 text-[28px] text-on-surface-variant/40">
-                psychology
-              </span>
+              <Brain
+                className="mb-2 mx-auto text-[28px] text-on-surface-variant/40"
+                size={28}
+              />
               <p className="text-[12px] font-medium text-on-surface-variant/60">
                 No Pet prompts available for this node.
               </p>
@@ -200,12 +202,10 @@ const RoadmapAiHelper = ({
             style={{ borderColor: `${accentColor}15` }}
           >
             <div className="flex items-center gap-2">
-              <span
-                className="material-symbols-outlined text-[14px]"
+              <Sparkles
+                size={14}
                 style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
-              >
-                auto_awesome
-              </span>
+              />
               <span className="text-[11px] font-medium text-on-surface-variant">
                 Pet helps left:{" "}
                 <span

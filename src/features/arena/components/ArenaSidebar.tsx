@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { Swords, History, Trophy, Shield } from "lucide-react";
 import { api } from "../../../services/axiosClient";
 import { useArenaStore } from "../store/arena.store";
 
@@ -12,6 +13,12 @@ interface ArenaProfile {
   arenaDraws: number;
   winRate: number;
 }
+
+const navIconMap: Record<string, React.ReactNode> = {
+  swords: <Swords size={20} className="opacity-90" />,
+  history: <History size={20} className="opacity-90" />,
+  emoji_events: <Trophy size={20} className="opacity-90" />,
+};
 
 const ArenaSidebar = () => {
   const location = useLocation();
@@ -54,9 +61,10 @@ const ArenaSidebar = () => {
       <div className="flex flex-col items-center mb-10">
         <div className="w-[84px] h-[84px] rounded-[24px] dark:bg-[#0b1219] bg-surface border-2 dark:border-[#e6c1d8] border-primary-fixed-dim flex items-center justify-center p-1 dark:shadow-[0_0_20px_rgba(230,193,216,0.15)] shadow-md mb-4 overflow-hidden transition-colors duration-300">
           <div className="w-full h-full rounded-[20px] dark:bg-gradient-to-b dark:from-[#14232e] dark:to-[#0b1219] bg-surface-container-high flex items-center justify-center shadow-inner">
-            <span className="material-symbols-outlined text-[42px] dark:text-[#29b6f6] text-primary dark:drop-shadow-[0_0_8px_rgba(41,182,246,0.6)]">
-              security
-            </span>
+            <Shield
+              className="w-[42px] h-[42px] dark:text-[#29b6f6] text-primary dark:drop-shadow-[0_0_8px_rgba(41,182,246,0.6)]"
+              strokeWidth={1.5}
+            />
           </div>
         </div>
         <h2 className="text-[24px] font-extrabold dark:text-[#f3d9e9] text-on-surface mb-1 tracking-wide transition-colors duration-300">
@@ -96,9 +104,7 @@ const ArenaSidebar = () => {
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-colors duration-200 ${isActive ? "dark:bg-[#5e4655] bg-primary/10 dark:text-[#ecd6e5] text-primary" : "dark:text-gray-400 text-on-surface-variant dark:hover:text-gray-200 hover:text-on-surface dark:hover:bg-white/5 hover:bg-surface-container-high"}`}
             >
-              <span className="material-symbols-outlined text-[20px] opacity-90">
-                {item.icon}
-              </span>
+              {navIconMap[item.icon]}
               {item.label}
             </Link>
           );

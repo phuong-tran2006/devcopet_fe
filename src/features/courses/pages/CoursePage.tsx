@@ -1,5 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
+import {
+  Terminal,
+  Braces,
+  Search,
+  ChevronDown,
+  ArrowRight,
+} from "lucide-react";
 import { courseApi } from "../api/course.api";
 import { useAuthStore } from "../../users/store/auth.store";
 
@@ -65,7 +72,7 @@ const CourseIcon = ({ course }: { course: any }) => {
 
   return (
     <div className="w-[50px] h-[50px] rounded-xl bg-surface/30 border border-on-surface/10 flex items-center justify-center text-primary-fixed-dim group-hover:scale-105 transition-transform">
-      <span className="material-symbols-outlined text-[28px]">terminal</span>
+      <Terminal size={28} strokeWidth={1.5} />
     </div>
   );
 };
@@ -100,11 +107,11 @@ const CourseCard = ({
             {course?.title || "Untitled Course"}
           </h3>
           <div className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[14px]">
-              {(course?.programmingLanguage || "").toLowerCase() === "python"
-                ? "terminal"
-                : "data_object"}
-            </span>
+            {(course?.programmingLanguage || "").toLowerCase() === "python" ? (
+              <Terminal size={14} strokeWidth={2} />
+            ) : (
+              <Braces size={14} strokeWidth={2} />
+            )}
           </div>
         </div>
 
@@ -150,9 +157,7 @@ const CourseCard = ({
             className="w-full bg-primary-fixed-dim text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)]"
           >
             {buttonLabel}
-            <span className="material-symbols-outlined text-[14px]">
-              arrow_forward
-            </span>
+            <ArrowRight size={14} strokeWidth={2} />
           </Link>
         </div>
       </div>
@@ -285,9 +290,7 @@ const CoursePage = () => {
         <div className="flex flex-col md:flex-row gap-3 mb-5">
           <div className="flex-1 relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
-              <span className="material-symbols-outlined text-[20px]">
-                search
-              </span>
+              <Search size={20} strokeWidth={1.5} />
             </span>
             <input
               type="text"
@@ -310,9 +313,7 @@ const CoursePage = () => {
                 <option value="advanced">Advanced</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px]">
-                  expand_more
-                </span>
+                <ChevronDown size={18} strokeWidth={2} />
               </div>
             </div>
 
@@ -327,9 +328,7 @@ const CoursePage = () => {
                 <option value="progress">Sort: Progress</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px]">
-                  expand_more
-                </span>
+                <ChevronDown size={18} strokeWidth={2} />
               </div>
             </div>
           </div>

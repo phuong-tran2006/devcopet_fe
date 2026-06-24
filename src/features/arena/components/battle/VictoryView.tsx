@@ -1,4 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
+import { Trophy, RotateCcw, Home } from "lucide-react";
 import { useAuthStore } from "../../../users/store/auth.store";
 import { useArenaStore } from "../../store/arena.store";
 
@@ -78,9 +79,7 @@ const VictoryView = () => {
           {myScore?.username || currentUser?.username || "Player"}
         </h2>
         <div className="mt-3 dark:bg-[#1e4e50] bg-primary/10 border border-[#0d9488] text-[#4fd1c5] px-4 py-1.5 rounded-full flex items-center gap-2 shadow-lg transition-colors duration-300">
-          <span className="material-symbols-outlined text-[16px]">
-            emoji_events
-          </span>
+          <Trophy size={16} />
           <span className="text-[12px] font-bold tracking-wider">
             {myRatingChange
               ? `${myRatingChange.oldRating} to ${myRatingChange.newRating}`
@@ -136,16 +135,14 @@ const VictoryView = () => {
             className="flex-1 dark:bg-[#d6bcce] bg-secondary-container dark:hover:bg-[#e6ccde] hover:bg-secondary-container/80 dark:text-[#4a3544] text-on-secondary-container font-black text-[13px] tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-lg"
             onClick={goLobby}
           >
-            <span className="material-symbols-outlined text-[18px]">
-              replay
-            </span>
+            <RotateCcw size={18} />
             REMATCH
           </button>
           <button
             className="flex-1 dark:bg-[#0d9488] bg-primary hover:bg-[#0faba0] dark:text-white text-on-primary font-black text-[13px] tracking-wider py-4 rounded-xl flex items-center justify-center gap-2 transition-all transform hover:scale-105 shadow-lg"
             onClick={goLobby}
           >
-            <span className="material-symbols-outlined text-[18px]">home</span>
+            <Home size={18} />
             LOBBY
           </button>
         </div>

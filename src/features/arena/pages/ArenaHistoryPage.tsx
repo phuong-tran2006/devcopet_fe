@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
 import type { PublicScoreboardItem } from "../store/arena.store";
@@ -205,15 +206,13 @@ const ArenaHistoryPage = () => {
                 <div
                   className={`flex items-center gap-1 font-bold text-[16px] ${view.ratingChange > 0 ? "dark:text-[#4dd0d0] text-primary" : view.ratingChange < 0 ? "dark:text-[#ff3b30] text-error" : "dark:text-gray-400 text-on-surface-variant"}`}
                 >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {view.ratingChange > 0
-                      ? "trending_up"
-                      : view.ratingChange < 0
-                        ? "trending_down"
-                        : isDraw
-                          ? "remove"
-                          : "show_chart"}
-                  </span>
+                  {view.ratingChange > 0 ? (
+                    <TrendingUp size={18} />
+                  ) : view.ratingChange < 0 ? (
+                    <TrendingDown size={18} />
+                  ) : (
+                    <Minus size={18} />
+                  )}
                   {view.ratingChange > 0 ? "+" : ""}
                   {view.ratingChange}
                 </div>

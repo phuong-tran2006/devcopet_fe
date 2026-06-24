@@ -5,6 +5,7 @@ import OpponentCard from "../components/OpponentCard";
 import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
 import type { ArenaMode } from "../store/arena.store";
+import { Zap } from "lucide-react";
 
 const MatchmakingPage = () => {
   const mode: ArenaMode = "ranked";
@@ -121,12 +122,11 @@ const MatchmakingPage = () => {
                 : { color: "var(--md-sys-color-primary)" }
             }
           >
-            <span
-              className="material-symbols-outlined text-[26px] dark:text-[#4dd0d0]"
+            <Zap
+              size={26}
+              className="dark:text-[#4dd0d0]"
               style={visualStatus === "found" ? { color: "inherit" } : {}}
-            >
-              bolt
-            </span>
+            />
           </div>
           <span
             className={`font-black text-[16px] tracking-widest transition-colors duration-300 ${visualStatus === "found" ? "dark:text-[#ff3b30] text-error" : "dark:text-[#4dd0d0] text-primary"}`}

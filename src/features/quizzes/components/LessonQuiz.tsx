@@ -1,5 +1,19 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
+import {
+  CheckCircle2,
+  XCircle,
+  ClipboardList,
+  HelpCircle,
+  Trophy,
+  RotateCcw,
+  RefreshCw,
+  ArrowLeft,
+  ArrowRight,
+  CheckCheck,
+  AlertCircle,
+  X,
+} from "lucide-react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
@@ -252,14 +266,10 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
                 </div>
                 {/* Result icon */}
                 {isReviewMode && isCorrectOption && (
-                  <span className="material-symbols-outlined text-[22px] text-[#4ade80] flex-shrink-0">
-                    check_circle
-                  </span>
+                  <CheckCircle2 className="w-[22px] h-[22px] text-[#4ade80] flex-shrink-0" />
                 )}
                 {isReviewMode && isWrongSelected && (
-                  <span className="material-symbols-outlined text-[22px] text-[#f87171] flex-shrink-0">
-                    cancel
-                  </span>
+                  <XCircle className="w-[22px] h-[22px] text-[#f87171] flex-shrink-0" />
                 )}
               </button>
             );
@@ -274,9 +284,11 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
                 qResult.isCorrect ? "text-[#4ade80]" : "text-[#f87171]"
               }`}
             >
-              <span className="material-symbols-outlined text-[22px]">
-                {qResult.isCorrect ? "check_circle" : "cancel"}
-              </span>
+              {qResult.isCorrect ? (
+                <CheckCircle2 className="w-[22px] h-[22px]" />
+              ) : (
+                <XCircle className="w-[22px] h-[22px]" />
+              )}
               {qResult.isCorrect ? "Correct!" : "Incorrect"}
               <span className="text-on-surface-variant font-normal text-[13px] ml-1">
                 (+{qResult.earnedPoints}/{qResult.points} XP)
@@ -315,9 +327,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
           onClick={handleStart}
           className="w-full md:w-auto flex-shrink-0 bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)] whitespace-nowrap"
         >
-          <span className="material-symbols-outlined text-[20px]">
-            assignment
-          </span>
+          <ClipboardList size={20} />
           Start Quiz
         </button>
       </div>
@@ -355,9 +365,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
   if (phase === "not_found") {
     return (
       <div className="bg-surface-container rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
-        <span className="material-symbols-outlined text-3xl mb-2 block">
-          quiz
-        </span>
+        <HelpCircle className="w-8 h-8 mx-auto mb-2 block text-on-surface-variant/70" />
         No quiz is available for this lesson yet.
       </div>
     );
@@ -391,13 +399,11 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
                 result.passed ? "bg-[#4ade80]/20" : "bg-[#f87171]/20"
               }`}
             >
-              <span
-                className={`material-symbols-outlined text-[36px] ${
-                  result.passed ? "text-[#4ade80]" : "text-[#f87171]"
-                }`}
-              >
-                {result.passed ? "emoji_events" : "replay"}
-              </span>
+              {result.passed ? (
+                <Trophy className="w-[36px] h-[36px] text-[#4ade80]" />
+              ) : (
+                <RotateCcw className="w-[36px] h-[36px] text-[#f87171]" />
+              )}
             </div>
 
             <div>
@@ -432,9 +438,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
                 : "bg-primary-fixed-dim text-on-primary-fixed hover:bg-primary-fixed hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">
-              {result.passed ? "replay" : "refresh"}
-            </span>
+            {result.passed ? <RotateCcw size={18} /> : <RefreshCw size={18} />}
             {result.passed ? "Retake Quiz" : "Try Again"}
           </button>
         </div>
@@ -479,9 +483,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
               className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <span className="inline-flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">
-                  arrow_back
-                </span>
+                <ArrowLeft size={18} />
                 Previous
               </span>
             </button>
@@ -493,9 +495,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
                 className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
               >
                 Next Review
-                <span className="material-symbols-outlined text-[18px]">
-                  arrow_forward
-                </span>
+                <ArrowRight size={18} />
               </button>
             ) : (
               <button
@@ -504,9 +504,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
                 className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
               >
                 Finish Review
-                <span className="material-symbols-outlined text-[18px]">
-                  check_circle
-                </span>
+                <CheckCircle2 size={18} />
               </button>
             )}
           </div>
@@ -554,9 +552,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
       {/* ── Error Banner ── */}
       {submitError && (
         <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f87171]/10 border border-[#f87171]/30 text-[#f87171] text-[13px]">
-          <span className="material-symbols-outlined text-[18px] flex-shrink-0 mt-0.5">
-            error
-          </span>
+          <AlertCircle className="w-[18px] h-[18px] flex-shrink-0 mt-0.5" />
           <div>
             <span className="font-bold block mb-0.5">Submission failed</span>
             {submitError}
@@ -565,7 +561,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
             onClick={() => setSubmitError(null)}
             className="ml-auto flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
           >
-            <span className="material-symbols-outlined text-[16px]">close</span>
+            <X size={16} />
           </button>
         </div>
       )}
@@ -579,9 +575,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
           className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <span className="inline-flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">
-              arrow_back
-            </span>
+            <ArrowLeft size={18} />
             Previous
           </span>
         </button>
@@ -599,17 +593,13 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
             </>
           ) : isLastQuestion ? (
             <>
-              <span className="material-symbols-outlined text-[18px]">
-                done_all
-              </span>
+              <CheckCheck size={18} />
               Submit Quiz
             </>
           ) : (
             <>
               Next Question
-              <span className="material-symbols-outlined text-[18px]">
-                arrow_forward
-              </span>
+              <ArrowRight size={18} />
             </>
           )}
         </button>

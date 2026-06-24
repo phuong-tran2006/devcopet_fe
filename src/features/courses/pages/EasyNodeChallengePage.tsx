@@ -10,6 +10,17 @@ import {
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import { useAuthStore } from "../../users/store/auth.store";
+import {
+  ArrowLeft,
+  Lock,
+  Code,
+  Check,
+  Copy,
+  AlertCircle,
+  PawPrint,
+  X,
+  Star,
+} from "lucide-react";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
@@ -333,10 +344,10 @@ const EasyNodeChallengePage = () => {
             onClick={goBackToRoadmap}
             className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <ArrowLeft size={16} />
             Back to Roadmap
           </button>
-          
+
           <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
             <span>Easy Checkpoint</span>
           </div>
@@ -361,9 +372,7 @@ const EasyNodeChallengePage = () => {
           {!loading && !error && data && isLockedMode && (
             <div className="mx-auto mt-12 w-full rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
-                <span className="material-symbols-outlined text-[32px]">
-                  lock
-                </span>
+                <Lock size={32} />
               </div>
               <h1 className="mt-5 text-[28px] font-extrabold">
                 Checkpoint Locked
@@ -420,9 +429,7 @@ const EasyNodeChallengePage = () => {
                       <div className="mt-5 overflow-hidden rounded-xl border border-[#263b44] bg-[#071217] shadow-[0_0_22px_rgba(99,241,227,0.08)]">
                         <div className="flex items-center justify-between gap-3 border-b border-[#263b44] bg-[#0a161c] px-4 py-3">
                           <div className="flex min-w-0 items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                            <span className="material-symbols-outlined text-[18px]">
-                              code
-                            </span>
+                            <Code size={18} />
                             <span>
                               {formatCodeLanguage(codeSnippet.language)}
                             </span>
@@ -432,9 +439,11 @@ const EasyNodeChallengePage = () => {
                             onClick={copyCodeSnippet}
                             className="inline-flex items-center gap-2 rounded-lg border border-[#263b44] bg-[#101f25] px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3]"
                           >
-                            <span className="material-symbols-outlined text-[16px]">
-                              {copiedCode ? "check" : "content_copy"}
-                            </span>
+                            {copiedCode ? (
+                              <Check size={16} />
+                            ) : (
+                              <Copy size={16} />
+                            )}
                             {copiedCode ? "Copied" : "Copy"}
                           </button>
                         </div>
@@ -477,11 +486,7 @@ const EasyNodeChallengePage = () => {
                                 : "border-on-surface-variant"
                           }`}
                         >
-                          {isCorrectOption(option.id) && (
-                            <span className="material-symbols-outlined text-[15px]">
-                              check
-                            </span>
-                          )}
+                          {isCorrectOption(option.id) && <Check size={15} />}
                         </span>
                       </button>
                     ))}
@@ -496,9 +501,7 @@ const EasyNodeChallengePage = () => {
                   {wrongAttempt && (
                     <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
                       <div className="flex items-start gap-3">
-                        <span className="material-symbols-outlined text-[20px] text-red-300">
-                          error
-                        </span>
+                        <AlertCircle size={20} className="text-red-300" />
                         <div className="min-w-0 flex-1">
                           <p className="text-[14px] font-bold text-red-100">
                             {wrongAttempt.message || "Not quite. Try again."}
@@ -529,9 +532,7 @@ const EasyNodeChallengePage = () => {
                       <div className="rounded-xl border border-[#63f1e3]/30 bg-[#10262c] p-6 shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
                         <div className="mb-4 flex items-center gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
-                            <span className="material-symbols-outlined text-[20px]">
-                              pets
-                            </span>
+                            <PawPrint size={20} />
                           </div>
                           <div>
                             <p className="font-bold text-on-surface text-[14px] tracking-wide">
@@ -541,7 +542,9 @@ const EasyNodeChallengePage = () => {
                         </div>
 
                         <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                          {isReviewMode && review ? review.explanation : result?.explanation}
+                          {isReviewMode && review
+                            ? review.explanation
+                            : result?.explanation}
                         </p>
                       </div>
 
@@ -558,7 +561,9 @@ const EasyNodeChallengePage = () => {
                           disabled={nextChallengeLoading}
                           className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                          {nextChallengeLoading
+                            ? "Loading..."
+                            : "Next Challenge"}
                         </button>
                       </div>
                     </div>
@@ -574,16 +579,12 @@ const EasyNodeChallengePage = () => {
                       className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
                       aria-label="Close result"
                     >
-                      <span className="material-symbols-outlined text-[22px]">
-                        close
-                      </span>
+                      <X size={22} />
                     </button>
 
                     <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
                       <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
-                        <span className="material-symbols-outlined text-[46px]">
-                          star
-                        </span>
+                        <Star size={46} />
                       </div>
 
                       <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
@@ -595,9 +596,7 @@ const EasyNodeChallengePage = () => {
                       <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#1b3440]/70 p-4">
                         <div className="flex items-start gap-3">
                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
-                            <span className="material-symbols-outlined text-[24px]">
-                              pets
-                            </span>
+                            <PawPrint size={24} />
                           </div>
                           <div>
                             <p className="text-[13px] italic leading-relaxed text-on-surface-variant">

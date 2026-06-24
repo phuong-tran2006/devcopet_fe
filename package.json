@@ -22,7 +22,7 @@
     "axios": "^1.16.1",
     "class-variance-authority": "^0.7.1",
     "framer-motion": "^12.40.0",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^1.21.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-markdown": "^10.1.0",

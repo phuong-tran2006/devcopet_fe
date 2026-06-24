@@ -1,6 +1,16 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTheme } from "../../contexts/ThemeContext";
+import {
+  X,
+  Check,
+  Play,
+  Lock,
+  GripVertical,
+  ArrowUpDown,
+  Code,
+  HelpCircle,
+} from "lucide-react";
 import type {
   EasyRoadmapNode,
   MediumRoadmapNode,
@@ -63,6 +73,35 @@ const statusCopy = {
     badge: "bg-on-surface/5 text-on-surface-variant/60 border-on-surface/10",
   },
 } as const;
+
+const StatusIcon = ({ icon, size = 14 }: { icon: string; size?: number }) => {
+  const props = { size, strokeWidth: 2 };
+  switch (icon) {
+    case "done":
+      return <Check {...props} />;
+    case "play_arrow":
+      return <Play {...props} />;
+    case "lock":
+      return <Lock {...props} />;
+    default:
+      return <HelpCircle {...props} />;
+  }
+};
+
+const TypeIcon = ({ type }: { type: string }) => {
+  const props = { size: 14, strokeWidth: 2 };
+  if (type === "drag_drop" || type === "drag_drop_matching")
+    return <GripVertical {...props} />;
+  if (type.includes("ordering") || type.includes("ranking"))
+    return <ArrowUpDown {...props} />;
+  if (
+    type.includes("code") ||
+    type.includes("bug") ||
+    type === "fill_missing_line"
+  )
+    return <Code {...props} />;
+  return <HelpCircle {...props} />;
+};
 
 const getNodeDisplayTitle = (node: RoadmapDetailNode) => node.title.trim();
 const EASY_CHECKPOINT_DURATION = "1 min";
@@ -175,7 +214,7 @@ const NodeDetailsModal = ({
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors"
           aria-label="Close lesson details"
         >
-          <span className="material-symbols-outlined text-[20px]">close</span>
+          <X size={20} strokeWidth={2} />
         </button>
 
         <div className="flex items-center gap-2 mb-5">
@@ -201,9 +240,7 @@ const NodeDetailsModal = ({
                 : {}
             }
           >
-            <span className="material-symbols-outlined text-[14px]">
-              {copy.icon}
-            </span>
+            <StatusIcon icon={copy.icon} size={14} />
             {copy.label}
           </span>
           {(isMediumNode || isHardNode) && (
@@ -215,18 +252,7 @@ const NodeDetailsModal = ({
                 color: cfg.accent,
               }}
             >
-              <span className="material-symbols-outlined text-[14px]">
-                {node.type === "drag_drop" || node.type === "drag_drop_matching"
-                  ? "drag_indicator"
-                  : node.type.includes("ordering") ||
-                      node.type.includes("ranking")
-                    ? "sort"
-                    : node.type.includes("code") ||
-                        node.type.includes("bug") ||
-                        node.type === "fill_missing_line"
-                      ? "code"
-                      : "quiz"}
-              </span>
+              <TypeIcon type={node.type} />
               {isHardNode
                 ? node.type.replace(/_/g, " ")
                 : getTypeLabel(node.type)}

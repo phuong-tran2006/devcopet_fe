@@ -1,4 +1,5 @@
 import React from "react";
+import { Check } from "lucide-react";
 
 const DailyQuests = () => {
   const quests = [
@@ -36,11 +37,7 @@ const DailyQuests = () => {
                     : "border-outline bg-transparent"
                 }`}
               >
-                {quest.completed && (
-                  <span className="material-symbols-outlined text-[14px] font-bold">
-                    check
-                  </span>
-                )}
+                {quest.completed && <Check size={14} />}
               </div>
               <span
                 className={`text-sm transition-colors duration-300 ${quest.completed ? "text-on-surface-variant line-through" : "text-on-surface"}`}

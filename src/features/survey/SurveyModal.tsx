@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useMemo } from "react";
+import { ArrowLeft } from "lucide-react";
 import { mascotAxolotl } from "../users/constants/authImages";
 
 interface SurveyModalProps {
@@ -585,9 +586,7 @@ const SurveyModal = ({
                 : "text-black dark:text-[#64748b] hover:text-gray-950 dark:hover:text-white"
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">
-              arrow_back
-            </span>
+            <ArrowLeft size={18} strokeWidth={2} />
             Previous Question
           </button>
 

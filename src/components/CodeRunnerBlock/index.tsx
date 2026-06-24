@@ -1,5 +1,6 @@
 // @ts-nocheck
 import React, { useState, useEffect, useRef } from "react";
+import { Blocks, RotateCcw, Play } from "lucide-react";
 
 const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   const [code, setCode] = useState(initialCode || "");
@@ -130,9 +131,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#161B22] border-b border-[#1E293B]">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px] text-primary-fixed-dim">
-            code_blocks
-          </span>
+          <Blocks size={18} className="text-primary-fixed-dim" />
           <span className="text-[12px] font-bold text-white tracking-widest uppercase">
             {title}
           </span>
@@ -144,9 +143,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
             disabled={status === "running" || status === "loading"}
             className="text-[12px] font-bold text-on-surface-variant hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              refresh
-            </span>
+            <RotateCcw size={16} />
             RESET
           </button>
 
@@ -158,9 +155,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
             {status === "running" || status === "loading" ? (
               <div className="w-3.5 h-3.5 border-2 border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
             ) : (
-              <span className="material-symbols-outlined text-[16px]">
-                play_arrow
-              </span>
+              <Play size={16} />
             )}
             {status === "loading" ? "LOADING..." : "RUN"}
           </button>

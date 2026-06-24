@@ -1,12 +1,11 @@
 // @ts-nocheck
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { MessageCircle } from "lucide-react";
 import Button from "../../../../components/ui/Button";
 import EditText from "../../../../components/ui/EditText";
 import Dropdown from "../../../../components/ui/Dropdown";
 import CheckBox from "../../../../components/ui/CheckBox";
-import EmailProviderIcon from "../../../../components/ui/EmailProviderIcon";
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import { EmailIcon, LockIcon } from "../../../../components/ui/icons";
 import { useAuthStore } from "../../store/auth.store";
 import { authApi } from "../../api/auth.api";
@@ -167,27 +166,7 @@ const RegistrationPage = () => {
 
   return (
     <>
-      <MouseTrail />
       <main className="relative min-h-screen w-full flex items-center justify-center bg-surface">
-        {/* Background Grid & Streaks */}
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-1.5 h-1.5 bg-primary-fixed-dim rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
-            <div className="absolute w-1 h-1 bg-[#D8BFD8] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
-
-            <div className="absolute w-1 h-1 bg-primary-fixed-dim rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
-            <div className="absolute w-1.5 h-1.5 bg-primary-fixed-dim rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
-
-            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-primary/30 to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
-            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#D8BFD8] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
-          </div>
-          <div className="absolute inset-0 digital-grid opacity-20"></div>
-        </div>
-
         {/* Main Content Container */}
         <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16">
           <div className="flex flex-col lg:flex-row items-start justify-between gap-8 lg:gap-12">
@@ -457,17 +436,6 @@ const RegistrationPage = () => {
                               className={socialIconClassName}
                             />
                           </button>
-                          <button
-                            type="button"
-                            onClick={() => navigate({ to: "/login" })}
-                            disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 text-on-surface transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label="Sign up with Email"
-                          >
-                            <EmailProviderIcon
-                              className={socialIconClassName}
-                            />
-                          </button>
                         </div>
                       </div>
 
@@ -496,19 +464,7 @@ const RegistrationPage = () => {
           className="fixed bottom-8 right-8 flex items-center gap-2 bg-surface-container-high hover:bg-surface-container-highest border border-outline/20 rounded-3xl px-4 py-3 shadow-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary z-50"
           aria-label="Need assistance"
         >
-          <svg
-            className="w-5 h-5 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={1.5}
-              d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z"
-            />
-          </svg>
+          <MessageCircle className="w-5 h-5 text-primary" strokeWidth={1.5} />
           <span className="text-base font-normal leading-[19px] text-on-surface">
             Need assistance?
           </span>

@@ -353,14 +353,6 @@
     transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
   }
 
-  .material-symbols-outlined {
-    font-variation-settings:
-      "FILL" 0,
-      "wght" 400,
-      "GRAD" 0,
-      "opsz" 24;
-  }
-
   .streak-bg {
     background-image: url("https://lh3.googleusercontent.com/aida/AP1WRLsKnhr8DtgBSYHuRdfVyLGsj9Mq4vyNoTllfQlkAq_KlC9l0DFSB9w8kcZx0j3KlWcDhbpHaruEBSoe_XrTo8c1kKRkisLbcCyiaI4StOgxe4wwng-35-Neyy6ShvCOCV_IDwWFHPvLm-uLC604G65cO7-XQwnwzDLc2htU4Xc1hGGvpqPLYiAPIIaY3ofALfshiKgvRB5fJ44KM1JObAf4CAnt2cidO7Us5mNMHF_lA6aTQFcImpqZBuVK");
     background-size: cover;

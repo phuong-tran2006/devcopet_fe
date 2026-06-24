@@ -2,6 +2,7 @@ import React from "react";
 import MarkdownRenderer from "../../../../components/MarkdownRenderer";
 import type { ChatMessage } from "./useAiChat";
 import type { AiPrompt, PromptId, AiRelatedLesson } from "../../api/aiChat.api";
+import { PawPrint, BookOpen, ArrowRight } from "lucide-react";
 
 interface AiHelperMessagesProps {
   history: ChatMessage[];
@@ -48,12 +49,7 @@ export function AiHelperMessages({
               border: `1px solid ${aiPrimary}40`,
             }}
           >
-            <span
-              className="material-symbols-outlined text-[16px]"
-              style={{ color: aiPrimary }}
-            >
-              pets
-            </span>
+            <PawPrint size={16} style={{ color: aiPrimary }} />
           </div>
           <div
             className="rounded-2xl rounded-tl-sm px-4 py-3 text-[13px] leading-relaxed text-on-surface shadow-sm"
@@ -107,12 +103,11 @@ export function AiHelperMessages({
                   backgroundColor: `${aiSecondary}15`,
                 }}
               >
-                <span
-                  className="material-symbols-outlined text-[18px] shrink-0"
+                <BookOpen
+                  size={18}
                   style={{ color: aiSecondary }}
-                >
-                  menu_book
-                </span>
+                  className="shrink-0"
+                />
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
                     Review Related Lesson
@@ -124,12 +119,11 @@ export function AiHelperMessages({
                     {msg.relatedLesson.title}
                   </span>
                 </div>
-                <span
-                  className="material-symbols-outlined text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                <ArrowRight
+                  size={16}
                   style={{ color: accentColor }}
-                >
-                  arrow_forward
-                </span>
+                  className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                />
               </button>
             )}
           </div>
@@ -214,12 +208,11 @@ export function AiHelperMessages({
                 backgroundColor: `${aiSecondary}15`,
               }}
             >
-              <span
-                className="material-symbols-outlined text-[18px] shrink-0"
+              <BookOpen
+                size={18}
                 style={{ color: aiSecondary }}
-              >
-                menu_book
-              </span>
+                className="shrink-0"
+              />
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
                   Review Related Lesson
@@ -231,12 +224,11 @@ export function AiHelperMessages({
                   {relatedLesson.title}
                 </span>
               </div>
-              <span
-                className="material-symbols-outlined text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+              <ArrowRight
+                size={16}
                 style={{ color: accentColor }}
-              >
-                arrow_forward
-              </span>
+                className="shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+              />
             </button>
           )}
         </div>

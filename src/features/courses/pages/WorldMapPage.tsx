@@ -1,5 +1,24 @@
 // @ts-nocheck
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
+import {
+  Check,
+  Lock,
+  Brain,
+  Coins,
+  Route,
+  List,
+  ChevronRight,
+  Trophy,
+  ChevronLeft,
+  Menu,
+  Terminal,
+  AlertCircle,
+  Construction,
+  Zap,
+  Clock,
+  Locate,
+  ArrowUp,
+} from "lucide-react";
 import { useParams } from "@tanstack/react-router";
 import {
   courseApi,
@@ -523,13 +542,9 @@ const WorldMapPage = () => {
               }
             >
               {chapterStatus === "completed" ? (
-                <span className="material-symbols-outlined text-[16px]">
-                  done
-                </span>
+                <Check size={16} />
               ) : chapterStatus === "locked" ? (
-                <span className="material-symbols-outlined text-[15px]">
-                  lock
-                </span>
+                <Lock size={15} />
               ) : (
                 chapter.order
               )}
@@ -573,9 +588,7 @@ const WorldMapPage = () => {
                   boxShadow: `0 0 15px ${cfg.glowWeak}`,
                 }}
               >
-                <span className="material-symbols-outlined text-[25px]">
-                  psychology
-                </span>
+                <Brain size={25} />
               </div>
               <div className="flex flex-col">
                 <span className="text-[15px] font-extrabold text-on-surface">
@@ -589,12 +602,7 @@ const WorldMapPage = () => {
 
             <div className="mb-3 grid grid-cols-2 gap-2">
               <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
-                <span
-                  className="material-symbols-outlined text-[16px]"
-                  style={{ color: cfg.accent }}
-                >
-                  monetization_on
-                </span>
+                <Coins size={16} style={{ color: cfg.accent }} />
                 <div className="flex flex-col">
                   <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
                     Roadmap XP
@@ -605,9 +613,7 @@ const WorldMapPage = () => {
                 </div>
               </div>
               <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
-                <span className="material-symbols-outlined text-[16px] text-[#FFE052]">
-                  route
-                </span>
+                <Route size={16} className="text-[#FFE052]" />
                 <div className="flex flex-col">
                   <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
                     Nodes
@@ -638,12 +644,7 @@ const WorldMapPage = () => {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 border-b border-on-surface/5 px-5 pb-3 pt-4">
-            <span
-              className="material-symbols-outlined text-[16px]"
-              style={{ color: cfg.accent }}
-            >
-              format_list_bulleted
-            </span>
+            <List size={16} style={{ color: cfg.accent }} />
             <span className="flex-1 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
               Chapters
             </span>
@@ -729,24 +730,13 @@ const WorldMapPage = () => {
                               : {}
                         }
                       >
-                        {isCompleted && (
-                          <span
-                            className="material-symbols-outlined text-[14px]"
-                            style={{ fontVariationSettings: "'FILL' 1" }}
-                          >
-                            done
-                          </span>
-                        )}
+                        {isCompleted && <Check size={14} />}
                         {isInProgress && (
                           <span className="text-[11px] font-extrabold">
                             {idx + 1}
                           </span>
                         )}
-                        {isLocked && (
-                          <span className="material-symbols-outlined text-[13px]">
-                            lock
-                          </span>
-                        )}
+                        {isLocked && <Lock size={13} />}
                       </div>
 
                       {/* Chapter info */}
@@ -783,9 +773,10 @@ const WorldMapPage = () => {
                       </div>
 
                       {!isLocked && (
-                        <span className="material-symbols-outlined text-[15px] text-on-surface/20 flex-shrink-0">
-                          chevron_right
-                        </span>
+                        <ChevronRight
+                          className="text-on-surface/20 flex-shrink-0"
+                          size={15}
+                        />
                       )}
                     </button>
                   );
@@ -803,9 +794,7 @@ const WorldMapPage = () => {
                 borderColor: "rgba(255,224,82,0.2)",
               }}
             >
-              <span className="material-symbols-outlined text-[18px] text-[#FFE052]">
-                emoji_events
-              </span>
+              <Trophy className="text-[#FFE052]" size={18} />
               <div className="flex flex-col">
                 <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
                   Stars Collected
@@ -835,9 +824,7 @@ const WorldMapPage = () => {
         }`}
         aria-label={drawerOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
-        <span className="material-symbols-outlined text-[22px]">
-          {drawerOpen ? "chevron_left" : "menu"}
-        </span>
+        {drawerOpen ? <ChevronLeft size={22} /> : <Menu size={22} />}
       </button>
 
       <main
@@ -857,12 +844,7 @@ const WorldMapPage = () => {
                     boxShadow: `0 0 20px ${cfg.glowWeak}`,
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[26px]"
-                    style={{ color: cfg.accent }}
-                  >
-                    terminal
-                  </span>
+                  <Terminal size={26} style={{ color: cfg.accent }} />
                 </div>
                 <div>
                   <h1 className="text-[32px] font-extrabold uppercase leading-none tracking-wide text-on-surface md:text-[38px]">
@@ -912,11 +894,7 @@ const WorldMapPage = () => {
                           : {}
                       }
                     >
-                      {isLocked && (
-                        <span className="material-symbols-outlined text-[14px]">
-                          lock
-                        </span>
-                      )}
+                      {isLocked && <Lock size={14} />}
                       {dCfg.label}
                     </button>
                   );
@@ -969,9 +947,10 @@ const WorldMapPage = () => {
 
             {!loading && error && (
               <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
-                <span className="material-symbols-outlined mb-3 text-[34px] text-red-200">
-                  error
-                </span>
+                <AlertCircle
+                  className="mb-3 mx-auto text-[34px] text-red-200"
+                  size={34}
+                />
                 <h2 className="text-[18px] font-extrabold text-on-surface">
                   {DIFF_CONFIG[difficulty].label} roadmap could not load
                 </h2>
@@ -1026,12 +1005,7 @@ const WorldMapPage = () => {
                     borderColor: `${cfg.accent}35`,
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[22px]"
-                    style={{ color: cfg.accent }}
-                  >
-                    construction
-                  </span>
+                  <Construction size={22} style={{ color: cfg.accent }} />
                   <div>
                     <p className="text-[13px] font-bold text-on-surface">
                       Coming soon
@@ -1144,15 +1118,11 @@ const WorldMapPage = () => {
                               </p>
                               <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
                                 <span className="flex items-center gap-1">
-                                  <span className="material-symbols-outlined text-[12px]">
-                                    bolt
-                                  </span>
+                                  <Zap size={12} />
                                   {node.xp || 0} XP
                                 </span>
                                 <span className="flex items-center gap-1">
-                                  <span className="material-symbols-outlined text-[12px]">
-                                    schedule
-                                  </span>
+                                  <Clock size={12} />
                                   {EASY_CHECKPOINT_DURATION}
                                 </span>
                               </div>
@@ -1184,9 +1154,7 @@ const WorldMapPage = () => {
                           )}
                         >
                           {node.status === "locked" ? (
-                            <span className="material-symbols-outlined text-[18px]">
-                              lock
-                            </span>
+                            <Lock size={18} />
                           ) : (
                             node.label
                           )}
@@ -1226,12 +1194,7 @@ const WorldMapPage = () => {
                     borderColor: `${cfg.accent}35`,
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[22px]"
-                    style={{ color: cfg.accent }}
-                  >
-                    construction
-                  </span>
+                  <Construction size={22} style={{ color: cfg.accent }} />
                   <div>
                     <p className="text-[13px] font-bold text-on-surface">
                       Coming soon
@@ -1384,9 +1347,7 @@ const WorldMapPage = () => {
                           )}
                         >
                           {node.status === "locked" ? (
-                            <span className="material-symbols-outlined text-[18px]">
-                              lock
-                            </span>
+                            <Lock size={18} />
                           ) : (
                             node.label
                           )}
@@ -1554,9 +1515,7 @@ const WorldMapPage = () => {
                           )}
                         >
                           {node.status === "locked" ? (
-                            <span className="material-symbols-outlined text-[18px]">
-                              lock
-                            </span>
+                            <Lock size={18} />
                           ) : (
                             node.label
                           )}
@@ -1599,9 +1558,10 @@ const WorldMapPage = () => {
               color: isLight ? "#000000" : "#fff",
             }}
           >
-            <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-12">
-              my_location
-            </span>
+            <Locate
+              className="transition-transform duration-300 group-hover:rotate-12"
+              size={20}
+            />
           </button>
 
           <div
@@ -1616,9 +1576,7 @@ const WorldMapPage = () => {
               title="Scroll to top"
               className="flex h-12 w-12 items-center justify-center rounded-full border border-on-surface/10 bg-surface-container/90 text-on-surface-variant shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-on-surface/25 hover:text-on-surface active:scale-95"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                arrow_upward
-              </span>
+              <ArrowUp size={20} />
             </button>
           </div>
         </div>

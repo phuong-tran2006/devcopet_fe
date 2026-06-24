@@ -1,5 +1,15 @@
 import React from "react";
 import {
+  Lightbulb,
+  Code,
+  Link as LinkIcon,
+  HelpCircle,
+  AlertTriangle,
+  ArrowRight,
+  MessageSquare,
+  Moon,
+} from "lucide-react";
+import {
   PROMPT_ICONS,
   type AiPrompt,
   type PromptId,
@@ -14,6 +24,27 @@ interface AiHelperPromptsProps {
   usage: AiUsage | null;
   handleAskPrompt: (promptId: PromptId) => void;
 }
+
+const getLucideIcon = (iconName: string) => {
+  switch (iconName) {
+    case "lightbulb":
+      return Lightbulb;
+    case "code":
+      return Code;
+    case "link":
+      return LinkIcon;
+    case "emoji_objects":
+      return HelpCircle;
+    case "warning":
+      return AlertTriangle;
+    case "arrow_forward":
+      return ArrowRight;
+    case "bedtime":
+      return Moon;
+    default:
+      return MessageSquare;
+  }
+};
 
 export function AiHelperPrompts({
   activePromptId,
@@ -33,6 +64,7 @@ export function AiHelperPrompts({
           .filter((prompt) => prompt.id !== activePromptId)
           .map((prompt) => {
             const icon = PROMPT_ICONS[prompt.id] || "chat";
+            const IconComp = getLucideIcon(icon);
 
             return (
               <button
@@ -54,16 +86,15 @@ export function AiHelperPrompts({
                     : `${aiPrimary}10`,
                 }}
               >
-                <span
-                  className="material-symbols-outlined text-[18px] shrink-0"
+                <IconComp
+                  className="shrink-0"
+                  size={18}
                   style={{
                     color: chipsDisabled
                       ? "var(--color-on-surface-variant)"
                       : aiPrimary,
                   }}
-                >
-                  {icon}
-                </span>
+                />
                 <span
                   className="text-[12px] font-semibold leading-tight"
                   style={{
@@ -88,9 +119,7 @@ export function AiHelperPrompts({
             backgroundColor: "rgba(239, 68, 68, 0.1)",
           }}
         >
-          <span className="material-symbols-outlined text-[#ef4444] text-[20px]">
-            bedtime
-          </span>
+          <Moon className="text-[#ef4444]" size={20} />
           <div className="flex flex-col">
             <span className="text-[12px] font-bold text-[#ef4444]">
               Pet is resting!

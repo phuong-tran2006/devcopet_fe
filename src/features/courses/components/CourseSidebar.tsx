@@ -1,6 +1,7 @@
 // @ts-nocheck
 import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
+import { ChevronDown, ArrowLeft } from "lucide-react";
 import { courseApi } from "../api/course.api";
 import LessonProgressCircle from "./LessonProgressCircle";
 
@@ -46,11 +47,10 @@ const CourseSidebarChapter = ({
             {lessons.length} Lesson
           </span>
         </div>
-        <span
-          className={`material-symbols-outlined text-[20px] text-on-surface-variant transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-        >
-          expand_more
-        </span>
+        <ChevronDown
+          className={`text-on-surface-variant transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+          size={20}
+        />
       </button>
 
       {/* Tối ưu render bằng cách ẩn hiện class thay vì unmount */}
@@ -181,7 +181,7 @@ const CourseSidebar = ({
       {/* Header Info */}
       <div className="p-5 border-b border-outline-variant bg-surface">
         {/* <Link to="/course" className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-white font-label-sm tracking-widest uppercase text-[10px] mb-3 transition-colors">
-          <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+          <ArrowLeft size={14} />
           Trở về khoá học
         </Link> */}
         <h2 className="font-headline-sm text-[18px] font-bold text-on-surface mb-4 line-clamp-2">

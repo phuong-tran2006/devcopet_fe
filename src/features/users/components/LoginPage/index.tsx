@@ -1,8 +1,8 @@
 // @ts-nocheck
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
 import Button from "../../../../components/ui/Button";
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import ForgotPasswordModal from "../ForgotPasswordModal";
 import {
   EmailIcon,
@@ -100,27 +100,7 @@ const Login = () => {
 
   return (
     <>
-      <MouseTrail />
       <main className="relative w-full min-h-screen bg-surface">
-        {/* Background Grid & Streaks */}
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
-            <div className="absolute w-1 h-1 bg-[#D8BFD8] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
-
-            <div className="absolute w-1 h-1 bg-[#008080] rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
-
-            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-[#008080] to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
-            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#D8BFD8] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
-          </div>
-          <div className="absolute inset-0 digital-grid opacity-20"></div>
-        </div>
-
         {/* Content wrapper */}
         <div className="relative z-10 flex flex-col w-full h-full">
           {/* Main content area - centered */}
@@ -299,19 +279,10 @@ const Login = () => {
                         <span className="text-sm font-medium text-on-surface-variant hover:text-primary-fixed-dim transition-colors">
                           Create an Account
                         </span>
-                        <svg
+                        <ArrowRight
                           className="w-3 h-3 text-on-surface"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M17 8l4 4m0 0l-4 4m4-4H3"
-                          />
-                        </svg>
+                          strokeWidth={2}
+                        />
                       </Link>
                     </div>
                   </div>

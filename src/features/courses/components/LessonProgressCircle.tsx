@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { Check, Play, LockOpen } from "lucide-react";
+
 const LessonProgressCircle = ({
   progress = 0,
   isActive = false,
@@ -54,9 +56,13 @@ const LessonProgressCircle = ({
           }
         `}
       >
-        <span className="material-symbols-outlined text-[16px]">
-          {isCompleted ? "check" : isActive ? "play_arrow" : "lock_open"}
-        </span>
+        {isCompleted ? (
+          <Check size={16} />
+        ) : isActive ? (
+          <Play size={16} className="fill-current" />
+        ) : (
+          <LockOpen size={16} />
+        )}
       </div>
     </div>
   );

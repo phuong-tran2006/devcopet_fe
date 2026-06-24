@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { ArrowRight, Lock } from "lucide-react";
 import { courseApi } from "../api/course.api";
 import { useAuthStore } from "../../users/store/auth.store";
 
@@ -22,7 +23,7 @@ const RoadmapPage = () => {
     Promise.all([
       courseApi.getEasyRoadmap(courseSlug).catch(() => null),
       courseApi.getMediumRoadmap(courseSlug).catch(() => null),
-      courseApi.getHardRoadmap(courseSlug).catch(() => null)
+      courseApi.getHardRoadmap(courseSlug).catch(() => null),
     ]).then(([easy, medium, hard]) => {
       if (!alive) return;
       let total = 0;
@@ -30,7 +31,10 @@ const RoadmapPage = () => {
 
       const processRoadmap = (roadmap: any) => {
         if (!roadmap) return;
-        if (typeof roadmap.completedNodes === "number" && typeof roadmap.totalNodes === "number") {
+        if (
+          typeof roadmap.completedNodes === "number" &&
+          typeof roadmap.totalNodes === "number"
+        ) {
           completed += roadmap.completedNodes;
           total += roadmap.totalNodes;
         } else if (roadmap.chapters) {
@@ -56,27 +60,13 @@ const RoadmapPage = () => {
       }
     });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [isAuthenticated]);
 
   return (
     <main className="relative min-h-[calc(100vh-80px)] w-full flex flex-col items-center justify-start bg-background overflow-hidden pb-16 px-4 md:px-8 lg:px-16">
-      {/* Background Grid & Streaks */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="absolute inset-0 overflow-hidden">
-          {/* Glowing points */}
-          <div className="absolute w-1 h-1 bg-white rounded-full top-[15%] left-[10%] opacity-80 blur-[1px]"></div>
-          <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[25%] left-[85%] opacity-90 blur-[2px]"></div>
-          <div className="absolute w-1 h-1 bg-[#D8BFD8] rounded-full top-[70%] left-[15%] opacity-80 blur-[1px]"></div>
-          <div className="absolute w-2 h-2 bg-white rounded-full top-[85%] left-[75%] opacity-90 blur-[2px]"></div>
-
-          {/* Cybernetic streaks */}
-          <div className="absolute w-[2px] h-[120px] bg-gradient-to-b from-transparent via-[#008080]/30 to-transparent top-[10%] left-[30%] opacity-40 rotate-[35deg]"></div>
-          <div className="absolute w-[1px] h-[180px] bg-gradient-to-b from-transparent via-[#D8BFD8]/20 to-transparent top-[45%] left-[80%] opacity-30 rotate-[-25deg]"></div>
-        </div>
-        <div className="absolute inset-0 digital-grid opacity-20"></div>
-      </div>
-
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-[1200px] flex flex-col items-stretch gap-8 mt-8">
         {/* Page Title Header */}
@@ -172,10 +162,7 @@ const RoadmapPage = () => {
               }}
               className="mt-auto w-full bg-primary-fixed-dim text-on-primary-fixed font-extrabold text-[12px] py-2.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
-              Enter World{" "}
-              <span className="material-symbols-outlined text-[15px]">
-                arrow_forward
-              </span>
+              Enter World <ArrowRight size={15} />
             </Link>
           </div>
 
@@ -275,9 +262,7 @@ const RoadmapPage = () => {
               disabled
               className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[15px]">
-                lock
-              </span>
+              <Lock size={15} />
               Unlock at Lvl 12
             </button>
           </div>
@@ -368,14 +353,11 @@ const RoadmapPage = () => {
               disabled
               className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[15px]">
-                lock
-              </span>
+              <Lock size={15} />
               Unlock at Lvl 15
             </button>
           </div>
         </section>
-
       </div>
     </main>
   );

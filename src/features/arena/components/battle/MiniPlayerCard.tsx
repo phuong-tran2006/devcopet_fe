@@ -3,7 +3,7 @@ interface MiniPlayerCardProps {
   avatarUrl: string;
   hpPercentage: number;
   hpColor: string;
-  icon: string;
+  icon: React.ReactNode;
   iconColor: string;
   isRightAlign?: boolean;
   rank?: string;
@@ -79,13 +79,11 @@ const MiniPlayerCard = ({
         </div>
       )}
 
-      <div className="shrink-0 flex items-center justify-center w-7 h-7 ml-2">
-        <span
-          className="material-symbols-outlined transition-colors duration-300"
-          style={{ color: iconColor, fontSize: "18px" }}
-        >
-          {icon}
-        </span>
+      <div
+        className="shrink-0 flex items-center justify-center w-7 h-7 ml-2"
+        style={{ color: iconColor }}
+      >
+        {icon}
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 import React from "react";
+import { Award } from "lucide-react";
 
 const ProfileHeader = () => {
   return (
@@ -11,9 +12,7 @@ const ProfileHeader = () => {
         <span className="text-primary-fixed-dim">evolution?</span>
       </h1>
       <button className="flex items-center gap-2 bg-primary-fixed text-on-primary-fixed px-4 py-2 rounded-lg font-medium text-sm border border-outline/20 hover:bg-primary-container hover:text-on-primary-container transition-colors duration-300">
-        <span className="material-symbols-outlined text-[18px]">
-          workspace_premium
-        </span>
+        <Award size={18} />
         Global Rank: #2
       </button>
     </div>

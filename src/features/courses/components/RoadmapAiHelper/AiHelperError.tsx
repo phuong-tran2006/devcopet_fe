@@ -1,4 +1,11 @@
-import React from "react";
+import {
+  Ban,
+  Hourglass,
+  Loader2,
+  CloudOff,
+  Lock,
+  AlertCircle,
+} from "lucide-react";
 import { ERROR_MESSAGES } from "./constants";
 
 interface AiHelperErrorProps {
@@ -7,12 +14,54 @@ interface AiHelperErrorProps {
   accentColor: string;
 }
 
+interface AiErrorIconProps {
+  iconName: string;
+  accentColor: string;
+  isLimitReached: boolean;
+}
+
+function AiErrorIcon({
+  iconName,
+  accentColor,
+  isLimitReached,
+}: AiErrorIconProps) {
+  const iconProps = {
+    size: 48,
+    className: `drop-shadow-md ${iconName === "pending" ? "animate-spin" : ""}`,
+    style: {
+      color: isLimitReached ? "#ef4444" : accentColor,
+    },
+  };
+
+  switch (iconName) {
+    case "block":
+      return <Ban {...iconProps} />;
+    case "hourglass_top":
+      return <Hourglass {...iconProps} />;
+    case "pending":
+      return <Loader2 {...iconProps} />;
+    case "cloud_off":
+      return <CloudOff {...iconProps} />;
+    case "lock":
+    case "lock_person":
+      return <Lock {...iconProps} />;
+    case "error":
+    default:
+      return <AlertCircle {...iconProps} />;
+  }
+}
+
 export function AiHelperError({
   errorCode,
   cooldownSeconds,
   accentColor,
 }: AiHelperErrorProps) {
   const errorInfo = ERROR_MESSAGES[errorCode] || ERROR_MESSAGES.UNKNOWN;
+  const iconName =
+    errorCode === "UNAUTHORIZED" ? "lock_person" : errorInfo.icon;
+  const isLimitReached =
+    errorCode === "DAILY_LIMIT_REACHED" ||
+    errorCode === "AI_GLOBAL_LIMIT_REACHED";
 
   return (
     <div
@@ -38,18 +87,11 @@ export function AiHelperError({
             : "none",
       }}
     >
-      <span
-        className="material-symbols-outlined text-[48px] drop-shadow-md"
-        style={{
-          color:
-            errorCode === "DAILY_LIMIT_REACHED" ||
-            errorCode === "AI_GLOBAL_LIMIT_REACHED"
-              ? "#ef4444"
-              : accentColor,
-        }}
-      >
-        {errorCode === "UNAUTHORIZED" ? "lock_person" : errorInfo.icon}
-      </span>
+      <AiErrorIcon
+        iconName={iconName}
+        accentColor={accentColor}
+        isLimitReached={isLimitReached}
+      />
       <div className="flex flex-col gap-2">
         <span className="text-[18px] font-extrabold text-white">
           {errorCode === "UNAUTHORIZED"

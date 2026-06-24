@@ -1,4 +1,5 @@
 import React from "react";
+import { Zap, Ban, Minus } from "lucide-react";
 import petVideo from "../../../../assets/videos/conpet.mp4";
 import type { AiUsage } from "../../api/aiChat.api";
 
@@ -93,12 +94,17 @@ export function AiHelperHeader({
                   : "rgba(239,68,68,0.1)",
             }}
           >
-            <span
-              className="material-symbols-outlined text-[13px]"
-              style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
-            >
-              {usage.remaining > 0 ? "bolt" : "block"}
-            </span>
+            {usage.remaining > 0 ? (
+              <Zap
+                size={13}
+                style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
+              />
+            ) : (
+              <Ban
+                size={13}
+                style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
+              />
+            )}
             <span
               className="text-[10px] font-bold tracking-wide"
               style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
@@ -113,7 +119,7 @@ export function AiHelperHeader({
           className="flex h-7 w-7 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
           aria-label="Minimize Pet Helper"
         >
-          <span className="material-symbols-outlined text-[18px]">remove</span>
+          <Minus size={18} />
         </button>
       </div>
     </>

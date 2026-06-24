@@ -1,6 +1,16 @@
 import { useEffect, useRef } from "react";
+import {
+  Brain,
+  Users,
+  Blocks,
+  Puzzle,
+  Briefcase,
+  MessageSquare,
+  Sparkles,
+  BadgeCheck,
+  Building2,
+} from "lucide-react";
 
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import heroMascotVideo from "../../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../../components/ui/TransparentVideo";
 
@@ -44,35 +54,7 @@ const LandingPage = () => {
 
   return (
     <>
-      <MouseTrail />
       <main className="relative">
-        {/* Background Grid & Streaks */}
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[35%] left-[80%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[60%] left-[15%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[85%] left-[45%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[25%] left-[65%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[50%] left-[90%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[75%] left-[30%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[15%] left-[55%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[45%] left-[10%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[95%] left-[75%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[5%] left-[40%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[20%] left-[10%] opacity-100"></div>
-            <div className="absolute w-1.5 h-1.5 bg-white rounded-full top-[40%] left-[70%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[55%] left-[25%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-primary-fixed-dim rounded-full top-[70%] left-[85%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[90%] left-[50%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[12%] left-[95%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[30%] left-[35%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[65%] left-[5%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[22%] left-[3%] opacity-50 blur-[1px]"></div>
-          </div>
-          <div className="absolute inset-0 digital-grid opacity-20"></div>
-        </div>
-
         {/* Hero Section */}
         <section className="relative min-h-[90vh] flex items-center px-margin-desktop py-16 z-10">
           <div className="w-full max-w-container-max mx-auto">
@@ -118,9 +100,7 @@ const LandingPage = () => {
               className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
-                <span className="material-symbols-outlined text-3xl">
-                  psychology
-                </span>
+                <Brain size={28} strokeWidth={1.5} />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
                 Personalized Roadmap
@@ -137,9 +117,7 @@ const LandingPage = () => {
               className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
-                <span className="material-symbols-outlined text-3xl">
-                  groups
-                </span>
+                <Users size={28} strokeWidth={1.5} />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
                 Mentor Community
@@ -156,9 +134,7 @@ const LandingPage = () => {
               className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
-                <span className="material-symbols-outlined text-3xl">
-                  code_blocks
-                </span>
+                <Blocks size={28} strokeWidth={1.5} />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
                 Real-world Projects
@@ -186,9 +162,7 @@ const LandingPage = () => {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
-                  <span className="material-symbols-outlined text-3xl">
-                    extension
-                  </span>
+                  <Puzzle size={28} strokeWidth={1.5} />
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
                   Interactive Learning
@@ -217,9 +191,7 @@ const LandingPage = () => {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    work
-                  </span>
+                  <Briefcase size={28} strokeWidth={1.5} />
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
                   Real-world Projects
@@ -237,9 +209,7 @@ const LandingPage = () => {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    forum
-                  </span>
+                  <MessageSquare size={28} strokeWidth={1.5} />
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
                   Community Support
@@ -257,9 +227,7 @@ const LandingPage = () => {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
-                  <span className="material-symbols-outlined text-3xl">
-                    auto_awesome
-                  </span>
+                  <Sparkles size={28} strokeWidth={1.5} />
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
                   AI Assistance
@@ -278,9 +246,7 @@ const LandingPage = () => {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    verified
-                  </span>
+                  <BadgeCheck size={28} strokeWidth={1.5} />
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
                   Certificate
@@ -298,9 +264,7 @@ const LandingPage = () => {
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    apartment
-                  </span>
+                  <Building2 size={28} strokeWidth={1.5} />
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
                   Career Path
