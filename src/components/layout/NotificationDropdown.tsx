@@ -36,7 +36,7 @@ const resolveDailyMissionRedirect = (
     case "QUIZ":
       return {
         to: "/courses/$courseId" as const,
-        params: { courseId: "python" },
+        params: { courseId: "python-basic" },
       };
     case "ARENA":
       return { to: "/arena" };
