@@ -181,95 +181,85 @@ export const dailyMissionApi = {
    * Fallback: convert /daily-missions/today response to notification format.
    */
   _fallbackFromToday: async (): Promise<DailyMissionNotification> => {
-    try {
-      const response = await api.get("/daily-missions/today", {
-        validateStatus: (status: number) => status < 500,
-      } as any);
+    const response = await api.get("/daily-missions/today", {
+      validateStatus: (status: number) => status < 500,
+    } as any);
 
-      if (response.status === 401 || response.status === 403) {
-        return {
-          type: "SYSTEM" as any,
-          status: "auth_required" as any,
-          title: "Please sign in again",
-          message: "Your session expired. Log in again to view daily missions.",
-          ctaLabel: "Login",
-          redirect: { routeType: "LOGIN" },
-        };
-      }
+    if (response.status === 401 || response.status === 403) {
+      return {
+        type: "SYSTEM" as any,
+        status: "auth_required" as any,
+        title: "Please sign in again",
+        message: "Your session expired. Log in again to view daily missions.",
+        ctaLabel: "Login",
+        redirect: { routeType: "LOGIN" },
+      };
+    }
 
-      if (response.status === 202) {
-        return {
-          type: "DAILY_MISSION",
-          status: "generating",
-          title: "Preparing your mission",
-          message: "Your pet is building today's mission. Check again shortly.",
-          retryAfterMs: response.data?.retryAfterMs ?? 2000,
-          redirect: null,
-        };
-      }
-
-      if (
-        response.status === 204 ||
-        !response.data ||
-        (typeof response.data === "object" &&
-          Object.keys(response.data).length === 0)
-      ) {
-        return {
-          type: "DAILY_PRAISE",
-          status: "empty",
-          title: "You're all caught up!",
-          message: "Great work today. Your pet is proud of your consistency.",
-          ctaLabel: "View course",
-          redirect: {
-            routeType: "COURSE",
-            targetType: "COURSE",
-            targetId: "python",
-          },
-        };
-      }
-
-      const mission = response.data;
-      if (mission.status === "COMPLETED" || mission.status === "DISMISSED") {
-        return {
-          type: "DAILY_PRAISE",
-          status: "empty",
-          title: "You're all caught up!",
-          message: "Great work today. Your pet is proud of your consistency.",
-          ctaLabel: "View course",
-          redirect: {
-            routeType: "COURSE",
-            targetType: "COURSE",
-            targetId: "python",
-          },
-        };
-      }
-
+    if (response.status === 202) {
       return {
         type: "DAILY_MISSION",
-        status: "available",
-        missionId: mission._id || mission.id || "",
-        title: mission.title || "Daily Mission Ready",
-        message:
-          mission.description ||
-          mission.message ||
-          "Continue your learning adventure today.",
-        ctaLabel: "Start mission",
-        unread: true,
-        redirect: mission.redirect || {
-          routeType: "COURSE",
-          targetType: "COURSE",
-          targetId: "python",
-        },
+        status: "generating",
+        title: "Preparing your mission",
+        message: "Your pet is building today's mission. Check again shortly.",
+        retryAfterMs: response.data?.retryAfterMs ?? 2000,
+        redirect: null,
       };
-    } catch {
+    }
+
+    if (
+      response.status === 204 ||
+      !response.data ||
+      (typeof response.data === "object" &&
+        Object.keys(response.data).length === 0)
+    ) {
       return {
         type: "DAILY_PRAISE",
         status: "empty",
         title: "You're all caught up!",
         message: "Great work today. Your pet is proud of your consistency.",
-        redirect: null,
+        ctaLabel: "View course",
+        redirect: {
+          routeType: "COURSE",
+          targetType: "COURSE",
+          targetId: "python",
+        },
       };
     }
+
+    const mission = response.data;
+    if (mission.status === "COMPLETED" || mission.status === "DISMISSED") {
+      return {
+        type: "DAILY_PRAISE",
+        status: "empty",
+        title: "You're all caught up!",
+        message: "Great work today. Your pet is proud of your consistency.",
+        ctaLabel: "View course",
+        redirect: {
+          routeType: "COURSE",
+          targetType: "COURSE",
+          targetId: "python",
+        },
+      };
+    }
+
+    return {
+      type: "DAILY_MISSION",
+      status: "available",
+      missionId: mission._id || mission.id || "",
+      title: mission.title || "Daily Mission Ready",
+      message:
+        mission.description ||
+        mission.message ||
+        "Continue your learning adventure today.",
+      ctaLabel: "Start mission",
+      unread: true,
+      redirect: mission.redirect || {
+        routeType: "COURSE",
+        targetType: "COURSE",
+        targetId: "python",
+      },
+    };
   },
 
   /**

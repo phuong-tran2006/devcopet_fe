@@ -44,11 +44,13 @@ function resolveDailyMissionRedirect(
 const DailyQuests = () => {
   const [notif, setNotif] = useState<DailyMissionNotification | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const fetchMission = useCallback(async () => {
     try {
       setLoading(true);
+      setError(false);
       const data = await dailyMissionApi.getDailyMissionNotification();
       setNotif(data);
 
@@ -58,7 +60,8 @@ const DailyQuests = () => {
         setTimeout(() => fetchMission(), delay);
       }
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load daily mission:", err);
+      setError(true);
     } finally {
       setLoading(false);
     }
@@ -87,7 +90,19 @@ const DailyQuests = () => {
         Daily Quests
       </h2>
       <div className="space-y-3">
-        {loading && !notif ? (
+        {error ? (
+          <div className="flex flex-col items-center justify-center p-6 gap-3 bg-error-container/20 border border-error/30 rounded-xl">
+            <span className="text-sm text-on-surface-variant text-center">
+              Could not load your daily mission.
+            </span>
+            <button
+              onClick={fetchMission}
+              className="mt-2 px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-primary-fixed-dim text-on-primary-fixed rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Retry
+            </button>
+          </div>
+        ) : loading && !notif ? (
           <div className="flex flex-col items-center justify-center p-8 gap-3 bg-surface-container border border-outline/20 rounded-xl">
             <Loader2 className="w-6 h-6 animate-spin text-primary-fixed-dim" />
             <span className="text-sm text-on-surface-variant">
