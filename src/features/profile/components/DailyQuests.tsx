@@ -3,7 +3,7 @@ import { Check, Target, Loader2, Sparkles } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import {
   dailyMissionApi,
-  type DailyMissionNotification,
+  type DailyMissionNotificationItem,
   type DailyMissionRedirect,
 } from "../../../features/daily-missions/api/dailyMission.api";
 
@@ -29,7 +29,10 @@ function resolveDailyMissionRedirect(
     }
     case "COURSE":
     case "QUIZ":
-      return { to: "/course" };
+      return {
+        to: "/courses/$courseId" as any,
+        params: { courseId: redirect.targetId || "python-basic" },
+      };
     case "ARENA":
       return { to: "/arena" };
     case "HARD_LEVEL":
@@ -42,22 +45,40 @@ function resolveDailyMissionRedirect(
 }
 
 const DailyQuests = () => {
-  const [notif, setNotif] = useState<DailyMissionNotification | null>(null);
+  const [notif, setNotif] = useState<DailyMissionNotificationItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<boolean>(false);
+  const [devDebug, setDevDebug] = useState<any>(null);
   const navigate = useNavigate();
 
   const fetchMission = useCallback(async () => {
     try {
       setLoading(true);
       setError(false);
-      const data = await dailyMissionApi.getDailyMissionNotification();
+      setDevDebug(null);
+      const response = await dailyMissionApi.getDailyMissionNotifications(20);
+
+      const debugReason = response.debug?.reason;
+      if (
+        debugReason === "NO_CANDIDATES_OR_GENERATION_FAILED" ||
+        debugReason === "NO_PUBLISHED_COURSE" ||
+        debugReason === "PROVIDER_ERRORS_OR_NO_CANDIDATES"
+      ) {
+        setError(true);
+        setNotif(null);
+        if (import.meta.env.DEV) {
+          console.debug("[DailyQuests] Generation failed:", response.debug);
+          setDevDebug(response.debug);
+        }
+        return;
+      }
+
+      const data = response.items[0];
       setNotif(data);
 
       // Auto-retry if generating
-      if (data.status === "generating") {
-        const delay = (data as any).retryAfterMs ?? 2000;
-        setTimeout(() => fetchMission(), delay);
+      if (data?.status === "generating") {
+        setTimeout(() => fetchMission(), 2000);
       }
     } catch (err) {
       console.error("Failed to load daily mission:", err);
@@ -93,8 +114,18 @@ const DailyQuests = () => {
         {error ? (
           <div className="flex flex-col items-center justify-center p-6 gap-3 bg-error-container/20 border border-error/30 rounded-xl">
             <span className="text-sm text-on-surface-variant text-center">
-              Could not load your daily mission.
+              Daily mission is not available yet.
             </span>
+            {devDebug && (
+              <div className="text-xs text-error/80 mt-2 bg-error-container/50 p-2 rounded-lg text-left w-full break-words">
+                <strong>Dev Error:</strong> {devDebug.reason}
+                {devDebug.candidateDiagnostics && (
+                  <pre className="mt-1 opacity-70 whitespace-pre-wrap overflow-x-auto text-[10px]">
+                    {JSON.stringify(devDebug.candidateDiagnostics, null, 2)}
+                  </pre>
+                )}
+              </div>
+            )}
             <button
               onClick={fetchMission}
               className="mt-2 px-4 py-1.5 text-xs font-bold uppercase tracking-wider bg-primary-fixed-dim text-on-primary-fixed rounded-lg hover:opacity-90 transition-opacity"
