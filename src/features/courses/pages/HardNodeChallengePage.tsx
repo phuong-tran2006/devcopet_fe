@@ -336,7 +336,7 @@ const HardNodeChallengePage = () => {
           "group flex min-h-[52px] items-center gap-2 rounded-xl border px-3 py-2 transition-all",
           compact ? "inline-flex min-w-[150px] align-middle" : "w-full",
           isCorrect
-            ? "border-[#63f1e3] bg-[#10262c] text-[#63f1e3] shadow-[0_0_16px_rgba(99,241,227,0.18)]"
+            ? "border-hard bg-hard/5 text-on-surface shadow-[0_0_18px_rgba(30,58,138,0.18)]"
             : isIncorrect
               ? "border-red-400/80 bg-red-400/10 text-red-100"
               : assignedItemId
@@ -617,7 +617,7 @@ const HardNodeChallengePage = () => {
         <section className="w-full flex flex-col">
           <div className="mb-6 flex flex-col gap-2">
             <p className="text-[14px] text-on-surface-variant font-medium">
-              {data?.node.label} • {data?.node.title}
+              {data?.node.title}
             </p>
           </div>
 
@@ -1103,7 +1103,7 @@ const HardNodeChallengePage = () => {
                   <button
                     onClick={handleSubmit}
                     disabled={isSubmitDisabled}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] transition hover:bg-[#8cc8ff] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-hard/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
                     {submitting ? "Checking..." : "Submit Answer"}
                   </button>
@@ -1113,9 +1113,9 @@ const HardNodeChallengePage = () => {
                 {(isReviewMode || (result && result.correct)) && (
                   <div className="mx-6 mb-6 border-t border-[#1e3a5f] pt-6 flex flex-col gap-4">
                     {/* Explanation box */}
-                    <div className="rounded-xl border border-[#66b3ff]/30 bg-[#0c1a2d] p-6 shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
+                    <div className="rounded-xl border border-hard/30 bg-hard/10 p-6 shadow-[inset_0_0_12px_rgba(30,58,138,0.06)] transition-colors duration-300">
                       <div className="mb-4 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-hard bg-hard/10 text-hard">
                           <span className="material-symbols-outlined text-[20px]">
                             pets
                           </span>
@@ -1127,7 +1127,7 @@ const HardNodeChallengePage = () => {
                         </div>
                       </div>
 
-                      <p className="text-[14px] leading-relaxed text-[#dbeafe]">
+                      <p className="text-[14px] leading-relaxed text-on-surface-variant">
                         {isReviewMode && data.review ? data.review.explanation : result?.explanation}
                       </p>
 
@@ -1174,14 +1174,14 @@ const HardNodeChallengePage = () => {
                     <div className="flex flex-wrap gap-4 mt-2">
                       <button
                         onClick={goBackToRoadmap}
-                        className="flex-1 min-w-[150px] rounded-xl border border-[#1e3a5f] bg-[#0d2135] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#152e46] transition-colors"
+                        className="flex-1 min-w-[150px] rounded-xl border border-outline/20 bg-surface px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
                       >
                         Back to Roadmap
                       </button>
                       <button
                         onClick={goToNextChallenge}
                         disabled={nextChallengeLoading}
-                        className="flex-1 min-w-[150px] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] hover:bg-[#8cc8ff] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 min-w-[150px] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white hover:bg-hard/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                       >
                         {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                       </button>
@@ -1216,10 +1216,10 @@ const HardNodeChallengePage = () => {
                 </span>
               </button>
 
-              <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
-                <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
+              <div className="rounded-xl bg-surface px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(30,58,138,0.08)] transition-colors duration-300">
+                <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-hard bg-hard/10 text-hard shadow-[0_0_30px_rgba(30,58,138,0.24)]">
                   <span className="material-symbols-outlined text-[46px]">
-                    workspace_premium
+                    star
                   </span>
                 </div>
 
@@ -1229,11 +1229,11 @@ const HardNodeChallengePage = () => {
                   Accomplished
                 </h2>
 
-                <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
+                <div className="mt-6 rounded-lg border border-outline/20 bg-hard/5 p-4 transition-colors duration-300">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-hard/30 bg-hard/10 text-hard">
                       <span className="material-symbols-outlined text-[24px]">
-                        psychology
+                        pets
                       </span>
                     </div>
                     <div>
@@ -1245,7 +1245,7 @@ const HardNodeChallengePage = () => {
                           {result.explanation}
                         </p>
                       )}
-                      <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+                      <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-hard">
                         {petName}
                       </p>
                     </div>
@@ -1253,30 +1253,30 @@ const HardNodeChallengePage = () => {
                 </div>
 
                 <div className="mt-7 grid grid-cols-2 gap-4">
-                  <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
+                  <div className="rounded-lg bg-surface-container-high px-4 py-4 text-center transition-colors duration-300">
                     <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
                       Reward
                     </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
+                    <p className="mt-2 text-[24px] font-extrabold leading-none text-hard">
                       +{challenge.xp}
                     </p>
-                    <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
+                    <p className="text-[18px] font-bold text-hard">XP</p>
                   </div>
-                  <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
+                  <div className="rounded-lg bg-surface-container-high px-4 py-4 text-center transition-colors duration-300">
                     <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
                       Bonus
                     </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
+                    <p className="mt-2 text-[24px] font-extrabold leading-none text-secondary">
                       +10
                     </p>
-                    <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
+                    <p className="text-[18px] font-bold text-secondary">Stars</p>
                   </div>
                 </div>
 
                 <button
                   onClick={goToNextChallenge}
                   disabled={nextChallengeLoading}
-                  className="mt-7 w-full rounded-lg bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
+                  className="mt-7 w-full rounded-lg bg-hard px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-hard/80"
                 >
                   {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                   <span className="ml-2">→</span>

@@ -9,6 +9,10 @@
   --color-water: #3b82f6;
   --color-leaf: #22c55e;
 
+  --color-easy: #97CADB;
+  --color-medium: #018ABE;
+  --color-hard: #3a7fc1;
+
   --color-surface: #0c1013;
   --color-surface-dim: #0c1013;
   --color-surface-bright: #313d47;
@@ -144,6 +148,10 @@
     --color-on-primary: #ffffff;
     --color-primary-container: #b2dfdf;
     --color-on-primary-container: #000000;
+
+    --color-easy: #0284c7;
+    --color-medium: #0369a1;
+    --color-hard: #1e3a8a;
     --color-inverse-primary: #4dd0d0;
     --color-primary-fixed: #ccebeb;
     --color-primary-fixed-dim: #006666;

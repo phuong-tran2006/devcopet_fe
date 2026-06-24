@@ -83,7 +83,7 @@ const CodeSnippetCard = ({
       <div className="border-b border-[#263b44] bg-[#0a161c] px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
         {codeSnippet.language}
       </div>
-      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-[#d7f7f4]">
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-on-surface">
         <code>{codeSnippet.code}</code>
       </pre>
     </div>
@@ -540,7 +540,7 @@ const MediumNodeChallengePage = () => {
     if (isSelected) {
       return "border-[#63f1e3] bg-[#13282d] text-on-surface";
     }
-    return "border-[#1c2b33] bg-[#10191f] text-on-surface-variant hover:border-[#63f1e3]/35 hover:text-on-surface";
+    return "border-outline/20 bg-surface hover:border-medium/40 hover:bg-medium/5 hover:text-on-surface hover:bg-surface-container-high transition-colors duration-200";
   };
 
   const isDropZoneCorrect = (zoneId: string) => {
@@ -633,7 +633,7 @@ const MediumNodeChallengePage = () => {
           <section className="w-full flex flex-col">
             <div className="mb-6 flex flex-col gap-2">
               <p className="text-[14px] text-on-surface-variant font-medium">
-                {data.node.label} • {data.node.title}
+                {data.node.title}
               </p>
             </div>
 
@@ -777,7 +777,7 @@ const MediumNodeChallengePage = () => {
                                           : isDraggingAnyItem
                                             ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
                                             : canAssign
-                                              ? "border-gray-400 bg-gray-500/15 text-gray-200 shadow-[0_0_14px_rgba(148,163,184,0.14)]"
+                                              ? "border-medium bg-medium/5 text-on-surface shadow-[0_0_18px_rgba(3,105,161,0.18)]"
                                               : "border-dashed border-gray-500/70 bg-gray-500/10 text-gray-300"
                                 }`}
                               >
@@ -889,7 +889,7 @@ const MediumNodeChallengePage = () => {
                   <button
                     onClick={submitChallenge}
                     disabled={!canSubmit || submitting}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] transition hover:bg-[#86fff4] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-medium/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
                     {submitting ? "Submitting..." : "Submit Answer"}
                   </button>
@@ -899,9 +899,9 @@ const MediumNodeChallengePage = () => {
                 {(isReviewMode || (result && result.correct)) && (
                   <div className="mx-6 mb-6 border-t border-[#263b44] pt-6 flex flex-col gap-4">
                     {/* Explanation box */}
-                    <div className="rounded-xl border border-[#63f1e3]/30 bg-[#10262c] p-6 shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
+                    <div className="rounded-xl border border-medium/30 bg-medium/10 p-6 shadow-[inset_0_0_12px_rgba(3,105,161,0.06)] transition-colors duration-300">
                       <div className="mb-4 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-medium bg-medium/10 text-medium">
                           <span className="material-symbols-outlined text-[20px]">
                             pets
                           </span>
@@ -922,14 +922,14 @@ const MediumNodeChallengePage = () => {
                     <div className="flex flex-wrap gap-4 mt-2">
                       <button
                         onClick={goBackToRoadmap}
-                        className="flex-1 min-w-[150px] rounded-xl border border-[#263b44] bg-[#1a2b36] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#203442] transition-colors"
+                        className="flex-1 min-w-[150px] rounded-xl border border-outline/20 bg-surface px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors"
                       >
                         Back to Roadmap
                       </button>
                       <button
                         onClick={goToNextChallenge}
                         disabled={nextChallengeLoading}
-                        className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 min-w-[150px] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white hover:bg-medium/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                       >
                         {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                       </button>
@@ -953,8 +953,8 @@ const MediumNodeChallengePage = () => {
                   </span>
                 </button>
 
-                <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
-                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
+                <div className="rounded-xl bg-surface px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(3,105,161,0.06)] transition-colors duration-300">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-medium bg-medium/10 text-medium shadow-[0_0_30px_rgba(3,105,161,0.2)]">
                     <span className="material-symbols-outlined text-[46px]">
                       star
                     </span>
@@ -966,11 +966,11 @@ const MediumNodeChallengePage = () => {
                     Accomplished
                   </h2>
 
-                  <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#1b3440]/70 p-4">
+                  <div className="mt-6 rounded-lg border border-outline/20 bg-medium/5 p-4 transition-colors duration-300">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-medium/30 bg-medium/10 text-medium">
                         <span className="material-symbols-outlined text-[24px]">
-                          psychology
+                          pets
                         </span>
                       </div>
                       <div>
@@ -982,7 +982,7 @@ const MediumNodeChallengePage = () => {
                             {result.explanation}
                           </p>
                         )}
-                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-medium">
                           {petName}
                         </p>
                       </div>
@@ -990,23 +990,23 @@ const MediumNodeChallengePage = () => {
                   </div>
 
                   <div className="mt-7 grid grid-cols-2 gap-4">
-                    <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
+                    <div className="rounded-lg bg-surface-container-high px-4 py-4 text-center transition-colors duration-300">
                       <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
                         Reward
                       </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
+                      <p className="mt-2 text-[24px] font-extrabold leading-none text-medium">
                         +{challenge.xp}
                       </p>
-                      <p className="text-[18px] font-bold text-[#63f1e3]">XP</p>
+                      <p className="text-[18px] font-bold text-medium">XP</p>
                     </div>
-                    <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
+                    <div className="rounded-lg bg-surface-container-high px-4 py-4 text-center transition-colors duration-300">
                       <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
                         Bonus
                       </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
+                      <p className="mt-2 text-[24px] font-extrabold leading-none text-secondary">
                         +10
                       </p>
-                      <p className="text-[18px] font-bold text-[#f5c6ff]">
+                      <p className="text-[18px] font-bold text-secondary">
                         Stars
                       </p>
                     </div>
@@ -1015,7 +1015,7 @@ const MediumNodeChallengePage = () => {
                   <button
                     onClick={goToNextChallenge}
                     disabled={nextChallengeLoading}
-                    className="mt-7 w-full rounded-lg bg-[#63f1e3] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#052023] shadow-[0_10px_28px_rgba(99,241,227,0.24)] transition hover:bg-[#86fff4] disabled:cursor-wait disabled:opacity-70"
+                    className="mt-7 w-full rounded-lg bg-medium px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-medium/80"
                   >
                     {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                     <span className="ml-2">→</span>
