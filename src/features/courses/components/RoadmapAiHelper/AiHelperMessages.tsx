@@ -174,27 +174,27 @@ export function AiHelperMessages({
               className="ai-shimmer h-3 w-[85%] rounded-full"
               style={{ backgroundColor: `${aiPrimary}20` }}
             />
-          <div
-            className="ai-shimmer h-3 w-[70%] rounded-full"
-            style={{
-              backgroundColor: `${aiSecondary}20`,
-              animationDelay: "0.15s",
-            }}
-          />
-          <div
-            className="ai-shimmer h-3 w-[90%] rounded-full"
-            style={{
-              backgroundColor: `${aiPrimary}15`,
-              animationDelay: "0.3s",
-            }}
-          />
-          <div
-            className="ai-shimmer h-3 w-[60%] rounded-full"
-            style={{
-              backgroundColor: `${aiSecondary}20`,
-              animationDelay: "0.45s",
-            }}
-          />
+            <div
+              className="ai-shimmer h-3 w-[70%] rounded-full"
+              style={{
+                backgroundColor: `${aiSecondary}20`,
+                animationDelay: "0.15s",
+              }}
+            />
+            <div
+              className="ai-shimmer h-3 w-[90%] rounded-full"
+              style={{
+                backgroundColor: `${aiPrimary}15`,
+                animationDelay: "0.3s",
+              }}
+            />
+            <div
+              className="ai-shimmer h-3 w-[60%] rounded-full"
+              style={{
+                backgroundColor: `${aiSecondary}20`,
+                animationDelay: "0.45s",
+              }}
+            />
           </div>
         </div>
       )}

@@ -22,7 +22,7 @@ const RoadmapPage = () => {
     Promise.all([
       courseApi.getEasyRoadmap(courseSlug).catch(() => null),
       courseApi.getMediumRoadmap(courseSlug).catch(() => null),
-      courseApi.getHardRoadmap(courseSlug).catch(() => null)
+      courseApi.getHardRoadmap(courseSlug).catch(() => null),
     ]).then(([easy, medium, hard]) => {
       if (!alive) return;
       let total = 0;
@@ -30,7 +30,10 @@ const RoadmapPage = () => {
 
       const processRoadmap = (roadmap: any) => {
         if (!roadmap) return;
-        if (typeof roadmap.completedNodes === "number" && typeof roadmap.totalNodes === "number") {
+        if (
+          typeof roadmap.completedNodes === "number" &&
+          typeof roadmap.totalNodes === "number"
+        ) {
           completed += roadmap.completedNodes;
           total += roadmap.totalNodes;
         } else if (roadmap.chapters) {
@@ -56,7 +59,9 @@ const RoadmapPage = () => {
       }
     });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [isAuthenticated]);
 
   return (
@@ -95,7 +100,6 @@ const RoadmapPage = () => {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-4">
           {/* Card 1: Python */}
           <div className="bg-surface rounded-2xl border border-outline/30 p-6 flex flex-col hover:border-primary-fixed-dim/50 hover:shadow-[0_8px_30px_rgba(0,128,128,0.2)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
-
             {/* Logo Wrapper */}
             <div className="h-[100px] w-full bg-primary-fixed-dim/10 border border-primary-fixed-dim/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-primary-fixed-dim/20 transition-colors">
               <svg
@@ -140,7 +144,6 @@ const RoadmapPage = () => {
                 ></div>
               </div>
             </div>
-
 
             {/* Action Button */}
             <Link
@@ -360,7 +363,6 @@ const RoadmapPage = () => {
             </button>
           </div>
         </section>
-
       </div>
     </main>
   );

@@ -621,10 +621,12 @@ const MediumNodeChallengePage = () => {
               onClick={goBackToRoadmap}
               className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
             >
-              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[16px]">
+                arrow_back
+              </span>
               Back to Roadmap
             </button>
-            
+
             <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
               <span>Medium Checkpoint</span>
             </div>
@@ -876,14 +878,17 @@ const MediumNodeChallengePage = () => {
                   </div>
                 )}
 
-                {result && !result.correct && !isReviewMode && !isLockedMode && (
-                  <button
-                    onClick={handleTryAgain}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
-                  >
-                    Try Again
-                  </button>
-                )}
+                {result &&
+                  !result.correct &&
+                  !isReviewMode &&
+                  !isLockedMode && (
+                    <button
+                      onClick={handleTryAgain}
+                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
+                    >
+                      Try Again
+                    </button>
+                  )}
 
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
@@ -914,7 +919,9 @@ const MediumNodeChallengePage = () => {
                       </div>
 
                       <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                        {isReviewMode && data.review ? data.review.explanation : result?.explanation}
+                        {isReviewMode && data.review
+                          ? data.review.explanation
+                          : result?.explanation}
                       </p>
                     </div>
 

@@ -333,10 +333,12 @@ const EasyNodeChallengePage = () => {
             onClick={goBackToRoadmap}
             className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span className="material-symbols-outlined text-[16px]">
+              arrow_back
+            </span>
             Back to Roadmap
           </button>
-          
+
           <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
             <span>Easy Checkpoint</span>
           </div>
@@ -538,7 +540,9 @@ const EasyNodeChallengePage = () => {
                         </div>
 
                         <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                          {isReviewMode && review ? review.explanation : result?.explanation}
+                          {isReviewMode && review
+                            ? review.explanation
+                            : result?.explanation}
                         </p>
                       </div>
 
@@ -555,7 +559,9 @@ const EasyNodeChallengePage = () => {
                           disabled={nextChallengeLoading}
                           className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                          {nextChallengeLoading
+                            ? "Loading..."
+                            : "Next Challenge"}
                         </button>
                       </div>
                     </div>
@@ -591,7 +597,7 @@ const EasyNodeChallengePage = () => {
 
                       <div className="mt-6 rounded-lg border border-outline/20 bg-easy/5 p-4 transition-colors duration-300">
                         <div className="flex items-start gap-3">
-                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-easy/30 bg-easy/10 text-easy">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-easy/30 bg-easy/10 text-easy">
                             <span className="material-symbols-outlined text-[24px]">
                               pets
                             </span>
@@ -620,9 +626,7 @@ const EasyNodeChallengePage = () => {
                           <p className="mt-2 text-[24px] font-extrabold leading-none text-easy">
                             +{challenge.xp}
                           </p>
-                          <p className="text-[18px] font-bold text-easy">
-                            XP
-                          </p>
+                          <p className="text-[18px] font-bold text-easy">XP</p>
                         </div>
                         <div className="rounded-lg bg-surface-container-high px-4 py-4 text-center transition-colors duration-300">
                           <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
