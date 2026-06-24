@@ -22,11 +22,16 @@ const resolveDailyMissionRedirect = (
 ) => {
   if (!redirect) return { to: "/" };
   switch (redirect.routeType) {
-    case "COURSE":
+    case "COURSE": {
+      const slug =
+        redirect.targetId && redirect.targetId !== "python"
+          ? redirect.targetId
+          : "python-basic";
       return {
         to: "/courses/$courseId" as const,
-        params: { courseId: redirect.targetId || "python" },
+        params: { courseId: slug },
       };
+    }
     case "ROADMAP_NODE":
       return { to: "/roadmap" }; // adjust if you have node routes
     case "QUIZ":
@@ -38,6 +43,8 @@ const resolveDailyMissionRedirect = (
       return { to: "/arena" };
     case "HARD_LEVEL":
       return { to: "/roadmap" };
+    case "LOGIN":
+      return { to: "/login" };
     default:
       return { to: "/" };
   }

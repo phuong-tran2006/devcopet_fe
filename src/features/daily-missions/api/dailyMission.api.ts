@@ -8,7 +8,8 @@ export type DailyMissionRedirectRouteType =
   | "QUIZ"
   | "ARENA"
   | "HARD_LEVEL"
-  | "DASHBOARD";
+  | "DASHBOARD"
+  | "LOGIN";
 
 export interface DailyMissionRedirect {
   routeType: DailyMissionRedirectRouteType;
@@ -19,7 +20,7 @@ export interface DailyMissionRedirect {
 
 export type DailyMissionNotificationItem = {
   id: string;
-  type: "DAILY_MISSION" | "DAILY_PRAISE";
+  type: "DAILY_MISSION" | "DAILY_PRAISE" | "SYSTEM";
   status:
     | "available"
     | "generating"
@@ -27,7 +28,8 @@ export type DailyMissionNotificationItem = {
     | "opened"
     | "completed"
     | "dismissed"
-    | "failed";
+    | "failed"
+    | "auth_required";
   missionId?: string;
   title: string;
   message: string;
@@ -101,6 +103,25 @@ export const dailyMissionApi = {
         } as any,
       );
 
+      if (response.status === 401 || response.status === 403) {
+        return {
+          unreadCount: 1,
+          items: [
+            {
+              id: "auth-required",
+              type: "SYSTEM",
+              status: "auth_required",
+              title: "Please sign in again",
+              message:
+                "Your session expired. Log in again to view daily missions.",
+              ctaLabel: "Login",
+              unread: true,
+              redirect: { routeType: "LOGIN" },
+            },
+          ],
+        };
+      }
+
       if (response.status === 200 && response.data?.items) {
         return response.data as DailyMissionNotificationsResponse;
       }
@@ -163,6 +184,17 @@ export const dailyMissionApi = {
       const response = await api.get("/daily-missions/today", {
         validateStatus: (status: number) => status < 500,
       } as any);
+
+      if (response.status === 401 || response.status === 403) {
+        return {
+          type: "SYSTEM" as any,
+          status: "auth_required" as any,
+          title: "Please sign in again",
+          message: "Your session expired. Log in again to view daily missions.",
+          ctaLabel: "Login",
+          redirect: { routeType: "LOGIN" },
+        };
+      }
 
       if (response.status === 202) {
         return {
