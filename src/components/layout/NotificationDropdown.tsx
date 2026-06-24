@@ -7,69 +7,69 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
+  RefreshCw,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import {
   dailyMissionApi,
-  type DailyMissionNotification,
-  type DailyMissionRedirect,
+  type DailyMissionNotificationItem,
 } from "../../features/daily-missions/api/dailyMission.api";
 
-// ─── Redirect Helper ─────────────────────────────────────────────────────────
-
-function resolveDailyMissionRedirect(
-  redirect: DailyMissionRedirect | null,
-): { to: string; params?: Record<string, string> } | null {
-  if (!redirect) return null;
-
+// Helper to resolve routes
+const resolveDailyMissionRedirect = (
+  redirect: DailyMissionNotificationItem["redirect"],
+) => {
+  if (!redirect) return { to: "/" };
   switch (redirect.routeType) {
-    case "ROADMAP_NODE": {
-      // nodeId format: python-basic-medium-c1-n2
-      const nodeId = redirect.targetId || "";
-      const parts = nodeId.match(/^(.+?)-(easy|medium|hard)-c(\d+)-n(\d+)$/);
-      if (parts) {
-        const courseSlug = parts[1];
-        const mode = parts[2];
-        return {
-          to: `/roadmap/${courseSlug}/${mode}/nodes/${nodeId}/challenge` as any,
-        };
-      }
-      // Fallback: go to roadmap
-      return { to: "/roadmap" };
-    }
-
     case "COURSE":
-      return { to: "/course" };
-
+      return {
+        to: "/courses/$courseId" as const,
+        params: { courseId: redirect.targetId || "python" },
+      };
+    case "ROADMAP_NODE":
+      return { to: "/roadmap" }; // adjust if you have node routes
     case "QUIZ":
-      return { to: "/course" };
-
+      return {
+        to: "/courses/$courseId" as const,
+        params: { courseId: "python" },
+      };
     case "ARENA":
       return { to: "/arena" };
-
     case "HARD_LEVEL":
       return { to: "/roadmap" };
-
-    case "DASHBOARD":
-      return { to: "/profile" };
-
     default:
-      return { to: "/course" };
+      return { to: "/" };
   }
-}
-
-// ─── Component ────────────────────────────────────────────────────────────────
+};
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [missionNotif, setMissionNotif] =
-    useState<DailyMissionNotification | null>(null);
+  const [items, setItems] = useState<DailyMissionNotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [resetting, setResetting] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const retryTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const navigate = useNavigate();
 
-  // Close when clicking outside
+  const fetchNotifications = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await dailyMissionApi.getDailyMissionNotifications(20);
+      setItems(response.items);
+      setUnreadCount(response.unreadCount);
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, [fetchNotifications]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -83,245 +83,187 @@ const NotificationDropdown = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Cleanup retry timeout on unmount
-  useEffect(() => {
-    return () => {
-      if (retryTimeoutRef.current) {
-        clearTimeout(retryTimeoutRef.current);
-      }
-    };
-  }, []);
+  const handleDevReset = async () => {
+    setResetting(true);
+    await dailyMissionApi.resetTodayMissionDev();
+    // In dev mode, we might need to hit /today once to trigger generation
+    await dailyMissionApi._fallbackFromToday();
+    await fetchNotifications();
+    setResetting(false);
+  };
 
-  const fetchMissionNotification = useCallback(async () => {
-    setLoading(true);
-    setError(false);
-    try {
-      const notif = await dailyMissionApi.getDailyMissionNotification();
-      setMissionNotif(notif);
-
-      // Auto-retry if generating
-      if (notif.status === "generating") {
-        const delay = (notif as { retryAfterMs?: number }).retryAfterMs ?? 2000;
-        retryTimeoutRef.current = setTimeout(async () => {
-          try {
-            const retried = await dailyMissionApi.getDailyMissionNotification();
-            setMissionNotif(retried);
-          } catch {
-            // Keep showing generating state
-          }
-        }, delay);
-      }
-    } catch {
-      setError(true);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Fetch when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      fetchMissionNotification();
-    }
-  }, [isOpen, fetchMissionNotification]);
-
-  // Also fetch on mount to get unread badge
-  useEffect(() => {
-    fetchMissionNotification();
-  }, [fetchMissionNotification]);
-
-  const handleNotificationClick = async (notif: DailyMissionNotification) => {
-    if (notif.status === "generating") return;
-
-    // Mark opened if it's an available mission
-    if (notif.status === "available" && notif.missionId) {
-      dailyMissionApi.markDailyMissionOpened(notif.missionId);
-      // Mark as read locally
-      setMissionNotif((prev) =>
-        prev && prev.status === "available" ? { ...prev, unread: false } : prev,
+  const handleItemClick = async (item: DailyMissionNotificationItem) => {
+    if (item.status === "available" && item.missionId) {
+      await dailyMissionApi.markDailyMissionOpened(item.missionId);
+      // Optimistically update unread count
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      setItems((prev) =>
+        prev.map((i) =>
+          i.id === item.id ? { ...i, status: "opened", unread: false } : i,
+        ),
       );
     }
 
-    // Resolve redirect
-    const target = resolveDailyMissionRedirect(notif.redirect);
-    if (target) {
-      navigate(target as any);
+    if (item.redirect) {
+      navigate(resolveDailyMissionRedirect(item.redirect) as any);
+      setIsOpen(false);
     }
-    setIsOpen(false);
   };
 
-  const handleMarkAllRead = () => {
-    setMissionNotif((prev) =>
-      prev && prev.status === "available" ? { ...prev, unread: false } : prev,
-    );
-  };
+  const renderIcon = (item: DailyMissionNotificationItem) => {
+    if (item.type === "DAILY_PRAISE") {
+      return (
+        <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400">
+          <Sparkles size={20} />
+        </div>
+      );
+    }
 
-  const hasUnread =
-    missionNotif?.status === "available" && missionNotif?.unread === true;
+    switch (item.status) {
+      case "available":
+      case "opened":
+        return (
+          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-indigo-500/10 text-indigo-400 ring-1 ring-indigo-500/20">
+            <Target size={20} />
+          </div>
+        );
+      case "generating":
+        return (
+          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-purple-500/10 text-purple-400">
+            <Loader2 size={20} className="animate-spin" />
+          </div>
+        );
+      case "completed":
+        return (
+          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-emerald-500/10 text-emerald-400">
+            <CheckCircle2 size={20} />
+          </div>
+        );
+      case "dismissed":
+        return (
+          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-zinc-500/10 text-zinc-400">
+            <XCircle size={20} />
+          </div>
+        );
+      default:
+        return (
+          <div className="flex-shrink-0 flex items-center justify-center w-10 h-10 rounded-full bg-zinc-500/10 text-zinc-400">
+            <AlertCircle size={20} />
+          </div>
+        );
+    }
+  };
 
   return (
     <div className="relative" ref={dropdownRef}>
+      {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center transition-all text-on-surface relative ${
-          isOpen ? "bg-on-surface/10" : "hover:bg-on-surface/10"
-        }`}
+        className="relative p-2 text-zinc-400 hover:text-white transition-colors rounded-full hover:bg-white/5"
       >
-        <Bell className="w-5 h-5" strokeWidth={1.5} />
-        {/* Unread Badge */}
-        {hasUnread && (
-          <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#4ade80] text-[10px] flex items-center justify-center text-black font-bold animate-pulse">
-            1
-          </span>
+        <Bell size={20} />
+        {unreadCount > 0 && (
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-indigo-500 rounded-full" />
         )}
       </button>
 
       {/* Dropdown Panel */}
-      <div
-        className={`absolute top-[52px] right-[-80px] w-[340px] bg-surface-container-high/95 backdrop-blur-xl border border-on-surface/10 rounded-[1.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.2)] overflow-hidden transition-all duration-300 origin-top-right z-50 ${
-          isOpen
-            ? "opacity-100 scale-100 visible"
-            : "opacity-0 scale-95 invisible"
-        }`}
-      >
-        {/* Header */}
-        <div className="px-6 py-5 border-b border-on-surface/10 flex justify-between items-center">
-          <h3 className="font-headline-sm text-[18px] font-bold text-on-surface">
-            Notifications
-          </h3>
-          {hasUnread && (
-            <button
-              onClick={handleMarkAllRead}
-              className="text-primary-fixed-dim text-[11px] font-bold tracking-widest uppercase hover:text-primary-fixed transition-colors"
-            >
-              MARK ALL AS READ
-            </button>
-          )}
-        </div>
-
-        {/* Content */}
-        <div className="p-4 flex flex-col gap-3 max-h-[400px] overflow-y-auto custom-scrollbar">
-          {/* Loading State */}
-          {loading && !missionNotif && (
-            <div className="py-8 flex flex-col items-center justify-center gap-3">
-              <Loader2 className="w-6 h-6 text-primary-fixed-dim animate-spin" />
-              <span className="text-sm text-on-surface-variant">
-                Loading your missions…
-              </span>
-            </div>
-          )}
-
-          {/* Error State */}
-          {error && !missionNotif && (
-            <div className="py-8 flex flex-col items-center justify-center gap-3">
-              <AlertCircle className="w-6 h-6 text-on-surface-variant/50" />
-              <span className="text-sm text-on-surface-variant text-center">
-                Couldn't load notifications right now.
-              </span>
+      {isOpen && (
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+          {/* Header */}
+          <div className="px-4 py-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
+            <h3 className="font-medium text-white">Notifications</h3>
+            {import.meta.env.DEV && (
               <button
-                onClick={fetchMissionNotification}
-                className="text-xs text-primary-fixed-dim font-bold uppercase tracking-wider hover:text-primary-fixed transition-colors"
+                onClick={handleDevReset}
+                disabled={resetting}
+                title="Dev Only: Reset Today's Mission"
+                className="text-xs flex items-center gap-1.5 px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors disabled:opacity-50"
               >
-                Try again
+                <RefreshCw
+                  size={12}
+                  className={resetting ? "animate-spin" : ""}
+                />
+                Reset Mission
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
-          {/* Mission Notification */}
-          {missionNotif && !loading && (
-            <>
-              {/* ── Available Mission ── */}
-              {missionNotif.status === "available" && (
-                <div
-                  onClick={() => handleNotificationClick(missionNotif)}
-                  className="bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex gap-4 relative cursor-pointer hover:bg-on-surface/10 transition-colors group"
-                >
-                  {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#4ade80]/15 text-[#4ade80]">
-                    <Target className="w-6 h-6" />
-                  </div>
+          {/* List */}
+          <div className="max-h-[420px] overflow-y-auto">
+            {loading && items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-zinc-500">
+                <Loader2 size={24} className="animate-spin mb-2" />
+                <span className="text-sm">Loading notifications...</span>
+              </div>
+            ) : items.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-8 text-zinc-500">
+                <Bell size={24} className="mb-2 opacity-50" />
+                <span className="text-sm">No notifications yet</span>
+              </div>
+            ) : (
+              <div className="flex flex-col divide-y divide-zinc-800/50">
+                {items.map((item, index) => {
+                  const isTopActive =
+                    index === 0 &&
+                    (item.status === "available" ||
+                      item.status === "opened" ||
+                      item.status === "generating" ||
+                      item.type === "DAILY_PRAISE");
 
-                  {/* Content */}
-                  <div className="flex flex-col flex-1 pr-4">
-                    <span className="text-[15px] font-bold text-on-surface mb-1">
-                      {missionNotif.title}
-                    </span>
-                    <span className="text-[13px] font-['Open_Sans'] italic text-on-surface-variant leading-relaxed">
-                      {missionNotif.message}
-                    </span>
-                    {missionNotif.ctaLabel && (
-                      <span className="text-[12px] font-bold text-primary-fixed-dim mt-2 group-hover:text-primary-fixed transition-colors uppercase tracking-wider">
-                        {missionNotif.ctaLabel} →
-                      </span>
-                    )}
-                  </div>
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleItemClick(item)}
+                      className={`group relative flex items-start p-4 transition-colors cursor-pointer ${
+                        item.unread ? "bg-indigo-500/5" : "hover:bg-zinc-800/50"
+                      } ${isTopActive ? "bg-zinc-800/20" : ""}`}
+                    >
+                      {item.unread && (
+                        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-indigo-500" />
+                      )}
 
-                  {/* Unread indicator */}
-                  {missionNotif.unread && (
-                    <div className="absolute top-[18px] right-[18px] w-2.5 h-2.5 rounded-full bg-[#4ade80] animate-pulse" />
-                  )}
-                </div>
-              )}
+                      {renderIcon(item)}
 
-              {/* ── Generating State ── */}
-              {missionNotif.status === "generating" && (
-                <div className="bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex gap-4">
-                  {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#fbbf24]/15 text-[#fbbf24]">
-                    <Loader2 className="w-6 h-6 animate-spin" />
-                  </div>
+                      <div className="ml-3 flex-1 min-w-0">
+                        <p
+                          className={`text-sm font-medium truncate ${
+                            item.unread ? "text-white" : "text-zinc-200"
+                          }`}
+                        >
+                          {item.title}
+                        </p>
+                        <p className="text-sm text-zinc-400 mt-0.5 line-clamp-2">
+                          {item.message}
+                        </p>
 
-                  {/* Content */}
-                  <div className="flex flex-col flex-1">
-                    <span className="text-[15px] font-bold text-on-surface mb-1">
-                      {missionNotif.title}
-                    </span>
-                    <span className="text-[13px] font-['Open_Sans'] italic text-on-surface-variant leading-relaxed">
-                      {missionNotif.message}
-                    </span>
-                  </div>
-                </div>
-              )}
-
-              {/* ── Empty / Praise ── */}
-              {missionNotif.status === "empty" && (
-                <div
-                  onClick={() => handleNotificationClick(missionNotif)}
-                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex gap-4 ${
-                    missionNotif.redirect
-                      ? "cursor-pointer hover:bg-on-surface/10 transition-colors group"
-                      : ""
-                  }`}
-                >
-                  {/* Icon */}
-                  <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-[#b3a6d9]/20 text-[#b3a6d9]">
-                    {missionNotif.redirect ? (
-                      <Trophy className="w-6 h-6" />
-                    ) : (
-                      <Sparkles className="w-6 h-6" />
-                    )}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex flex-col flex-1">
-                    <span className="text-[15px] font-bold text-on-surface mb-1">
-                      {missionNotif.title}
-                    </span>
-                    <span className="text-[13px] font-['Open_Sans'] italic text-on-surface-variant leading-relaxed">
-                      {missionNotif.message}
-                    </span>
-                    {missionNotif.ctaLabel && missionNotif.redirect && (
-                      <span className="text-[12px] font-bold text-primary-fixed-dim mt-2 group-hover:text-primary-fixed transition-colors uppercase tracking-wider">
-                        {missionNotif.ctaLabel} →
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
+                        {(item.status === "available" ||
+                          item.status === "opened") &&
+                          item.ctaLabel && (
+                            <div className="mt-2 inline-flex items-center text-xs font-medium text-indigo-400 group-hover:text-indigo-300 transition-colors">
+                              {item.ctaLabel}{" "}
+                              <span className="ml-1 group-hover:translate-x-0.5 transition-transform">
+                                →
+                              </span>
+                            </div>
+                          )}
+                        {item.type === "DAILY_PRAISE" && item.ctaLabel && (
+                          <div className="mt-2 inline-flex items-center text-xs font-medium text-emerald-400 group-hover:text-emerald-300 transition-colors">
+                            {item.ctaLabel}{" "}
+                            <span className="ml-1 group-hover:translate-x-0.5 transition-transform">
+                              →
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

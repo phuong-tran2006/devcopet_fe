@@ -17,6 +17,43 @@ export interface DailyMissionRedirect {
   targetId?: string;
 }
 
+export type DailyMissionNotificationItem = {
+  id: string;
+  type: "DAILY_MISSION" | "DAILY_PRAISE";
+  status:
+    | "available"
+    | "generating"
+    | "empty"
+    | "opened"
+    | "completed"
+    | "dismissed"
+    | "failed";
+  missionId?: string;
+  title: string;
+  message: string;
+  ctaLabel?: string;
+  unread: boolean;
+  localDate?: string;
+  generatedAt?: string;
+  completedAt?: string;
+  dismissedAt?: string;
+  openedAt?: string;
+  actionType?: string;
+  targetType?: string;
+  targetId?: string;
+  reasonCode?: string;
+  estimatedMinutes?: number;
+  generationMode?: "AI" | "FALLBACK";
+  redirect: DailyMissionRedirect | null;
+};
+
+export interface DailyMissionNotificationsResponse {
+  unreadCount: number;
+  items: DailyMissionNotificationItem[];
+}
+
+// ─── Legacy Single Notification Type (for fallback) ──────────────────────────
+
 export type DailyMissionNotification =
   | {
       type: "DAILY_MISSION";
@@ -49,11 +86,59 @@ export type DailyMissionNotification =
 
 export const dailyMissionApi = {
   /**
-   * Fetch the daily mission notification.
-   * Tries /daily-missions/notification first, falls back to /daily-missions/today.
+   * Fetch the daily mission notifications (list).
+   * Tries /daily-missions/notifications first, falls back to legacy methods if 404.
+   */
+  getDailyMissionNotifications: async (
+    limit: number = 20,
+  ): Promise<DailyMissionNotificationsResponse> => {
+    try {
+      const response = await api.get(
+        `/daily-missions/notifications?limit=${limit}`,
+        {
+          _skipAuthRedirect: true,
+          validateStatus: (status: number) => status < 500,
+        } as any,
+      );
+
+      if (response.status === 200 && response.data?.items) {
+        return response.data as DailyMissionNotificationsResponse;
+      }
+    } catch {
+      // Network error or other issue, fall through to fallback
+    }
+
+    // Fallback: build a single item array using the old notification logic
+    const singleNotif = await dailyMissionApi.getDailyMissionNotification();
+
+    // Convert to DailyMissionNotificationItem format
+    const item: DailyMissionNotificationItem = {
+      id:
+        singleNotif.status === "available"
+          ? singleNotif.missionId || "1"
+          : "fallback",
+      type: singleNotif.type,
+      status: singleNotif.status,
+      missionId:
+        singleNotif.status === "available" ? singleNotif.missionId : undefined,
+      title: singleNotif.title,
+      message: singleNotif.message,
+      ctaLabel: (singleNotif as any).ctaLabel,
+      unread: singleNotif.status === "available" ? !!singleNotif.unread : false,
+      redirect: singleNotif.redirect,
+    };
+
+    return {
+      unreadCount:
+        singleNotif.status === "available" && singleNotif.unread ? 1 : 0,
+      items: [item],
+    };
+  },
+
+  /**
+   * Fetch a single daily mission notification (Legacy fallback).
    */
   getDailyMissionNotification: async (): Promise<DailyMissionNotification> => {
-    // Try the dedicated notification endpoint first
     try {
       const response = await api.get("/daily-missions/notification", {
         _skipAuthRedirect: true,
@@ -63,12 +148,10 @@ export const dailyMissionApi = {
       if (response.status === 200 && response.data?.type) {
         return response.data as DailyMissionNotification;
       }
-      // If 404 or unexpected shape, fall through to fallback
     } catch {
-      // Network error or other issue, fall through to fallback
+      // Fallback
     }
 
-    // Fallback: use /daily-missions/today
     return dailyMissionApi._fallbackFromToday();
   },
 
@@ -81,7 +164,6 @@ export const dailyMissionApi = {
         validateStatus: (status: number) => status < 500,
       } as any);
 
-      // HTTP 202: generating
       if (response.status === 202) {
         return {
           type: "DAILY_MISSION",
@@ -93,7 +175,6 @@ export const dailyMissionApi = {
         };
       }
 
-      // HTTP 204 or null body: empty / praise
       if (
         response.status === 204 ||
         !response.data ||
@@ -114,10 +195,7 @@ export const dailyMissionApi = {
         };
       }
 
-      // HTTP 200 with mission data
       const mission = response.data;
-
-      // If mission is already completed
       if (mission.status === "COMPLETED" || mission.status === "DISMISSED") {
         return {
           type: "DAILY_PRAISE",
@@ -151,7 +229,6 @@ export const dailyMissionApi = {
         },
       };
     } catch {
-      // If everything fails, return a praise fallback
       return {
         type: "DAILY_PRAISE",
         status: "empty",
@@ -170,6 +247,17 @@ export const dailyMissionApi = {
       await api.patch(`/daily-missions/${missionId}/opened`);
     } catch (error) {
       console.warn("Failed to mark daily mission as opened:", error);
+    }
+  },
+
+  /**
+   * Reset today's mission (DEV ONLY)
+   */
+  resetTodayMissionDev: async (): Promise<void> => {
+    try {
+      await api.post("/daily-missions/dev/reset-today");
+    } catch (error) {
+      console.warn("Failed to reset mission:", error);
     }
   },
 };
