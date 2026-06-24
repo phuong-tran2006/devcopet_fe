@@ -81,12 +81,9 @@ const Header = () => {
           {isAuthenticated ? (
             <>
               {!isOnboarding && (
-                <button
-                  onClick={() => triggerHaptic(40)}
-                  className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
-                >
-                  <Bell size={20} />
-                </button>
+                <div onClick={() => triggerHaptic(40)}>
+                  <NotificationDropdown />
+                </div>
               )}
               <button
                 onClick={toggleTheme}
