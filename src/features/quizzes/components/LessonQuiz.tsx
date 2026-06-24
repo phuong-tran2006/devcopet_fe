@@ -3,11 +3,17 @@ import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
+import { useAuthStore } from "../../users/store/auth.store";
 
 // ─── States ────────────────────────────────────────────────────────────────
 // idle | loading | active | submitting | finished | not_found
 
-const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
+const LessonQuizInner = ({
+  lessonId,
+  onQuizPassed,
+  onFinishReview,
+  onXpAwarded,
+}) => {
   const [phase, setPhase] = useState("idle");
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
@@ -79,6 +85,18 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
       try {
         const res = await submitQuiz(quiz._id, answersPayload);
         setResult(res);
+
+        const { xpAwarded, userProgress } = res;
+        if (xpAwarded && xpAwarded > 0) {
+          onXpAwarded?.(xpAwarded);
+        }
+        if (userProgress) {
+          useAuthStore.getState().updateUser({
+            exp: userProgress.exp,
+            level: userProgress.level,
+          });
+        }
+
         if (res?.passed) {
           onQuizPassed?.();
         }
@@ -615,6 +633,44 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
         </button>
       </div>
     </div>
+  );
+};
+
+const LessonQuiz = (props) => {
+  const [xpToast, setXpToast] = useState(null);
+
+  const handleXpAwarded = (xp) => {
+    setXpToast(xp);
+    setTimeout(() => setXpToast(null), 3500);
+  };
+
+  return (
+    <>
+      <LessonQuizInner {...props} onXpAwarded={handleXpAwarded} />
+      {xpToast !== null && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+          <style>{`
+            @keyframes fadeInDown {
+              0% { opacity: 0; transform: translate(-50%, -20px); }
+              10% { opacity: 1; transform: translate(-50%, 0); }
+              90% { opacity: 1; transform: translate(-50%, 0); }
+              100% { opacity: 0; transform: translate(-50%, -20px); }
+            }
+            .animate-xp-toast {
+              animation: fadeInDown 3.5s ease-in-out forwards;
+            }
+          `}</style>
+          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#63f1e3]">
+              stars
+            </span>
+            <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
+              +{xpToast} XP
+            </span>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 

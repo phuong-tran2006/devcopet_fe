@@ -93,15 +93,20 @@ const ArenaHistoryPage = () => {
     const opponentScore = match.finalScoreboard?.find(
       (item) => item.userId !== meId,
     );
+    const isCompletedOrFinished =
+      match.status === "finished" ||
+      match.status === "completed" ||
+      match.status === "cancelled" ||
+      match.status === "disconnected";
     const isDraw =
       match.resultType === "draw" ||
-      (!match.winnerUserId && match.status === "finished");
+      (!match.resultType && !match.winnerUserId && isCompletedOrFinished);
     const result = isDraw
       ? "DRAW"
       : match.winnerUserId === meId
         ? "WIN"
-        : match.status === "finished"
-          ? "LOSS"
+        : isCompletedOrFinished
+          ? "DEFEAT"
           : (match.status || "UNKNOWN").toUpperCase();
     const ratingChange =
       match.ratingChanges?.find((item) => item.userId === meId)?.delta ??
@@ -147,7 +152,7 @@ const ArenaHistoryPage = () => {
         {matches.map((match, index) => {
           const view = getMatchView(match);
           const isWin = view.result === "WIN";
-          const isLoss = view.result === "LOSS";
+          const isLoss = view.result === "LOSS" || view.result === "DEFEAT";
           const isDraw = view.result === "DRAW";
 
           return (

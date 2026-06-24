@@ -100,10 +100,7 @@ const buildTemplateRows = (template: string): TemplateRow[] => {
       );
 
       // Replace 3+ underscores with synthetic blank drop zones
-      line = line.replace(
-        /_{3,}/g,
-        () => `[blank_${anonymousBlankIndex++}]`,
-      );
+      line = line.replace(/_{3,}/g, () => `[blank_${anonymousBlankIndex++}]`);
 
       // 3. Inspect matches after all normalizations are done
       const matches = [...line.matchAll(DROP_ZONE_REGEX)];
@@ -169,8 +166,6 @@ const CodeSnippetCard = ({
   );
 };
 
-
-
 const HardNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -203,6 +198,7 @@ const HardNodeChallengePage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [xpToast, setXpToast] = useState<number | null>(null);
 
   const challenge = data?.challenge ?? null;
   const isReviewMode = data?.node.status === "completed" && !!data.review;
@@ -540,6 +536,19 @@ const HardNodeChallengePage = () => {
     try {
       const res = await courseApi.submitHardNodeChallenge(nodeId!, payload);
       setResult(res);
+
+      const { xpAwarded, userProgress } = res;
+      if (xpAwarded && xpAwarded > 0) {
+        setXpToast(xpAwarded);
+        window.setTimeout(() => setXpToast(null), 3500);
+      }
+      if (userProgress) {
+        useAuthStore.getState().updateUser({
+          exp: userProgress.exp,
+          level: userProgress.level,
+        });
+      }
+
       if (res.correct) {
         setShowSuccessModal(true);
       }
@@ -605,10 +614,12 @@ const HardNodeChallengePage = () => {
             onClick={goBackToRoadmap}
             className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span className="material-symbols-outlined text-[16px]">
+              arrow_back
+            </span>
             Back to Roadmap
           </button>
-          
+
           <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
             <span>Hard Checkpoint</span>
           </div>
@@ -732,8 +743,8 @@ const HardNodeChallengePage = () => {
                 {isDragDropMatching && dragDropChallenge && (
                   <div className="flex flex-col gap-6">
                     <p className="text-[13px] text-on-surface-variant font-medium">
-                      Select an item on the left, then a choice on the right to match
-                      them.
+                      Select an item on the left, then a choice on the right to
+                      match them.
                     </p>
                     <div className="grid grid-cols-2 gap-6">
                       <div className="flex flex-col gap-3">
@@ -745,7 +756,9 @@ const HardNodeChallengePage = () => {
                               key={item.id}
                               onClick={() =>
                                 canEdit &&
-                                setSelectedMatchItem(isSelected ? null : item.id)
+                                setSelectedMatchItem(
+                                  isSelected ? null : item.id,
+                                )
                               }
                               disabled={!canEdit}
                               className={`
@@ -766,22 +779,26 @@ const HardNodeChallengePage = () => {
                       </div>
                       <div className="flex flex-col gap-3">
                         {dragDropChallenge.choices.map((choice) => {
-                          const matchedItemId = Object.keys(activeMatchingMap).find(
-                            (k) => activeMatchingMap[k] === choice.id,
-                          );
+                          const matchedItemId = Object.keys(
+                            activeMatchingMap,
+                          ).find((k) => activeMatchingMap[k] === choice.id);
                           const matchedItem = dragDropChallenge.items.find(
                             (i) => i.id === matchedItemId,
                           );
                           const isCorrectMatch =
                             canRevealAnswerDetails &&
-                            correctMatchingMap?.[matchedItemId || ""] === choice.id;
+                            correctMatchingMap?.[matchedItemId || ""] ===
+                              choice.id;
                           const isIncorrectMatch =
                             canRevealAnswerDetails &&
                             matchedItemId &&
                             !isCorrectMatch;
 
                           return (
-                            <div key={choice.id} className="flex items-center gap-3">
+                            <div
+                              key={choice.id}
+                              className="flex items-center gap-3"
+                            >
                               <button
                                 onClick={() => {
                                   if (!canEdit) return;
@@ -916,9 +933,9 @@ const HardNodeChallengePage = () => {
                       </p>
                       <div className="flex flex-col gap-2">
                         {hardFillChallenge.poolItems.map((item) => {
-                          const isUsed = Object.values(activeDropZoneMap).includes(
-                            item.id,
-                          );
+                          const isUsed = Object.values(
+                            activeDropZoneMap,
+                          ).includes(item.id);
                           const isSelected = selectedPoolItemId === item.id;
 
                           return (
@@ -927,7 +944,9 @@ const HardNodeChallengePage = () => {
                               type="button"
                               onClick={() => {
                                 if (!canEdit || isUsed) return;
-                                setSelectedPoolItemId(isSelected ? null : item.id);
+                                setSelectedPoolItemId(
+                                  isSelected ? null : item.id,
+                                );
                               }}
                               disabled={!canEdit || isUsed}
                               className={[
@@ -964,7 +983,8 @@ const HardNodeChallengePage = () => {
                       const step = orderingItems.find((s) => s.id === id);
                       if (!step) return null;
                       const isCorrect =
-                        canRevealAnswerDetails && correctOrderedIds?.[index] === id;
+                        canRevealAnswerDetails &&
+                        correctOrderedIds?.[index] === id;
                       const isIncorrect =
                         canRevealAnswerDetails &&
                         correctOrderedIds &&
@@ -982,319 +1002,355 @@ const HardNodeChallengePage = () => {
                           <div className="flex flex-col gap-1">
                             <button
                               onClick={() => {
-                                  if (!canEdit || index === 0) return;
-                                  const newIds = [...orderedIds];
-                                  [newIds[index - 1], newIds[index]] = [
-                                    newIds[index],
-                                    newIds[index - 1],
-                                  ];
-                                  setOrderedIds(newIds);
-                                }}
-                                disabled={!canEdit || index === 0}
-                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  keyboard_arrow_up
-                                </span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  if (!canEdit || index === orderedIds.length - 1)
-                                    return;
-                                  const newIds = [...orderedIds];
-                                  [newIds[index + 1], newIds[index]] = [
-                                    newIds[index],
-                                    newIds[index + 1],
-                                  ];
-                                  setOrderedIds(newIds);
-                                }}
-                                disabled={!canEdit || index === orderedIds.length - 1}
-                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  keyboard_arrow_down
-                                </span>
-                              </button>
-                            </div>
-                            <div className="w-6 h-6 rounded-full bg-on-surface/10 flex items-center justify-center text-[11px] font-bold text-on-surface-variant">
-                              {index + 1}
-                            </div>
-                            <span className="text-[14px] font-semibold flex-1">
-                              {step.text}
-                            </span>
-                            {isCorrect && (
-                              <span className="material-symbols-outlined text-[#63f1e3]">
-                                check_circle
+                                if (!canEdit || index === 0) return;
+                                const newIds = [...orderedIds];
+                                [newIds[index - 1], newIds[index]] = [
+                                  newIds[index],
+                                  newIds[index - 1],
+                                ];
+                                setOrderedIds(newIds);
+                              }}
+                              disabled={!canEdit || index === 0}
+                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">
+                                keyboard_arrow_up
                               </span>
-                            )}
-                            {isIncorrect && (
-                              <span className="material-symbols-outlined text-red-400">
-                                cancel
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (!canEdit || index === orderedIds.length - 1)
+                                  return;
+                                const newIds = [...orderedIds];
+                                [newIds[index + 1], newIds[index]] = [
+                                  newIds[index],
+                                  newIds[index + 1],
+                                ];
+                                setOrderedIds(newIds);
+                              }}
+                              disabled={
+                                !canEdit || index === orderedIds.length - 1
+                              }
+                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
+                            >
+                              <span className="material-symbols-outlined text-[18px]">
+                                keyboard_arrow_down
                               </span>
-                            )}
+                            </button>
                           </div>
-                        );
-                      })}
+                          <div className="w-6 h-6 rounded-full bg-on-surface/10 flex items-center justify-center text-[11px] font-bold text-on-surface-variant">
+                            {index + 1}
+                          </div>
+                          <span className="text-[14px] font-semibold flex-1">
+                            {step.text}
+                          </span>
+                          {isCorrect && (
+                            <span className="material-symbols-outlined text-[#63f1e3]">
+                              check_circle
+                            </span>
+                          )}
+                          {isIncorrect && (
+                            <span className="material-symbols-outlined text-red-400">
+                              cancel
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {!isOptionBased &&
+                  !isDragDropMatching &&
+                  !isHardDragDrop &&
+                  !isOrdering && (
+                    <div className="rounded-xl border border-on-surface/10 bg-surface-container/60 px-5 py-6 text-center">
+                      <p className="font-bold text-on-surface">
+                        Unsupported Challenge Type
+                      </p>
+                      <p className="text-[13px] text-on-surface-variant mt-1">
+                        Please return to the roadmap.
+                      </p>
                     </div>
                   )}
+              </div>
 
-                  {!isOptionBased &&
-                    !isDragDropMatching &&
-                    !isHardDragDrop &&
-                    !isOrdering && (
-                      <div className="rounded-xl border border-on-surface/10 bg-surface-container/60 px-5 py-6 text-center">
-                        <p className="font-bold text-on-surface">
-                          Unsupported Challenge Type
-                        </p>
-                        <p className="text-[13px] text-on-surface-variant mt-1">
-                          Please return to the roadmap.
-                        </p>
-                      </div>
-                    )}
+              {submitError && (
+                <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-5 py-4 flex items-center gap-3">
+                  <span className="material-symbols-outlined text-red-300">
+                    error
+                  </span>
+                  <p className="text-[13px] font-bold text-red-200">
+                    {submitError}
+                  </p>
                 </div>
+              )}
 
-                {submitError && (
-                  <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-5 py-4 flex items-center gap-3">
-                    <span className="material-symbols-outlined text-red-300">
+              {result && !result.correct && (
+                <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
+                  <div className="flex items-start gap-3">
+                    <span className="material-symbols-outlined text-[20px] text-red-300">
                       error
                     </span>
-                    <p className="text-[13px] font-bold text-red-200">{submitError}</p>
-                  </div>
-                )}
-
-                {result && !result.correct && (
-                  <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
-                    <div className="flex items-start gap-3">
-                      <span className="material-symbols-outlined text-[20px] text-red-300">
-                        error
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-bold text-red-100 text-[14px]">
-                          {result.message || "Not quite. Try again."}
-                        </p>
-                        {result.explanation && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
-                            {result.explanation}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {result && !result.correct && !isReviewMode && (
-                  <button
-                    onClick={() => {
-                      setResult(null);
-                      setSelectedOptionId(null);
-                      setMatchingMap({});
-                      setDropZoneMap({});
-                      setSelectedPoolItemId(null);
-                      if (orderingChallenge)
-                        setOrderedIds(orderingItems.map((s) => s.id));
-                    }}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#66b3ff]/45 bg-[#66b3ff]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:bg-[#66b3ff]/15"
-                  >
-                    Try Again
-                  </button>
-                )}
-
-                {canEdit && (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitDisabled}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] transition hover:bg-[#8cc8ff] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
-                  >
-                    {submitting ? "Checking..." : "Submit Answer"}
-                  </button>
-                )}
-
-                {/* Inline Explanation and Navigation Section */}
-                {(isReviewMode || (result && result.correct)) && (
-                  <div className="mx-6 mb-6 border-t border-[#1e3a5f] pt-6 flex flex-col gap-4">
-                    {/* Explanation box */}
-                    <div className="rounded-xl border border-[#66b3ff]/30 bg-[#0c1a2d] p-6 shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
-                      <div className="mb-4 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
-                          <span className="material-symbols-outlined text-[20px]">
-                            pets
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                            {petName} Says
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="text-[14px] leading-relaxed text-[#dbeafe]">
-                        {isReviewMode && data.review ? data.review.explanation : result?.explanation}
-                      </p>
-
-                      {/* Complexities */}
-                      {(result?.timeComplexity || data?.review?.timeComplexity || result?.spaceComplexity || data?.review?.spaceComplexity) && (
-                        <div className="mt-4 grid grid-cols-2 gap-3">
-                          {(result?.timeComplexity || data?.review?.timeComplexity) && (
-                            <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                                Time Complexity
-                              </p>
-                              <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
-                                {result?.timeComplexity || data?.review?.timeComplexity}
-                              </p>
-                            </div>
-                          )}
-                          {(result?.spaceComplexity || data?.review?.spaceComplexity) && (
-                            <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                                Space Complexity
-                              </p>
-                              <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
-                                {result?.spaceComplexity || data?.review?.spaceComplexity}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Pet feedback */}
-                      {(result?.petFeedback || data?.review?.petFeedback) && (
-                        <div className="mt-3 rounded-lg border border-[#eab308]/25 bg-[#eab308]/10 px-4 py-3">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#fde047]">
-                            Companion Feedback
-                          </p>
-                          <p className="mt-2 text-[14px] leading-relaxed text-[#dbeafe]">
-                            {result?.petFeedback || data?.review?.petFeedback}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Navigation buttons */}
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <button
-                        onClick={goBackToRoadmap}
-                        className="flex-1 min-w-[150px] rounded-xl border border-[#1e3a5f] bg-[#0d2135] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#152e46] transition-colors"
-                      >
-                        Back to Roadmap
-                      </button>
-                      <button
-                        onClick={goToNextChallenge}
-                        disabled={nextChallengeLoading}
-                        className="flex-1 min-w-[150px] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] hover:bg-[#8cc8ff] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {nextChallengeLoading ? "Loading..." : "Next Challenge"}
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </section>
-        </div>
-
-        <RoadmapAiHelper
-          nodeId={nodeId!}
-          nodeTitle={challenge.title}
-          nodeStatus={data?.node.status || "available"}
-          mode="hard"
-          accentColor="#3a7fc1"
-          accentGradient="linear-gradient(90deg, #3a7fc1, #02457A)"
-          accentGlowWeak="rgba(2,69,122,0.25)"
-        />
-
-        {showSuccessModal && result?.correct && challenge && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-            <div className="relative w-full max-w-[480px] rounded-3xl bg-[#24384b] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
-              <button
-                onClick={() => setShowSuccessModal(false)}
-                className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
-                aria-label="Close result"
-              >
-                <span className="material-symbols-outlined text-[22px]">
-                  close
-                </span>
-              </button>
-
-              <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
-                <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
-                  <span className="material-symbols-outlined text-[46px]">
-                    workspace_premium
-                  </span>
-                </div>
-
-                <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
-                  Mission
-                  <br />
-                  Accomplished
-                </h2>
-
-                <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
-                      <span className="material-symbols-outlined text-[24px]">
-                        psychology
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
-                        “{result.message || "Correct. Nice work."}”
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-red-100 text-[14px]">
+                        {result.message || "Not quite. Try again."}
                       </p>
                       {result.explanation && (
-                        <p className="mt-2 line-clamp-4 text-[12px] leading-relaxed text-on-surface-variant/80">
+                        <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
                           {result.explanation}
                         </p>
                       )}
-                      <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
-                        {petName}
-                      </p>
                     </div>
                   </div>
                 </div>
+              )}
 
-                <div className="mt-7 grid grid-cols-2 gap-4">
-                  <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
-                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                      Reward
+              {result && !result.correct && !isReviewMode && (
+                <button
+                  onClick={() => {
+                    setResult(null);
+                    setSelectedOptionId(null);
+                    setMatchingMap({});
+                    setDropZoneMap({});
+                    setSelectedPoolItemId(null);
+                    if (orderingChallenge)
+                      setOrderedIds(orderingItems.map((s) => s.id));
+                  }}
+                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#66b3ff]/45 bg-[#66b3ff]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:bg-[#66b3ff]/15"
+                >
+                  Try Again
+                </button>
+              )}
+
+              {canEdit && (
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitDisabled}
+                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] transition hover:bg-[#8cc8ff] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                >
+                  {submitting ? "Checking..." : "Submit Answer"}
+                </button>
+              )}
+
+              {/* Inline Explanation and Navigation Section */}
+              {(isReviewMode || (result && result.correct)) && (
+                <div className="mx-6 mb-6 border-t border-[#1e3a5f] pt-6 flex flex-col gap-4">
+                  {/* Explanation box */}
+                  <div className="rounded-xl border border-[#66b3ff]/30 bg-[#0c1a2d] p-6 shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
+                        <span className="material-symbols-outlined text-[20px]">
+                          pets
+                        </span>
+                      </div>
+                      <div>
+                        <p className="font-bold text-on-surface text-[14px] tracking-wide">
+                          {petName} Says
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-[14px] leading-relaxed text-[#dbeafe]">
+                      {isReviewMode && data.review
+                        ? data.review.explanation
+                        : result?.explanation}
                     </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
-                      +{challenge.xp}
-                    </p>
-                    <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
+
+                    {/* Complexities */}
+                    {(result?.timeComplexity ||
+                      data?.review?.timeComplexity ||
+                      result?.spaceComplexity ||
+                      data?.review?.spaceComplexity) && (
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        {(result?.timeComplexity ||
+                          data?.review?.timeComplexity) && (
+                          <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                              Time Complexity
+                            </p>
+                            <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
+                              {result?.timeComplexity ||
+                                data?.review?.timeComplexity}
+                            </p>
+                          </div>
+                        )}
+                        {(result?.spaceComplexity ||
+                          data?.review?.spaceComplexity) && (
+                          <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                              Space Complexity
+                            </p>
+                            <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
+                              {result?.spaceComplexity ||
+                                data?.review?.spaceComplexity}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Pet feedback */}
+                    {(result?.petFeedback || data?.review?.petFeedback) && (
+                      <div className="mt-3 rounded-lg border border-[#eab308]/25 bg-[#eab308]/10 px-4 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#fde047]">
+                          Companion Feedback
+                        </p>
+                        <p className="mt-2 text-[14px] leading-relaxed text-[#dbeafe]">
+                          {result?.petFeedback || data?.review?.petFeedback}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                      Bonus
-                    </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                      +10
-                    </p>
-                    <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
+
+                  {/* Navigation buttons */}
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    <button
+                      onClick={goBackToRoadmap}
+                      className="flex-1 min-w-[150px] rounded-xl border border-[#1e3a5f] bg-[#0d2135] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#152e46] transition-colors"
+                    >
+                      Back to Roadmap
+                    </button>
+                    <button
+                      onClick={goToNextChallenge}
+                      disabled={nextChallengeLoading}
+                      className="flex-1 min-w-[150px] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] hover:bg-[#8cc8ff] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                    </button>
                   </div>
                 </div>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
 
-                <button
-                  onClick={goToNextChallenge}
-                  disabled={nextChallengeLoading}
-                  className="mt-7 w-full rounded-lg bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
-                >
-                  {nextChallengeLoading ? "Loading..." : "Next Challenge"}
-                  <span className="ml-2">→</span>
-                </button>
+      <RoadmapAiHelper
+        nodeId={nodeId!}
+        nodeTitle={challenge.title}
+        nodeStatus={data?.node.status || "available"}
+        mode="hard"
+        accentColor="#3a7fc1"
+        accentGradient="linear-gradient(90deg, #3a7fc1, #02457A)"
+        accentGlowWeak="rgba(2,69,122,0.25)"
+      />
 
-                <button
-                  onClick={() => setShowSuccessModal(false)}
-                  className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
-                >
-                  Review Mission
-                </button>
+      {showSuccessModal && result?.correct && challenge && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+          <div className="relative w-full max-w-[480px] rounded-3xl bg-[#24384b] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+              aria-label="Close result"
+            >
+              <span className="material-symbols-outlined text-[22px]">
+                close
+              </span>
+            </button>
+
+            <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
+              <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
+                <span className="material-symbols-outlined text-[46px]">
+                  workspace_premium
+                </span>
               </div>
+
+              <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                Mission
+                <br />
+                Accomplished
+              </h2>
+
+              <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
+                    <span className="material-symbols-outlined text-[24px]">
+                      psychology
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                      “{result.message || "Correct. Nice work."}”
+                    </p>
+                    {result.explanation && (
+                      <p className="mt-2 line-clamp-4 text-[12px] leading-relaxed text-on-surface-variant/80">
+                        {result.explanation}
+                      </p>
+                    )}
+                    <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+                      {petName}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-7 grid grid-cols-2 gap-4">
+                <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
+                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                    Reward
+                  </p>
+                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
+                    +{challenge.xp}
+                  </p>
+                  <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
+                </div>
+                <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
+                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                    Bonus
+                  </p>
+                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
+                    +10
+                  </p>
+                  <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
+                </div>
+              </div>
+
+              <button
+                onClick={goToNextChallenge}
+                disabled={nextChallengeLoading}
+                className="mt-7 w-full rounded-lg bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
+              >
+                {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                <span className="ml-2">→</span>
+              </button>
+
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
+              >
+                Review Mission
+              </button>
             </div>
           </div>
-        )}
-      </main>
-    );
-  };
+        </div>
+      )}
+
+      {xpToast !== null && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+          <style>{`
+              @keyframes fadeInDown {
+                0% { opacity: 0; transform: translate(-50%, -20px); }
+                10% { opacity: 1; transform: translate(-50%, 0); }
+                90% { opacity: 1; transform: translate(-50%, 0); }
+                100% { opacity: 0; transform: translate(-50%, -20px); }
+              }
+              .animate-xp-toast {
+                animation: fadeInDown 3.5s ease-in-out forwards;
+              }
+            `}</style>
+          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#63f1e3]">
+              stars
+            </span>
+            <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
+              +{xpToast} XP
+            </span>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+};
 
 export default HardNodeChallengePage;
-

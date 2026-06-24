@@ -197,6 +197,7 @@ const MediumNodeChallengePage = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [xpToast, setXpToast] = useState<number | null>(null);
 
   const challenge = data?.challenge ?? null;
   const isReviewMode = data?.node.status === "completed" && !!data.review;
@@ -221,6 +222,17 @@ const MediumNodeChallengePage = () => {
       dragDropChallenge ? extractDropZoneIds(dragDropChallenge.template) : [],
     [dragDropChallenge],
   );
+
+  const initialAssignedMap = useMemo(() => {
+    if (!data?.review) return {};
+
+    const isMatchReview =
+      data.review.challengeType === "drag_drop" &&
+      !!data.review.selectedDropZoneMap;
+    if (!isMatchReview) return {};
+
+    return data.review.selectedDropZoneMap!;
+  }, [data]);
 
   const reviewDropZoneMap =
     data?.review && "dropZoneMap" in data.review ? data.review.dropZoneMap : {};
@@ -253,66 +265,37 @@ const MediumNodeChallengePage = () => {
       return;
     }
 
-    let alive = true;
     setLoading(true);
     setError(null);
-    setSubmitError(null);
     setSelectedOptionId(null);
     setDropZoneMap({});
-    setSelectedPoolItemId(null);
-    setDraggingPoolItemId(null);
-    setDragOverZoneId(null);
-    setDragPreview(null);
     setResult(null);
     setShowSuccessModal(false);
-    setNextChallengeLoading(false);
+    setSubmitError(null);
 
-    Promise.all([
-      courseApi.getMediumNodeChallenge(nodeId),
-      courseSlug
-        ? courseApi.getMediumRoadmap(courseSlug)
-        : Promise.resolve(null),
-    ])
-      .then(([response, roadmap]) => {
-        if (!alive) return;
-        if (roadmap) {
-          const nodes = [...roadmap.chapters]
-            .sort((a, b) => a.order - b.order)
-            .flatMap((chapter) =>
-              [...chapter.nodes].sort((a, b) => a.order - b.order),
-            );
-          const index = nodes.findIndex((n) => n.id === nodeId);
-          if (index >= 0) {
-            response.node.label = (index + 1).toString();
-          }
-        }
+    courseApi
+      .getMediumNodeChallenge(nodeId)
+      .then((response) => {
         setData(response);
-        if (response.review) {
-          if ("selectedOptionId" in response.review) {
-            setSelectedOptionId(response.review.selectedOptionId ?? null);
-          }
-          if ("dropZoneMap" in response.review) {
-            setDropZoneMap(response.review.dropZoneMap ?? {});
-          }
+        if (response.review?.selectedOptionId) {
+          setSelectedOptionId(response.review.selectedOptionId);
         }
-        document.title = `${response.node.label} Medium Challenge | Devcopet`;
+        if (
+          response.review?.challengeType === "drag_drop" &&
+          response.review.selectedDropZoneMap
+        ) {
+          setDropZoneMap(response.review.selectedDropZoneMap);
+        }
       })
       .catch((err) => {
-        if (!alive) return;
         setError(
           err?.response?.data?.message ||
             err?.message ||
-            "Unable to load this Medium challenge.",
+            "Unable to load challenge details.",
         );
       })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-
-    return () => {
-      alive = false;
-    };
-  }, [nodeId, courseSlug]);
+      .finally(() => setLoading(false));
+  }, [nodeId]);
 
   const goBackToRoadmap = () => {
     navigate({
@@ -321,21 +304,18 @@ const MediumNodeChallengePage = () => {
     });
   };
 
-  const goToNextChallenge = async () => {
-    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+  const goToNextChallenge = () => {
+    if (nextChallengeLoading || !data) return;
+
+    const nextNode = data.nextNode;
+    if (!nextNode) {
+      goBackToRoadmap();
+      return;
+    }
 
     setNextChallengeLoading(true);
     try {
-      const roadmap = await courseApi.getMediumRoadmap(courseSlug);
-      const nodes = [...roadmap.chapters]
-        .sort((a, b) => a.order - b.order)
-        .flatMap((chapter) =>
-          [...chapter.nodes].sort((a, b) => a.order - b.order),
-        );
-      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
-      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
-
-      if (!nextNode) {
+      if (nextNode.status === "locked") {
         goBackToRoadmap();
         return;
       }
@@ -343,12 +323,12 @@ const MediumNodeChallengePage = () => {
       navigate({
         to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
         params: {
-          courseSlug,
+          courseSlug: courseSlug || "python-basic",
           nodeId: nextNode.id,
         },
       });
     } catch (err) {
-      console.error("Unable to open next Medium challenge:", err);
+      console.error("Unable to open next challenge:", err);
       goBackToRoadmap();
     } finally {
       setNextChallengeLoading(false);
@@ -361,14 +341,8 @@ const MediumNodeChallengePage = () => {
     setSubmitting(true);
     setSubmitError(null);
 
-    const requiredDropZoneMap = dropZoneIds.reduce<Record<string, string>>(
-      (acc, zoneId) => {
-        if (dropZoneMap[zoneId]) {
-          acc[zoneId] = dropZoneMap[zoneId];
-        }
-        return acc;
-      },
-      {},
+    const requiredDropZoneMap = Object.fromEntries(
+      dropZoneIds.map((zoneId) => [zoneId, dropZoneMap[zoneId] ?? ""]),
     );
 
     const payload = isMultipleChoice
@@ -385,6 +359,18 @@ const MediumNodeChallengePage = () => {
     courseApi
       .submitMediumNodeChallenge(nodeId, payload)
       .then((response) => {
+        const { xpAwarded, userProgress } = response;
+        if (xpAwarded && xpAwarded > 0) {
+          setXpToast(xpAwarded);
+          window.setTimeout(() => setXpToast(null), 3500);
+        }
+        if (userProgress) {
+          useAuthStore.getState().updateUser({
+            exp: userProgress.exp,
+            level: userProgress.level,
+          });
+        }
+
         setResult(response);
         setShowSuccessModal(response.correct);
       })
@@ -621,10 +607,12 @@ const MediumNodeChallengePage = () => {
               onClick={goBackToRoadmap}
               className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
             >
-              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+              <span className="material-symbols-outlined text-[16px]">
+                arrow_back
+              </span>
               Back to Roadmap
             </button>
-            
+
             <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
               <span>Medium Checkpoint</span>
             </div>
@@ -876,14 +864,17 @@ const MediumNodeChallengePage = () => {
                   </div>
                 )}
 
-                {result && !result.correct && !isReviewMode && !isLockedMode && (
-                  <button
-                    onClick={handleTryAgain}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
-                  >
-                    Try Again
-                  </button>
-                )}
+                {result &&
+                  !result.correct &&
+                  !isReviewMode &&
+                  !isLockedMode && (
+                    <button
+                      onClick={handleTryAgain}
+                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
+                    >
+                      Try Again
+                    </button>
+                  )}
 
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
@@ -914,7 +905,9 @@ const MediumNodeChallengePage = () => {
                       </div>
 
                       <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                        {isReviewMode && data.review ? data.review.explanation : result?.explanation}
+                        {isReviewMode && data.review
+                          ? data.review.explanation
+                          : result?.explanation}
                       </p>
                     </div>
 
@@ -1056,6 +1049,30 @@ const MediumNodeChallengePage = () => {
           accentGradient="linear-gradient(to right, #00a99d, #223746)"
           accentGlowWeak="rgba(99,241,227,0.2)"
         />
+      )}
+
+      {xpToast !== null && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+          <style>{`
+            @keyframes fadeInDown {
+              0% { opacity: 0; transform: translate(-50%, -20px); }
+              10% { opacity: 1; transform: translate(-50%, 0); }
+              90% { opacity: 1; transform: translate(-50%, 0); }
+              100% { opacity: 0; transform: translate(-50%, -20px); }
+            }
+            .animate-xp-toast {
+              animation: fadeInDown 3.5s ease-in-out forwards;
+            }
+          `}</style>
+          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#63f1e3]">
+              stars
+            </span>
+            <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
+              +{xpToast} XP
+            </span>
+          </div>
+        </div>
       )}
     </main>
   );

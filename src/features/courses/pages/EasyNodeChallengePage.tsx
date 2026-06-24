@@ -86,6 +86,7 @@ const EasyNodeChallengePage = () => {
   const [copiedCode, setCopiedCode] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [xpToast, setXpToast] = useState<number | null>(null);
 
   const challenge = data?.challenge ?? null;
   const review = data?.review ?? null;
@@ -111,57 +112,28 @@ const EasyNodeChallengePage = () => {
       return;
     }
 
-    let alive = true;
     setLoading(true);
     setError(null);
-    setSubmitError(null);
     setSelectedOptionId(null);
     setResult(null);
     setShowSuccessModal(false);
     setWrongAttempt(null);
-    setCopiedCode(false);
+    setSubmitError(null);
 
-    Promise.all([
-      courseApi.getEasyNodeChallenge(nodeId),
-      courseSlug ? courseApi.getEasyRoadmap(courseSlug) : Promise.resolve(null),
-    ])
-      .then(([response, roadmap]) => {
-        if (!alive) return;
-        const normalizedResponse = normalizeChallengeResponse(response);
-        if (roadmap) {
-          const nodes = [...roadmap.chapters]
-            .sort((a, b) => a.order - b.order)
-            .flatMap((chapter) =>
-              [...chapter.nodes].sort((a, b) => a.lessonOrder - b.lessonOrder),
-            );
-          const index = nodes.findIndex((n) => n.id === nodeId);
-          if (index >= 0) {
-            normalizedResponse.node.label = (index + 1).toString();
-          }
-        }
-        setData(normalizedResponse);
-        setSelectedOptionId(
-          normalizedResponse.review?.selectedOptionId ?? null,
-        );
-        setResult(null);
-        document.title = `${normalizedResponse.node.label} Challenge | Devcopet`;
+    courseApi
+      .getEasyNodeChallenge(nodeId)
+      .then((response) => {
+        setData(normalizeChallengeResponse(response));
       })
       .catch((err) => {
-        if (!alive) return;
         setError(
           err?.response?.data?.message ||
             err?.message ||
-            "Unable to load this checkpoint.",
+            "Unable to load challenge details.",
         );
       })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
-
-    return () => {
-      alive = false;
-    };
-  }, [nodeId, courseSlug]);
+      .finally(() => setLoading(false));
+  }, [nodeId]);
 
   const goBackToRoadmap = () => {
     navigate({
@@ -170,21 +142,18 @@ const EasyNodeChallengePage = () => {
     });
   };
 
-  const goToNextChallenge = async () => {
-    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+  const goToNextChallenge = () => {
+    if (nextChallengeLoading || !data) return;
+
+    const nextNode = data.nextNode;
+    if (!nextNode) {
+      goBackToRoadmap();
+      return;
+    }
 
     setNextChallengeLoading(true);
     try {
-      const roadmap = await courseApi.getEasyRoadmap(courseSlug);
-      const nodes = [...roadmap.chapters]
-        .sort((a, b) => a.order - b.order)
-        .flatMap((chapter) =>
-          [...chapter.nodes].sort((a, b) => a.lessonOrder - b.lessonOrder),
-        );
-      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
-      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
-
-      if (!nextNode) {
+      if (nextNode.status === "locked") {
         goBackToRoadmap();
         return;
       }
@@ -192,7 +161,7 @@ const EasyNodeChallengePage = () => {
       navigate({
         to: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
         params: {
-          courseSlug,
+          courseSlug: courseSlug || "python-basic",
           nodeId: nextNode.id,
         },
       });
@@ -216,6 +185,18 @@ const EasyNodeChallengePage = () => {
     courseApi
       .submitEasyNodeChallenge(nodeId, selectedOptionId)
       .then((response) => {
+        const { xpAwarded, userProgress } = response;
+        if (xpAwarded && xpAwarded > 0) {
+          setXpToast(xpAwarded);
+          window.setTimeout(() => setXpToast(null), 3500);
+        }
+        if (userProgress) {
+          useAuthStore.getState().updateUser({
+            exp: userProgress.exp,
+            level: userProgress.level,
+          });
+        }
+
         if (response.correct) {
           setResult(response);
           setShowSuccessModal(true);
@@ -333,10 +314,12 @@ const EasyNodeChallengePage = () => {
             onClick={goBackToRoadmap}
             className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <span className="material-symbols-outlined text-[16px]">
+              arrow_back
+            </span>
             Back to Roadmap
           </button>
-          
+
           <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
             <span>Easy Checkpoint</span>
           </div>
@@ -541,7 +524,9 @@ const EasyNodeChallengePage = () => {
                         </div>
 
                         <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                          {isReviewMode && review ? review.explanation : result?.explanation}
+                          {isReviewMode && review
+                            ? review.explanation
+                            : result?.explanation}
                         </p>
                       </div>
 
@@ -558,7 +543,9 @@ const EasyNodeChallengePage = () => {
                           disabled={nextChallengeLoading}
                           className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                          {nextChallengeLoading
+                            ? "Loading..."
+                            : "Next Challenge"}
                         </button>
                       </div>
                     </div>
@@ -674,6 +661,30 @@ const EasyNodeChallengePage = () => {
           accentGradient="linear-gradient(to right, #00a99d, #223746)"
           accentGlowWeak="rgba(99,241,227,0.2)"
         />
+      )}
+
+      {xpToast !== null && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+          <style>{`
+            @keyframes fadeInDown {
+              0% { opacity: 0; transform: translate(-50%, -20px); }
+              10% { opacity: 1; transform: translate(-50%, 0); }
+              90% { opacity: 1; transform: translate(-50%, 0); }
+              100% { opacity: 0; transform: translate(-50%, -20px); }
+            }
+            .animate-xp-toast {
+              animation: fadeInDown 3.5s ease-in-out forwards;
+            }
+          `}</style>
+          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+            <span className="material-symbols-outlined text-[#63f1e3]">
+              stars
+            </span>
+            <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
+              +{xpToast} XP
+            </span>
+          </div>
+        </div>
       )}
     </main>
   );
