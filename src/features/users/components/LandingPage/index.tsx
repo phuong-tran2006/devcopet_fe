@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import heroMascotVideo from "../../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../../components/ui/TransparentVideo";
 
@@ -44,32 +43,9 @@ const LandingPage = () => {
 
   return (
     <>
-      <MouseTrail />
       <main className="relative">
-        {/* Background Grid & Streaks */}
+        {/* Background Grid */}
         <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[35%] left-[80%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[60%] left-[15%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[85%] left-[45%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[25%] left-[65%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[50%] left-[90%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[75%] left-[30%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[15%] left-[55%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[45%] left-[10%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[95%] left-[75%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[5%] left-[40%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[20%] left-[10%] opacity-100"></div>
-            <div className="absolute w-1.5 h-1.5 bg-white rounded-full top-[40%] left-[70%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[55%] left-[25%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-primary-fixed-dim rounded-full top-[70%] left-[85%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[90%] left-[50%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[12%] left-[95%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[30%] left-[35%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[65%] left-[5%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[22%] left-[3%] opacity-50 blur-[1px]"></div>
-          </div>
           <div className="absolute inset-0 digital-grid opacity-20"></div>
         </div>
 
@@ -80,15 +56,20 @@ const LandingPage = () => {
               {/* Left: Text Content */}
               <div className="flex-1 space-y-8 text-center lg:text-left">
                 <h1 className="font-headline-lg text-headline-lg md:text-[72px] leading-tight font-extrabold tracking-tight text-on-surface">
-                  Explore the Depths of <br />
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim via-cyan-300 to-secondary-fixed-dim">
-                    Coding
+                  Code{" "}
+                  <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim via-cyan-300 to-secondary-fixed-dim px-2 -mx-2 pb-1">
+                    Now
+                  </span>
+                  ,<br />
+                  Tomorrow{" "}
+                  <span className="inline-block text-transparent bg-clip-text bg-gradient-to-r from-secondary-fixed-dim via-pink-300 to-primary-fixed-dim px-2 -mx-2 pb-1">
+                    Wow...
                   </span>
                 </h1>
                 <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-                  An AI-powered training system with personalized roadmaps,
-                  project-based mentoring, and a community of elite developers.
-                  Break every technical limit.
+                  Step into the future of learning. Our AI-driven platform
+                  equips you with the skills, logic, and mindset to build
+                  incredible software. Let's make "wow" happen.
                 </p>
               </div>
 
@@ -123,18 +104,18 @@ const LandingPage = () => {
                 </span>
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
-                Personalized Roadmap
+                AI-Powered Learning
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Our AI system analyzes your skills and suggests an optimized
-                learning path tailored to your learning pace.
+                Experience tailored roadmaps that adapt dynamically to your
+                learning pace and cognitive style.
               </p>
             </div>
 
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(216,191,216,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                 <span className="material-symbols-outlined text-3xl">
@@ -142,18 +123,18 @@ const LandingPage = () => {
                 </span>
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
-                Mentor Community
+                1:1 Expert Mentorship
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Connect directly with experts from leading tech corporations to
-                receive 1:1 personalized feedback.
+                Unlock your potential by connecting with top-tier engineers who
+                guide you through the toughest bugs.
               </p>
             </div>
 
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#87A96B" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(135,169,107,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                 <span className="material-symbols-outlined text-3xl">
@@ -161,11 +142,11 @@ const LandingPage = () => {
                 </span>
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
-                Real-world Projects
+                Project-Driven Growth
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Learn by building actual products. Solve complex technical
-                problems within a professional terminal environment.
+                Ditch the theory. Build portfolio-ready applications in a
+                professional, real-world development environment.
               </p>
             </div>
           </div>
@@ -175,98 +156,97 @@ const LandingPage = () => {
         <section className="relative py-24 px-margin-desktop z-10 max-w-container-max mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-headline-lg text-headline-lg md:text-[48px] text-on-surface mb-4">
-              Everything you need to become a developer
+              Everything You Need to Succeed
             </h2>
+            <p className="font-body-lg text-on-surface-variant max-w-2xl mx-auto">
+              From foundational concepts to advanced architecture, Devcopet
+              provides a complete ecosystem for your software engineering
+              journey.
+            </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
             {/* Card 1: Interactive Learning */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card hover:-translate-y-1 transition-transform duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                   <span className="material-symbols-outlined text-3xl">
-                    extension
+                    keyboard
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Interactive Learning
+                  Hands-On Coding
                 </h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-                Hands-on exercises with instant feedback
+                Write real code in your browser with immediate validation and
+                intelligent feedback loops.
               </p>
-              <div className="space-y-2">
-                <div className="h-1.5 w-full bg-on-surface/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary-fixed-dim w-[37.5%]"></div>
-                </div>
-                <div className="flex justify-end">
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">
-                    3/8 lessons
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* Card 2: Real-world Projects */}
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card hover:-translate-y-1 transition-transform duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                   <span className="material-symbols-outlined text-3xl">
-                    work
+                    rocket_launch
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Real-world Projects
+                  Launch Ready
                 </h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Build portfolio-worthy applications
+                Assemble a striking portfolio with applications that demonstrate
+                your readiness for the tech industry.
               </p>
             </div>
 
             {/* Card 3: Community Support */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card hover:-translate-y-1 transition-transform duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                   <span className="material-symbols-outlined text-3xl">
-                    forum
+                    hub
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Community Support
+                  Global Network
                 </h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Join thousands of learners and mentors
+                Collaborate with a sprawling network of learners, share
+                insights, and conquer coding challenges together.
               </p>
             </div>
 
             {/* Card 4: AI Assistance */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card hover:-translate-y-1 transition-transform duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
                   <span className="material-symbols-outlined text-3xl">
-                    auto_awesome
+                    smart_toy
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  AI Assistance
+                  24/7 AI Companion
                 </h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Get help from our AI-powered coding assistant
+                Stuck on a bug? Our smart assistant is always online to debug,
+                explain, and optimize your code.
               </p>
             </div>
 
@@ -274,41 +254,42 @@ const LandingPage = () => {
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card hover:-translate-y-1 transition-transform duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                   <span className="material-symbols-outlined text-3xl">
-                    verified
+                    military_tech
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Certificate
+                  Earn Your Badge
                 </h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Earn verified certificates upon completion
+                Gain recognized certifications that prove your mastery and boost
+                your resume's credibility.
               </p>
             </div>
 
-            {/* Card 6: Career Path (Full Width) */}
+            {/* Card 6: Career Path */}
             <div
               ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card md:col-span-3 shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card hover:-translate-y-1 transition-transform duration-300"
             >
               <div className="flex items-center gap-4 mb-6">
                 <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                   <span className="material-symbols-outlined text-3xl">
-                    apartment
+                    trending_up
                   </span>
                 </div>
                 <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Career Path
+                  Accelerated Career
                 </h3>
               </div>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Follow structured learning paths from beginner to professional
-                developer
+                Follow meticulously designed paths that transform complete
+                beginners into confident, hirable developers.
               </p>
             </div>
           </div>

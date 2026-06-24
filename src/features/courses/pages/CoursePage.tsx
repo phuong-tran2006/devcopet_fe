@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
 import { useAuthStore } from "../../users/store/auth.store";
+import searchIconUrl from "../../../assets/images/search.png";
+import arrowDownIconUrl from "../../../assets/images/arrow-down-sign-to-navigate.png";
 
 const formatNumber = (value: number) =>
   new Intl.NumberFormat("en-US").format(Math.max(0, Math.round(value || 0)));
@@ -272,28 +274,22 @@ const CoursePage = () => {
               Choose a stack to master and evolve your familiar.
             </p>
           </div>
-          <div className="bg-surface-container text-on-surface px-4 py-2 rounded-lg flex items-center gap-2 border border-on-surface/5 min-w-[126px] justify-center">
-            <span className="font-bold text-[14px]">
-              {formatNumber(userXp)}
-            </span>
-            <span className="text-[10px] text-on-surface-variant font-medium tracking-wider">
-              TOTAL XP
-            </span>
-          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3 mb-5">
           <div className="flex-1 relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
-              <span className="material-symbols-outlined text-[20px]">
-                search
-              </span>
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
+              <img
+                src={searchIconUrl}
+                alt="Search"
+                className="w-[16px] h-[16px] opacity-70 dark:invert"
+              />
             </span>
             <input
               type="text"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Search technologies..."
+              placeholder="Search courses..."
               className="w-full bg-surface-container border border-on-surface/10 rounded-lg pl-10 pr-4 py-2 text-[13px] text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim transition-colors"
             />
           </div>
@@ -310,9 +306,11 @@ const CoursePage = () => {
                 <option value="advanced">Advanced</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px]">
-                  expand_more
-                </span>
+                <img
+                  src={arrowDownIconUrl}
+                  alt="Arrow Down"
+                  className="w-[14px] h-[14px] opacity-70 dark:invert"
+                />
               </div>
             </div>
 
@@ -327,9 +325,11 @@ const CoursePage = () => {
                 <option value="progress">Sort: Progress</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px]">
-                  expand_more
-                </span>
+                <img
+                  src={arrowDownIconUrl}
+                  alt="Arrow Down"
+                  className="w-[14px] h-[14px] opacity-70 dark:invert"
+                />
               </div>
             </div>
           </div>

@@ -12,7 +12,7 @@ const LeaderboardPage = () => {
     const fetchLeaderboard = async () => {
       try {
         const { api } = await import("../../../services/axiosClient");
-        const response = await api.get("/users/leaderboard");
+        const response = await api.get("/arena/leaderboard?limit=50");
         setUsers(response.data || []);
       } catch (err) {
         console.error("Failed to load leaderboard from backend", err);
@@ -26,44 +26,102 @@ const LeaderboardPage = () => {
   const podium = useMemo(() => {
     if (users.length === 0) {
       return [
-        { rank: 2, name: "PixelWizard", levelTitle: "Lvl 42 Architect", stars: "14,200", xp: "89k", avatarColor: "bg-[#234E52]", color: "#4FD1C5" },
-        { rank: 1, name: "KernelOverlord", levelTitle: "Lvl 50 System God", stars: "21,800", xp: "142k", avatarColor: "bg-[#702459]", color: "#F687B3", isCenter: true },
-        { rank: 3, name: "LogicLassie", levelTitle: "Lvl 38 Engineer", stars: "11,500", xp: "67k", avatarColor: "bg-[#2D3748]", color: "#A0AEC0" },
+        {
+          rank: 2,
+          name: "PixelWizard",
+          levelTitle: "Architect",
+          stars: "14,200",
+          xp: "89 Wins",
+          avatarColor: "bg-[#234E52]",
+          color: "#4FD1C5",
+        },
+        {
+          rank: 1,
+          name: "KernelOverlord",
+          levelTitle: "System God",
+          stars: "21,800",
+          xp: "142 Wins",
+          avatarColor: "bg-[#702459]",
+          color: "#F687B3",
+          isCenter: true,
+        },
+        {
+          rank: 3,
+          name: "LogicLassie",
+          levelTitle: "Engineer",
+          stars: "11,500",
+          xp: "67 Wins",
+          avatarColor: "bg-[#2D3748]",
+          color: "#A0AEC0",
+        },
       ];
     }
 
-    const sorted = [...users].sort((a, b) => (b.exp || 0) - (a.exp || 0));
+    const sorted = [...users].sort(
+      (a, b) => (b.arenaRating || 0) - (a.arenaRating || 0),
+    );
 
-    const p1 = sorted[0] ? {
-      rank: 1,
-      name: sorted[0].username,
-      levelTitle: `Lvl ${sorted[0].level} Coder`,
-      stars: String(sorted[0].exp || 0),
-      xp: `${Math.round((sorted[0].exp || 0) / 100) / 10}k`,
-      avatarColor: "bg-[#702459]",
-      color: "#F687B3",
-      isCenter: true,
-    } : { rank: 1, name: "KernelOverlord", levelTitle: "Lvl 50 System God", stars: "21,800", xp: "142k", avatarColor: "bg-[#702459]", color: "#F687B3", isCenter: true };
+    const p1 = sorted[0]
+      ? {
+          rank: 1,
+          name: sorted[0].username,
+          levelTitle: `${sorted[0].arenaRank || "Beginner"}`,
+          stars: String(sorted[0].arenaRating || 0),
+          xp: `${sorted[0].arenaWins || 0} Wins`,
+          avatarColor: "bg-[#702459]",
+          color: "#F687B3",
+          isCenter: true,
+        }
+      : {
+          rank: 1,
+          name: "KernelOverlord",
+          levelTitle: "System God",
+          stars: "21,800",
+          xp: "142 Wins",
+          avatarColor: "bg-[#702459]",
+          color: "#F687B3",
+          isCenter: true,
+        };
 
-    const p2 = sorted[1] ? {
-      rank: 2,
-      name: sorted[1].username,
-      levelTitle: `Lvl ${sorted[1].level} Coder`,
-      stars: String(sorted[1].exp || 0),
-      xp: `${Math.round((sorted[1].exp || 0) / 100) / 10}k`,
-      avatarColor: "bg-[#234E52]",
-      color: "#4FD1C5",
-    } : { rank: 2, name: "PixelWizard", levelTitle: "Lvl 42 Architect", stars: "14,200", xp: "89k", avatarColor: "bg-[#234E52]", color: "#4FD1C5" };
+    const p2 = sorted[1]
+      ? {
+          rank: 2,
+          name: sorted[1].username,
+          levelTitle: `${sorted[1].arenaRank || "Beginner"}`,
+          stars: String(sorted[1].arenaRating || 0),
+          xp: `${sorted[1].arenaWins || 0} Wins`,
+          avatarColor: "bg-[#234E52]",
+          color: "#4FD1C5",
+        }
+      : {
+          rank: 2,
+          name: "PixelWizard",
+          levelTitle: "Architect",
+          stars: "14,200",
+          xp: "89 Wins",
+          avatarColor: "bg-[#234E52]",
+          color: "#4FD1C5",
+        };
 
-    const p3 = sorted[2] ? {
-      rank: 3,
-      name: sorted[2].username,
-      levelTitle: `Lvl ${sorted[2].level} Coder`,
-      stars: String(sorted[2].exp || 0),
-      xp: `${Math.round((sorted[2].exp || 0) / 100) / 10}k`,
-      avatarColor: "bg-[#2D3748]",
-      color: "#A0AEC0",
-    } : { rank: 3, name: "LogicLassie", levelTitle: "Lvl 38 Engineer", stars: "11,500", xp: "67k", avatarColor: "bg-[#2D3748]", color: "#A0AEC0" };
+    const p3 = sorted[2]
+      ? {
+          rank: 3,
+          name: sorted[2].username,
+          levelTitle: `${sorted[2].arenaRank || "Beginner"}`,
+          stars: String(sorted[2].arenaRating || 0),
+          xp: `${sorted[2].arenaWins || 0} Wins`,
+          avatarColor: "bg-[#2D3748]",
+          color: "#A0AEC0",
+        }
+      : {
+          rank: 3,
+          name: "LogicLassie",
+          levelTitle: "Engineer",
+          stars: "11,500",
+          xp: "67 Wins",
+          avatarColor: "bg-[#2D3748]",
+          color: "#A0AEC0",
+        };
 
     return [p2, p1, p3];
   }, [users]);
@@ -71,42 +129,76 @@ const LeaderboardPage = () => {
   const rankings = useMemo(() => {
     if (users.length === 0) {
       return [
-        { rank: "04", name: "BinaryBardo", level: "Lvl 35", badge: "PYTHON EXPERT", stars: "9,420", progress: 80 },
-        { rank: "05", name: "ScriptSiren", level: "Lvl 34", badge: "CODE NINJA", stars: "8,815", progress: 75 },
-        { rank: "06", name: "BugHunterX", level: "Lvl 31", badge: "DEBUGGER", stars: "7,240", progress: 60 },
-        { rank: "07", name: "AsyncAbby", level: "Lvl 29", badge: "DEV OPS", stars: "6,920", progress: 55 },
-        { rank: "08", name: "CyberSamurai", level: "Lvl 28", badge: "HACKER", stars: "6,100", progress: 50 },
-        { rank: "09", name: "DataDruid", level: "Lvl 27", badge: "DATA MAGE", stars: "5,800", progress: 48 },
-        { rank: "10", name: "NullPointer", level: "Lvl 25", badge: "DEBUGGER", stars: "5,200", progress: 42 },
+        {
+          rank: "04",
+          name: "BinaryBardo",
+          level: "Senior",
+          badge: "PYTHON EXPERT",
+          stars: "9,420",
+          progress: 80,
+        },
+        {
+          rank: "05",
+          name: "ScriptSiren",
+          level: "Fresher",
+          badge: "CODE NINJA",
+          stars: "8,815",
+          progress: 75,
+        },
+        {
+          rank: "06",
+          name: "BugHunterX",
+          level: "Beginner",
+          badge: "DEBUGGER",
+          stars: "7,240",
+          progress: 60,
+        },
       ];
     }
 
-    const sorted = [...users].sort((a, b) => (b.exp || 0) - (a.exp || 0));
+    const sorted = [...users].sort(
+      (a, b) => (b.arenaRating || 0) - (a.arenaRating || 0),
+    );
     return sorted.slice(3).map((u, index) => {
       const rankNum = index + 4;
       return {
         rank: rankNum < 10 ? `0${rankNum}` : String(rankNum),
         name: u.username,
-        level: `Lvl ${u.level}`,
-        badge: u.level >= 30 ? "CODE NINJA" : "DATA MAGE",
-        stars: String(u.exp || 0),
-        progress: Math.min(100, Math.round((((u.exp || 0) % 1000) / 1000) * 100)),
+        level: u.arenaRank || "Beginner",
+        badge: "ARENA",
+        stars: String(u.arenaRating || 0),
+        progress: Math.min(
+          100,
+          Math.round((((u.arenaRating || 0) % 1000) / 1000) * 100),
+        ),
       };
     });
   }, [users]);
 
   const currentUserRank = useMemo(() => {
     if (!currentUser) return null;
-    const sorted = [...users].sort((a, b) => (b.exp || 0) - (a.exp || 0));
-    const index = sorted.findIndex((u) => u._id === currentUser.id || u.username === currentUser.username);
+    const sorted = [...users].sort(
+      (a, b) => (b.arenaRating || 0) - (a.arenaRating || 0),
+    );
+    const index = sorted.findIndex(
+      (u) =>
+        u._id === currentUser.id ||
+        u.userId === currentUser.id ||
+        u.username === currentUser.username,
+    );
     const rankNum = index !== -1 ? index + 1 : 142;
+    const currentData =
+      index !== -1 ? sorted[index] : { arenaRating: 0, arenaRank: "Beginner" };
     return {
       rank: String(rankNum),
       name: currentUser.username || "You",
-      level: `Lvl ${currentUser.level || 1}`,
-      badge: (currentUser.level || 1) >= 15 ? "DATA NOVICE" : "NOVICE",
-      stars: String(currentUser.exp || 0),
-      progress: Math.min(100, Math.round((((currentUser.exp || 0) % 1000) / 1000) * 100)),
+      level: currentData.arenaRank || "Beginner",
+      badge: "ARENA",
+      stars: String(currentData.arenaRating || 0),
+      progress: Math.min(
+        100,
+        Math.round((((currentData.arenaRating || 0) % 1000) / 1000) * 100),
+      ),
     };
   }, [users, currentUser]);
 
