@@ -7,7 +7,6 @@ import {
   Loader2,
   AlertCircle,
   Sparkles,
-  RefreshCw,
   CheckCircle2,
   XCircle,
 } from "lucide-react";
@@ -55,7 +54,7 @@ const NotificationDropdown = () => {
   const [items, setItems] = useState<DailyMissionNotificationItem[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [resetting, setResetting] = useState(false);
+  const pollCountRef = useRef(0);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -66,6 +65,19 @@ const NotificationDropdown = () => {
       const response = await dailyMissionApi.getDailyMissionNotifications(20);
       setItems(response.items);
       setUnreadCount(response.unreadCount);
+
+      if (
+        response.items.length > 0 &&
+        response.items[0].status === "generating" &&
+        pollCountRef.current < 3
+      ) {
+        pollCountRef.current++;
+        setTimeout(() => {
+          fetchNotifications();
+        }, 2000);
+      } else if (response.items[0]?.status !== "generating") {
+        pollCountRef.current = 0;
+      }
     } catch (error) {
       console.error("Failed to fetch notifications", error);
     } finally {
@@ -89,15 +101,6 @@ const NotificationDropdown = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const handleDevReset = async () => {
-    setResetting(true);
-    await dailyMissionApi.resetTodayMissionDev();
-    // In dev mode, we might need to hit /today once to trigger generation
-    await dailyMissionApi._fallbackFromToday();
-    await fetchNotifications();
-    setResetting(false);
-  };
 
   const handleItemClick = async (item: DailyMissionNotificationItem) => {
     if (item.status === "available" && item.missionId) {
@@ -180,20 +183,6 @@ const NotificationDropdown = () => {
           {/* Header */}
           <div className="px-4 py-3 border-b border-zinc-800 flex justify-between items-center bg-zinc-900/50">
             <h3 className="font-medium text-white">Notifications</h3>
-            {import.meta.env.DEV && (
-              <button
-                onClick={handleDevReset}
-                disabled={resetting}
-                title="Dev Only: Reset Today's Mission"
-                className="text-xs flex items-center gap-1.5 px-2 py-1 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 rounded-md transition-colors disabled:opacity-50"
-              >
-                <RefreshCw
-                  size={12}
-                  className={resetting ? "animate-spin" : ""}
-                />
-                Reset Mission
-              </button>
-            )}
           </div>
 
           {/* List */}
