@@ -390,12 +390,6 @@ const EasyNodeChallengePage = () => {
           {!loading && !error && data && !isLockedMode && challenge && (
             <div className="w-full flex flex-col gap-6">
               <section className="w-full">
-                <div className="mb-6 flex flex-col gap-2">
-                  <p className="text-[14px] text-on-surface-variant font-medium">
-                    {data.node.label} • {data.node.title}
-                  </p>
-                </div>
-
                 <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#111c23] shadow-[0_0_28px_rgba(99,241,227,0.08)]">
                   <div className="border-b border-[#263b44] bg-[#0c171d] px-6 py-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">

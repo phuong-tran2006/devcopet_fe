@@ -11,7 +11,7 @@ import {
   type SubmitMediumNodeChallengeResponse,
 } from "src/features/courses/api/course.api";
 import RoadmapAiHelper from "src/features/roadmap/components/RoadmapAiHelper";
-
+import { RewardSummary } from "src/features/roadmap/components/challenge/RewardSummary";
 import { useAuthStore } from "src/features/users/store/auth.store";
 import {
   CheckCircle,
@@ -326,6 +326,7 @@ const MediumNodeChallengePage = () => {
     navigate({
       to: "/roadmap/$worldId",
       params: { worldId: courseSlug || "python-basic" },
+      search: { mode: "medium" },
     });
   };
 
@@ -639,12 +640,6 @@ const MediumNodeChallengePage = () => {
           </div>
 
           <section className="w-full flex flex-col">
-            <div className="mb-6 flex flex-col gap-2">
-              <p className="text-[14px] text-on-surface-variant font-medium">
-                {data.node.label} • {data.node.title}
-              </p>
-            </div>
-
             {isLockedMode && (
               <div className="mx-auto mt-12 w-full rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
@@ -858,34 +853,27 @@ const MediumNodeChallengePage = () => {
                 )}
 
                 {result && !result.correct && (
-                  <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
-                    <div className="flex items-start gap-3">
-                      <AlertCircle size={20} className="text-red-300" />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-bold text-red-100 text-[14px]">
-                          {result.message || "Not quite. Try again."}
-                        </p>
-                        {result.explanation && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
-                            {result.explanation}
-                          </p>
-                        )}
+                  <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+                    <div className="relative w-full max-w-[400px] rounded-3xl bg-[#2a3947] p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] text-center border border-red-500/20">
+                      <div className="mx-auto mb-6 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-400 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                        <X size={36} />
                       </div>
+                      <h2 className="text-[24px] font-extrabold text-on-surface mb-3">
+                        Mission failed
+                      </h2>
+                      <p className="text-[14px] text-on-surface-variant mb-8 leading-relaxed">
+                        Your answer was not correct. Return to the roadmap and
+                        try this checkpoint again.
+                      </p>
+                      <button
+                        onClick={goBackToRoadmap}
+                        className="w-full rounded-xl bg-surface-container-high px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface hover:bg-surface-container-highest transition-colors border border-outline/20"
+                      >
+                        Return to Roadmap
+                      </button>
                     </div>
                   </div>
                 )}
-
-                {result &&
-                  !result.correct &&
-                  !isReviewMode &&
-                  !isLockedMode && (
-                    <button
-                      onClick={handleTryAgain}
-                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
-                    >
-                      Try Again
-                    </button>
-                  )}
 
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
@@ -908,7 +896,7 @@ const MediumNodeChallengePage = () => {
                         </div>
                         <div>
                           <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                            {petName} Companion Says
+                            {petName} explains
                           </p>
                         </div>
                       </div>
@@ -985,29 +973,7 @@ const MediumNodeChallengePage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-7 grid grid-cols-2 gap-4">
-                    <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        Reward
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                        +{challenge.xp}
-                      </p>
-                      <p className="text-[18px] font-bold text-[#63f1e3]">XP</p>
-                    </div>
-                    <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        Bonus
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                        +10
-                      </p>
-                      <p className="text-[18px] font-bold text-[#f5c6ff]">
-                        Stars
-                      </p>
-                    </div>
-                  </div>
-
+                  <RewardSummary xp={challenge.xp} stars={10} />
                   <button
                     onClick={goToNextChallenge}
                     disabled={nextChallengeLoading}

@@ -18,19 +18,23 @@ const CourseSidebarChapter = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setLoading(true);
+    if (lessons.length === 0) setLoading(true);
     courseApi
       .getLessons(chapter._id)
       .then((data) => {
         const nextLessons = data || [];
-        setLessons(nextLessons);
-        // Nếu bài học hiện tại nằm trong chương này, tự động mở Accordion
-        if (nextLessons.some((l) => l._id === currentLessonId)) {
+        // Nếu bài học hiện tại nằm trong chương này và ta chưa từng set lessons, tự động mở Accordion
+        if (
+          lessons.length === 0 &&
+          nextLessons.some((l) => l._id === currentLessonId)
+        ) {
           setIsOpen(true);
         }
+        setLessons(nextLessons);
       })
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapter._id, currentLessonId, refreshKey]);
 
   return (

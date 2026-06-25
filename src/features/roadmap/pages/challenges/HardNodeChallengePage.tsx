@@ -14,6 +14,7 @@ import {
   type OrderingPayload,
 } from "src/features/courses/api/course.api";
 import RoadmapAiHelper from "src/features/roadmap/components/RoadmapAiHelper";
+import { RewardSummary } from "src/features/roadmap/components/challenge/RewardSummary";
 import { useAuthStore } from "src/features/users/store/auth.store";
 import {
   CheckCircle,
@@ -485,6 +486,7 @@ const HardNodeChallengePage = () => {
     navigate({
       to: "/roadmap/$worldId",
       params: { worldId: courseSlug || "python-basic" },
+      search: { mode: "hard" },
     });
   };
 
@@ -585,8 +587,39 @@ const HardNodeChallengePage = () => {
     if (challenge.hints && challenge.hints.length > 0) {
       arr.push(...challenge.hints.map((h: any) => h.text));
     }
+
+    if (arr.length === 0) {
+      if (isOptionBased) {
+        arr.push(
+          "Read through all the options carefully. Eliminate the ones that are obviously incorrect first.",
+        );
+      } else if (isDragDropMatching) {
+        arr.push(
+          "Start by matching the pairs you are most confident about to narrow down the remaining choices.",
+        );
+      } else if (isOrdering) {
+        arr.push(
+          "Look for logical starting and ending steps. Often, identifying the first and last step makes the rest easier.",
+        );
+      } else if (isHardDragDrop) {
+        arr.push(
+          "Analyze the surrounding code/text for clues about what kind of value or structure is expected in each blank.",
+        );
+      } else {
+        arr.push(
+          "Break the problem down into smaller parts and tackle them one at a time.",
+        );
+      }
+    }
+
     return Array.from(new Set(arr)).filter((h) => h.trim().length > 0);
-  }, [challenge]);
+  }, [
+    challenge,
+    isOptionBased,
+    isDragDropMatching,
+    isOrdering,
+    isHardDragDrop,
+  ]);
 
   if (loading) {
     return (
@@ -639,12 +672,6 @@ const HardNodeChallengePage = () => {
         </div>
 
         <section className="w-full flex flex-col">
-          <div className="mb-6 flex flex-col gap-2">
-            <p className="text-[14px] text-on-surface-variant font-medium">
-              {data?.node.label} • {data?.node.title}
-            </p>
-          </div>
-
           {isLockedMode && (
             <div className="mx-auto mt-12 w-full rounded-xl border border-[#1e3a5f] bg-[#081624] p-8 text-center shadow-[0_0_28px_rgba(58,127,193,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
@@ -1277,26 +1304,7 @@ const HardNodeChallengePage = () => {
                 </div>
               </div>
 
-              <div className="mt-7 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
-                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                    Reward
-                  </p>
-                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
-                    +{challenge.xp}
-                  </p>
-                  <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
-                </div>
-                <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                    Bonus
-                  </p>
-                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                    +10
-                  </p>
-                  <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
-                </div>
-              </div>
+              <RewardSummary xp={challenge.xp} stars={10} />
 
               <button
                 onClick={goToNextChallenge}

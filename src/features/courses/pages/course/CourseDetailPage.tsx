@@ -187,11 +187,13 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
   const chapterId = chapter._id || chapter.id;
 
   useEffect(() => {
+    if (lessons.length === 0) setLoading(true);
     courseApi
       .getLessons(chapterId)
       .then((data) => setLessons(data || []))
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chapterId]);
 
   const getRankLabel = () => {
