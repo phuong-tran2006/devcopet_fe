@@ -80,15 +80,17 @@ const LandingPage = () => {
               {/* Left: Text Content */}
               <div className="flex-1 space-y-8 text-center lg:text-left">
                 <h1 className="font-headline-lg text-headline-lg md:text-[72px] leading-tight font-extrabold tracking-tight text-on-surface">
-                  Explore the Depths of <br />
+                  Code Now,
+                  <br />
+                  Tomorrow{" "}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-fixed-dim via-cyan-300 to-secondary-fixed-dim">
-                    Coding
+                    Wow
                   </span>
                 </h1>
                 <p className="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
-                  An AI-powered training system with personalized roadmaps,
-                  project-based mentoring, and a community of elite developers.
-                  Break every technical limit.
+                  Step into the future of learning. Our AI-driven platform
+                  equips you with the skills, logic, and mindset to build
+                  incredible software. Let’s make “wow” happen.
                 </p>
               </div>
 
@@ -171,146 +173,88 @@ const LandingPage = () => {
           </div>
         </section>
 
-        {/* Trending Courses */}
+        {/* Everything You Need to Succeed */}
         <section className="relative py-24 px-margin-desktop z-10 max-w-container-max mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-headline-lg text-headline-lg md:text-[48px] text-on-surface mb-4">
-              Everything you need to become a developer
+              Everything You Need to Succeed
             </h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">
+              From foundational concepts to advanced architecture, Devcopet
+              provides a complete ecosystem for your software engineering
+              journey.
+            </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-            {/* Card 1: Interactive Learning */}
-            <div
-              ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
-                  <span className="material-symbols-outlined text-3xl">
-                    extension
-                  </span>
-                </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Interactive Learning
-                </h3>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant mb-6">
-                Hands-on exercises with instant feedback
-              </p>
-              <div className="space-y-2">
-                <div className="h-1.5 w-full bg-on-surface/10 rounded-full overflow-hidden">
-                  <div className="h-full bg-primary-fixed-dim w-[37.5%]"></div>
-                </div>
-                <div className="flex justify-end">
-                  <span className="font-label-sm text-label-sm text-on-surface-variant">
-                    3/8 lessons
-                  </span>
-                </div>
-              </div>
-            </div>
 
-            {/* Card 2: Real-world Projects */}
-            <div
-              ref={addToRefs}
-              style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    work
-                  </span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Hands-On Coding",
+                description:
+                  "Write real code in your browser with immediate validation and intelligent feedback loops.",
+                icon: "keyboard",
+                color: "bg-primary-fixed-dim/10 text-primary-fixed-dim",
+              },
+              {
+                title: "Launch Ready",
+                description:
+                  "Assemble a striking portfolio with applications that demonstrate your readiness for the tech industry.",
+                icon: "rocket_launch",
+                color: "bg-secondary-container/10 text-secondary-container",
+              },
+              {
+                title: "Global Network",
+                description:
+                  "Collaborate with a sprawling network of learners, share insights, and conquer coding challenges together.",
+                icon: "share",
+                color: "bg-primary-container/10 text-primary-container",
+              },
+              {
+                title: "24/7 AI Companion",
+                description:
+                  "Stuck on a bug? Our smart assistant is always online to debug, explain, and optimize your code.",
+                icon: "smart_toy",
+                color: "bg-primary-fixed-dim/10 text-primary-fixed-dim",
+              },
+              {
+                title: "Earn Your Badge",
+                description:
+                  "Gain recognized certifications that prove your mastery and boost your resume's credibility.",
+                icon: "badge",
+                color: "bg-secondary-container/10 text-secondary-container",
+              },
+              {
+                title: "Accelerated Career",
+                description:
+                  "Follow meticulously designed paths that transform complete beginners into confident, hirable developers.",
+                icon: "trending_up",
+                color: "bg-primary-container/10 text-primary-container",
+              },
+            ].map((card) => (
+              <div
+                key={card.title}
+                ref={addToRefs}
+                className="group rounded-[2rem] border border-on-surface/10 bg-surface-container/40 p-8 shadow-[0_20px_60px_rgba(0,0,0,0.12)] transition-all duration-300 hover:-translate-y-1 hover:border-primary-fixed-dim/30"
+              >
+                <div className="flex items-start gap-4">
+                  <div
+                    className={`min-w-[52px] h-[52px] rounded-3xl flex items-center justify-center ${card.color}`}
+                  >
+                    <span className="material-symbols-outlined text-2xl">
+                      {card.icon}
+                    </span>
+                  </div>
+                  <div className="space-y-3 text-left">
+                    <h3 className="font-headline-sm text-headline-sm text-on-surface">
+                      {card.title}
+                    </h3>
+                    <p className="font-body-md text-body-md text-on-surface-variant max-w-[23rem]">
+                      {card.description}
+                    </p>
+                  </div>
                 </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Real-world Projects
-                </h3>
               </div>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Build portfolio-worthy applications
-              </p>
-            </div>
-
-            {/* Card 3: Community Support */}
-            <div
-              ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    forum
-                  </span>
-                </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Community Support
-                </h3>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Join thousands of learners and mentors
-              </p>
-            </div>
-
-            {/* Card 4: AI Assistance */}
-            <div
-              ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
-                  <span className="material-symbols-outlined text-3xl">
-                    auto_awesome
-                  </span>
-                </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  AI Assistance
-                </h3>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Get help from our AI-powered coding assistant
-              </p>
-            </div>
-
-            {/* Card 5: Certificate */}
-            <div
-              ref={addToRefs}
-              style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    verified
-                  </span>
-                </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Certificate
-                </h3>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Earn verified certificates upon completion
-              </p>
-            </div>
-
-            {/* Card 6: Career Path (Full Width) */}
-            <div
-              ref={addToRefs}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card md:col-span-3 shadow-[0_0_20px_rgba(0,128,128,0.1)]"
-            >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
-                  <span className="material-symbols-outlined text-3xl">
-                    apartment
-                  </span>
-                </div>
-                <h3 className="font-headline-sm text-headline-sm text-on-surface">
-                  Career Path
-                </h3>
-              </div>
-              <p className="font-body-md text-body-md text-on-surface-variant">
-                Follow structured learning paths from beginner to professional
-                developer
-              </p>
-            </div>
+            ))}
           </div>
         </section>
 

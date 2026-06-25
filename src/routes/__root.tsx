@@ -2,7 +2,6 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 import Header from "../components/layout/Header";
-import Footer from "../components/layout/Footer";
 import { ThemeProvider } from "../contexts/ThemeContext";
 import "../index.css";
 
@@ -15,7 +14,6 @@ function RootContent() {
         <div className="flex-1 flex flex-col w-full relative pt-[80px]">
           <Outlet />
         </div>
-        <Footer />
         <TanStackRouterDevtools />
         {/* Global Brightness Overlay */}
         <div
