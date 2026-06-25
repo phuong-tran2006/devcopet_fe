@@ -55,8 +55,13 @@ function resolveDailyMissionRedirect(
       return { to: "/roadmap" };
     case "DASHBOARD":
       return { to: "/profile" };
+    case "LOGIN":
+      return { to: "/login" };
     default:
-      return { to: "/course" };
+      return {
+        to: "/courses/$courseId" as any,
+        params: { courseId: "python-basic" },
+      };
   }
 }
 
