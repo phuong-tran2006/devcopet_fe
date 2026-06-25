@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
 import { useAuthStore } from "../../users/store/auth.store";
-import searchIconUrl from "../../../assets/images/search.png";
-import arrowDownIconUrl from "../../../assets/images/arrow-down-sign-to-navigate.png";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const formatNumber = (value: number) =>
   new Intl.NumberFormat("en-US").format(Math.max(0, Math.round(value || 0)));
@@ -67,7 +66,7 @@ const CourseIcon = ({ course }: { course: any }) => {
 
   return (
     <div className="w-[50px] h-[50px] rounded-xl bg-surface/30 border border-on-surface/10 flex items-center justify-center text-primary-fixed-dim group-hover:scale-105 transition-transform">
-      <span className="material-symbols-outlined text-[28px]">terminal</span>
+      <LucideIcon name="terminal" className="text-[28px]" />
     </div>
   );
 };
@@ -102,11 +101,14 @@ const CourseCard = ({
             {course?.title || "Untitled Course"}
           </h3>
           <div className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg flex items-center justify-center shrink-0">
-            <span className="material-symbols-outlined text-[14px]">
-              {(course?.programmingLanguage || "").toLowerCase() === "python"
-                ? "terminal"
-                : "data_object"}
-            </span>
+            <LucideIcon
+              name={
+                (course?.programmingLanguage || "").toLowerCase() === "python"
+                  ? "terminal"
+                  : "data_object"
+              }
+              className="text-[14px]"
+            />
           </div>
         </div>
 
@@ -152,9 +154,7 @@ const CourseCard = ({
             className="w-full bg-primary-fixed-dim text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)]"
           >
             {buttonLabel}
-            <span className="material-symbols-outlined text-[14px]">
-              arrow_forward
-            </span>
+            <LucideIcon name="arrow_forward" className="text-[14px]" />
           </Link>
         </div>
       </div>
@@ -278,12 +278,8 @@ const CoursePage = () => {
 
         <div className="flex flex-col md:flex-row gap-3 mb-5">
           <div className="flex-1 relative">
-            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none flex items-center justify-center">
-              <img
-                src={searchIconUrl}
-                alt="Search"
-                className="w-[16px] h-[16px] opacity-70 dark:invert"
-              />
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none">
+              <LucideIcon name="search" className="text-[20px]" />
             </span>
             <input
               type="text"
@@ -306,11 +302,7 @@ const CoursePage = () => {
                 <option value="advanced">Advanced</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                <img
-                  src={arrowDownIconUrl}
-                  alt="Arrow Down"
-                  className="w-[14px] h-[14px] opacity-70 dark:invert"
-                />
+                <LucideIcon name="expand_more" className="text-[18px]" />
               </div>
             </div>
 
@@ -325,11 +317,7 @@ const CoursePage = () => {
                 <option value="progress">Sort: Progress</option>
               </select>
               <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant">
-                <img
-                  src={arrowDownIconUrl}
-                  alt="Arrow Down"
-                  className="w-[14px] h-[14px] opacity-70 dark:invert"
-                />
+                <LucideIcon name="expand_more" className="text-[18px]" />
               </div>
             </div>
           </div>

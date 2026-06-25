@@ -69,6 +69,11 @@ export interface EasyNodeChallengeReview {
   completedAt?: string;
 }
 
+export interface UserProgressSnapshot {
+  exp: number;
+  level: number;
+}
+
 export interface EasyNodeChallengeResponse {
   node: {
     id: string;
@@ -81,6 +86,12 @@ export interface EasyNodeChallengeResponse {
   challenge: EasyNodeChallenge | null;
   review?: EasyNodeChallengeReview;
   message?: string;
+  nextNode?: {
+    id: string;
+    label: string;
+    title: string;
+    status: EasyRoadmapNodeStatus;
+  } | null;
 }
 
 export interface SubmitEasyNodeChallengeResponse {
@@ -89,6 +100,8 @@ export interface SubmitEasyNodeChallengeResponse {
   correctOptionId?: EasyChallengeOptionId;
   explanation?: string;
   review?: EasyNodeChallengeReview;
+  xpAwarded?: number;
+  userProgress?: UserProgressSnapshot;
 }
 
 export type MediumChallengeType = "multiple_choice" | "drag_drop";
@@ -179,26 +192,28 @@ export type MediumNodeChallenge =
   | MediumMultipleChoiceChallenge
   | MediumDragDropChallenge;
 
-export type MediumNodeChallengeReview =
-  | {
-      selectedOptionId?: EasyChallengeOptionId;
-      correctOptionId?: EasyChallengeOptionId;
-      correct: boolean;
-      explanation: string;
-      completedAt?: string;
-    }
-  | {
-      dropZoneMap?: Record<string, string>;
-      correctDropZoneMap?: Record<string, string>;
-      correct: boolean;
-      explanation: string;
-      completedAt?: string;
-    };
+export type MediumNodeChallengeReview = {
+  challengeType?: "multiple_choice" | "drag_drop";
+  selectedOptionId?: EasyChallengeOptionId;
+  correctOptionId?: EasyChallengeOptionId;
+  selectedDropZoneMap?: Record<string, string>;
+  dropZoneMap?: Record<string, string>;
+  correctDropZoneMap?: Record<string, string>;
+  correct: boolean;
+  explanation: string;
+  completedAt?: string;
+};
 
 export interface MediumNodeChallengeResponse {
   node: MediumChallengeNode;
   challenge: MediumNodeChallenge;
   review?: MediumNodeChallengeReview;
+  nextNode?: {
+    id: string;
+    label: string;
+    title: string;
+    status: EasyRoadmapNodeStatus;
+  } | null;
 }
 
 export type SubmitMediumNodeChallengePayload =
@@ -217,6 +232,8 @@ export interface SubmitMediumNodeChallengeResponse {
   correctOptionId?: EasyChallengeOptionId;
   correctDropZoneMap?: Record<string, string>;
   explanation?: string;
+  xpAwarded?: number;
+  userProgress?: UserProgressSnapshot;
 }
 
 export type HardChallengeType =
@@ -413,6 +430,8 @@ export interface SubmitHardNodeChallengeResponse {
   correctMatchingMap?: Record<string, string>;
   correctOrderedIds?: string[];
   correctDropZoneMap?: Record<string, string>;
+  xpAwarded?: number;
+  userProgress?: UserProgressSnapshot;
 }
 
 export const courseApi = {

@@ -17,6 +17,8 @@ import {
 } from "../../constants/authImages";
 import mascotVideo from "../../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../../components/ui/TransparentVideo";
+import VerifyEmailModal from "../VerifyEmailModal";
+
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -31,6 +33,7 @@ const RegistrationPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
 
   const { setAuth, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
@@ -112,37 +115,38 @@ const RegistrationPage = () => {
 
     setLoading(true);
     try {
-      // Register the account first
+      const formatDate = (dateString: string) => {
+        if (!dateString) return "";
+        const parts = dateString.split("-");
+        if (parts.length === 3) {
+          return `${parts[2]}/${parts[1]}/${parts[0]}`; // YYYY-MM-DD -> DD/MM/YYYY
+        }
+        return dateString;
+      };
+
+      const selectedLevel = codingExperienceLevels.find(
+        (item) => item.value === formData.codingExperience,
+      );
+      const experienceLevel = selectedLevel
+        ? selectedLevel.label
+        : formData.codingExperience;
+
+      // Register the account
       await authApi.register({
         email: formData.email,
         password: formData.password,
+        confirmPassword: formData.confirmPassword,
         name: formData.fullName,
         username: formData.username,
+        dateOfBirth: formatDate(formData.dateOfBirth),
+        experienceLevel: experienceLevel,
+        termsAccepted: formData.agreeToTerms,
       });
 
-      setSuccessMessage("Account created successfully! Redirecting...");
-
-      // Auto-login after successful registration to get tokens
-      try {
-        const loginResponse = await authApi.login({
-          email: formData.email,
-          password: formData.password,
-        });
-
-        if (loginResponse.user) {
-          setAuth(null, null, loginResponse.user);
-          setTimeout(() => {
-            if (loginResponse.user && !loginResponse.user.onboardingCompleted) {
-              navigate({ to: "/onboarding" });
-            } else {
-              navigate({ to: "/course" });
-            }
-          }, 1500);
-        }
-      } catch {
-        // If auto-login fails, redirect to login page
-        setTimeout(() => navigate({ to: "/login" }), 1500);
-      }
+      setSuccessMessage(
+        "Account created successfully! Please verify your email.",
+      );
+      setShowVerifyModal(true);
     } catch (err: any) {
       const errorMessage =
         err?.response?.data?.message ||
@@ -493,6 +497,18 @@ const RegistrationPage = () => {
           </span>
         </button>
       </main>
+      <VerifyEmailModal
+        isOpen={showVerifyModal}
+        email={formData.email}
+        onClose={() => setShowVerifyModal(false)}
+        onSuccess={(msg) => {
+          setSuccessMessage(msg);
+          setShowVerifyModal(false);
+          setTimeout(() => {
+            navigate({ to: "/login" });
+          }, 1500);
+        }}
+      />
     </>
   );
 };

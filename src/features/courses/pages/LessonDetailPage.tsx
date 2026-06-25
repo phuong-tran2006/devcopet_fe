@@ -1,16 +1,21 @@
 // @ts-nocheck
-import React, { useEffect, useRef, useState } from "react";
+import LucideIcon from "../../../components/ui/LucideIcon";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import {
+  atomDark,
+  oneLight,
+} from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
 import CodeRunnerBlock from "../../../components/CodeRunnerBlock";
 import CourseSidebar from "../components/CourseSidebar";
 import { courseApi } from "../api/course.api";
 import LessonQuiz from "../../quizzes/components/LessonQuiz";
+import { useTheme } from "../../../contexts/ThemeContext";
 
-const markdownComponents = {
+const createMarkdownComponents = (isLight: boolean) => ({
   code({ node, inline, className, children, ...props }) {
     const language = className ? className.replace("language-", "").trim() : "";
 
@@ -25,10 +30,26 @@ const markdownComponents = {
         <SyntaxHighlighter
           {...props}
           children={String(children).replace(/\n$/, "")}
-          style={atomDark}
+          style={isLight ? oneLight : atomDark}
           language={language}
           PreTag="div"
-          className="rounded-xl my-6 border border-outline/20 !bg-[#1d1f21]"
+          customStyle={{
+            margin: "24px 0",
+            borderRadius: "10px",
+            border: isLight ? "1px solid #d4e0eb" : "1px solid #263443",
+            background: isLight ? "#eef4f8" : "#101820",
+            color: isLight ? "#263447" : "#d6e4ef",
+            fontSize: "14px",
+            lineHeight: 1.65,
+            padding: "16px 18px",
+            boxShadow: "none",
+          }}
+          codeTagProps={{
+            style: {
+              fontFamily: "JetBrains Mono, Roboto Mono, monospace",
+            },
+          }}
+          className="rounded-xl"
         />
       );
     }
@@ -36,15 +57,16 @@ const markdownComponents = {
     return (
       <code
         {...props}
-        className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+        className={`${className} rounded border border-[#bfd0dd] bg-[#e7f0f5] px-1.5 py-0.5 font-code-md text-[13px] text-[#0f5c66] dark:border-outline/20 dark:bg-surface-container-high dark:text-[#8fd3dd]`}
       >
         {children}
       </code>
     );
   },
-};
+});
 
 const LessonDetailPage = () => {
+  const { theme } = useTheme();
   const { lessonId } = useParams({ strict: false });
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
@@ -55,6 +77,10 @@ const LessonDetailPage = () => {
   const contentScrollRef = useRef(null);
   const [quizPassed, setQuizPassed] = useState(false);
   const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
+  const markdownComponents = useMemo(
+    () => createMarkdownComponents(theme === "light"),
+    [theme],
+  );
   const lastScrollRef = useRef({
     scrollTop: 0,
 
@@ -228,9 +254,10 @@ const LessonDetailPage = () => {
   if (!lesson) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
-          error
-        </span>
+        <LucideIcon
+          name="error"
+          className="text-5xl text-on-surface-variant mb-4"
+        />
         <h2 className="font-headline-md text-on-surface mb-2">
           Lesson Not Found
         </h2>
@@ -289,9 +316,10 @@ const LessonDetailPage = () => {
     `}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <span className="material-symbols-outlined text-[22px]">
-            {isSidebarOpen ? "chevron_left" : "menu"}
-          </span>
+          <LucideIcon
+            name={isSidebarOpen ? "chevron_left" : "menu"}
+            className="text-[22px]"
+          />
         </button>
       )}
       {/* Cột phải: Nội dung bài học */}
@@ -305,7 +333,7 @@ const LessonDetailPage = () => {
             onClick={() => setIsMobileSidebarOpen(true)}
             className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">menu</span>
+            <LucideIcon name="menu" className="text-[20px]" />
             <span className="font-label-sm tracking-widest text-[11px] uppercase font-bold">
               Danh sách bài học
             </span>
@@ -321,18 +349,17 @@ const LessonDetailPage = () => {
             onClick={() => window.history.back()}
             className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
+            <LucideIcon name="arrow_back" className="text-[16px]" />
             Back to Modules
           </button>
 
           {/* Current Lesson Dashboard Info */}
           <div className="bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-lg">
             <div className="p-4 bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
-              <span className="material-symbols-outlined text-4xl text-primary-fixed-dim">
-                play_lesson
-              </span>
+              <LucideIcon
+                name="play_lesson"
+                className="text-4xl text-primary-fixed-dim"
+              />
             </div>
             <div className="flex-1">
               <div className="text-[12px] font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">
@@ -348,15 +375,17 @@ const LessonDetailPage = () => {
             </div>
             <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
               <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px] text-[#4ade80]">
-                  military_tech
-                </span>
+                <LucideIcon
+                  name="military_tech"
+                  className="text-[18px] text-[#4ade80]"
+                />
                 XP Reward: {lesson.points || 100}
               </div>
               <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px] text-[#f87171]">
-                  local_fire_department
-                </span>
+                <LucideIcon
+                  name="local_fire_department"
+                  className="text-[18px] text-[#f87171]"
+                />
                 Difficulty:{" "}
                 <span className="capitalize">
                   {lesson.difficulty || "Normal"}
@@ -407,9 +436,7 @@ const LessonDetailPage = () => {
                   className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Next Lesson
-                  <span className="material-symbols-outlined text-[20px]">
-                    arrow_forward
-                  </span>
+                  <LucideIcon name="arrow_forward" className="text-[20px]" />
                 </button>
               ) : (
                 <Link
@@ -418,9 +445,7 @@ const LessonDetailPage = () => {
                   className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Back to Course Curriculum
-                  <span className="material-symbols-outlined text-[20px]">
-                    assignment
-                  </span>
+                  <LucideIcon name="assignment" className="text-[20px]" />
                 </Link>
               )}
             </div>
@@ -444,9 +469,7 @@ const LessonDetailPage = () => {
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline/20 shadow-lg"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  close
-                </span>
+                <LucideIcon name="close" className="text-[20px]" />
               </button>
             </div>
             <div className="flex-1 h-full overflow-hidden">

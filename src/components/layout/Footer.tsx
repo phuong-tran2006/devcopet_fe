@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../ui/LucideIcon";
 import React from "react";
 
 const Footer = () => {
@@ -47,12 +48,10 @@ const Footer = () => {
         </div>
         <div className="flex gap-4">
           <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-on-surface">
-            <span className="material-symbols-outlined text-[20px]">
-              terminal
-            </span>
+            <LucideIcon name="terminal" className="text-[20px]" />
           </button>
           <button className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/5 transition-all text-on-surface">
-            <span className="material-symbols-outlined text-[20px]">hub</span>
+            <LucideIcon name="hub" className="text-[20px]" />
           </button>
         </div>
       </div>

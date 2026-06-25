@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { mascotAxolotl } from "../users/constants/authImages";
+import LucideIcon from "../../components/ui/LucideIcon";
 
 interface SurveyModalProps {
   isOpen: boolean;
@@ -585,9 +586,7 @@ const SurveyModal = ({
                 : "text-black dark:text-[#64748b] hover:text-gray-950 dark:hover:text-white"
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">
-              arrow_back
-            </span>
+            <LucideIcon name="arrow_back" className="text-[18px]" />
             Previous Question
           </button>
 

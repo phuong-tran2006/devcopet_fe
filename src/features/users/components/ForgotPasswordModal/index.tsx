@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 import Button from "../../../../components/ui/Button";
-import { changePassword, retryPassword } from "../../api/auth.api";
+import {
+  changePassword,
+  retryPassword,
+  verifyResetCode,
+} from "../../api/auth.api";
 
 type ForgotPasswordModalProps = {
   isOpen: boolean;
@@ -9,9 +13,9 @@ type ForgotPasswordModalProps = {
 };
 
 const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
-  const [step, setStep] = useState<1 | 2>(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
+  const [otp, setOtp] = useState<string[]>(Array(6).fill(""));
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [message, setMessage] = useState("");
@@ -19,11 +23,12 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
   const [loading, setLoading] = useState(false);
   const [devResetCode, setDevResetCode] = useState("");
   const closeTimerRef = useRef<number | null>(null);
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const resetState = useCallback(() => {
     setStep(1);
     setEmail("");
-    setCode("");
+    setOtp(Array(6).fill(""));
     setPassword("");
     setConfirmPassword("");
     setMessage("");
@@ -53,6 +58,14 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
       }
     };
   }, [isOpen, resetState]);
+
+  useEffect(() => {
+    if (step === 2) {
+      setTimeout(() => {
+        inputRefs.current[0]?.focus();
+      }, 100);
+    }
+  }, [step]);
 
   if (!isOpen) return null;
 
@@ -89,12 +102,83 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
     }
   };
 
+  const handleOtpChange = (value: string, index: number) => {
+    if (value && !/^\d$/.test(value)) return;
+
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    if (value && index < 5) {
+      inputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleOtpKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+    if (e.key === "Backspace") {
+      if (!otp[index] && index > 0) {
+        const newOtp = [...otp];
+        newOtp[index - 1] = "";
+        setOtp(newOtp);
+        inputRefs.current[index - 1]?.focus();
+      } else {
+        const newOtp = [...otp];
+        newOtp[index] = "";
+        setOtp(newOtp);
+      }
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").trim();
+    if (/^\d{6}$/.test(pastedData)) {
+      const digits = pastedData.split("");
+      setOtp(digits);
+      inputRefs.current[5]?.focus();
+    }
+  };
+
+  const handleVerifyCode = async (event: FormEvent) => {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+
+    const codeStr = otp.join("");
+    if (!/^\d{6}$/.test(codeStr)) {
+      setError("Please enter the 6-digit OTP code.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await verifyResetCode(email.trim(), codeStr);
+      setMessage(
+        response?.message ||
+          "Code verified successfully. Please set your new password.",
+      );
+      setStep(3);
+    } catch (err: any) {
+      setError(
+        err?.response?.data?.message ||
+          err?.message ||
+          "Could not verify code. Please check the code and try again.",
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleChangePassword = async (event: FormEvent) => {
     event.preventDefault();
     setError("");
     setMessage("");
 
-    if (!/^\d{6}$/.test(code.trim())) {
+    const codeStr = otp.join("");
+    if (!/^\d{6}$/.test(codeStr)) {
       setError("Please enter the 6-digit OTP code.");
       return;
     }
@@ -113,14 +197,14 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
     try {
       await changePassword({
         email: email.trim(),
-        code: code.trim(),
-        password,
+        code: codeStr,
+        newPassword: password,
         confirmPassword,
       });
       setMessage(
         "Password changed successfully. Returning you to the login form...",
       );
-      setCode("");
+      setOtp(Array(6).fill(""));
       setPassword("");
       setConfirmPassword("");
       closeTimerRef.current = window.setTimeout(() => {
@@ -151,7 +235,9 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
             <p className="mt-2 text-sm leading-6 text-on-surface-variant">
               {step === 1
                 ? "Enter your email address. We will send a 6-digit reset code."
-                : "Enter the reset code and choose a new password."}
+                : step === 2
+                  ? "Enter the 6-digit reset code sent to your email."
+                  : "Enter your new password to reset your account."}
             </p>
           </div>
           <button
@@ -164,20 +250,25 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
           </button>
         </div>
 
-        <div className="mb-6 grid grid-cols-2 gap-3 text-xs font-bold uppercase tracking-[0.18em]">
+        <div className="mb-6 grid grid-cols-3 gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-[0.1em] sm:tracking-[0.18em] text-center">
           <div
-            className={`rounded-lg border px-3 py-2 ${step === 1 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
+            className={`rounded-lg border px-2 py-2 ${step === 1 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
           >
             1. Email
           </div>
           <div
-            className={`rounded-lg border px-3 py-2 ${step === 2 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
+            className={`rounded-lg border px-2 py-2 ${step === 2 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
           >
-            2. Reset
+            2. Verify
+          </div>
+          <div
+            className={`rounded-lg border px-2 py-2 ${step === 3 ? "border-primary-fixed-dim text-primary-fixed-dim" : "border-on-surface/10 text-on-surface-variant"}`}
+          >
+            3. Reset
           </div>
         </div>
 
-        {step === 1 ? (
+        {step === 1 && (
           <form onSubmit={handleSendCode} className="flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm text-on-surface">
               Email address
@@ -200,25 +291,58 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
               disabled={loading}
             />
           </form>
-        ) : (
-          <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
-            <label className="flex flex-col gap-2 text-sm text-on-surface">
-              Reset code
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={code}
-                onChange={(e) =>
-                  setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-                }
-                placeholder="6-digit code"
-                autoComplete="one-time-code"
-                className="w-full rounded-lg border border-on-surface/10 bg-surface/60 px-4 py-3 text-on-surface outline-none transition focus:border-primary-fixed-dim focus:ring-2 focus:ring-primary-fixed-dim/40"
-                disabled={loading}
-              />
-            </label>
+        )}
 
+        {step === 2 && (
+          <form onSubmit={handleVerifyCode} className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <span className="text-sm text-on-surface">Reset code</span>
+              <div
+                className="flex justify-between gap-2 w-full"
+                onPaste={handleOtpPaste}
+              >
+                {otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    ref={(el) => {
+                      inputRefs.current[index] = el;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={1}
+                    value={digit}
+                    onChange={(e) => handleOtpChange(e.target.value, index)}
+                    onKeyDown={(e) => handleOtpKeyDown(e, index)}
+                    className="w-12 h-14 rounded-xl border border-on-surface/10 bg-surface/50 text-center text-xl font-bold text-on-surface outline-none transition focus:border-primary-fixed-dim focus:ring-2 focus:ring-primary-fixed-dim/30 focus:bg-surface shadow-inner"
+                    disabled={loading}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button
+                type="button"
+                text="Back"
+                variant="secondary"
+                className="w-full"
+                layout_width="full"
+                disabled={loading}
+                onClick={() => setStep(1)}
+              />
+              <Button
+                type="submit"
+                text={loading ? "Verifying..." : "Verify code"}
+                className="w-full"
+                layout_width="full"
+                disabled={loading || !otp.every((digit) => digit !== "")}
+              />
+            </div>
+          </form>
+        )}
+
+        {step === 3 && (
+          <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
             <label className="flex flex-col gap-2 text-sm text-on-surface">
               New password
               <input
@@ -253,7 +377,7 @@ const ForgotPasswordModal = ({ isOpen, onClose }: ForgotPasswordModalProps) => {
                 className="w-full"
                 layout_width="full"
                 disabled={loading}
-                onClick={() => setStep(1)}
+                onClick={() => setStep(2)}
               />
               <Button
                 type="submit"

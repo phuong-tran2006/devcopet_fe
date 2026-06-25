@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import Button from "../../../../components/ui/Button";
 import ForgotPasswordModal from "../ForgotPasswordModal";
+import VerifyEmailModal from "../VerifyEmailModal";
 import {
   EmailIcon,
   LockIcon,
@@ -25,6 +26,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const { setAuth, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
@@ -48,6 +51,7 @@ const Login = () => {
   const handleLogin = async (e: any) => {
     if (e) e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     if (!email || !password) {
       setError("Please enter both email and password.");
@@ -74,6 +78,10 @@ const Login = () => {
         err?.message ||
         "Login failed. Please check your credentials.";
       setError(errorMessage);
+
+      if (errorMessage.toLowerCase().includes("verify your email")) {
+        setShowVerifyModal(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -95,6 +103,7 @@ const Login = () => {
   const handleInputChange = (setter: any) => (e: any) => {
     setter(e?.target?.value);
     if (error) setError("");
+    if (successMessage) setSuccessMessage("");
   };
 
   return (
@@ -214,6 +223,12 @@ const Login = () => {
                     <p className="text-sm text-red-400">{error}</p>
                   ) : null}
 
+                  {successMessage ? (
+                    <p className="text-sm text-green-400 font-semibold">
+                      {successMessage}
+                    </p>
+                  ) : null}
+
                   {/* Social login section */}
                   <div className="flex flex-col gap-3">
                     {/* Divider with text */}
@@ -323,6 +338,15 @@ const Login = () => {
       <ForgotPasswordModal
         isOpen={isForgotPasswordOpen}
         onClose={() => setIsForgotPasswordOpen(false)}
+      />
+      <VerifyEmailModal
+        isOpen={showVerifyModal}
+        email={email}
+        onClose={() => setShowVerifyModal(false)}
+        onSuccess={(msg) => {
+          setSuccessMessage(msg);
+          setShowVerifyModal(false);
+        }}
       />
     </>
   );

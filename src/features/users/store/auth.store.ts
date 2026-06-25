@@ -26,11 +26,21 @@ interface AuthState {
   ) => void;
   logout: () => void;
   checkAuth: () => void;
+  updateUser: (updatedFields: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
+
+  updateUser: (updatedFields) => {
+    set((state) => {
+      if (!state.user) return state;
+      const mergedUser = { ...state.user, ...updatedFields };
+      localStorage.setItem("user", JSON.stringify(mergedUser));
+      return { user: mergedUser };
+    });
+  },
 
   setAuth: (_accessToken, _refreshToken, user) => {
     localStorage.removeItem("accessToken");

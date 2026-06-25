@@ -9,6 +9,7 @@ export type ArenaStatus =
   | "idle"
   | "searching"
   | "found"
+  | "accepting"
   | "countdown"
   | "playing"
   | "question_result"
@@ -126,12 +127,16 @@ interface ArenaState {
   opponentAnsweredUserIds: string[];
   matchResult: ArenaMatchResult | null;
   errorMessage: string | null;
+  hasAccepted: boolean;
+  acceptTimeoutSeconds: number;
   connectArenaSocket: () => void;
   findMatch: (payload: FindMatchPayload) => void;
   cancelFindMatch: () => void;
   submitMultipleChoice: (optionId: string) => void;
   submitDragDrop: (dropZoneMap: Record<string, string>) => void;
   leaveRoom: () => void;
+  acceptMatch: () => void;
+  declineMatch: () => void;
   resetArena: () => void;
 }
 
@@ -157,9 +162,19 @@ const initialArenaState = {
   opponentAnsweredUserIds: [],
   matchResult: null,
   errorMessage: null,
+  hasAccepted: false,
+  acceptTimeoutSeconds: 5,
 };
 
 let listenersRegistered = false;
+let searchInterval: number | null = null;
+
+const clearSearchInterval = () => {
+  if (searchInterval) {
+    clearInterval(searchInterval);
+    searchInterval = null;
+  }
+};
 
 export const useArenaStore = create<ArenaState>((set, get) => {
   const registerListeners = () => {
@@ -168,26 +183,31 @@ export const useArenaStore = create<ArenaState>((set, get) => {
 
     socketService.on("arena:waiting", (data) => {
       if (data?.status === "cancelled") {
+        clearSearchInterval();
         set({ ...initialArenaState });
         return;
       }
 
       set({
         status: "searching",
-        waitingSeconds: data?.waitingSeconds ?? 0,
+        waitingSeconds: data?.waitingSeconds ?? get().waitingSeconds,
         estimatedBotFallbackSeconds: data?.estimatedBotFallbackSeconds ?? 0,
         errorMessage: null,
       });
     });
 
     socketService.on("arena:match_found", (data) => {
+      clearSearchInterval();
+      console.log("Socket Event: arena:match_found", data);
       set({
-        status: "found",
+        status: data.status || "accepting",
         roomId: data.roomId,
         mode: data.mode,
         courseSlug: data.courseSlug,
         matchTier: data.matchTier,
         players: data.players ?? [],
+        acceptTimeoutSeconds: data.acceptTimeoutSeconds ?? 5,
+        hasAccepted: false,
         scoreboard: (data.players ?? []).map((player: PublicArenaPlayer) => ({
           userId: player.userId,
           username: player.username,
@@ -202,7 +222,29 @@ export const useArenaStore = create<ArenaState>((set, get) => {
       });
     });
 
+    socketService.on("arena:match_started", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
+      clearSearchInterval();
+      console.log("Socket Event: arena:match_started", data);
+      set({
+        status: "countdown",
+        roomId: data?.roomId || get().roomId,
+      });
+    });
+
+    socketService.on("arena:match_cancelled", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
+      clearSearchInterval();
+      console.log("Socket Event: arena:match_cancelled", data);
+      set({
+        ...initialArenaState,
+        status: "idle",
+      });
+    });
+
     socketService.on("arena:countdown", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
+      console.log("Socket Event: arena:countdown", data);
       set({
         status: "countdown",
         roomId: data.roomId,
@@ -212,6 +254,7 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     });
 
     socketService.on("arena:question", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
       set({
         status: "playing",
         roomId: data.roomId,
@@ -230,6 +273,7 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     });
 
     socketService.on("arena:answer_result", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
       set({
         status: "question_result",
         answerResult: data,
@@ -238,10 +282,12 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     });
 
     socketService.on("arena:score_update", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
       set({ scoreboard: data?.scoreboard ?? [] });
     });
 
     socketService.on("arena:opponent_answered", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
       if (!data?.userId) return;
       set((state) => ({
         opponentAnsweredUserIds: state.opponentAnsweredUserIds.includes(
@@ -253,6 +299,7 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     });
 
     socketService.on("arena:question_finished", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
       set({
         status: "question_result",
         questionFinished: data,
@@ -261,6 +308,7 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     });
 
     socketService.on("arena:match_finished", (data) => {
+      if (data?.roomId && data.roomId !== get().roomId) return;
       set({
         status: "finished",
         matchResult: data,
@@ -270,6 +318,7 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     });
 
     socketService.on("arena:error", (data) => {
+      clearSearchInterval();
       set({
         status: "error",
         errorMessage: data?.message || "Arena error",
@@ -286,17 +335,24 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     },
 
     findMatch: ({ courseSlug, mode }) => {
+      if (get().status === "searching") return;
+
       get().connectArenaSocket();
+      clearSearchInterval();
       set({
         ...initialArenaState,
         status: "searching",
         courseSlug,
         mode,
       });
+      searchInterval = window.setInterval(() => {
+        set((state) => ({ waitingSeconds: state.waitingSeconds + 1 }));
+      }, 1000);
       socketService.emit("arena:find_match", { courseSlug, mode });
     },
 
     cancelFindMatch: () => {
+      clearSearchInterval();
       socketService.emit("arena:cancel_find_match", {});
       set({ ...initialArenaState });
     },
@@ -332,6 +388,7 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     },
 
     leaveRoom: () => {
+      clearSearchInterval();
       const { roomId } = get();
       if (roomId) {
         socketService.emit("arena:leave_room", { roomId });
@@ -339,7 +396,24 @@ export const useArenaStore = create<ArenaState>((set, get) => {
       set({ ...initialArenaState });
     },
 
+    acceptMatch: () => {
+      const { roomId } = get();
+      if (!roomId) return;
+      set({ hasAccepted: true });
+      socketService.emit("arena:accept_match", { roomId });
+    },
+
+    declineMatch: () => {
+      clearSearchInterval();
+      const { roomId } = get();
+      if (roomId) {
+        socketService.emit("arena:decline_match", { roomId });
+      }
+      set({ ...initialArenaState });
+    },
+
     resetArena: () => {
+      clearSearchInterval();
       set({ ...initialArenaState });
     },
   };

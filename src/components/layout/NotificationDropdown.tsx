@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import LucideIcon from "../ui/LucideIcon";
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -56,9 +57,7 @@ const NotificationDropdown = () => {
           isOpen ? "bg-on-surface/10" : "hover:bg-on-surface/10"
         }`}
       >
-        <span className="material-symbols-outlined text-[20px]">
-          notifications
-        </span>
+        <LucideIcon name="notifications" className="text-[20px]" />
         {/* Unread Badge */}
         {notifications.some((n) => n.unread) && (
           <span className="absolute top-2 right-2.5 w-2 h-2 rounded-full bg-[#4ade80]"></span>
@@ -106,9 +105,7 @@ const NotificationDropdown = () => {
                       : "bg-primary-fixed-dim/20 text-primary-fixed-dim"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[24px]">
-                    {notif.icon}
-                  </span>
+                  <LucideIcon name={notif.icon} className="text-[24px]" />
                 </div>
 
                 {/* Content */}

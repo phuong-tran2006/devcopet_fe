@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { dailyQuestsApi, type DailyMission } from "../api/dailyQuests.api";
+import React from "react";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const DailyQuests = () => {
   const [mission, setMission] = useState<DailyMission | null>(null);
@@ -70,29 +70,27 @@ const DailyQuests = () => {
         Daily Quests
       </h2>
       <div className="space-y-3">
-        <div
-          className={`flex items-center justify-between p-4 rounded-xl border transition-colors duration-300 ${
-            isCompleted
-              ? "bg-surface-container-highest border-transparent"
-              : "bg-surface-container border-outline/20 cursor-pointer hover:border-primary"
-          }`}
-          onClick={handleComplete}
-        >
-          <div className="flex items-center gap-4">
-            <div
-              className={`w-5 h-5 rounded flex items-center justify-center border transition-colors duration-300 ${
-                isCompleted
-                  ? "bg-primary-fixed-dim border-primary-fixed-dim text-white"
-                  : "border-outline bg-transparent"
-              }`}
-            >
-              {isCompleted && (
-                <span className="material-symbols-outlined text-[14px] font-bold">
-                  check
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col">
+        {quests.map((quest) => (
+          <div
+            key={quest.id}
+            className={`flex items-center justify-between p-4 rounded-xl border transition-colors duration-300 ${
+              quest.completed
+                ? "bg-surface-container-highest border-transparent"
+                : "bg-surface-container border-outline/20"
+            }`}
+          >
+            <div className="flex items-center gap-4">
+              <div
+                className={`w-5 h-5 rounded flex items-center justify-center border transition-colors duration-300 ${
+                  quest.completed
+                    ? "bg-primary-fixed-dim border-primary-fixed-dim text-white"
+                    : "border-outline bg-transparent"
+                }`}
+              >
+                {quest.completed && (
+                  <LucideIcon name="check" className="text-[14px] font-bold" />
+                )}
+              </div>
               <span
                 className={`text-sm transition-colors duration-300 ${isCompleted ? "text-on-surface-variant line-through" : "text-on-surface"}`}
               >

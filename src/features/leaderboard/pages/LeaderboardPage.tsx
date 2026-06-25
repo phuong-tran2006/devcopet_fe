@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuthStore } from "../../users/store/auth.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const LeaderboardPage = () => {
   const [activeTab, setActiveTab] = useState("Python World");
@@ -29,18 +30,18 @@ const LeaderboardPage = () => {
         {
           rank: 2,
           name: "PixelWizard",
-          levelTitle: "Architect",
-          stars: "14,200",
-          xp: "89 Wins",
+          levelTitle: "Lvl 42 Architect",
+          points: "14,200",
+          avatarUrl: undefined,
           avatarColor: "bg-[#234E52]",
           color: "#4FD1C5",
         },
         {
           rank: 1,
           name: "KernelOverlord",
-          levelTitle: "System God",
-          stars: "21,800",
-          xp: "142 Wins",
+          levelTitle: "Lvl 50 System God",
+          points: "21,800",
+          avatarUrl: undefined,
           avatarColor: "bg-[#702459]",
           color: "#F687B3",
           isCenter: true,
@@ -48,26 +49,24 @@ const LeaderboardPage = () => {
         {
           rank: 3,
           name: "LogicLassie",
-          levelTitle: "Engineer",
-          stars: "11,500",
-          xp: "67 Wins",
+          levelTitle: "Lvl 38 Engineer",
+          points: "11,500",
+          avatarUrl: undefined,
           avatarColor: "bg-[#2D3748]",
           color: "#A0AEC0",
         },
       ];
     }
 
-    const sorted = [...users].sort(
-      (a, b) => (b.arenaRating || 0) - (a.arenaRating || 0),
-    );
+    const sorted = users;
 
     const p1 = sorted[0]
       ? {
           rank: 1,
           name: sorted[0].username,
-          levelTitle: `${sorted[0].arenaRank || "Beginner"}`,
-          stars: String(sorted[0].arenaRating || 0),
-          xp: `${sorted[0].arenaWins || 0} Wins`,
+          levelTitle: `Lvl ${sorted[0].level} Coder`,
+          points: String(sorted[0].exp || 0),
+          avatarUrl: sorted[0].avatarUrl,
           avatarColor: "bg-[#702459]",
           color: "#F687B3",
           isCenter: true,
@@ -75,9 +74,9 @@ const LeaderboardPage = () => {
       : {
           rank: 1,
           name: "KernelOverlord",
-          levelTitle: "System God",
-          stars: "21,800",
-          xp: "142 Wins",
+          levelTitle: "Lvl 50 System God",
+          points: "21,800",
+          avatarUrl: undefined,
           avatarColor: "bg-[#702459]",
           color: "#F687B3",
           isCenter: true,
@@ -87,18 +86,18 @@ const LeaderboardPage = () => {
       ? {
           rank: 2,
           name: sorted[1].username,
-          levelTitle: `${sorted[1].arenaRank || "Beginner"}`,
-          stars: String(sorted[1].arenaRating || 0),
-          xp: `${sorted[1].arenaWins || 0} Wins`,
+          levelTitle: `Lvl ${sorted[1].level} Coder`,
+          points: String(sorted[1].exp || 0),
+          avatarUrl: sorted[1].avatarUrl,
           avatarColor: "bg-[#234E52]",
           color: "#4FD1C5",
         }
       : {
           rank: 2,
           name: "PixelWizard",
-          levelTitle: "Architect",
-          stars: "14,200",
-          xp: "89 Wins",
+          levelTitle: "Lvl 42 Architect",
+          points: "14,200",
+          avatarUrl: undefined,
           avatarColor: "bg-[#234E52]",
           color: "#4FD1C5",
         };
@@ -107,18 +106,18 @@ const LeaderboardPage = () => {
       ? {
           rank: 3,
           name: sorted[2].username,
-          levelTitle: `${sorted[2].arenaRank || "Beginner"}`,
-          stars: String(sorted[2].arenaRating || 0),
-          xp: `${sorted[2].arenaWins || 0} Wins`,
+          levelTitle: `Lvl ${sorted[2].level} Coder`,
+          points: String(sorted[2].exp || 0),
+          avatarUrl: sorted[2].avatarUrl,
           avatarColor: "bg-[#2D3748]",
           color: "#A0AEC0",
         }
       : {
           rank: 3,
           name: "LogicLassie",
-          levelTitle: "Engineer",
-          stars: "11,500",
-          xp: "67 Wins",
+          levelTitle: "Lvl 38 Engineer",
+          points: "11,500",
+          avatarUrl: undefined,
           avatarColor: "bg-[#2D3748]",
           color: "#A0AEC0",
         };
@@ -132,44 +131,75 @@ const LeaderboardPage = () => {
         {
           rank: "04",
           name: "BinaryBardo",
-          level: "Senior",
+          level: "Lvl 35",
           badge: "PYTHON EXPERT",
-          stars: "9,420",
+          points: "9,420",
           progress: 80,
         },
         {
           rank: "05",
           name: "ScriptSiren",
-          level: "Fresher",
+          level: "Lvl 34",
           badge: "CODE NINJA",
-          stars: "8,815",
+          points: "8,815",
           progress: 75,
         },
         {
           rank: "06",
           name: "BugHunterX",
-          level: "Beginner",
+          level: "Lvl 31",
           badge: "DEBUGGER",
-          stars: "7,240",
+          points: "7,240",
           progress: 60,
+        },
+        {
+          rank: "07",
+          name: "AsyncAbby",
+          level: "Lvl 29",
+          badge: "DEV OPS",
+          points: "6,920",
+          progress: 55,
+        },
+        {
+          rank: "08",
+          name: "CyberSamurai",
+          level: "Lvl 28",
+          badge: "HACKER",
+          points: "6,100",
+          progress: 50,
+        },
+        {
+          rank: "09",
+          name: "DataDruid",
+          level: "Lvl 27",
+          badge: "DATA MAGE",
+          points: "5,800",
+          progress: 48,
+        },
+        {
+          rank: "10",
+          name: "NullPointer",
+          level: "Lvl 25",
+          badge: "DEBUGGER",
+          points: "5,200",
+          progress: 42,
         },
       ];
     }
 
-    const sorted = [...users].sort(
-      (a, b) => (b.arenaRating || 0) - (a.arenaRating || 0),
-    );
+    const sorted = users;
     return sorted.slice(3).map((u, index) => {
       const rankNum = index + 4;
       return {
         rank: rankNum < 10 ? `0${rankNum}` : String(rankNum),
         name: u.username,
-        level: u.arenaRank || "Beginner",
-        badge: "ARENA",
-        stars: String(u.arenaRating || 0),
+        level: `Lvl ${u.level}`,
+        badge: u.level >= 30 ? "CODE NINJA" : "DATA MAGE",
+        points: String(u.exp || 0),
+        avatarUrl: u.avatarUrl,
         progress: Math.min(
           100,
-          Math.round((((u.arenaRating || 0) % 1000) / 1000) * 100),
+          Math.round((((u.exp || 0) % 1000) / 1000) * 100),
         ),
       };
     });
@@ -177,27 +207,23 @@ const LeaderboardPage = () => {
 
   const currentUserRank = useMemo(() => {
     if (!currentUser) return null;
-    const sorted = [...users].sort(
-      (a, b) => (b.arenaRating || 0) - (a.arenaRating || 0),
-    );
+    const sorted = users;
     const index = sorted.findIndex(
-      (u) =>
-        u._id === currentUser.id ||
-        u.userId === currentUser.id ||
-        u.username === currentUser.username,
+      (u) => u._id === currentUser.id || u.username === currentUser.username,
     );
     const rankNum = index !== -1 ? index + 1 : 142;
     const currentData =
       index !== -1 ? sorted[index] : { arenaRating: 0, arenaRank: "Beginner" };
     return {
-      rank: String(rankNum),
+      rank: rankNum < 10 ? `0${rankNum}` : String(rankNum),
       name: currentUser.username || "You",
-      level: currentData.arenaRank || "Beginner",
-      badge: "ARENA",
-      stars: String(currentData.arenaRating || 0),
+      level: `Lvl ${currentUser.level || 1}`,
+      badge: (currentUser.level || 1) >= 15 ? "DATA NOVICE" : "NOVICE",
+      points: String(currentUser.exp || 0),
+      avatarUrl: currentUser.avatarUrl,
       progress: Math.min(
         100,
-        Math.round((((currentData.arenaRating || 0) % 1000) / 1000) * 100),
+        Math.round((((currentUser.exp || 0) % 1000) / 1000) * 100),
       ),
     };
   }, [users, currentUser]);
@@ -245,9 +271,7 @@ const LeaderboardPage = () => {
                     {tab.split(" ")[1]}
                   </div>
                   {isLocked && (
-                    <span className="material-symbols-outlined text-[14px]">
-                      lock
-                    </span>
+                    <LucideIcon name="lock" className="text-[14px]" />
                   )}
                 </button>
               );
@@ -259,15 +283,28 @@ const LeaderboardPage = () => {
         <div className="flex flex-col md:flex-row items-end justify-center gap-4 md:gap-6 lg:gap-8 mb-16 px-2">
           {/* 2nd Place */}
           <div className="w-full md:w-[280px] order-2 md:order-1 bg-surface-container/40 backdrop-blur-md rounded-3xl border border-[#4FD1C5]/20 p-6 flex flex-col items-center relative transition-transform hover:-translate-y-1 duration-300">
-            <span className="absolute top-4 right-4 material-symbols-outlined text-[#4FD1C5]/20 text-[40px]">
-              military_tech
-            </span>
-            <div className="relative w-24 h-24 rounded-full border-[3px] border-[#4FD1C5] mb-5 p-1 bg-surface-container">
-              <div
-                className={`w-full h-full rounded-full ${podium[0].avatarColor} flex items-center justify-center text-3xl overflow-hidden`}
-              >
-                🐙
-              </div>
+            <div className="relative w-24 h-24 rounded-full border-[3px] border-[#4FD1C5] mb-5 p-1 bg-surface-container flex items-center justify-center text-[24px] font-black text-[#4FD1C5] bg-[#234E52]/40">
+              {podium[0].avatarUrl ? (
+                <img
+                  src={podium[0].avatarUrl}
+                  alt={podium[0].name}
+                  className="w-full h-full rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    if (e.currentTarget.parentElement) {
+                      e.currentTarget.parentElement.innerText = podium[0].name
+                        ? podium[0].name.charAt(0).toUpperCase()
+                        : "?";
+                    }
+                  }}
+                />
+              ) : (
+                <span>
+                  {podium[0].name
+                    ? podium[0].name.charAt(0).toUpperCase()
+                    : "?"}
+                </span>
+              )}
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-7 h-7 bg-[#4FD1C5] text-surface font-extrabold rounded-full flex items-center justify-center text-[13px]">
                 {podium[0].rank}
               </div>
@@ -279,49 +316,48 @@ const LeaderboardPage = () => {
               {podium[0].levelTitle}
             </p>
 
-            <div className="w-full flex justify-between px-2 pt-4 border-t border-on-surface/10">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  Stars
-                </span>
-                <span className="text-[15px] font-mono tracking-tight font-semibold text-on-surface">
-                  {podium[0].stars}
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  XP
-                </span>
-                <span className="text-[15px] font-mono tracking-tight font-semibold text-on-surface">
-                  {podium[0].xp}
-                </span>
-              </div>
+            <div className="w-full flex flex-col items-center pt-4 border-t border-on-surface/10">
+              <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
+                Points
+              </span>
+              <span className="text-[18px] font-mono tracking-tight font-extrabold text-on-surface">
+                {podium[0].points}
+              </span>
             </div>
           </div>
 
           {/* 1st Place */}
           <div className="w-full md:w-[320px] order-1 md:order-2 bg-surface-container/60 backdrop-blur-md rounded-[32px] border border-[#F687B3]/30 p-8 flex flex-col items-center relative shadow-[0_0_40px_rgba(246,135,179,0.1)] transition-transform hover:-translate-y-2 duration-300 transform md:-translate-y-4">
-            <span className="absolute top-5 right-5 material-symbols-outlined text-[#F687B3]/30 text-[50px]">
-              emoji_events
-            </span>
+            <LucideIcon
+              name="emoji_events"
+              className="absolute top-5 right-5 text-[#F687B3]/30 text-[50px]"
+            />
             <div className="relative mb-6">
               <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[32px] drop-shadow-md z-10">
                 👑
               </span>
-              <div className="relative w-32 h-32 rounded-full border-[4px] border-[#F687B3] p-1.5 bg-surface-container shadow-[0_0_20px_rgba(246,135,179,0.3)]">
-                <div
-                  className={`w-full h-full rounded-full ${podium[1].avatarColor} flex items-center justify-center overflow-hidden`}
-                >
+              <div className="relative w-32 h-32 rounded-full border-[4px] border-[#F687B3] p-1.5 bg-surface-container shadow-[0_0_20px_rgba(246,135,179,0.3)] flex items-center justify-center text-[#F687B3] font-black text-3xl bg-[#702459]/40">
+                {podium[1].avatarUrl ? (
                   <img
-                    src="/src/assets/images/axolot_smile.png"
-                    alt="Axolotl"
-                    className="w-[120%] h-[120%] object-cover"
+                    src={podium[1].avatarUrl}
+                    alt={podium[1].name}
+                    className="w-full h-full rounded-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = "none";
-                      e.currentTarget.parentElement!.innerHTML = "🐉";
+                      if (e.currentTarget.parentElement) {
+                        e.currentTarget.parentElement.innerText = podium[1].name
+                          ? podium[1].name.charAt(0).toUpperCase()
+                          : "?";
+                      }
                     }}
                   />
-                </div>
+                ) : (
+                  <span>
+                    {podium[1].name
+                      ? podium[1].name.charAt(0).toUpperCase()
+                      : "?"}
+                  </span>
+                )}
                 <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-9 h-9 bg-[#F687B3] text-[#4A1D36] font-extrabold rounded-full flex items-center justify-center text-[18px] shadow-lg">
                   {podium[1].rank}
                 </div>
@@ -335,37 +371,40 @@ const LeaderboardPage = () => {
               {podium[1].levelTitle}
             </p>
 
-            <div className="w-full flex justify-between px-4 pt-5 border-t border-on-surface/10">
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  Total Stars
-                </span>
-                <span className="text-[20px] font-mono tracking-tight font-extrabold text-on-surface">
-                  {podium[1].stars}
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-1.5">
-                <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  Total XP
-                </span>
-                <span className="text-[20px] font-mono tracking-tight font-extrabold text-on-surface">
-                  {podium[1].xp}
-                </span>
-              </div>
+            <div className="w-full flex flex-col items-center pt-5 border-t border-on-surface/10">
+              <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">
+                Total Points
+              </span>
+              <span className="text-[24px] font-mono tracking-tight font-black text-on-surface">
+                {podium[1].points}
+              </span>
             </div>
           </div>
 
           {/* 3rd Place */}
           <div className="w-full md:w-[280px] order-3 md:order-3 bg-surface-container/40 backdrop-blur-md rounded-3xl border border-[#A0AEC0]/20 p-6 flex flex-col items-center relative transition-transform hover:-translate-y-1 duration-300">
-            <span className="absolute top-4 right-4 material-symbols-outlined text-[#A0AEC0]/20 text-[40px]">
-              star
-            </span>
-            <div className="relative w-24 h-24 rounded-full border-[3px] border-[#A0AEC0] mb-5 p-1 bg-surface-container">
-              <div
-                className={`w-full h-full rounded-full ${podium[2].avatarColor} flex items-center justify-center text-3xl overflow-hidden`}
-              >
-                🦊
-              </div>
+            <div className="relative w-24 h-24 rounded-full border-[3px] border-[#A0AEC0] mb-5 p-1 bg-surface-container flex items-center justify-center text-[#A0AEC0] font-black text-2xl bg-[#2D3748]/40">
+              {podium[2].avatarUrl ? (
+                <img
+                  src={podium[2].avatarUrl}
+                  alt={podium[2].name}
+                  className="w-full h-full rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                    if (e.currentTarget.parentElement) {
+                      e.currentTarget.parentElement.innerText = podium[2].name
+                        ? podium[2].name.charAt(0).toUpperCase()
+                        : "?";
+                    }
+                  }}
+                />
+              ) : (
+                <span>
+                  {podium[2].name
+                    ? podium[2].name.charAt(0).toUpperCase()
+                    : "?"}
+                </span>
+              )}
               <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-7 h-7 bg-[#A0AEC0] text-surface font-extrabold rounded-full flex items-center justify-center text-[13px]">
                 {podium[2].rank}
               </div>
@@ -377,23 +416,13 @@ const LeaderboardPage = () => {
               {podium[2].levelTitle}
             </p>
 
-            <div className="w-full flex justify-between px-2 pt-4 border-t border-on-surface/10">
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  Stars
-                </span>
-                <span className="text-[15px] font-mono tracking-tight font-semibold text-on-surface">
-                  {podium[2].stars}
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-1">
-                <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                  XP
-                </span>
-                <span className="text-[15px] font-mono tracking-tight font-semibold text-on-surface">
-                  {podium[2].xp}
-                </span>
-              </div>
+            <div className="w-full flex flex-col items-center pt-4 border-t border-on-surface/10">
+              <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
+                Points
+              </span>
+              <span className="text-[18px] font-mono tracking-tight font-semibold text-on-surface">
+                {podium[2].points}
+              </span>
             </div>
           </div>
         </div>
@@ -405,9 +434,10 @@ const LeaderboardPage = () => {
               Main Rankings
             </h2>
             <div className="relative w-full sm:w-[260px]">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none material-symbols-outlined text-[18px]">
-                search
-              </span>
+              <LucideIcon
+                name="search"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none text-[18px]"
+              />
               <input
                 type="text"
                 placeholder="Find coder..."
@@ -426,8 +456,26 @@ const LeaderboardPage = () => {
                 <div className="w-8 text-[15px] font-mono font-bold text-on-surface-variant/60 group-hover:text-primary transition-colors">
                   {user.rank}
                 </div>
-                <div className="w-10 h-10 rounded-full bg-surface border border-on-surface/10 flex items-center justify-center text-[18px]">
-                  🤖
+                <div className="w-10 h-10 rounded-full bg-surface border border-on-surface/10 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        if (e.currentTarget.parentElement) {
+                          e.currentTarget.parentElement.innerText = user.name
+                            ? user.name.charAt(0).toUpperCase()
+                            : "?";
+                        }
+                      }}
+                    />
+                  ) : (
+                    <span>
+                      {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+                    </span>
+                  )}
                 </div>
                 <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                   <div className="flex items-center gap-3">
@@ -446,10 +494,10 @@ const LeaderboardPage = () => {
                 <div className="flex items-center gap-8 ml-auto pl-4">
                   <div className="hidden md:flex flex-col items-end">
                     <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                      Stars
+                      Points
                     </span>
                     <span className="text-[13px] font-mono font-semibold text-on-surface">
-                      {user.stars}
+                      {user.points}
                     </span>
                   </div>
                   <div className="w-24 lg:w-32 flex flex-col gap-1.5">
@@ -477,8 +525,29 @@ const LeaderboardPage = () => {
               <div className="w-8 text-[15px] font-mono font-extrabold text-primary-fixed-dim transition-colors">
                 {currentUserRank.rank}
               </div>
-              <div className="w-10 h-10 rounded-full bg-surface border-2 border-primary-fixed-dim/40 flex items-center justify-center text-[18px]">
-                🦖
+              <div className="w-10 h-10 rounded-full bg-surface border-2 border-primary-fixed-dim/40 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
+                {currentUserRank.avatarUrl ? (
+                  <img
+                    src={currentUserRank.avatarUrl}
+                    alt={currentUserRank.name}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                      if (e.currentTarget.parentElement) {
+                        e.currentTarget.parentElement.innerText =
+                          currentUserRank.name
+                            ? currentUserRank.name.charAt(0).toUpperCase()
+                            : "?";
+                      }
+                    }}
+                  />
+                ) : (
+                  <span>
+                    {currentUserRank.name
+                      ? currentUserRank.name.charAt(0).toUpperCase()
+                      : "?"}
+                  </span>
+                )}
               </div>
               <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                 <div className="flex items-center gap-3">
@@ -497,10 +566,10 @@ const LeaderboardPage = () => {
               <div className="flex items-center gap-8 ml-auto pl-4">
                 <div className="hidden md:flex flex-col items-end">
                   <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                    Stars
+                    Points
                   </span>
                   <span className="text-[13px] font-mono font-bold text-on-surface">
-                    {currentUserRank.stars}
+                    {currentUserRank.points}
                   </span>
                 </div>
                 <div className="w-24 lg:w-32 flex flex-col gap-1.5">
@@ -526,11 +595,10 @@ const LeaderboardPage = () => {
               className="text-[13px] font-bold text-primary-fixed-dim hover:text-primary-fixed hover:underline underline-offset-4 transition-colors flex items-center gap-1"
             >
               {showAll ? "Show Less" : "View All Rankings"}
-              <span
-                className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
-              >
-                expand_more
-              </span>
+              <LucideIcon
+                name="expand_more"
+                className={`text-[18px] transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
+              />
             </button>
           </div>
         </div>
@@ -538,7 +606,7 @@ const LeaderboardPage = () => {
 
       {/* Fast Climb Mode Button */}
       <button className="fixed bottom-8 right-8 z-50 bg-[#E9D8FD] text-[#44337A] px-6 py-3.5 rounded-full font-extrabold text-[14px] flex items-center gap-2 shadow-[0_8px_24px_rgba(233,216,253,0.4)] hover:-translate-y-1 transition-transform duration-300">
-        <span className="material-symbols-outlined text-[20px]">bolt</span>
+        <LucideIcon name="bolt" className="text-[20px]" />
         Fast Climb Mode
       </button>
     </main>
