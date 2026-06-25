@@ -221,15 +221,4 @@ export const dailyMissionApi = {
       return null;
     }
   },
-
-  /**
-   * Reset today's missions (DEV ONLY)
-   */
-  resetTodayMissionDev: async (): Promise<void> => {
-    try {
-      await api.post("/daily-missions/dev/reset-today");
-    } catch (error) {
-      console.warn("Failed to reset missions:", error);
-    }
-  },
 };

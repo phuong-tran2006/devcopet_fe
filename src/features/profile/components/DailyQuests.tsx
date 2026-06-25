@@ -25,29 +25,55 @@ function resolveDailyMissionRedirect(
 ): { to: string; params?: Record<string, string> } | null {
   if (!redirect) return null;
 
+  if (redirect.targetType === "LESSON" && redirect.targetId) {
+    return {
+      to: "/lesson/$lessonId" as any,
+      params: { lessonId: redirect.targetId },
+    };
+  }
+
+  if (redirect.targetType === "NODE" && redirect.targetId) {
+    const nodeId = redirect.targetId;
+    const parts = nodeId.match(/^(.+?)-(easy|medium|hard)-c(\d+)-n(\d+)$/);
+    if (parts) {
+      const courseSlug = parts[1];
+      const mode = parts[2];
+      return {
+        to: `/roadmap/${courseSlug}/${mode}/nodes/${nodeId}/challenge` as any,
+      };
+    }
+    return { to: "/roadmap" };
+  }
+
   switch (redirect.routeType) {
+    case "COURSE": {
+      const slug =
+        redirect.targetId && redirect.targetId !== "python"
+          ? redirect.targetId
+          : "python-basic";
+      return {
+        to: "/courses/$courseId" as any,
+        params: { courseId: slug },
+      };
+    }
     case "ROADMAP_NODE": {
-      const nodeId = redirect.targetId || "";
-      const parts = nodeId.match(/^(.+?)-(easy|medium|hard)-c(\d+)-n(\d+)$/);
-      if (parts) {
-        const courseSlug = parts[1];
-        const mode = parts[2];
-        return {
-          to: `/roadmap/${courseSlug}/${mode}/nodes/${nodeId}/challenge` as any,
-        };
+      if (redirect.targetId) {
+        const nodeId = redirect.targetId;
+        const parts = nodeId.match(/^(.+?)-(easy|medium|hard)-c(\d+)-n(\d+)$/);
+        if (parts) {
+          const courseSlug = parts[1];
+          const mode = parts[2];
+          return {
+            to: `/roadmap/${courseSlug}/${mode}/nodes/${nodeId}/challenge` as any,
+          };
+        }
       }
       return { to: "/roadmap" };
     }
-    case "COURSE":
     case "QUIZ":
       return {
         to: "/courses/$courseId" as any,
-        params: {
-          courseId:
-            !redirect.targetId || redirect.targetId === "python"
-              ? "python-basic"
-              : redirect.targetId,
-        },
+        params: { courseId: "python-basic" },
       };
     case "ARENA":
       return { to: "/arena" };
@@ -350,18 +376,7 @@ const DailyQuests = () => {
       mission.missionId,
     );
     if (result) {
-      setTodayData((prev) => {
-        if (!prev) return prev;
-        return {
-          ...prev,
-          progress: result.progress,
-          missions: prev.missions.map((m) =>
-            m.id === mission.id
-              ? { ...m, status: "dismissed" as const, unread: false }
-              : m,
-          ),
-        };
-      });
+      await fetchMissions();
     }
   };
 

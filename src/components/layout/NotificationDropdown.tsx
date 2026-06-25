@@ -20,9 +20,30 @@ import {
 
 // Helper to resolve routes
 const resolveDailyMissionRedirect = (
-  redirect: DailyMissionNotificationItem["redirect"],
-) => {
+  redirect: DailyMissionNotificationItem["redirect"] | null,
+): { to: string; params?: Record<string, string> } => {
   if (!redirect) return { to: "/" };
+
+  if (redirect.targetType === "LESSON" && redirect.targetId) {
+    return {
+      to: "/lesson/$lessonId" as any,
+      params: { lessonId: redirect.targetId },
+    };
+  }
+
+  if (redirect.targetType === "NODE" && redirect.targetId) {
+    const nodeId = redirect.targetId;
+    const parts = nodeId.match(/^(.+?)-(easy|medium|hard)-c(\d+)-n(\d+)$/);
+    if (parts) {
+      const courseSlug = parts[1];
+      const mode = parts[2];
+      return {
+        to: `/roadmap/${courseSlug}/${mode}/nodes/${nodeId}/challenge` as any,
+      };
+    }
+    return { to: "/roadmap" };
+  }
+
   switch (redirect.routeType) {
     case "COURSE": {
       const slug =
@@ -30,15 +51,27 @@ const resolveDailyMissionRedirect = (
           ? redirect.targetId
           : "python-basic";
       return {
-        to: "/courses/$courseId" as const,
+        to: "/courses/$courseId" as any,
         params: { courseId: slug },
       };
     }
-    case "ROADMAP_NODE":
+    case "ROADMAP_NODE": {
+      if (redirect.targetId) {
+        const nodeId = redirect.targetId;
+        const parts = nodeId.match(/^(.+?)-(easy|medium|hard)-c(\d+)-n(\d+)$/);
+        if (parts) {
+          const courseSlug = parts[1];
+          const mode = parts[2];
+          return {
+            to: `/roadmap/${courseSlug}/${mode}/nodes/${nodeId}/challenge` as any,
+          };
+        }
+      }
       return { to: "/roadmap" };
+    }
     case "QUIZ":
       return {
-        to: "/courses/$courseId" as const,
+        to: "/courses/$courseId" as any,
         params: { courseId: "python-basic" },
       };
     case "ARENA":
@@ -47,6 +80,8 @@ const resolveDailyMissionRedirect = (
       return { to: "/roadmap" };
     case "LOGIN":
       return { to: "/login" };
+    case "DASHBOARD":
+      return { to: "/profile" };
     default:
       return { to: "/" };
   }
