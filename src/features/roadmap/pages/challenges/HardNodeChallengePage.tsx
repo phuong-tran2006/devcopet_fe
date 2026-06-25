@@ -578,6 +578,16 @@ const HardNodeChallengePage = () => {
       Object.keys(dropZoneMap).length < dropZoneIds.length) ||
     (isOrdering && orderedIds.length < orderingItems.length);
 
+  const allHints = useMemo(() => {
+    if (!challenge) return [];
+    const arr: string[] = [];
+    if (challenge.hint) arr.push(challenge.hint);
+    if (challenge.hints && challenge.hints.length > 0) {
+      arr.push(...challenge.hints.map((h: any) => h.text));
+    }
+    return Array.from(new Set(arr)).filter((h) => h.trim().length > 0);
+  }, [challenge]);
+
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-background text-on-surface">
@@ -609,8 +619,6 @@ const HardNodeChallengePage = () => {
       </div>
     );
   }
-
-  const hintText = challenge.hint || challenge.hints?.[0]?.text || "";
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
@@ -663,9 +671,6 @@ const HardNodeChallengePage = () => {
               <div className="border-b border-[#1e3a5f] bg-[#0c1a2d] px-6 py-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
-                      Question 01
-                    </p>
                     <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                       {challenge.title}
                     </h2>
@@ -687,6 +692,27 @@ const HardNodeChallengePage = () => {
                 {challenge.codeSnippet && (
                   <div className="mt-5">
                     <CodeSnippetCard codeSnippet={challenge.codeSnippet} />
+                  </div>
+                )}
+                {allHints.length > 0 && (
+                  <div className="mt-6 rounded-xl border border-[#eab308]/20 bg-[#eab308]/5 p-5 shadow-[inset_0_0_12px_rgba(234,179,8,0.02)]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <AlertCircle size={16} className="text-[#eab308]" />
+                      <p className="text-[12px] font-bold uppercase tracking-widest text-[#eab308]">
+                        Helpful Hints
+                      </p>
+                    </div>
+                    {allHints.length === 1 ? (
+                      <p className="text-[14px] leading-relaxed text-[#dbeafe]/90">
+                        {allHints[0]}
+                      </p>
+                    ) : (
+                      <ul className="list-disc pl-5 space-y-2 text-[14px] leading-relaxed text-[#dbeafe]/90 marker:text-[#eab308]/60">
+                        {allHints.map((hint, i) => (
+                          <li key={i}>{hint}</li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
               </div>
@@ -1075,38 +1101,26 @@ const HardNodeChallengePage = () => {
               )}
 
               {result && !result.correct && (
-                <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
-                  <div className="flex items-start gap-3">
-                    <AlertCircle size={20} className="text-red-300" />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-red-100 text-[14px]">
-                        {result.message || "Not quite. Try again."}
-                      </p>
-                      {result.explanation && (
-                        <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
-                          {result.explanation}
-                        </p>
-                      )}
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+                  <div className="relative w-full max-w-[400px] rounded-3xl bg-[#2a3947] p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] text-center border border-red-500/20">
+                    <div className="mx-auto mb-6 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-400 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                      <X size={36} />
                     </div>
+                    <h2 className="text-[24px] font-extrabold text-on-surface mb-3">
+                      Mission failed
+                    </h2>
+                    <p className="text-[14px] text-on-surface-variant mb-8 leading-relaxed">
+                      Your answer was not correct. Return to the roadmap and try
+                      this checkpoint again.
+                    </p>
+                    <button
+                      onClick={goBackToRoadmap}
+                      className="w-full rounded-xl bg-surface-container-high px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface hover:bg-surface-container-highest transition-colors border border-outline/20"
+                    >
+                      Return to Roadmap
+                    </button>
                   </div>
                 </div>
-              )}
-
-              {result && !result.correct && !isReviewMode && (
-                <button
-                  onClick={() => {
-                    setResult(null);
-                    setSelectedOptionId(null);
-                    setMatchingMap({});
-                    setDropZoneMap({});
-                    setSelectedPoolItemId(null);
-                    if (orderingChallenge)
-                      setOrderedIds(orderingItems.map((s) => s.id));
-                  }}
-                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#66b3ff]/45 bg-[#66b3ff]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:bg-[#66b3ff]/15"
-                >
-                  Try Again
-                </button>
               )}
 
               {canEdit && (

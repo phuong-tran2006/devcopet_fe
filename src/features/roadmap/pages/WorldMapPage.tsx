@@ -19,7 +19,7 @@ import {
   Locate,
   ArrowUp,
 } from "lucide-react";
-import { useParams } from "@tanstack/react-router";
+import { useParams, useSearch } from "@tanstack/react-router";
 import {
   courseApi,
   type EasyRoadmapChapter,
@@ -191,8 +191,12 @@ const WorldMapPage = () => {
   const currentUser = useAuthStore((state) => state.user);
   const isLight = theme === "light";
   const { worldId } = useParams({ strict: false });
+  const search: any = useSearch({ strict: false });
+  const initialDifficulty = ["easy", "medium", "hard"].includes(search.mode)
+    ? (search.mode as Difficulty)
+    : "easy";
   const courseSlug = worldId;
-  const [difficulty, setDifficulty] = useState<Difficulty>("easy");
+  const [difficulty, setDifficulty] = useState<Difficulty>(initialDifficulty);
   const [isMediumUnlocked, setIsMediumUnlocked] = useState(false);
   const [isHardUnlocked, setIsHardUnlocked] = useState(false);
   const [roadmap, setRoadmap] = useState<EasyRoadmapResponse | null>(null);

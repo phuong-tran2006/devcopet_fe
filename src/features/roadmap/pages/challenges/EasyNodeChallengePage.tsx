@@ -21,6 +21,7 @@ import {
   X,
   Star,
 } from "lucide-react";
+import { RewardSummary } from "src/features/roadmap/components/challenge/RewardSummary";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
@@ -178,6 +179,7 @@ const EasyNodeChallengePage = () => {
     navigate({
       to: "/roadmap/$worldId",
       params: { worldId: courseSlug || "python-basic" },
+      search: { mode: "easy" },
     });
   };
 
@@ -235,11 +237,9 @@ const EasyNodeChallengePage = () => {
 
         setWrongAttempt({
           optionId: selectedOptionId,
-          message: response.message,
-          correctOptionId: response.correctOptionId,
-          explanation: response.explanation,
+          message:
+            "Your answer was not correct. Return to the roadmap and try this checkpoint again.",
         });
-        setSelectedOptionId(null);
       })
       .catch((err) => {
         setSubmitError(
@@ -295,10 +295,7 @@ const EasyNodeChallengePage = () => {
   };
 
   const isCorrectOption = (optionId: EasyChallengeOptionId) => {
-    const correctOptionId =
-      review?.correctOptionId ??
-      result?.correctOptionId ??
-      wrongAttempt?.correctOptionId;
+    const correctOptionId = review?.correctOptionId ?? result?.correctOptionId;
     return correctOptionId === optionId;
   };
 
@@ -403,10 +400,7 @@ const EasyNodeChallengePage = () => {
                   <div className="border-b border-[#263b44] bg-[#0c171d] px-6 py-4">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
-                          Question 01
-                        </p>
-                        <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
+                        <h2 className="truncate text-[18px] font-extrabold text-on-surface">
                           {challenge.title}
                         </h2>
                       </div>
@@ -481,12 +475,17 @@ const EasyNodeChallengePage = () => {
                           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${
                             isCorrectOption(option.id)
                               ? "border-[#63f1e3] bg-[#63f1e3] text-[#052023]"
-                              : selectedOptionId === option.id
-                                ? "border-[#63f1e3]"
-                                : "border-on-surface-variant"
+                              : wrongAttempt?.optionId === option.id
+                                ? "border-[#ef4444] bg-[#ef4444] text-[#2b171a]"
+                                : selectedOptionId === option.id
+                                  ? "border-[#63f1e3]"
+                                  : "border-on-surface-variant"
                           }`}
                         >
                           {isCorrectOption(option.id) && <Check size={15} />}
+                          {wrongAttempt?.optionId === option.id && (
+                            <X size={15} />
+                          )}
                         </span>
                       </button>
                     ))}
@@ -496,23 +495,6 @@ const EasyNodeChallengePage = () => {
                     <p className="mx-6 mb-6 rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-3 text-[13px] text-red-100/80">
                       {submitError}
                     </p>
-                  )}
-
-                  {wrongAttempt && (
-                    <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
-                      <div className="flex items-start gap-3">
-                        <AlertCircle size={20} className="text-red-300" />
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[14px] font-bold text-red-100">
-                            {wrongAttempt.message || "Not quite. Try again."}
-                          </p>
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
-                            {wrongAttempt.explanation ||
-                              "Pick another answer, then submit again."}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   )}
 
                   {canAnswer && !result && !isReviewMode && (
@@ -536,7 +518,7 @@ const EasyNodeChallengePage = () => {
                           </div>
                           <div>
                             <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                              {petName} Companion Says
+                              {petName} explains
                             </p>
                           </div>
                         </div>
@@ -614,30 +596,7 @@ const EasyNodeChallengePage = () => {
                         </div>
                       </div>
 
-                      <div className="mt-7 grid grid-cols-2 gap-4">
-                        <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
-                          <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                            Reward
-                          </p>
-                          <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                            +{challenge.xp}
-                          </p>
-                          <p className="text-[18px] font-bold text-[#63f1e3]">
-                            XP
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                          <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                            Bonus
-                          </p>
-                          <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                            +10
-                          </p>
-                          <p className="text-[18px] font-bold text-[#f5c6ff]">
-                            Stars
-                          </p>
-                        </div>
-                      </div>
+                      <RewardSummary xp={challenge.xp} stars={10} />
 
                       <button
                         onClick={goToNextChallenge}
@@ -655,6 +614,28 @@ const EasyNodeChallengePage = () => {
                         Review Mission
                       </button>
                     </div>
+                  </div>
+                </div>
+              )}
+              {wrongAttempt && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+                  <div className="relative w-full max-w-[400px] rounded-3xl bg-[#2a3947] p-8 shadow-[0_0_60px_rgba(0,0,0,0.45)] text-center border border-red-500/20">
+                    <div className="mx-auto mb-6 flex h-[72px] w-[72px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-400 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                      <X size={36} />
+                    </div>
+                    <h2 className="text-[24px] font-extrabold text-on-surface mb-3">
+                      Mission failed
+                    </h2>
+                    <p className="text-[14px] text-on-surface-variant mb-8 leading-relaxed">
+                      Your answer was not correct. Return to the roadmap and try
+                      this checkpoint again.
+                    </p>
+                    <button
+                      onClick={goBackToRoadmap}
+                      className="w-full rounded-xl bg-surface-container-high px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface hover:bg-surface-container-highest transition-colors border border-outline/20"
+                    >
+                      Return to Roadmap
+                    </button>
                   </div>
                 </div>
               )}

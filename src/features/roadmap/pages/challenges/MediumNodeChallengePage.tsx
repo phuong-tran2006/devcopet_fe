@@ -671,9 +671,6 @@ const MediumNodeChallengePage = () => {
                 <div className="border-b border-[#263b44] bg-[#0c171d] px-6 py-4">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
-                        Question 01
-                      </p>
                       <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                         {challenge.title}
                       </h2>

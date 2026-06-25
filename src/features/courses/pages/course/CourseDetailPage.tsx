@@ -184,14 +184,15 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
 
   const isActive = chapter.status !== "locked";
 
+  const chapterId = chapter._id || chapter.id;
+
   useEffect(() => {
-    const chapterId = chapter._id || chapter.id;
     courseApi
       .getLessons(chapterId)
       .then((data) => setLessons(data || []))
       .catch(() => setLessons([]))
       .finally(() => setLoading(false));
-  }, [chapter]);
+  }, [chapterId]);
 
   const getRankLabel = () => {
     const ranks = [
@@ -281,12 +282,13 @@ const CourseDetailPage = () => {
   const { courseId } = useParams({ strict: false });
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [resetting, setResetting] = useState(false);
 
   const loadData = useCallback(() => {
     if (!courseId) return;
-    setLoading(true);
+    setRefreshing(true);
     courseApi
       .getCourses()
       .then((courses) => {
@@ -299,7 +301,10 @@ const CourseDetailPage = () => {
       })
       .then((data) => setChapters(data || []))
       .catch((err) => console.error(err))
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setInitialLoading(false);
+        setRefreshing(false);
+      });
   }, [courseId]);
 
   useEffect(() => {
@@ -333,7 +338,7 @@ const CourseDetailPage = () => {
       : "Course - Devcopet";
   }, [course]);
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex justify-center items-center min-h-[70vh]">
         <div className="flex flex-col items-center gap-4">

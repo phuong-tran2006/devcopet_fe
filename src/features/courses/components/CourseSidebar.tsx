@@ -58,7 +58,7 @@ const CourseSidebarChapter = ({
         className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? "max-h-[1000px] opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="flex flex-col bg-surface-container-lowest py-2">
-          {loading ? (
+          {loading && lessons.length === 0 ? (
             <div className="flex justify-center py-4">
               <div className="w-5 h-5 border-2 border-primary-fixed-dim/60 border-t-transparent rounded-full animate-spin" />
             </div>
@@ -207,7 +207,7 @@ const CourseSidebar = ({
       <div className="overflow-y-auto flex-1 custom-scrollbar">
         {/* Chapters Accordion */}
         <div className="mt-2 pb-6">
-          {loading ? (
+          {loading && chapters.length === 0 ? (
             <div className="flex justify-center py-10">
               <div className="w-8 h-8 border-4 border-primary-fixed-dim/50 border-t-primary-fixed-dim rounded-full animate-spin" />
             </div>
