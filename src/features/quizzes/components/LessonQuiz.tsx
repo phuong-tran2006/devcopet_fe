@@ -271,10 +271,16 @@ const LessonQuizInner = ({
                 </div>
                 {/* Result icon */}
                 {isReviewMode && isCorrectOption && (
-                  <LucideIcon name="check_circle" className=" text-[22px] text-[#4ade80] flex-shrink-0" />
+                  <LucideIcon
+                    name="check_circle"
+                    className=" text-[22px] text-[#4ade80] flex-shrink-0"
+                  />
                 )}
                 {isReviewMode && isWrongSelected && (
-                  <LucideIcon name="cancel" className=" text-[22px] text-[#f87171] flex-shrink-0" />
+                  <LucideIcon
+                    name="cancel"
+                    className=" text-[22px] text-[#f87171] flex-shrink-0"
+                  />
                 )}
               </button>
             );
@@ -560,7 +566,10 @@ const LessonQuizInner = ({
       {/* ── Error Banner ── */}
       {submitError && (
         <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f87171]/10 border border-[#f87171]/30 text-[#f87171] text-[13px]">
-          <LucideIcon name="error" className=" text-[18px] flex-shrink-0 mt-0.5" />
+          <LucideIcon
+            name="error"
+            className=" text-[18px] flex-shrink-0 mt-0.5"
+          />
           <div>
             <span className="font-bold block mb-0.5">Submission failed</span>
             {submitError}

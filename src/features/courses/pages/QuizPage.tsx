@@ -119,7 +119,10 @@ const QuizPage = () => {
 
         <div className="flex flex-col gap-3 mb-10">
           <div className="bg-surface-container/50 border border-outline/10 rounded-full px-4 py-2 flex items-center gap-2 w-max">
-            <LucideIcon name="add_circle" className="text-[#4ade80] text-[16px]" />
+            <LucideIcon
+              name="add_circle"
+              className="text-[#4ade80] text-[16px]"
+            />
             <span className="text-[13px] font-bold text-on-surface-variant">
               {userExp.toLocaleString()} XP
             </span>
@@ -268,7 +271,10 @@ const QuizPage = () => {
             {/* Floating chat bubble */}
             <div className="absolute -top-16 -right-10 bg-surface border border-primary-fixed-dim/40 rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,128,128,0.2)] max-w-[200px]">
               <div className="flex items-start gap-2">
-                <LucideIcon name="chat" className=" text-[16px] text-primary-fixed-dim shrink-0" />
+                <LucideIcon
+                  name="chat"
+                  className=" text-[16px] text-primary-fixed-dim shrink-0"
+                />
                 <span className="text-[12px] text-on-surface font-medium leading-relaxed">
                   {q.hint}
                 </span>
@@ -307,7 +313,10 @@ const QuizPage = () => {
         {/* Left Pane - Blocks */}
         <div className="flex-1 flex flex-col w-full xl:max-w-[400px]">
           <div className="flex items-center gap-2 mb-6">
-            <LucideIcon name="view_module" className=" text-on-surface-variant text-[20px]" />
+            <LucideIcon
+              name="view_module"
+              className=" text-on-surface-variant text-[20px]"
+            />
             <h3 className="text-[14px] font-mono text-on-surface-variant uppercase tracking-widest">
               Available Blocks
             </h3>
@@ -326,7 +335,10 @@ const QuizPage = () => {
                       : "bg-[#1E252E] border-[#F687B3]/30 hover:border-[#F687B3] text-[#F687B3] shadow-[0_0_10px_rgba(246,135,179,0.1)] hover:-translate-y-0.5"
                   }`}
                 >
-                  <LucideIcon name="drag_indicator" className="text-[16px] opacity-50" />
+                  <LucideIcon
+                    name="drag_indicator"
+                    className="text-[16px] opacity-50"
+                  />
                   {block.text.split("\\n").map((line, i) => (
                     <React.Fragment key={i}>
                       {line}
@@ -418,7 +430,10 @@ const QuizPage = () => {
             {/* Floating chat bubble */}
             <div className="absolute -top-16 -right-10 bg-surface border border-primary-fixed-dim/40 rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,128,128,0.2)] max-w-[200px]">
               <div className="flex items-start gap-2">
-                <LucideIcon name="chat" className="text-[16px] text-primary-fixed-dim shrink-0" />
+                <LucideIcon
+                  name="chat"
+                  className="text-[16px] text-primary-fixed-dim shrink-0"
+                />
                 <span className="text-[12px] text-on-surface font-medium leading-relaxed">
                   {q.hint}
                 </span>
@@ -506,7 +521,10 @@ const QuizPage = () => {
                     )}
                   </div>
                   {opt.selected && opt.isCorrect ? (
-                    <LucideIcon name="check_circle" className=" text-[#4ade80]" />
+                    <LucideIcon
+                      name="check_circle"
+                      className=" text-[#4ade80]"
+                    />
                   ) : (
                     <span className="w-5 h-5 rounded-full border border-outline/30"></span>
                   )}

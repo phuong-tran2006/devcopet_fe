@@ -28,7 +28,11 @@ const Header = () => {
             aria-label="Toggle menu"
             onClick={() => setMenuOpen(!menuOpen)}
           >
-            {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            {menuOpen ? (
+              <X className="w-6 h-6" />
+            ) : (
+              <Menu className="w-6 h-6" />
+            )}
           </button>
 
           {/* Desktop Navigation Menu */}

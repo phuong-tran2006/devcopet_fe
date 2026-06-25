@@ -101,9 +101,14 @@ const CourseCard = ({
             {course?.title || "Untitled Course"}
           </h3>
           <div className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg flex items-center justify-center shrink-0">
-            <LucideIcon name={(course?.programmingLanguage || "").toLowerCase() === "python"
-                ? "terminal"
-                : "data_object"} className="text-[14px]" />
+            <LucideIcon
+              name={
+                (course?.programmingLanguage || "").toLowerCase() === "python"
+                  ? "terminal"
+                  : "data_object"
+              }
+              className="text-[14px]"
+            />
           </div>
         </div>
 

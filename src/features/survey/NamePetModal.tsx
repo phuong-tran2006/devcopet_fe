@@ -101,8 +101,8 @@ const NamePetModal = ({ isOpen, onConfirm }: NamePetModalProps) => {
                 title="Generate random name"
                 className="absolute left-4 z-10 text-gray-400 dark:text-[#64748b] hover:text-purple-500 dark:hover:text-[#d4a8d4] text-[18px] transition-colors"
               >
-                  <LucideIcon name="edit" className="text-[18px]" />
-                </button>
+                <LucideIcon name="edit" className="text-[18px]" />
+              </button>
               <input
                 type="text"
                 value={petName}

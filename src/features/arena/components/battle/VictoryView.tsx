@@ -149,7 +149,10 @@ const VictoryView = () => {
             <div
               className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-md ${headerIconContainerClass} mb-0.5`}
             >
-              <LucideIcon name={headerIcon} className={`text-[24px] ${headerIconColor}`} />
+              <LucideIcon
+                name={headerIcon}
+                className={`text-[24px] ${headerIconColor}`}
+              />
             </div>
             <h1
               className={`text-[24px] md:text-[28px] font-black tracking-[0.2em] bg-gradient-to-r ${titleColorClass} bg-clip-text text-transparent leading-none mt-0.5`}
@@ -211,9 +214,14 @@ const VictoryView = () => {
                         : "text-red-800 dark:text-red-400 border-red-300 dark:border-red-800/80 bg-red-100/80 dark:bg-red-950/40"
                     }`}
                   >
-                    <LucideIcon name={myRatingChange.delta >= 0
-                        ? "trending_up"
-                        : "trending_down"} className="text-[10px]" />
+                    <LucideIcon
+                      name={
+                        myRatingChange.delta >= 0
+                          ? "trending_up"
+                          : "trending_down"
+                      }
+                      className="text-[10px]"
+                    />
                     <span>
                       {myRatingChange.oldRating} ➔ {myRatingChange.newRating} (
                       {myRatingChange.delta >= 0 ? "+" : ""}
@@ -272,9 +280,14 @@ const VictoryView = () => {
                         : "text-red-800 dark:text-red-400 border-red-300 dark:border-red-800/80 bg-red-100/80 dark:bg-red-950/40"
                     }`}
                   >
-                    <LucideIcon name={opponentRatingChange.delta >= 0
-                        ? "trending_up"
-                        : "trending_down"} className="text-[10px]" />
+                    <LucideIcon
+                      name={
+                        opponentRatingChange.delta >= 0
+                          ? "trending_up"
+                          : "trending_down"
+                      }
+                      className="text-[10px]"
+                    />
                     <span>
                       {opponentRatingChange.oldRating} ➔{" "}
                       {opponentRatingChange.newRating} (
@@ -379,7 +392,10 @@ const VictoryView = () => {
           {myRankUp && (
             <div className="w-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-2.5 flex flex-col items-center gap-0.5 shadow-lg mb-3 animate-pulse">
               <div className="flex items-center gap-1">
-                <LucideIcon name="stars" className="text-[14px] text-amber-400" />
+                <LucideIcon
+                  name="stars"
+                  className="text-[14px] text-amber-400"
+                />
                 <span className="text-[8px] font-black text-amber-400 tracking-[0.25em] uppercase">
                   RANK PROMOTED!
                 </span>

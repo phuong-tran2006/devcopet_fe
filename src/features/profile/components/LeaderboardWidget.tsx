@@ -14,7 +14,10 @@ const LeaderboardWidget = () => {
         <h2 className="text-xl font-bold text-on-surface transition-colors duration-300">
           Leaderboard
         </h2>
-        <LucideIcon name="workspace_premium" className="text-secondary-fixed-dim transition-colors duration-300" />
+        <LucideIcon
+          name="workspace_premium"
+          className="text-secondary-fixed-dim transition-colors duration-300"
+        />
       </div>
 
       <div className="space-y-2">

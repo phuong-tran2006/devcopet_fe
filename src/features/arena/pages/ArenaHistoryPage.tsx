@@ -211,13 +211,18 @@ const ArenaHistoryPage = () => {
                 <div
                   className={`flex items-center gap-1 font-bold text-[16px] ${view.ratingChange > 0 ? "dark:text-[#4dd0d0] text-primary" : view.ratingChange < 0 ? "dark:text-[#ff3b30] text-error" : "dark:text-gray-400 text-on-surface-variant"}`}
                 >
-                  <LucideIcon name={view.ratingChange > 0
-                      ? "trending_up"
-                      : view.ratingChange < 0
-                        ? "trending_down"
-                        : isDraw
-                          ? "remove"
-                          : "show_chart"} className="text-[18px]" />
+                  <LucideIcon
+                    name={
+                      view.ratingChange > 0
+                        ? "trending_up"
+                        : view.ratingChange < 0
+                          ? "trending_down"
+                          : isDraw
+                            ? "remove"
+                            : "show_chart"
+                    }
+                    className="text-[18px]"
+                  />
                   {view.ratingChange > 0 ? "+" : ""}
                   {view.ratingChange}
                 </div>

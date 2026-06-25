@@ -326,7 +326,10 @@ const LeaderboardPage = () => {
 
           {/* 1st Place */}
           <div className="w-full md:w-[320px] order-1 md:order-2 bg-surface-container/60 backdrop-blur-md rounded-[32px] border border-[#F687B3]/30 p-8 flex flex-col items-center relative shadow-[0_0_40px_rgba(246,135,179,0.1)] transition-transform hover:-translate-y-2 duration-300 transform md:-translate-y-4">
-            <LucideIcon name="emoji_events" className="absolute top-5 right-5 text-[#F687B3]/30 text-[50px]" />
+            <LucideIcon
+              name="emoji_events"
+              className="absolute top-5 right-5 text-[#F687B3]/30 text-[50px]"
+            />
             <div className="relative mb-6">
               <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[32px] drop-shadow-md z-10">
                 👑
@@ -429,7 +432,10 @@ const LeaderboardPage = () => {
               Main Rankings
             </h2>
             <div className="relative w-full sm:w-[260px]">
-              <LucideIcon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none text-[18px]" />
+              <LucideIcon
+                name="search"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none text-[18px]"
+              />
               <input
                 type="text"
                 placeholder="Find coder..."
@@ -587,7 +593,10 @@ const LeaderboardPage = () => {
               className="text-[13px] font-bold text-primary-fixed-dim hover:text-primary-fixed hover:underline underline-offset-4 transition-colors flex items-center gap-1"
             >
               {showAll ? "Show Less" : "View All Rankings"}
-              <LucideIcon name="expand_more" className={`text-[18px] transition-transform duration-300 ${showAll ?"rotate-180" :""}`} />
+              <LucideIcon
+                name="expand_more"
+                className={`text-[18px] transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
+              />
             </button>
           </div>
         </div>

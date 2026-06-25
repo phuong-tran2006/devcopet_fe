@@ -123,7 +123,10 @@ const FeedbackPanel = ({
       }`}
     >
       <div className="flex items-start gap-3">
-        <LucideIcon name={isCorrect ? "check_circle" : "error"} className={`mt-0.5 text-[22px] ${ isCorrect ?"text-[#63f1e3]" :"text-amber-200" }`} />
+        <LucideIcon
+          name={isCorrect ? "check_circle" : "error"}
+          className={`mt-0.5 text-[22px] ${isCorrect ? "text-[#63f1e3]" : "text-amber-200"}`}
+        />
         <div className="min-w-0 flex-1">
           <p
             className={`text-[11px] font-bold uppercase tracking-widest ${
@@ -687,7 +690,10 @@ const MediumNodeChallengePage = () => {
                           {option.id}) {option.text}
                         </span>
                         {correctOptionId === option.id && (
-                          <LucideIcon name="check_circle" className="text-[18px]" />
+                          <LucideIcon
+                            name="check_circle"
+                            className="text-[18px]"
+                          />
                         )}
                       </button>
                     ))}
@@ -836,7 +842,10 @@ const MediumNodeChallengePage = () => {
                 {result && !result.correct && (
                   <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
                     <div className="flex items-start gap-3">
-                      <LucideIcon name="error" className="text-[20px] text-red-300" />
+                      <LucideIcon
+                        name="error"
+                        className="text-[20px] text-red-300"
+                      />
                       <div className="min-w-0 flex-1">
                         <p className="font-bold text-red-100 text-[14px]">
                           {result.message || "Not quite. Try again."}

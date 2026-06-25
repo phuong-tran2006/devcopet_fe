@@ -410,7 +410,10 @@ const EasyNodeChallengePage = () => {
                             onClick={copyCodeSnippet}
                             className="inline-flex items-center gap-2 rounded-lg border border-[#263b44] bg-[#101f25] px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3]"
                           >
-                            <LucideIcon name={copiedCode ? "check" : "content_copy"} className="text-[16px]" />
+                            <LucideIcon
+                              name={copiedCode ? "check" : "content_copy"}
+                              className="text-[16px]"
+                            />
                             {copiedCode ? "Copied" : "Copy"}
                           </button>
                         </div>
@@ -470,7 +473,10 @@ const EasyNodeChallengePage = () => {
                   {wrongAttempt && (
                     <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
                       <div className="flex items-start gap-3">
-                        <LucideIcon name="error" className=" text-[20px] text-red-300" />
+                        <LucideIcon
+                          name="error"
+                          className=" text-[20px] text-red-300"
+                        />
                         <div className="min-w-0 flex-1">
                           <p className="text-[14px] font-bold text-red-100">
                             {wrongAttempt.message || "Not quite. Try again."}

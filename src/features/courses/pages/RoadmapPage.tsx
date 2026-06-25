@@ -23,7 +23,7 @@ const RoadmapPage = () => {
     Promise.all([
       courseApi.getEasyRoadmap(courseSlug).catch(() => null),
       courseApi.getMediumRoadmap(courseSlug).catch(() => null),
-      courseApi.getHardRoadmap(courseSlug).catch(() => null)
+      courseApi.getHardRoadmap(courseSlug).catch(() => null),
     ]).then(([easy, medium, hard]) => {
       if (!alive) return;
       let total = 0;
@@ -31,7 +31,10 @@ const RoadmapPage = () => {
 
       const processRoadmap = (roadmap: any) => {
         if (!roadmap) return;
-        if (typeof roadmap.completedNodes === "number" && typeof roadmap.totalNodes === "number") {
+        if (
+          typeof roadmap.completedNodes === "number" &&
+          typeof roadmap.totalNodes === "number"
+        ) {
           completed += roadmap.completedNodes;
           total += roadmap.totalNodes;
         } else if (roadmap.chapters) {
@@ -57,7 +60,9 @@ const RoadmapPage = () => {
       }
     });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [isAuthenticated]);
 
   return (
@@ -370,7 +375,6 @@ const RoadmapPage = () => {
             </button>
           </div>
         </section>
-
       </div>
     </main>
   );

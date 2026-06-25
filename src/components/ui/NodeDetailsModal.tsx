@@ -218,15 +218,15 @@ const NodeDetailsModal = ({
                 name={
                   node.type === "drag_drop" ||
                   node.type === "drag_drop_matching"
-                  ? "drag_indicator"
-                  : node.type.includes("ordering") ||
-                      node.type.includes("ranking")
-                    ? "sort"
-                    : node.type.includes("code") ||
-                        node.type.includes("bug") ||
-                        node.type === "fill_missing_line"
-                      ? "code"
-                      : "quiz"
+                    ? "drag_indicator"
+                    : node.type.includes("ordering") ||
+                        node.type.includes("ranking")
+                      ? "sort"
+                      : node.type.includes("code") ||
+                          node.type.includes("bug") ||
+                          node.type === "fill_missing_line"
+                        ? "code"
+                        : "quiz"
                 }
                 className="text-[14px]"
               />

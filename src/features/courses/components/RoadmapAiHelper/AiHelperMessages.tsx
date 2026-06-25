@@ -49,7 +49,11 @@ export function AiHelperMessages({
               border: `1px solid ${aiPrimary}40`,
             }}
           >
-            <LucideIcon name="pets" className="text-[16px]" style={{ color: aiPrimary }} />
+            <LucideIcon
+              name="pets"
+              className="text-[16px]"
+              style={{ color: aiPrimary }}
+            />
           </div>
           <div
             className="rounded-2xl rounded-tl-sm px-4 py-3 text-[13px] leading-relaxed text-on-surface shadow-sm"
@@ -103,7 +107,11 @@ export function AiHelperMessages({
                   backgroundColor: `${aiSecondary}15`,
                 }}
               >
-                <LucideIcon name="menu_book" className="text-[18px] shrink-0" style={{ color: aiSecondary }} />
+                <LucideIcon
+                  name="menu_book"
+                  className="text-[18px] shrink-0"
+                  style={{ color: aiSecondary }}
+                />
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
                     Review Related Lesson
@@ -115,7 +123,11 @@ export function AiHelperMessages({
                     {msg.relatedLesson.title}
                   </span>
                 </div>
-                <LucideIcon name="arrow_forward" className="text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" style={{ color: accentColor }} />
+                <LucideIcon
+                  name="arrow_forward"
+                  className="text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                  style={{ color: accentColor }}
+                />
               </button>
             )}
           </div>
@@ -200,7 +212,11 @@ export function AiHelperMessages({
                 backgroundColor: `${aiSecondary}15`,
               }}
             >
-              <LucideIcon name="menu_book" className="text-[18px] shrink-0" style={{ color: aiSecondary }} />
+              <LucideIcon
+                name="menu_book"
+                className="text-[18px] shrink-0"
+                style={{ color: aiSecondary }}
+              />
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
                   Review Related Lesson
@@ -212,7 +228,11 @@ export function AiHelperMessages({
                   {relatedLesson.title}
                 </span>
               </div>
-              <LucideIcon name="arrow_forward" className="text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5" style={{ color: accentColor }} />
+              <LucideIcon
+                name="arrow_forward"
+                className="text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                style={{ color: accentColor }}
+              />
             </button>
           )}
         </div>

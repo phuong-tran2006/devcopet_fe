@@ -211,7 +211,8 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
             {isActive ? (
               <>
                 <span className="font-label-sm text-[11px] text-primary-fixed-dim tracking-[0.08em]">
-                  {chapter.progress ? `${chapter.progress.percent}%` : "0%"} Completed
+                  {chapter.progress ? `${chapter.progress.percent}%` : "0%"}{" "}
+                  Completed
                 </span>
                 <span className="text-on-surface-variant/40 text-[11px]">
                   •
@@ -222,7 +223,10 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
               </>
             ) : (
               <>
-                <LucideIcon name="lock" className="text-[14px] text-on-surface-variant/50" />
+                <LucideIcon
+                  name="lock"
+                  className="text-[14px] text-on-surface-variant/50"
+                />
                 <span className="font-label-sm text-[11px] text-on-surface-variant/50 tracking-[0.08em]">
                   Locked
                 </span>
@@ -246,10 +250,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
           </div>
         ) : lessons.length > 0 ? (
           lessons.map((lesson) => (
-            <LessonCard
-              key={lesson._id || lesson.id}
-              lesson={lesson}
-            />
+            <LessonCard key={lesson._id || lesson.id} lesson={lesson} />
           ))
         ) : (
           <div className="text-on-surface-variant/40 font-body-md text-[14px] py-4 pl-2">
@@ -298,7 +299,11 @@ const CourseDetailPage = () => {
 
   const handleResetProgress = async () => {
     if (!course?._id) return;
-    if (!window.confirm("Are you sure you want to reset your progress for this course? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to reset your progress for this course? This action cannot be undone.",
+      )
+    ) {
       return;
     }
     setResetting(true);
@@ -312,7 +317,6 @@ const CourseDetailPage = () => {
       setResetting(false);
     }
   };
-
 
   useEffect(() => {
     document.title = course
@@ -336,7 +340,10 @@ const CourseDetailPage = () => {
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <LucideIcon name="error" className="text-5xl text-on-surface-variant/40 mb-4" />
+        <LucideIcon
+          name="error"
+          className="text-5xl text-on-surface-variant/40 mb-4"
+        />
         <h2 className="font-headline-md text-on-surface mb-2">
           Course Not Found
         </h2>
@@ -365,9 +372,13 @@ const CourseDetailPage = () => {
     0,
   );
   const overallPercent =
-    totalLessons > 0 ? Math.round((totalCompletedLessons / totalLessons) * 100) : 0;
+    totalLessons > 0
+      ? Math.round((totalCompletedLessons / totalLessons) * 100)
+      : 0;
   const totalUnlockedLessons =
-    totalCompletedLessons < totalLessons ? totalCompletedLessons + 1 : totalCompletedLessons;
+    totalCompletedLessons < totalLessons
+      ? totalCompletedLessons + 1
+      : totalCompletedLessons;
 
   return (
     <main className="w-full relative pb-20 min-h-screen">
@@ -414,7 +425,10 @@ const CourseDetailPage = () => {
                 <span className="font-label-sm text-[10px] text-on-surface-variant tracking-[0.15em] uppercase">
                   Overall Progress
                 </span>
-                <LucideIcon name="insert_chart" className="text-[20px] text-on-surface-variant/40" />
+                <LucideIcon
+                  name="insert_chart"
+                  className="text-[20px] text-on-surface-variant/40"
+                />
               </div>
 
               {/* Percentage */}
@@ -476,7 +490,10 @@ const CourseDetailPage = () => {
 
           {chapters.length === 0 && (
             <div className="bg-surface-container rounded-xl border border-outline-variant p-16 text-center shadow-[0_0_20px_rgba(0,0,0,0.15)]">
-              <LucideIcon name="inventory_2" className="text-5xl text-on-surface-variant/30 mb-4" />
+              <LucideIcon
+                name="inventory_2"
+                className="text-5xl text-on-surface-variant/30 mb-4"
+              />
               <h3 className="font-headline-sm text-on-surface mb-2">
                 No Modules Found
               </h3>

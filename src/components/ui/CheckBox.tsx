@@ -161,7 +161,9 @@ const CheckBox = ({
             disabled && "cursor-not-allowed",
           )}
         >
-          {isChecked && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
+          {isChecked && (
+            <Check className="w-3 h-3 text-white" strokeWidth={3} />
+          )}
         </div>
       </div>
       <span style={textStyles} className="select-none">

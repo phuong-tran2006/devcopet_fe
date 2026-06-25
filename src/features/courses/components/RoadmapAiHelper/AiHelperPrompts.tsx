@@ -55,7 +55,15 @@ export function AiHelperPrompts({
                     : `${aiPrimary}10`,
                 }}
               >
-                <LucideIcon name={icon} className="text-[18px] shrink-0" style={{ color: chipsDisabled ?"var(--color-on-surface-variant)" : aiPrimary, }} />
+                <LucideIcon
+                  name={icon}
+                  className="text-[18px] shrink-0"
+                  style={{
+                    color: chipsDisabled
+                      ? "var(--color-on-surface-variant)"
+                      : aiPrimary,
+                  }}
+                />
                 <span
                   className="text-[12px] font-semibold leading-tight"
                   style={{

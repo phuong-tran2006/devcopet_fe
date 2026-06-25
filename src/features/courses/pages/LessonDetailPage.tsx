@@ -254,7 +254,10 @@ const LessonDetailPage = () => {
   if (!lesson) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <LucideIcon name="error" className="text-5xl text-on-surface-variant mb-4" />
+        <LucideIcon
+          name="error"
+          className="text-5xl text-on-surface-variant mb-4"
+        />
         <h2 className="font-headline-md text-on-surface mb-2">
           Lesson Not Found
         </h2>
@@ -313,7 +316,10 @@ const LessonDetailPage = () => {
     `}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <LucideIcon name={isSidebarOpen ? "chevron_left" : "menu"} className="text-[22px]" />
+          <LucideIcon
+            name={isSidebarOpen ? "chevron_left" : "menu"}
+            className="text-[22px]"
+          />
         </button>
       )}
       {/* Cột phải: Nội dung bài học */}
@@ -350,7 +356,10 @@ const LessonDetailPage = () => {
           {/* Current Lesson Dashboard Info */}
           <div className="bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-lg">
             <div className="p-4 bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
-              <LucideIcon name="play_lesson" className="text-4xl text-primary-fixed-dim" />
+              <LucideIcon
+                name="play_lesson"
+                className="text-4xl text-primary-fixed-dim"
+              />
             </div>
             <div className="flex-1">
               <div className="text-[12px] font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">
@@ -366,11 +375,17 @@ const LessonDetailPage = () => {
             </div>
             <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
               <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <LucideIcon name="military_tech" className="text-[18px] text-[#4ade80]" />
+                <LucideIcon
+                  name="military_tech"
+                  className="text-[18px] text-[#4ade80]"
+                />
                 XP Reward: {lesson.points || 100}
               </div>
               <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <LucideIcon name="local_fire_department" className="text-[18px] text-[#f87171]" />
+                <LucideIcon
+                  name="local_fire_department"
+                  className="text-[18px] text-[#f87171]"
+                />
                 Difficulty:{" "}
                 <span className="capitalize">
                   {lesson.difficulty || "Normal"}

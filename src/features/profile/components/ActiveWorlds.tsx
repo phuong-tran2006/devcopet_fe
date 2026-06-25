@@ -18,7 +18,10 @@ const ActiveWorlds = () => {
           <div className="absolute top-4 left-4 bg-primary-fixed-dim text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider transition-colors duration-300">
             ACTIVE
           </div>
-          <LucideIcon name="terminal" className="text-6xl text-outline-variant transition-colors duration-300" />
+          <LucideIcon
+            name="terminal"
+            className="text-6xl text-outline-variant transition-colors duration-300"
+          />
         </div>
         <div className="p-6">
           <h3 className="text-lg font-bold text-on-surface mb-1 transition-colors duration-300">

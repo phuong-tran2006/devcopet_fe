@@ -55,7 +55,10 @@ const LessonProgressCircle = ({
           }
         `}
       >
-        <LucideIcon name={isCompleted ? "check" : isActive ? "play_arrow" : "lock_open"} className="text-[16px]" />
+        <LucideIcon
+          name={isCompleted ? "check" : isActive ? "play_arrow" : "lock_open"}
+          className="text-[16px]"
+        />
       </div>
     </div>
   );

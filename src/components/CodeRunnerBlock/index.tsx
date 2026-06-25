@@ -131,7 +131,10 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 bg-[#edf3f8] border-b border-[#d8e2ec]">
         <div className="flex items-center gap-2">
-          <LucideIcon name="code_blocks" className="text-[18px] text-[#207985]" />
+          <LucideIcon
+            name="code_blocks"
+            className="text-[18px] text-[#207985]"
+          />
           <span className="text-[12px] font-bold text-[#253447] tracking-widest uppercase">
             {title}
           </span>

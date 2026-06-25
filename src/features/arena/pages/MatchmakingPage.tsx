@@ -122,7 +122,10 @@ const MatchmakingPage = () => {
             className="w-12 h-12 rounded-full dark:bg-[#1e2e38] bg-surface-container-high border-4 dark:border-[#081015] border-surface shadow-2xl flex items-center justify-center transition-colors duration-300"
             style={{ color: "var(--md-sys-color-primary)" }}
           >
-            <LucideIcon name="bolt" className="text-[26px] dark:text-[#4dd0d0]" />
+            <LucideIcon
+              name="bolt"
+              className="text-[26px] dark:text-[#4dd0d0]"
+            />
           </div>
           <span className="font-black text-[16px] tracking-widest transition-colors duration-300 dark:text-[#4dd0d0] text-primary">
             VS

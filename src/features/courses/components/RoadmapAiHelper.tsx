@@ -156,7 +156,10 @@ const RoadmapAiHelper = ({
 
           {!loadingPrompts && !errorCode && prompts.length === 0 && (
             <div className="py-6 text-center">
-              <LucideIcon name="psychology" className="mb-2 text-[28px] text-on-surface-variant/40" />
+              <LucideIcon
+                name="psychology"
+                className="mb-2 text-[28px] text-on-surface-variant/40"
+              />
               <p className="text-[12px] font-medium text-on-surface-variant/60">
                 No Pet prompts available for this node.
               </p>

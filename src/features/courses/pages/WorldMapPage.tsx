@@ -750,7 +750,11 @@ const WorldMapPage = () => {
                     boxShadow: `0 0 20px ${cfg.glowWeak}`,
                   }}
                 >
-                  <LucideIcon name="terminal" className=" text-[26px]" style={{ color: cfg.accent }} />
+                  <LucideIcon
+                    name="terminal"
+                    className=" text-[26px]"
+                    style={{ color: cfg.accent }}
+                  />
                 </div>
                 <div>
                   <h1 className="text-[32px] font-extrabold uppercase leading-none tracking-wide text-on-surface md:text-[38px]">
@@ -855,7 +859,10 @@ const WorldMapPage = () => {
 
             {!loading && error && (
               <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
-                <LucideIcon name="error" className=" mb-3 text-[34px] text-red-200" />
+                <LucideIcon
+                  name="error"
+                  className=" mb-3 text-[34px] text-red-200"
+                />
                 <h2 className="text-[18px] font-extrabold text-on-surface">
                   {DIFF_CONFIG[difficulty].label} roadmap could not load
                 </h2>
@@ -910,7 +917,11 @@ const WorldMapPage = () => {
                     borderColor: `${cfg.accent}35`,
                   }}
                 >
-                  <LucideIcon name="construction" className=" text-[22px]" style={{ color: cfg.accent }} />
+                  <LucideIcon
+                    name="construction"
+                    className=" text-[22px]"
+                    style={{ color: cfg.accent }}
+                  />
                   <div>
                     <p className="text-[13px] font-bold text-on-surface">
                       Coming soon
@@ -1022,11 +1033,17 @@ const WorldMapPage = () => {
                               </p>
                               <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
                                 <span className="flex items-center gap-1">
-                                  <LucideIcon name="bolt" className=" text-[12px]" />
+                                  <LucideIcon
+                                    name="bolt"
+                                    className=" text-[12px]"
+                                  />
                                   {node.xp || 0} XP
                                 </span>
                                 <span className="flex items-center gap-1">
-                                  <LucideIcon name="schedule" className=" text-[12px]" />
+                                  <LucideIcon
+                                    name="schedule"
+                                    className=" text-[12px]"
+                                  />
                                   {EASY_CHECKPOINT_DURATION}
                                 </span>
                               </div>
@@ -1098,7 +1115,11 @@ const WorldMapPage = () => {
                     borderColor: `${cfg.accent}35`,
                   }}
                 >
-                  <LucideIcon name="construction" className=" text-[22px]" style={{ color: cfg.accent }} />
+                  <LucideIcon
+                    name="construction"
+                    className=" text-[22px]"
+                    style={{ color: cfg.accent }}
+                  />
                   <div>
                     <p className="text-[13px] font-bold text-on-surface">
                       Coming soon
@@ -1456,7 +1477,10 @@ const WorldMapPage = () => {
               color: isLight ? "#000000" : "#fff",
             }}
           >
-            <LucideIcon name="my_location" className=" text-[20px] transition-transform duration-300 group-hover:rotate-12" />
+            <LucideIcon
+              name="my_location"
+              className=" text-[20px] transition-transform duration-300 group-hover:rotate-12"
+            />
           </button>
 
           <div

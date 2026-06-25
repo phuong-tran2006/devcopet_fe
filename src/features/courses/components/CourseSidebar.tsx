@@ -47,7 +47,10 @@ const CourseSidebarChapter = ({
             {lessons.length} Lesson
           </span>
         </div>
-        <LucideIcon name="expand_more" className={`text-[20px] text-on-surface-variant transition-transform duration-300 ${isOpen ?"rotate-180" :""}`} />
+        <LucideIcon
+          name="expand_more"
+          className={`text-[20px] text-on-surface-variant transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
+        />
       </button>
 
       {/* Tối ưu render bằng cách ẩn hiện class thay vì unmount */}

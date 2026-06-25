@@ -20,7 +20,10 @@ const RoundResultView = () => {
           <span className="dark:text-gray-500 text-on-surface-variant font-semibold text-[16px] transition-colors duration-300">
             O(1)
           </span>
-          <LucideIcon name="close" className="dark:text-gray-600 text-on-surface-variant transition-colors duration-300" />
+          <LucideIcon
+            name="close"
+            className="dark:text-gray-600 text-on-surface-variant transition-colors duration-300"
+          />
         </div>
 
         {/* Option B - Correct (Selected) */}
@@ -36,7 +39,10 @@ const RoundResultView = () => {
           <span className="dark:text-gray-500 text-on-surface-variant font-semibold text-[16px] transition-colors duration-300">
             O(n)
           </span>
-          <LucideIcon name="close" className="dark:text-gray-600 text-on-surface-variant transition-colors duration-300" />
+          <LucideIcon
+            name="close"
+            className="dark:text-gray-600 text-on-surface-variant transition-colors duration-300"
+          />
         </div>
 
         {/* Option D - Incorrect */}
@@ -44,7 +50,10 @@ const RoundResultView = () => {
           <span className="dark:text-gray-500 text-on-surface-variant font-semibold text-[16px] transition-colors duration-300">
             O(n log n)
           </span>
-          <LucideIcon name="close" className="dark:text-gray-600 text-on-surface-variant transition-colors duration-300" />
+          <LucideIcon
+            name="close"
+            className="dark:text-gray-600 text-on-surface-variant transition-colors duration-300"
+          />
         </div>
       </div>
 
@@ -62,9 +71,18 @@ const RoundResultView = () => {
             Total Score
           </div>
           <div className="flex gap-2">
-            <LucideIcon name="local_fire_department" className="text-[#84cc16] text-[18px] drop-shadow-[0_0_5px_rgba(132,204,22,0.5)]" />
-            <LucideIcon name="local_fire_department" className="text-[#84cc16] text-[18px] drop-shadow-[0_0_5px_rgba(132,204,22,0.5)]" />
-            <LucideIcon name="local_fire_department" className="text-[#84cc16] text-[18px] drop-shadow-[0_0_5px_rgba(132,204,22,0.5)]" />
+            <LucideIcon
+              name="local_fire_department"
+              className="text-[#84cc16] text-[18px] drop-shadow-[0_0_5px_rgba(132,204,22,0.5)]"
+            />
+            <LucideIcon
+              name="local_fire_department"
+              className="text-[#84cc16] text-[18px] drop-shadow-[0_0_5px_rgba(132,204,22,0.5)]"
+            />
+            <LucideIcon
+              name="local_fire_department"
+              className="text-[#84cc16] text-[18px] drop-shadow-[0_0_5px_rgba(132,204,22,0.5)]"
+            />
           </div>
         </div>
 

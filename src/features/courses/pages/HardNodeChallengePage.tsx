@@ -366,7 +366,12 @@ const HardNodeChallengePage = () => {
               </span>
             )}
           </span>
-          <LucideIcon name={isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"} className="text-[18px] opacity-80" />
+          <LucideIcon
+            name={
+              isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"
+            }
+            className="text-[18px] opacity-80"
+          />
         </button>
 
         {canEdit && assignedItemId && (
@@ -720,10 +725,16 @@ const HardNodeChallengePage = () => {
                             {opt.text}
                           </span>
                           {isCorrect && (
-                            <LucideIcon name="check_circle" className="text-[#63f1e3]" />
+                            <LucideIcon
+                              name="check_circle"
+                              className="text-[#63f1e3]"
+                            />
                           )}
                           {isIncorrect && (
-                            <LucideIcon name="cancel" className="text-red-400" />
+                            <LucideIcon
+                              name="cancel"
+                              className="text-red-400"
+                            />
                           )}
                         </button>
                       );
@@ -821,7 +832,10 @@ const HardNodeChallengePage = () => {
                                         {matchedItem?.text}
                                       </span>
                                       {canEdit && (
-                                        <LucideIcon name="close" className="text-[16px] text-on-surface-variant hover:text-red-400" />
+                                        <LucideIcon
+                                          name="close"
+                                          className="text-[16px] text-on-surface-variant hover:text-red-400"
+                                        />
                                       )}
                                     </div>
                                   )}
@@ -946,11 +960,16 @@ const HardNodeChallengePage = () => {
                               ].join(" ")}
                             >
                               <span>{item.text}</span>
-                              <LucideIcon name={isUsed
-                                  ? "check"
-                                  : isSelected
-                                    ? "radio_button_checked"
-                                    : "radio_button_unchecked"} className="text-[17px] opacity-70" />
+                              <LucideIcon
+                                name={
+                                  isUsed
+                                    ? "check"
+                                    : isSelected
+                                      ? "radio_button_checked"
+                                      : "radio_button_unchecked"
+                                }
+                                className="text-[17px] opacity-70"
+                              />
                             </button>
                           );
                         })}
@@ -998,7 +1017,10 @@ const HardNodeChallengePage = () => {
                               disabled={!canEdit || index === 0}
                               className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
                             >
-                              <LucideIcon name="keyboard_arrow_up" className="text-[18px]" />
+                              <LucideIcon
+                                name="keyboard_arrow_up"
+                                className="text-[18px]"
+                              />
                             </button>
                             <button
                               onClick={() => {
@@ -1016,7 +1038,10 @@ const HardNodeChallengePage = () => {
                               }
                               className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
                             >
-                              <LucideIcon name="keyboard_arrow_down" className="text-[18px]" />
+                              <LucideIcon
+                                name="keyboard_arrow_down"
+                                className="text-[18px]"
+                              />
                             </button>
                           </div>
                           <div className="w-6 h-6 rounded-full bg-on-surface/10 flex items-center justify-center text-[11px] font-bold text-on-surface-variant">
@@ -1026,10 +1051,16 @@ const HardNodeChallengePage = () => {
                             {step.text}
                           </span>
                           {isCorrect && (
-                            <LucideIcon name="check_circle" className="text-[#63f1e3]" />
+                            <LucideIcon
+                              name="check_circle"
+                              className="text-[#63f1e3]"
+                            />
                           )}
                           {isIncorrect && (
-                            <LucideIcon name="cancel" className="text-red-400" />
+                            <LucideIcon
+                              name="cancel"
+                              className="text-red-400"
+                            />
                           )}
                         </div>
                       );
@@ -1064,7 +1095,10 @@ const HardNodeChallengePage = () => {
               {result && !result.correct && (
                 <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
                   <div className="flex items-start gap-3">
-                    <LucideIcon name="error" className="text-[20px] text-red-300" />
+                    <LucideIcon
+                      name="error"
+                      className="text-[20px] text-red-300"
+                    />
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-red-100 text-[14px]">
                         {result.message || "Not quite. Try again."}
