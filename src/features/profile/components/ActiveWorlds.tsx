@@ -1,4 +1,5 @@
 import React from "react";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const ActiveWorlds = () => {
   return (
@@ -17,9 +18,10 @@ const ActiveWorlds = () => {
           <div className="absolute top-4 left-4 bg-primary-fixed-dim text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wider transition-colors duration-300">
             ACTIVE
           </div>
-          <span className="material-symbols-outlined text-6xl text-outline-variant transition-colors duration-300">
-            terminal
-          </span>
+          <LucideIcon
+            name="terminal"
+            className="text-6xl text-outline-variant transition-colors duration-300"
+          />
         </div>
         <div className="p-6">
           <h3 className="text-lg font-bold text-on-surface mb-1 transition-colors duration-300">
@@ -40,9 +42,7 @@ const ActiveWorlds = () => {
               </div>
             </div>
             <button className="w-8 h-8 rounded-full bg-primary-fixed flex items-center justify-center text-primary-fixed-dim hover:bg-primary-container hover:text-on-primary-container transition-colors duration-300">
-              <span className="material-symbols-outlined text-[16px]">
-                play_arrow
-              </span>
+              <LucideIcon name="play_arrow" className="text-[16px]" />
             </button>
           </div>
         </div>

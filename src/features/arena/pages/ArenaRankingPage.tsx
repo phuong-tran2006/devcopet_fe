@@ -68,9 +68,6 @@ const ArenaRankingPage = () => {
             See where you stand among the world's best developers.
           </p>
         </div>
-        <button className="px-4 py-2 rounded-lg dark:bg-[#29b6f6]/20 bg-primary/10 dark:text-[#29b6f6] text-primary font-bold text-[14px]">
-          Global
-        </button>
       </div>
 
       <div className="flex flex-col gap-3 max-w-5xl w-full">
@@ -79,7 +76,7 @@ const ArenaRankingPage = () => {
           <div>Player</div>
           <div className="text-center">Tier</div>
           <div className="text-center">Win Rate</div>
-          <div className="text-right">Rating</div>
+          <div className="text-right">Points</div>
         </div>
 
         {loading && (

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../ui/LucideIcon";
 import React, { useState, useEffect, useRef } from "react";
 
 const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
@@ -126,14 +127,15 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   };
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden border border-[#1E293B] bg-[#0b1118]">
+    <div className="my-6 rounded-xl overflow-hidden border border-[#d8e2ec] bg-[#f5f8fb] shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#161B22] border-b border-[#1E293B]">
+      <div className="flex items-center justify-between px-4 py-3 bg-[#edf3f8] border-b border-[#d8e2ec]">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px] text-primary-fixed-dim">
-            code_blocks
-          </span>
-          <span className="text-[12px] font-bold text-white tracking-widest uppercase">
+          <LucideIcon
+            name="code_blocks"
+            className="text-[18px] text-[#207985]"
+          />
+          <span className="text-[12px] font-bold text-[#253447] tracking-widest uppercase">
             {title}
           </span>
         </div>
@@ -142,11 +144,9 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           <button
             onClick={handleReset}
             disabled={status === "running" || status === "loading"}
-            className="text-[12px] font-bold text-on-surface-variant hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1"
+            className="text-[12px] font-bold text-[#637386] hover:text-[#1f2f43] transition-colors disabled:opacity-50 flex items-center gap-1"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              refresh
-            </span>
+            <LucideIcon name="refresh" className="text-[16px]" />
             RESET
           </button>
 
@@ -158,9 +158,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
             {status === "running" || status === "loading" ? (
               <div className="w-3.5 h-3.5 border-2 border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
             ) : (
-              <span className="material-symbols-outlined text-[16px]">
-                play_arrow
-              </span>
+              <LucideIcon name="play_arrow" className="text-[16px]" />
             )}
             {status === "loading" ? "LOADING..." : "RUN"}
           </button>
@@ -168,22 +166,22 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
       </div>
 
       {/* Editor */}
-      <div className="p-4 border-b border-[#1E293B] relative group">
+      <div className="p-4 border-b border-[#d8e2ec] bg-[#f8fbfd] relative group">
         <textarea
           ref={textareaRef}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck="false"
-          className="custom-scrollbar w-full bg-transparent text-[#e2e8f0] font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none"
+          className="custom-scrollbar w-full bg-transparent text-[#263447] placeholder:text-[#7b8da1] font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none selection:bg-[#cce7ee]"
           style={{ fontFamily: "Roboto Mono, monospace" }}
         />
       </div>
 
       {/* Output Panel */}
-      <div className="bg-[#121c25] p-4 relative">
+      <div className="bg-[#eef4f8] p-4 relative">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
+          <span className="text-[11px] font-bold text-[#637386] uppercase tracking-widest">
             Output
           </span>
           {status === "loading" && (
@@ -193,14 +191,14 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
         <pre
           className={`font-mono text-[13.5px] leading-relaxed whitespace-pre-wrap ${
             status === "loading"
-              ? "animate-pulse text-[#7fe3dd]"
+              ? "animate-pulse text-[#207985]"
               : output.includes("timed out")
-                ? "text-[#FBBF24]"
+                ? "text-amber-600"
                 : status === "error"
-                  ? "text-[#F87171]"
+                  ? "text-red-600"
                   : status === "done"
-                    ? "text-[#10B981]"
-                    : "text-[#94A3B8]"
+                    ? "text-emerald-700"
+                    : "text-[#4c5e73]"
           }`}
         >
           {output}

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
 import { useAuthStore } from "../../users/store/auth.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const RoadmapPage = () => {
   const [pythonCompletion, setPythonCompletion] = useState<number>(0);
@@ -22,7 +23,7 @@ const RoadmapPage = () => {
     Promise.all([
       courseApi.getEasyRoadmap(courseSlug).catch(() => null),
       courseApi.getMediumRoadmap(courseSlug).catch(() => null),
-      courseApi.getHardRoadmap(courseSlug).catch(() => null)
+      courseApi.getHardRoadmap(courseSlug).catch(() => null),
     ]).then(([easy, medium, hard]) => {
       if (!alive) return;
       let total = 0;
@@ -30,7 +31,10 @@ const RoadmapPage = () => {
 
       const processRoadmap = (roadmap: any) => {
         if (!roadmap) return;
-        if (typeof roadmap.completedNodes === "number" && typeof roadmap.totalNodes === "number") {
+        if (
+          typeof roadmap.completedNodes === "number" &&
+          typeof roadmap.totalNodes === "number"
+        ) {
           completed += roadmap.completedNodes;
           total += roadmap.totalNodes;
         } else if (roadmap.chapters) {
@@ -56,7 +60,9 @@ const RoadmapPage = () => {
       }
     });
 
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [isAuthenticated]);
 
   return (
@@ -95,13 +101,6 @@ const RoadmapPage = () => {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-4">
           {/* Card 1: Python */}
           <div className="bg-surface rounded-2xl border border-outline/30 p-6 flex flex-col hover:border-primary-fixed-dim/50 hover:shadow-[0_8px_30px_rgba(0,128,128,0.2)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
-            {/* Header Badge */}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-primary bg-primary-fixed-dim/10 border border-primary-fixed-dim/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                Lvl. 42 Master
-              </span>
-            </div>
-
             {/* Logo Wrapper */}
             <div className="h-[100px] w-full bg-primary-fixed-dim/10 border border-primary-fixed-dim/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-primary-fixed-dim/20 transition-colors">
               <svg
@@ -123,7 +122,7 @@ const RoadmapPage = () => {
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
               <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-primary transition-colors">
-                Python 1: Variables
+                Python World
               </h2>
               <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
                 The realm of Data Science, AI, and rapid prototyping. Master the
@@ -147,16 +146,6 @@ const RoadmapPage = () => {
               </div>
             </div>
 
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
-                SYSTEM
-              </span>
-              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
-                AI DRIVEN
-              </span>
-            </div>
-
             {/* Action Button */}
             <Link
               to="/roadmap/$worldId"
@@ -173,9 +162,7 @@ const RoadmapPage = () => {
               className="mt-auto w-full bg-primary-fixed-dim text-on-primary-fixed font-extrabold text-[12px] py-2.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
               Enter World{" "}
-              <span className="material-symbols-outlined text-[15px]">
-                arrow_forward
-              </span>
+              <LucideIcon name="arrow_forward" className="text-[15px]" />
             </Link>
           </div>
 
@@ -275,9 +262,7 @@ const RoadmapPage = () => {
               disabled
               className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[15px]">
-                lock
-              </span>
+              <LucideIcon name="lock" className="text-[15px]" />
               Unlock at Lvl 12
             </button>
           </div>
@@ -368,14 +353,11 @@ const RoadmapPage = () => {
               disabled
               className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[15px]">
-                lock
-              </span>
+              <LucideIcon name="lock" className="text-[15px]" />
               Unlock at Lvl 15
             </button>
           </div>
         </section>
-
       </div>
     </main>
   );

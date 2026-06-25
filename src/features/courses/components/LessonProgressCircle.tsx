@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../../../components/ui/LucideIcon";
 const LessonProgressCircle = ({
   progress = 0,
   isActive = false,
@@ -54,9 +55,10 @@ const LessonProgressCircle = ({
           }
         `}
       >
-        <span className="material-symbols-outlined text-[16px]">
-          {isCompleted ? "check" : isActive ? "play_arrow" : "lock_open"}
-        </span>
+        <LucideIcon
+          name={isCompleted ? "check" : isActive ? "play_arrow" : "lock_open"}
+          className="text-[16px]"
+        />
       </div>
     </div>
   );

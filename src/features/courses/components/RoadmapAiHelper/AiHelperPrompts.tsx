@@ -5,6 +5,7 @@ import {
   type PromptId,
   type AiUsage,
 } from "../../api/aiChat.api";
+import LucideIcon from "../../../../components/ui/LucideIcon";
 
 interface AiHelperPromptsProps {
   activePromptId: PromptId | null;
@@ -54,16 +55,15 @@ export function AiHelperPrompts({
                     : `${aiPrimary}10`,
                 }}
               >
-                <span
-                  className="material-symbols-outlined text-[18px] shrink-0"
+                <LucideIcon
+                  name={icon}
+                  className="text-[18px] shrink-0"
                   style={{
                     color: chipsDisabled
                       ? "var(--color-on-surface-variant)"
                       : aiPrimary,
                   }}
-                >
-                  {icon}
-                </span>
+                />
                 <span
                   className="text-[12px] font-semibold leading-tight"
                   style={{
@@ -88,9 +88,7 @@ export function AiHelperPrompts({
             backgroundColor: "rgba(239, 68, 68, 0.1)",
           }}
         >
-          <span className="material-symbols-outlined text-[#ef4444] text-[20px]">
-            bedtime
-          </span>
+          <LucideIcon name="bedtime" className="text-[#ef4444] text-[20px]" />
           <div className="flex flex-col">
             <span className="text-[12px] font-bold text-[#ef4444]">
               Pet is resting!

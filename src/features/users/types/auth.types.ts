@@ -6,6 +6,10 @@ export interface LoginDto {
 export interface RegisterDto {
   email: string;
   password?: string;
+  confirmPassword?: string;
   name?: string;
   username: string;
+  dateOfBirth?: string;
+  experienceLevel?: string;
+  termsAccepted?: boolean;
 }

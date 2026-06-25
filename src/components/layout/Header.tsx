@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../ui/LucideIcon";
 import React from "react";
 import {
   Link,
@@ -84,18 +85,17 @@ const Header = () => {
                   onClick={() => triggerHaptic(40)}
                   className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
                 >
-                  <span className="material-symbols-outlined text-[20px]">
-                    notifications
-                  </span>
+                  <LucideIcon name="notifications" className="text-[20px]" />
                 </button>
               )}
               <button
                 onClick={toggleTheme}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  {theme === "dark" ? "light_mode" : "dark_mode"}
-                </span>
+                <LucideIcon
+                  name={theme === "dark" ? "light_mode" : "dark_mode"}
+                  className="text-[20px]"
+                />
               </button>
               {!isOnboarding ? (
                 <>
@@ -126,9 +126,7 @@ const Header = () => {
                             onClick={() => triggerHaptic(40)}
                             className="w-full text-left px-3 py-2 text-sm text-on-surface hover:bg-white/5 rounded-lg transition-colors font-medium flex items-center gap-2"
                           >
-                            <span className="material-symbols-outlined text-[16px]">
-                              person
-                            </span>
+                            <LucideIcon name="person" className="text-[16px]" />
                             {t("profile")}
                           </Link>
                           <div className="h-px w-full bg-white/5 my-1"></div>
@@ -139,9 +137,7 @@ const Header = () => {
                             }}
                             className="w-full text-left px-3 py-2 text-sm text-error hover:bg-error/10 rounded-lg transition-colors font-medium flex items-center gap-2"
                           >
-                            <span className="material-symbols-outlined text-[16px]">
-                              logout
-                            </span>
+                            <LucideIcon name="logout" className="text-[16px]" />
                             {t("logout")}
                           </button>
                         </div>

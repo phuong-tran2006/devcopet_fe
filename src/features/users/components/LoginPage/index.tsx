@@ -2,8 +2,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import Button from "../../../../components/ui/Button";
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import ForgotPasswordModal from "../ForgotPasswordModal";
+import VerifyEmailModal from "../VerifyEmailModal";
 import {
   EmailIcon,
   LockIcon,
@@ -26,6 +26,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const { setAuth, isAuthenticated, user } = useAuthStore();
   const navigate = useNavigate();
@@ -49,6 +51,7 @@ const Login = () => {
   const handleLogin = async (e: any) => {
     if (e) e.preventDefault();
     setError("");
+    setSuccessMessage("");
 
     if (!email || !password) {
       setError("Please enter both email and password.");
@@ -75,6 +78,10 @@ const Login = () => {
         err?.message ||
         "Login failed. Please check your credentials.";
       setError(errorMessage);
+
+      if (errorMessage.toLowerCase().includes("verify your email")) {
+        setShowVerifyModal(true);
+      }
     } finally {
       setLoading(false);
     }
@@ -96,31 +103,12 @@ const Login = () => {
   const handleInputChange = (setter: any) => (e: any) => {
     setter(e?.target?.value);
     if (error) setError("");
+    if (successMessage) setSuccessMessage("");
   };
 
   return (
     <>
-      <MouseTrail />
       <main className="relative w-full min-h-screen bg-surface">
-        {/* Background Grid & Streaks */}
-        <div className="absolute inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[30%] left-[80%] opacity-100 blur-[2px]"></div>
-            <div className="absolute w-1 h-1 bg-[#D8BFD8] rounded-full top-[60%] left-[10%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-2 h-2 bg-white rounded-full top-[80%] left-[70%] opacity-100 blur-[2px]"></div>
-
-            <div className="absolute w-1 h-1 bg-[#008080] rounded-full top-[20%] left-[50%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[45%] left-[30%] opacity-80"></div>
-            <div className="absolute w-1.5 h-1.5 bg-[#008080] rounded-full top-[75%] left-[40%] opacity-90 blur-[1px]"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[90%] left-[85%] opacity-100 blur-[1px]"></div>
-
-            <div className="absolute w-[2px] h-[100px] bg-gradient-to-b from-transparent via-[#008080] to-transparent top-[15%] left-[25%] opacity-40 rotate-[25deg]"></div>
-            <div className="absolute w-[1px] h-[150px] bg-gradient-to-b from-transparent via-[#D8BFD8] to-transparent top-[55%] left-[75%] opacity-30 rotate-[-15deg]"></div>
-          </div>
-          <div className="absolute inset-0 digital-grid opacity-20"></div>
-        </div>
-
         {/* Content wrapper */}
         <div className="relative z-10 flex flex-col w-full h-full">
           {/* Main content area - centered */}
@@ -235,6 +223,12 @@ const Login = () => {
                     <p className="text-sm text-red-400">{error}</p>
                   ) : null}
 
+                  {successMessage ? (
+                    <p className="text-sm text-green-400 font-semibold">
+                      {successMessage}
+                    </p>
+                  ) : null}
+
                   {/* Social login section */}
                   <div className="flex flex-col gap-3">
                     {/* Divider with text */}
@@ -344,6 +338,15 @@ const Login = () => {
       <ForgotPasswordModal
         isOpen={isForgotPasswordOpen}
         onClose={() => setIsForgotPasswordOpen(false)}
+      />
+      <VerifyEmailModal
+        isOpen={showVerifyModal}
+        email={email}
+        onClose={() => setShowVerifyModal(false)}
+        onSuccess={(msg) => {
+          setSuccessMessage(msg);
+          setShowVerifyModal(false);
+        }}
       />
     </>
   );

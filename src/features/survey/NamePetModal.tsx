@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import heroMascotVideo from "../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../components/ui/TransparentVideo";
+import LucideIcon from "../../components/ui/LucideIcon";
 
 interface NamePetModalProps {
   isOpen: boolean;
@@ -98,9 +99,9 @@ const NamePetModal = ({ isOpen, onConfirm }: NamePetModalProps) => {
                 type="button"
                 onClick={handleRandomName}
                 title="Generate random name"
-                className="absolute left-4 z-10 text-gray-400 dark:text-[#64748b] hover:text-purple-500 dark:hover:text-[#d4a8d4] material-symbols-outlined text-[18px] transition-colors"
+                className="absolute left-4 z-10 text-gray-400 dark:text-[#64748b] hover:text-purple-500 dark:hover:text-[#d4a8d4] text-[18px] transition-colors"
               >
-                edit
+                <LucideIcon name="edit" className="text-[18px]" />
               </button>
               <input
                 type="text"
