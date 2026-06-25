@@ -414,6 +414,14 @@ const LessonDetailPage = () => {
             </ReactMarkdown>
           </article>
 
+          {/* Quiz Section */}
+          <LessonQuiz
+            key={lesson._id}
+            lessonId={lesson._id}
+            onQuizPassed={handleQuizPassed}
+            onFinishReview={handleFinishReview}
+          />
+
           {/* Next Lesson Button */}
           {(lesson.status === "completed" || quizPassed) && (
             <div className="mt-8 flex justify-end gap-4 border-t border-outline/20 pt-6">
@@ -442,14 +450,6 @@ const LessonDetailPage = () => {
               )}
             </div>
           )}
-
-          {/* Quiz Section */}
-          <LessonQuiz
-            key={lesson._id}
-            lessonId={lesson._id}
-            onQuizPassed={handleQuizPassed}
-            onFinishReview={handleFinishReview}
-          />
         </div>
       </main>
 

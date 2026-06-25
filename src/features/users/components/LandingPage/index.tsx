@@ -45,30 +45,8 @@ const LandingPage = () => {
   return (
     <>
       <main className="relative">
-        {/* Background Grid & Streaks */}
+        {/* Background Grid */}
         <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[10%] left-[20%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[35%] left-[80%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[60%] left-[15%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[85%] left-[45%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[25%] left-[65%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[50%] left-[90%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[75%] left-[30%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[15%] left-[55%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[45%] left-[10%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[95%] left-[75%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[5%] left-[40%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[20%] left-[10%] opacity-100"></div>
-            <div className="absolute w-1.5 h-1.5 bg-white rounded-full top-[40%] left-[70%] opacity-100 blur-[1px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[55%] left-[25%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-primary-fixed-dim rounded-full top-[70%] left-[85%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-white rounded-full top-[90%] left-[50%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[12%] left-[95%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-0.5 h-0.5 bg-primary-fixed-dim rounded-full top-[30%] left-[35%] opacity-100"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[65%] left-[5%] opacity-100 blur-[0.5px]"></div>
-            <div className="absolute w-1 h-1 bg-white rounded-full top-[22%] left-[3%] opacity-50 blur-[1px]"></div>
-          </div>
           <div className="absolute inset-0 digital-grid opacity-20"></div>
         </div>
 
@@ -122,45 +100,45 @@ const LandingPage = () => {
                 <LucideIcon name="psychology" className="text-3xl" />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
-                Personalized Roadmap
+                AI-Powered Learning
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Our AI system analyzes your skills and suggests an optimized
-                learning path tailored to your learning pace.
+                Experience tailored roadmaps that adapt dynamically to your
+                learning pace and cognitive style.
               </p>
             </div>
 
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#D8BFD8" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(216,191,216,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
                 <LucideIcon name="groups" className="text-3xl" />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
-                Mentor Community
+                1:1 Expert Mentorship
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Connect directly with experts from leading tech corporations to
-                receive 1:1 personalized feedback.
+                Unlock your potential by connecting with top-tier engineers who
+                guide you through the toughest bugs.
               </p>
             </div>
 
             <div
               ref={addToRefs}
               style={{ "--glow-color": "#87A96B" } as any}
-              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
+              className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(135,169,107,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
                 <LucideIcon name="code_blocks" className="text-3xl" />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
-                Real-world Projects
+                Project-Driven Growth
               </h3>
               <p className="font-body-md text-body-md text-on-surface-variant">
-                Learn by building actual products. Solve complex technical
-                problems within a professional terminal environment.
+                Ditch the theory. Build portfolio-ready applications in a
+                professional, real-world development environment.
               </p>
             </div>
           </div>

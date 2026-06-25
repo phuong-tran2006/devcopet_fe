@@ -274,14 +274,6 @@ const CoursePage = () => {
               Choose a stack to master and evolve your familiar.
             </p>
           </div>
-          <div className="bg-surface-container text-on-surface px-4 py-2 rounded-lg flex items-center gap-2 border border-on-surface/5 min-w-[126px] justify-center">
-            <span className="font-bold text-[14px]">
-              {formatNumber(userXp)}
-            </span>
-            <span className="text-[10px] text-on-surface-variant font-medium tracking-wider">
-              TOTAL XP
-            </span>
-          </div>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3 mb-5">
@@ -293,7 +285,7 @@ const CoursePage = () => {
               type="text"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              placeholder="Search technologies..."
+              placeholder="Search courses..."
               className="w-full bg-surface-container border border-on-surface/10 rounded-lg pl-10 pr-4 py-2 text-[13px] text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary-fixed-dim transition-colors"
             />
           </div>
