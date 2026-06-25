@@ -1,5 +1,6 @@
 import React from "react";
 import { ERROR_MESSAGES } from "./constants";
+import LucideIcon from "../../../../components/ui/LucideIcon";
 
 interface AiHelperErrorProps {
   errorCode: string;
@@ -38,18 +39,7 @@ export function AiHelperError({
             : "none",
       }}
     >
-      <span
-        className="material-symbols-outlined text-[48px] drop-shadow-md"
-        style={{
-          color:
-            errorCode === "DAILY_LIMIT_REACHED" ||
-            errorCode === "AI_GLOBAL_LIMIT_REACHED"
-              ? "#ef4444"
-              : accentColor,
-        }}
-      >
-        {errorCode === "UNAUTHORIZED" ? "lock_person" : errorInfo.icon}
-      </span>
+      <LucideIcon name={errorCode === "UNAUTHORIZED" ? "lock_person" : errorInfo.icon} className="text-[48px] drop-shadow-md" style={{ color: errorCode ==="DAILY_LIMIT_REACHED" || errorCode ==="AI_GLOBAL_LIMIT_REACHED" ?"#ef4444" : accentColor, }} />
       <div className="flex flex-col gap-2">
         <span className="text-[18px] font-extrabold text-white">
           {errorCode === "UNAUTHORIZED"

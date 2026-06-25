@@ -7,6 +7,7 @@ import OptionButton from "../components/battle/OptionButton";
 import VictoryView from "../components/battle/VictoryView";
 import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const optionColors = ["#0d9488", "#4f46e5", "#059669", "#4b5563"];
 const optionBgClasses = [
@@ -158,7 +159,7 @@ const BattlePage = () => {
         onClick={handleForfeit}
         className="absolute top-4 right-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-xl dark:bg-[#16202a] bg-surface-container-high dark:text-gray-300 text-on-surface hover:bg-error hover:text-white transition-all shadow-md text-[13px] font-black"
       >
-        <span className="material-symbols-outlined text-[16px]">logout</span>
+        <LucideIcon name="logout" className="text-[16px]" />
         <span>Exit</span>
       </button>
 
@@ -315,9 +316,7 @@ const BattlePage = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="w-full max-w-[360px] rounded-2xl border border-on-surface/10 dark:border-white/5 bg-surface-container dark:bg-[#121c27] p-5 flex flex-col items-center gap-4 text-center shadow-2xl transition-all duration-300">
             <div className="w-12 h-12 rounded-full bg-red-500/10 dark:bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0">
-              <span className="material-symbols-outlined text-red-500 text-[24px]">
-                warning
-              </span>
+              <LucideIcon name="warning" className="text-red-500 text-[24px]" />
             </div>
             <div className="flex flex-col gap-1.5">
               <h3 className="text-lg font-black text-on-surface dark:text-white">
@@ -467,9 +466,7 @@ const RoundResultNotice = ({
           className={`px-6 py-4 flex items-center justify-between ${headerBgClass}`}
         >
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-white text-[24px]">
-              {headerIcon}
-            </span>
+            <LucideIcon name={headerIcon} className="text-white text-[24px]" />
             <span className="text-white text-base font-extrabold tracking-wider">
               {headerText} {pointsText}
             </span>

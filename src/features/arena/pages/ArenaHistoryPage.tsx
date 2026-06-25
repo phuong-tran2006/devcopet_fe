@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
 import type { PublicScoreboardItem } from "../store/arena.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 interface HistoryPlayer {
   userId?: string;
@@ -210,15 +211,13 @@ const ArenaHistoryPage = () => {
                 <div
                   className={`flex items-center gap-1 font-bold text-[16px] ${view.ratingChange > 0 ? "dark:text-[#4dd0d0] text-primary" : view.ratingChange < 0 ? "dark:text-[#ff3b30] text-error" : "dark:text-gray-400 text-on-surface-variant"}`}
                 >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {view.ratingChange > 0
+                  <LucideIcon name={view.ratingChange > 0
                       ? "trending_up"
                       : view.ratingChange < 0
                         ? "trending_down"
                         : isDraw
                           ? "remove"
-                          : "show_chart"}
-                  </span>
+                          : "show_chart"} className="text-[18px]" />
                   {view.ratingChange > 0 ? "+" : ""}
                   {view.ratingChange}
                 </div>

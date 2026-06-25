@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
+import LucideIcon from "../../../../components/ui/LucideIcon";
 
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import heroMascotVideo from "../../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../../components/ui/TransparentVideo";
 
@@ -44,7 +44,6 @@ const LandingPage = () => {
 
   return (
     <>
-      <MouseTrail />
       <main className="relative">
         {/* Background Grid & Streaks */}
         <div className="fixed inset-0 pointer-events-none z-0">
@@ -120,9 +119,7 @@ const LandingPage = () => {
               className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-fixed-dim/10 text-primary-fixed-dim">
-                <span className="material-symbols-outlined text-3xl">
-                  psychology
-                </span>
+                <LucideIcon name="psychology" className="text-3xl" />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
                 Personalized Roadmap
@@ -139,9 +136,7 @@ const LandingPage = () => {
               className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-secondary-container/10 text-secondary-container">
-                <span className="material-symbols-outlined text-3xl">
-                  groups
-                </span>
+                <LucideIcon name="groups" className="text-3xl" />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
                 Mentor Community
@@ -158,9 +153,7 @@ const LandingPage = () => {
               className="group p-8 bg-on-surface/5 backdrop-blur-xl border border-on-surface/10 rounded-xl spinning-border-card shadow-[0_0_20px_rgba(0,128,128,0.1)]"
             >
               <div className="w-12 h-12 mb-6 flex items-center justify-center rounded-lg bg-primary-container/10 text-primary-container">
-                <span className="material-symbols-outlined text-3xl">
-                  code_blocks
-                </span>
+                <LucideIcon name="code_blocks" className="text-3xl" />
               </div>
               <h3 className="font-headline-sm text-headline-sm mb-4 text-on-surface">
                 Real-world Projects
@@ -240,9 +233,7 @@ const LandingPage = () => {
                   <div
                     className={`min-w-[52px] h-[52px] rounded-3xl flex items-center justify-center ${card.color}`}
                   >
-                    <span className="material-symbols-outlined text-2xl">
-                      {card.icon}
-                    </span>
+                    <LucideIcon name={card.icon} className="text-2xl" />
                   </div>
                   <div className="space-y-3 text-left">
                     <h3 className="font-headline-sm text-headline-sm text-on-surface">

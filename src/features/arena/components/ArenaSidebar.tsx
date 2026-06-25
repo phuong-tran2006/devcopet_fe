@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 interface ArenaProfile {
   arenaRating: number;
@@ -118,9 +119,7 @@ const ArenaSidebar = () => {
               to={item.path}
               className={`flex items-center gap-3 px-4 py-3.5 rounded-xl text-[15px] font-semibold transition-colors duration-200 ${isActive ? "dark:bg-[#5e4655] bg-primary/10 dark:text-[#ecd6e5] text-primary" : "dark:text-gray-400 text-on-surface-variant dark:hover:text-gray-200 hover:text-on-surface dark:hover:bg-white/5 hover:bg-surface-container-high"}`}
             >
-              <span className="material-symbols-outlined text-[20px] opacity-90">
-                {item.icon}
-              </span>
+              <LucideIcon name={item.icon} className="text-[20px] opacity-90" />
               {item.label}
             </Link>
           );

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
 import { useAuthStore } from "../../users/store/auth.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const RoadmapPage = () => {
   const [pythonCompletion, setPythonCompletion] = useState<number>(0);
@@ -173,9 +174,7 @@ const RoadmapPage = () => {
               className="mt-auto w-full bg-primary-fixed-dim text-on-primary-fixed font-extrabold text-[12px] py-2.5 rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)] hover:scale-[1.02] active:scale-[0.98]"
             >
               Enter World{" "}
-              <span className="material-symbols-outlined text-[15px]">
-                arrow_forward
-              </span>
+              <LucideIcon name="arrow_forward" className="text-[15px]" />
             </Link>
           </div>
 
@@ -275,9 +274,7 @@ const RoadmapPage = () => {
               disabled
               className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[15px]">
-                lock
-              </span>
+              <LucideIcon name="lock" className="text-[15px]" />
               Unlock at Lvl 12
             </button>
           </div>
@@ -368,9 +365,7 @@ const RoadmapPage = () => {
               disabled
               className="mt-auto w-full bg-on-surface/5 text-on-surface/30 font-bold text-[12px] py-2.5 rounded-xl border border-on-surface/10 flex items-center justify-center gap-2 cursor-not-allowed"
             >
-              <span className="material-symbols-outlined text-[15px]">
-                lock
-              </span>
+              <LucideIcon name="lock" className="text-[15px]" />
               Unlock at Lvl 15
             </button>
           </div>

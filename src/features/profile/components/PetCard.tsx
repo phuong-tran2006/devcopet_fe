@@ -1,5 +1,6 @@
 import React from "react";
 import { mascotAxolotl } from "../../users/constants/authImages";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const PetCard = () => {
   return (
@@ -31,15 +32,11 @@ const PetCard = () => {
       {/* Actions */}
       <div className="flex gap-4 mb-8">
         <button className="flex-1 bg-primary-fixed-dim text-on-primary font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-primary transition-colors duration-300">
-          <span className="material-symbols-outlined text-[18px]">
-            restaurant
-          </span>
+          <LucideIcon name="restaurant" className="text-[18px]" />
           Feed Logic
         </button>
         <button className="flex-1 bg-transparent border border-outline text-on-surface font-bold py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-on-surface/5 transition-colors duration-300">
-          <span className="material-symbols-outlined text-[18px]">
-            keyboard_double_arrow_up
-          </span>
+          <LucideIcon name="keyboard_double_arrow_up" className="text-[18px]" />
           Evolve
         </button>
       </div>

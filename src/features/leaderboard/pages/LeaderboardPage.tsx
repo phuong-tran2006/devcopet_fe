@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { useAuthStore } from "../../users/store/auth.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const LeaderboardPage = () => {
   const [activeTab, setActiveTab] = useState("Python World");
@@ -268,9 +269,7 @@ const LeaderboardPage = () => {
                     {tab.split(" ")[1]}
                   </div>
                   {isLocked && (
-                    <span className="material-symbols-outlined text-[14px]">
-                      lock
-                    </span>
+                    <LucideIcon name="lock" className="text-[14px]" />
                   )}
                 </button>
               );
@@ -327,9 +326,7 @@ const LeaderboardPage = () => {
 
           {/* 1st Place */}
           <div className="w-full md:w-[320px] order-1 md:order-2 bg-surface-container/60 backdrop-blur-md rounded-[32px] border border-[#F687B3]/30 p-8 flex flex-col items-center relative shadow-[0_0_40px_rgba(246,135,179,0.1)] transition-transform hover:-translate-y-2 duration-300 transform md:-translate-y-4">
-            <span className="absolute top-5 right-5 material-symbols-outlined text-[#F687B3]/30 text-[50px]">
-              emoji_events
-            </span>
+            <LucideIcon name="emoji_events" className="absolute top-5 right-5 text-[#F687B3]/30 text-[50px]" />
             <div className="relative mb-6">
               <span className="absolute -top-6 left-1/2 -translate-x-1/2 text-[32px] drop-shadow-md z-10">
                 👑
@@ -432,9 +429,7 @@ const LeaderboardPage = () => {
               Main Rankings
             </h2>
             <div className="relative w-full sm:w-[260px]">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none material-symbols-outlined text-[18px]">
-                search
-              </span>
+              <LucideIcon name="search" className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/50 pointer-events-none text-[18px]" />
               <input
                 type="text"
                 placeholder="Find coder..."
@@ -592,11 +587,7 @@ const LeaderboardPage = () => {
               className="text-[13px] font-bold text-primary-fixed-dim hover:text-primary-fixed hover:underline underline-offset-4 transition-colors flex items-center gap-1"
             >
               {showAll ? "Show Less" : "View All Rankings"}
-              <span
-                className={`material-symbols-outlined text-[18px] transition-transform duration-300 ${showAll ? "rotate-180" : ""}`}
-              >
-                expand_more
-              </span>
+              <LucideIcon name="expand_more" className={`text-[18px] transition-transform duration-300 ${showAll ?"rotate-180" :""}`} />
             </button>
           </div>
         </div>
@@ -604,7 +595,7 @@ const LeaderboardPage = () => {
 
       {/* Fast Climb Mode Button */}
       <button className="fixed bottom-8 right-8 z-50 bg-[#E9D8FD] text-[#44337A] px-6 py-3.5 rounded-full font-extrabold text-[14px] flex items-center gap-2 shadow-[0_8px_24px_rgba(233,216,253,0.4)] hover:-translate-y-1 transition-transform duration-300">
-        <span className="material-symbols-outlined text-[20px]">bolt</span>
+        <LucideIcon name="bolt" className="text-[20px]" />
         Fast Climb Mode
       </button>
     </main>

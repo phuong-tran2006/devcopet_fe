@@ -6,7 +6,6 @@ import EditText from "../../../../components/ui/EditText";
 import Dropdown from "../../../../components/ui/Dropdown";
 import CheckBox from "../../../../components/ui/CheckBox";
 import EmailProviderIcon from "../../../../components/ui/EmailProviderIcon";
-import MouseTrail from "../../../../components/ui/MouseTrail";
 import { EmailIcon, LockIcon } from "../../../../components/ui/icons";
 import { useAuthStore } from "../../store/auth.store";
 import { authApi } from "../../api/auth.api";
@@ -171,7 +170,6 @@ const RegistrationPage = () => {
 
   return (
     <>
-      <MouseTrail />
       <main className="relative min-h-screen w-full flex items-center justify-center bg-surface">
         {/* Background Grid & Streaks */}
         <div className="absolute inset-0 pointer-events-none z-0">

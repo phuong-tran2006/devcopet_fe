@@ -1,4 +1,5 @@
 import React from "react";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const DailyQuests = () => {
   const quests = [
@@ -37,9 +38,7 @@ const DailyQuests = () => {
                 }`}
               >
                 {quest.completed && (
-                  <span className="material-symbols-outlined text-[14px] font-bold">
-                    check
-                  </span>
+                  <LucideIcon name="check" className="text-[14px] font-bold" />
                 )}
               </div>
               <span

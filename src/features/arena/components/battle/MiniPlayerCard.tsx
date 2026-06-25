@@ -1,3 +1,5 @@
+import LucideIcon from "../../../../components/ui/LucideIcon";
+
 interface MiniPlayerCardProps {
   name: string;
   avatarUrl: string;
@@ -55,7 +57,11 @@ const MiniPlayerCard = ({
             {name}
           </span>
           <span
-            className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${answered ? "dark:bg-[#1e4e50] bg-primary/10 text-primary" : "dark:bg-white/5 bg-outline/10 dark:text-gray-500 text-on-surface-variant"}`}
+            className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${
+              answered
+                ? "dark:bg-[#1e4e50] bg-primary/10 text-primary"
+                : "dark:bg-white/5 bg-outline/10 dark:text-gray-500 text-on-surface-variant"
+            }`}
           >
             {answered ? "LOCKED" : "..."}
           </span>
@@ -102,12 +108,11 @@ const MiniPlayerCard = ({
       )}
 
       <div className="shrink-0 flex items-center justify-center w-7 h-7 ml-2">
-        <span
-          className="material-symbols-outlined transition-colors duration-300"
+        <LucideIcon
+          name={icon}
+          className="transition-colors duration-300"
           style={{ color: iconColor, fontSize: "18px" }}
-        >
-          {icon}
-        </span>
+        />
       </div>
     </div>
   );

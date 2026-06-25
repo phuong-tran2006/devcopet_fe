@@ -5,6 +5,7 @@ import OpponentCard from "../components/OpponentCard";
 import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
 import type { ArenaMode } from "../store/arena.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 const MatchmakingPage = () => {
   const mode: ArenaMode = "ranked";
@@ -121,9 +122,7 @@ const MatchmakingPage = () => {
             className="w-12 h-12 rounded-full dark:bg-[#1e2e38] bg-surface-container-high border-4 dark:border-[#081015] border-surface shadow-2xl flex items-center justify-center transition-colors duration-300"
             style={{ color: "var(--md-sys-color-primary)" }}
           >
-            <span className="material-symbols-outlined text-[26px] dark:text-[#4dd0d0]">
-              bolt
-            </span>
+            <LucideIcon name="bolt" className="text-[26px] dark:text-[#4dd0d0]" />
           </div>
           <span className="font-black text-[16px] tracking-widest transition-colors duration-300 dark:text-[#4dd0d0] text-primary">
             VS
@@ -224,9 +223,7 @@ const MatchmakingPage = () => {
 
               <div className="flex flex-col items-center gap-1.5 shrink-0">
                 <div className="w-10 h-10 rounded-full bg-error-container border-2 border-error/30 flex items-center justify-center text-error animate-pulse">
-                  <span className="material-symbols-outlined text-[20px]">
-                    bolt
-                  </span>
+                  <LucideIcon name="bolt" className="text-[20px]" />
                 </div>
                 <span className="font-black text-xs tracking-widest text-error">
                   VS

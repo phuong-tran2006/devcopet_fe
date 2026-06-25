@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useAuthStore } from "../../../users/store/auth.store";
 import { useArenaStore } from "../../store/arena.store";
+import LucideIcon from "../../../../components/ui/LucideIcon";
 
 const VictoryView = () => {
   const navigate = useNavigate();
@@ -148,11 +149,7 @@ const VictoryView = () => {
             <div
               className={`w-11 h-11 rounded-full flex items-center justify-center border shadow-md ${headerIconContainerClass} mb-0.5`}
             >
-              <span
-                className={`material-symbols-outlined text-[24px] ${headerIconColor}`}
-              >
-                {headerIcon}
-              </span>
+              <LucideIcon name={headerIcon} className={`text-[24px] ${headerIconColor}`} />
             </div>
             <h1
               className={`text-[24px] md:text-[28px] font-black tracking-[0.2em] bg-gradient-to-r ${titleColorClass} bg-clip-text text-transparent leading-none mt-0.5`}
@@ -214,11 +211,9 @@ const VictoryView = () => {
                         : "text-red-800 dark:text-red-400 border-red-300 dark:border-red-800/80 bg-red-100/80 dark:bg-red-950/40"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[10px]">
-                      {myRatingChange.delta >= 0
+                    <LucideIcon name={myRatingChange.delta >= 0
                         ? "trending_up"
-                        : "trending_down"}
-                    </span>
+                        : "trending_down"} className="text-[10px]" />
                     <span>
                       {myRatingChange.oldRating} ➔ {myRatingChange.newRating} (
                       {myRatingChange.delta >= 0 ? "+" : ""}
@@ -277,11 +272,9 @@ const VictoryView = () => {
                         : "text-red-800 dark:text-red-400 border-red-300 dark:border-red-800/80 bg-red-100/80 dark:bg-red-950/40"
                     }`}
                   >
-                    <span className="material-symbols-outlined text-[10px]">
-                      {opponentRatingChange.delta >= 0
+                    <LucideIcon name={opponentRatingChange.delta >= 0
                         ? "trending_up"
-                        : "trending_down"}
-                    </span>
+                        : "trending_down"} className="text-[10px]" />
                     <span>
                       {opponentRatingChange.oldRating} ➔{" "}
                       {opponentRatingChange.newRating} (
@@ -386,9 +379,7 @@ const VictoryView = () => {
           {myRankUp && (
             <div className="w-full bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-2xl p-2.5 flex flex-col items-center gap-0.5 shadow-lg mb-3 animate-pulse">
               <div className="flex items-center gap-1">
-                <span className="material-symbols-outlined text-[14px] text-amber-400">
-                  stars
-                </span>
+                <LucideIcon name="stars" className="text-[14px] text-amber-400" />
                 <span className="text-[8px] font-black text-amber-400 tracking-[0.25em] uppercase">
                   RANK PROMOTED!
                 </span>
@@ -408,18 +399,14 @@ const VictoryView = () => {
               className="flex-1 bg-on-surface/5 hover:bg-on-surface/10 text-on-surface border border-on-surface/10 dark:bg-white/5 dark:hover:bg-white/10 dark:text-white dark:border-white/10 font-black text-[12px] tracking-[0.15em] py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md"
               onClick={goLobby}
             >
-              <span className="material-symbols-outlined text-[16px]">
-                dashboard
-              </span>
+              <LucideIcon name="dashboard" className="text-[16px]" />
               BACK TO LOBBY
             </button>
             <button
               className="flex-1 bg-primary hover:bg-primary/95 text-on-primary dark:bg-gradient-to-r dark:from-teal-500 dark:to-[#00bfa5] dark:text-[#081015] font-black text-[12px] tracking-[0.15em] py-2.5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md transform hover:scale-[1.02]"
               onClick={goLobby}
             >
-              <span className="material-symbols-outlined text-[16px]">
-                sports_esports
-              </span>
+              <LucideIcon name="sports_esports" className="text-[16px]" />
               PLAY AGAIN
             </button>
           </div>

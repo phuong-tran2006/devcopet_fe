@@ -1,3 +1,4 @@
+import LucideIcon from "../../../components/ui/LucideIcon";
 interface OpponentCardProps {
   status: "idle" | "searching" | "found";
   opponent?: {
@@ -22,9 +23,7 @@ const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
         <>
           <div className="relative mb-4">
             <div className="w-[78px] h-[78px] rounded-full border-2 border-dashed dark:border-gray-600/30 border-outline/30 flex items-center justify-center transition-colors duration-300">
-              <span className="material-symbols-outlined text-[28px] dark:text-gray-600/50 text-on-surface-variant/50">
-                help
-              </span>
+              <LucideIcon name="help" className="text-[28px] dark:text-gray-600/50 text-on-surface-variant/50" />
             </div>
           </div>
           <h3 className="text-[20px] font-extrabold dark:text-gray-400 text-on-surface-variant mb-1 transition-colors duration-300">
@@ -41,9 +40,7 @@ const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
           <div className="relative mb-4">
             <div className="w-[78px] h-[78px] rounded-full border-2 border-dashed dark:border-gray-500/50 border-outline/50 flex items-center justify-center animate-[spin_10s_linear_infinite] transition-colors duration-300"></div>
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="material-symbols-outlined text-[28px] dark:text-gray-500/80 text-on-surface-variant/80 transition-colors duration-300">
-                person_search
-              </span>
+              <LucideIcon name="person_search" className="text-[28px] dark:text-gray-500/80 text-on-surface-variant/80 transition-colors duration-300" />
             </div>
           </div>
           <h3 className="text-[20px] font-extrabold dark:text-gray-300 text-on-surface mb-1 transition-colors duration-300">

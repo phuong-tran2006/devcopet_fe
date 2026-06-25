@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../../../components/ui/LucideIcon";
 import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
@@ -270,14 +271,10 @@ const LessonQuizInner = ({
                 </div>
                 {/* Result icon */}
                 {isReviewMode && isCorrectOption && (
-                  <span className="material-symbols-outlined text-[22px] text-[#4ade80] flex-shrink-0">
-                    check_circle
-                  </span>
+                  <LucideIcon name="check_circle" className=" text-[22px] text-[#4ade80] flex-shrink-0" />
                 )}
                 {isReviewMode && isWrongSelected && (
-                  <span className="material-symbols-outlined text-[22px] text-[#f87171] flex-shrink-0">
-                    cancel
-                  </span>
+                  <LucideIcon name="cancel" className=" text-[22px] text-[#f87171] flex-shrink-0" />
                 )}
               </button>
             );
@@ -292,9 +289,10 @@ const LessonQuizInner = ({
                 qResult.isCorrect ? "text-[#4ade80]" : "text-[#f87171]"
               }`}
             >
-              <span className="material-symbols-outlined text-[22px]">
-                {qResult.isCorrect ? "check_circle" : "cancel"}
-              </span>
+              <LucideIcon
+                name={qResult.isCorrect ? "check_circle" : "cancel"}
+                className="text-[22px]"
+              />
               {qResult.isCorrect ? "Correct!" : "Incorrect"}
               <span className="text-on-surface-variant font-normal text-[13px] ml-1">
                 (+{qResult.earnedPoints}/{qResult.points} XP)
@@ -333,9 +331,7 @@ const LessonQuizInner = ({
           onClick={handleStart}
           className="w-full md:w-auto flex-shrink-0 bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)] whitespace-nowrap"
         >
-          <span className="material-symbols-outlined text-[20px]">
-            assignment
-          </span>
+          <LucideIcon name="assignment" className=" text-[20px]" />
           Start Quiz
         </button>
       </div>
@@ -373,9 +369,7 @@ const LessonQuizInner = ({
   if (phase === "not_found") {
     return (
       <div className="bg-surface-container rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
-        <span className="material-symbols-outlined text-3xl mb-2 block">
-          quiz
-        </span>
+        <LucideIcon name="quiz" className=" text-3xl mb-2 block" />
         No quiz is available for this lesson yet.
       </div>
     );
@@ -409,13 +403,12 @@ const LessonQuizInner = ({
                 result.passed ? "bg-[#4ade80]/20" : "bg-[#f87171]/20"
               }`}
             >
-              <span
-                className={`material-symbols-outlined text-[36px] ${
+              <LucideIcon
+                name={result.passed ? "emoji_events" : "replay"}
+                className={`text-[36px] ${
                   result.passed ? "text-[#4ade80]" : "text-[#f87171]"
                 }`}
-              >
-                {result.passed ? "emoji_events" : "replay"}
-              </span>
+              />
             </div>
 
             <div>
@@ -450,9 +443,10 @@ const LessonQuizInner = ({
                 : "bg-primary-fixed-dim text-on-primary-fixed hover:bg-primary-fixed hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
             }`}
           >
-            <span className="material-symbols-outlined text-[18px]">
-              {result.passed ? "replay" : "refresh"}
-            </span>
+            <LucideIcon
+              name={result.passed ? "replay" : "refresh"}
+              className="text-[18px]"
+            />
             {result.passed ? "Retake Quiz" : "Try Again"}
           </button>
         </div>
@@ -497,9 +491,7 @@ const LessonQuizInner = ({
               className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <span className="inline-flex items-center gap-2">
-                <span className="material-symbols-outlined text-[18px]">
-                  arrow_back
-                </span>
+                <LucideIcon name="arrow_back" className=" text-[18px]" />
                 Previous
               </span>
             </button>
@@ -511,9 +503,7 @@ const LessonQuizInner = ({
                 className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
               >
                 Next Review
-                <span className="material-symbols-outlined text-[18px]">
-                  arrow_forward
-                </span>
+                <LucideIcon name="arrow_forward" className=" text-[18px]" />
               </button>
             ) : (
               <button
@@ -522,9 +512,7 @@ const LessonQuizInner = ({
                 className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
               >
                 Finish Review
-                <span className="material-symbols-outlined text-[18px]">
-                  check_circle
-                </span>
+                <LucideIcon name="check_circle" className=" text-[18px]" />
               </button>
             )}
           </div>
@@ -572,9 +560,7 @@ const LessonQuizInner = ({
       {/* ── Error Banner ── */}
       {submitError && (
         <div className="flex items-start gap-3 p-4 rounded-xl bg-[#f87171]/10 border border-[#f87171]/30 text-[#f87171] text-[13px]">
-          <span className="material-symbols-outlined text-[18px] flex-shrink-0 mt-0.5">
-            error
-          </span>
+          <LucideIcon name="error" className=" text-[18px] flex-shrink-0 mt-0.5" />
           <div>
             <span className="font-bold block mb-0.5">Submission failed</span>
             {submitError}
@@ -583,7 +569,7 @@ const LessonQuizInner = ({
             onClick={() => setSubmitError(null)}
             className="ml-auto flex-shrink-0 opacity-60 hover:opacity-100 transition-opacity"
           >
-            <span className="material-symbols-outlined text-[16px]">close</span>
+            <LucideIcon name="close" className=" text-[16px]" />
           </button>
         </div>
       )}
@@ -597,9 +583,7 @@ const LessonQuizInner = ({
           className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <span className="inline-flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px]">
-              arrow_back
-            </span>
+            <LucideIcon name="arrow_back" className=" text-[18px]" />
             Previous
           </span>
         </button>
@@ -617,17 +601,13 @@ const LessonQuizInner = ({
             </>
           ) : isLastQuestion ? (
             <>
-              <span className="material-symbols-outlined text-[18px]">
-                done_all
-              </span>
+              <LucideIcon name="done_all" className=" text-[18px]" />
               Submit Quiz
             </>
           ) : (
             <>
               Next Question
-              <span className="material-symbols-outlined text-[18px]">
-                arrow_forward
-              </span>
+              <LucideIcon name="arrow_forward" className=" text-[18px]" />
             </>
           )}
         </button>
@@ -661,9 +641,7 @@ const LessonQuiz = (props) => {
             }
           `}</style>
           <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#63f1e3]">
-              stars
-            </span>
+            <LucideIcon name="stars" className=" text-[#63f1e3]" />
             <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
               +{xpToast} XP
             </span>

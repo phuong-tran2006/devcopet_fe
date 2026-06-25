@@ -15,6 +15,7 @@ import {
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import { useAuthStore } from "../../users/store/auth.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 // ── Template drop-zone helpers (same pattern as MediumNodeChallengePage) ──────
 const DROP_ZONE_REGEX =
@@ -365,9 +366,7 @@ const HardNodeChallengePage = () => {
               </span>
             )}
           </span>
-          <span className="material-symbols-outlined text-[18px] opacity-80">
-            {isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"}
-          </span>
+          <LucideIcon name={isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"} className="text-[18px] opacity-80" />
         </button>
 
         {canEdit && assignedItemId && (
@@ -377,7 +376,7 @@ const HardNodeChallengePage = () => {
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-red-400/15 hover:text-red-200"
             aria-label={`Clear ${zoneId}`}
           >
-            <span className="material-symbols-outlined text-[17px]">close</span>
+            <LucideIcon name="close" className="text-[17px]" />
           </button>
         )}
       </div>
@@ -614,9 +613,7 @@ const HardNodeChallengePage = () => {
             onClick={goBackToRoadmap}
             className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
+            <LucideIcon name="arrow_back" className="text-[16px]" />
             Back to Roadmap
           </button>
 
@@ -635,9 +632,7 @@ const HardNodeChallengePage = () => {
           {isLockedMode && (
             <div className="mx-auto mt-12 w-full rounded-xl border border-[#1e3a5f] bg-[#081624] p-8 text-center shadow-[0_0_28px_rgba(58,127,193,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
-                <span className="material-symbols-outlined text-[32px]">
-                  lock
-                </span>
+                <LucideIcon name="lock" className="text-[32px]" />
               </div>
               <h1 className="mt-5 text-[28px] font-extrabold">
                 Checkpoint Locked
@@ -725,14 +720,10 @@ const HardNodeChallengePage = () => {
                             {opt.text}
                           </span>
                           {isCorrect && (
-                            <span className="material-symbols-outlined text-[#63f1e3]">
-                              check_circle
-                            </span>
+                            <LucideIcon name="check_circle" className="text-[#63f1e3]" />
                           )}
                           {isIncorrect && (
-                            <span className="material-symbols-outlined text-red-400">
-                              cancel
-                            </span>
+                            <LucideIcon name="cancel" className="text-red-400" />
                           )}
                         </button>
                       );
@@ -830,9 +821,7 @@ const HardNodeChallengePage = () => {
                                         {matchedItem?.text}
                                       </span>
                                       {canEdit && (
-                                        <span className="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-red-400">
-                                          close
-                                        </span>
+                                        <LucideIcon name="close" className="text-[16px] text-on-surface-variant hover:text-red-400" />
                                       )}
                                     </div>
                                   )}
@@ -889,9 +878,7 @@ const HardNodeChallengePage = () => {
                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-white/10 hover:text-white"
                             aria-label="Clear selected item"
                           >
-                            <span className="material-symbols-outlined text-[18px]">
-                              close
-                            </span>
+                            <LucideIcon name="close" className="text-[18px]" />
                           </button>
                         </div>
                       )}
@@ -959,13 +946,11 @@ const HardNodeChallengePage = () => {
                               ].join(" ")}
                             >
                               <span>{item.text}</span>
-                              <span className="material-symbols-outlined text-[17px] opacity-70">
-                                {isUsed
+                              <LucideIcon name={isUsed
                                   ? "check"
                                   : isSelected
                                     ? "radio_button_checked"
-                                    : "radio_button_unchecked"}
-                              </span>
+                                    : "radio_button_unchecked"} className="text-[17px] opacity-70" />
                             </button>
                           );
                         })}
@@ -1013,9 +998,7 @@ const HardNodeChallengePage = () => {
                               disabled={!canEdit || index === 0}
                               className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
                             >
-                              <span className="material-symbols-outlined text-[18px]">
-                                keyboard_arrow_up
-                              </span>
+                              <LucideIcon name="keyboard_arrow_up" className="text-[18px]" />
                             </button>
                             <button
                               onClick={() => {
@@ -1033,9 +1016,7 @@ const HardNodeChallengePage = () => {
                               }
                               className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
                             >
-                              <span className="material-symbols-outlined text-[18px]">
-                                keyboard_arrow_down
-                              </span>
+                              <LucideIcon name="keyboard_arrow_down" className="text-[18px]" />
                             </button>
                           </div>
                           <div className="w-6 h-6 rounded-full bg-on-surface/10 flex items-center justify-center text-[11px] font-bold text-on-surface-variant">
@@ -1045,14 +1026,10 @@ const HardNodeChallengePage = () => {
                             {step.text}
                           </span>
                           {isCorrect && (
-                            <span className="material-symbols-outlined text-[#63f1e3]">
-                              check_circle
-                            </span>
+                            <LucideIcon name="check_circle" className="text-[#63f1e3]" />
                           )}
                           {isIncorrect && (
-                            <span className="material-symbols-outlined text-red-400">
-                              cancel
-                            </span>
+                            <LucideIcon name="cancel" className="text-red-400" />
                           )}
                         </div>
                       );
@@ -1077,9 +1054,7 @@ const HardNodeChallengePage = () => {
 
               {submitError && (
                 <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-5 py-4 flex items-center gap-3">
-                  <span className="material-symbols-outlined text-red-300">
-                    error
-                  </span>
+                  <LucideIcon name="error" className="text-red-300" />
                   <p className="text-[13px] font-bold text-red-200">
                     {submitError}
                   </p>
@@ -1089,9 +1064,7 @@ const HardNodeChallengePage = () => {
               {result && !result.correct && (
                 <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
                   <div className="flex items-start gap-3">
-                    <span className="material-symbols-outlined text-[20px] text-red-300">
-                      error
-                    </span>
+                    <LucideIcon name="error" className="text-[20px] text-red-300" />
                     <div className="min-w-0 flex-1">
                       <p className="font-bold text-red-100 text-[14px]">
                         {result.message || "Not quite. Try again."}
@@ -1140,9 +1113,7 @@ const HardNodeChallengePage = () => {
                   <div className="rounded-xl border border-[#66b3ff]/30 bg-[#0c1a2d] p-6 shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
                     <div className="mb-4 flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
-                        <span className="material-symbols-outlined text-[20px]">
-                          pets
-                        </span>
+                        <LucideIcon name="pets" className="text-[20px]" />
                       </div>
                       <div>
                         <p className="font-bold text-on-surface text-[14px] tracking-wide">
@@ -1244,16 +1215,12 @@ const HardNodeChallengePage = () => {
               className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
               aria-label="Close result"
             >
-              <span className="material-symbols-outlined text-[22px]">
-                close
-              </span>
+              <LucideIcon name="close" className="text-[22px]" />
             </button>
 
             <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
               <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
-                <span className="material-symbols-outlined text-[46px]">
-                  workspace_premium
-                </span>
+                <LucideIcon name="workspace_premium" className="text-[46px]" />
               </div>
 
               <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
@@ -1265,9 +1232,7 @@ const HardNodeChallengePage = () => {
               <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
                 <div className="flex items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
-                    <span className="material-symbols-outlined text-[24px]">
-                      psychology
-                    </span>
+                    <LucideIcon name="psychology" className="text-[24px]" />
                   </div>
                   <div>
                     <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
@@ -1340,9 +1305,7 @@ const HardNodeChallengePage = () => {
               }
             `}</style>
           <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#63f1e3]">
-              stars
-            </span>
+            <LucideIcon name="stars" className="text-[#63f1e3]" />
             <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
               +{xpToast} XP
             </span>

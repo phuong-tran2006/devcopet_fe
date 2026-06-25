@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../../../components/ui/LucideIcon";
 import React, { useState, useEffect } from "react";
 import { Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
@@ -46,11 +47,7 @@ const CourseSidebarChapter = ({
             {lessons.length} Lesson
           </span>
         </div>
-        <span
-          className={`material-symbols-outlined text-[20px] text-on-surface-variant transition-transform duration-300 ${isOpen ? "rotate-180" : ""}`}
-        >
-          expand_more
-        </span>
+        <LucideIcon name="expand_more" className={`text-[20px] text-on-surface-variant transition-transform duration-300 ${isOpen ?"rotate-180" :""}`} />
       </button>
 
       {/* Tối ưu render bằng cách ẩn hiện class thay vì unmount */}
@@ -181,7 +178,7 @@ const CourseSidebar = ({
       {/* Header Info */}
       <div className="p-5 border-b border-outline-variant bg-surface">
         {/* <Link to="/course" className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-white font-label-sm tracking-widest uppercase text-[10px] mb-3 transition-colors">
-          <span className="material-symbols-outlined text-[14px]">arrow_back</span>
+          <LucideIcon name="arrow_back" className="text-[14px]" />
           Trở về khoá học
         </Link> */}
         <h2 className="font-headline-sm text-[18px] font-bold text-on-surface mb-4 line-clamp-2">
