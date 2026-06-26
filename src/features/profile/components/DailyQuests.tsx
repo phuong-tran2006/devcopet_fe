@@ -15,7 +15,7 @@ const DailyQuests = () => {
   ];
 
   return (
-    <div className="bg-surface border border-outline/20 rounded-2xl p-6 w-full mb-6 transition-colors duration-300 shadow-sm">
+    <div className="bg-surface border border-outline/20 rounded-2xl p-6 w-full transition-colors duration-300 shadow-sm">
       <h2 className="text-xl font-bold text-on-surface mb-6 transition-colors duration-300">
         Daily Quests
       </h2>

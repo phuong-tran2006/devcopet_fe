@@ -14,8 +14,18 @@ import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import LucideIcon from "../../../components/ui/LucideIcon";
 
 import { useAuthStore } from "../../users/store/auth.store";
+import {
+  getNavigationForResponse,
+  getRewardItems,
+  getSpeakerName,
+} from "../utils/challengeResponse";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
+const CHALLENGE_ROUTES = {
+  easy: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+  medium: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+  hard: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+} as const;
 
 const sortOptions = (options: MediumMultipleChoiceChallenge["options"]) =>
   [...options].sort(
@@ -80,8 +90,8 @@ const CodeSnippetCard = ({
   if (!codeSnippet) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#071217] shadow-[0_0_22px_rgba(99,241,227,0.08)]">
-      <div className="border-b border-[#263b44] bg-[#0a161c] px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-[0_18px_36px_rgba(15,23,42,0.14)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
+      <div className="border-b border-slate-800 bg-slate-900 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3] dark:border-[#263b44] dark:bg-[#0a161c]">
         {codeSnippet.language}
       </div>
       <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-[#d7f7f4]">
@@ -209,6 +219,16 @@ const MediumNodeChallengePage = () => {
     ? (challenge as MediumDragDropChallenge)
     : null;
   const canEditDragDrop = !isLockedMode && !isReviewMode && !result;
+  const activeNavigation = getNavigationForResponse(
+    result?.navigation,
+    data?.navigation,
+  );
+  const speakerName = getSpeakerName(
+    result?.explanationSpeaker?.name,
+    data?.explanationSpeaker?.name,
+    petName,
+  );
+  const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
 
   const options = useMemo(
     () => sortOptions(multipleChoiceChallenge?.options ?? []),
@@ -296,35 +316,31 @@ const MediumNodeChallengePage = () => {
   }, [nodeId]);
 
   const goBackToRoadmap = () => {
+    const target = activeNavigation?.returnToRoadmap;
     navigate({
       to: "/roadmap/$worldId",
-      params: { worldId: courseSlug || "python-basic" },
+      params: { worldId: target?.courseSlug || courseSlug || "python-basic" },
     });
   };
 
   const goToNextChallenge = () => {
     if (nextChallengeLoading || !data) return;
 
-    const nextNode = data.nextNode;
-    if (!nextNode) {
+    const nextChallenge = activeNavigation?.nextChallenge;
+    if (!nextChallenge) {
       goBackToRoadmap();
       return;
     }
 
     setNextChallengeLoading(true);
     try {
-      if (nextNode.status === "locked") {
-        goBackToRoadmap();
-        return;
-      }
-
       navigate({
-        to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+        to: CHALLENGE_ROUTES[nextChallenge.mode],
         params: {
-          courseSlug: courseSlug || "python-basic",
-          nodeId: nextNode.id,
+          courseSlug: nextChallenge.courseSlug,
+          nodeId: nextChallenge.nodeId,
         },
-      });
+      } as any);
     } catch (err) {
       console.error("Unable to open next challenge:", err);
       goBackToRoadmap();
@@ -357,9 +373,10 @@ const MediumNodeChallengePage = () => {
     courseApi
       .submitMediumNodeChallenge(nodeId, payload)
       .then((response) => {
-        const { xpAwarded, userProgress } = response;
-        if (xpAwarded && xpAwarded > 0) {
-          setXpToast(xpAwarded);
+        const { xpAwarded, userProgress, rewardSummary } = response;
+        const toastXp = rewardSummary?.xp ?? xpAwarded;
+        if (toastXp && toastXp > 0) {
+          setXpToast(toastXp);
           window.setTimeout(() => setXpToast(null), 3500);
         }
         if (userProgress) {
@@ -516,15 +533,15 @@ const MediumNodeChallengePage = () => {
       !isCorrect;
 
     if (isCorrect) {
-      return "border-[#63f1e3] bg-[#172d31] text-[#63f1e3]";
+      return "border-teal-600 bg-teal-50 text-teal-950 dark:border-[#63f1e3] dark:bg-[#172d31] dark:text-[#63f1e3]";
     }
     if (isWrong) {
-      return "border-[#ef4444] bg-[#2b171a] text-red-100";
+      return "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#2b171a] dark:text-red-100";
     }
     if (isSelected) {
-      return "border-[#63f1e3] bg-[#13282d] text-on-surface";
+      return "border-teal-600 bg-teal-50 text-slate-950 dark:border-[#63f1e3] dark:bg-[#13282d] dark:text-on-surface";
     }
-    return "border-[#1c2b33] bg-[#10191f] text-on-surface-variant hover:border-[#63f1e3]/35 hover:text-on-surface";
+    return "border-slate-200 bg-white text-slate-800 hover:border-teal-500/60 hover:bg-teal-50/60 hover:text-slate-950 dark:border-[#1c2b33] dark:bg-[#10191f] dark:text-on-surface-variant dark:hover:border-[#63f1e3]/35 dark:hover:text-on-surface";
   };
 
   const isDropZoneCorrect = (zoneId: string) => {
@@ -581,7 +598,7 @@ const MediumNodeChallengePage = () => {
     : "";
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
+    <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
       {loading && (
         <div className="flex min-h-[520px] items-center justify-center">
           <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#63f1e3]/45 border-t-transparent" />
@@ -622,7 +639,7 @@ const MediumNodeChallengePage = () => {
             </div>
 
             {isLockedMode && (
-              <div className="mx-auto mt-12 w-full rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
+              <div className="mx-auto mt-12 w-full rounded-xl border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
                   <LucideIcon name="lock" className="text-[32px]" />
                 </div>
@@ -635,7 +652,7 @@ const MediumNodeChallengePage = () => {
                 </p>
                 <button
                   onClick={goBackToRoadmap}
-                  className="mt-7 rounded-xl border border-[#263b44] bg-[#10191f] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:text-on-surface"
+                  className="mt-7 rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-teal-500/50 hover:text-on-surface dark:border-[#263b44] dark:bg-[#10191f]"
                 >
                   Back to Roadmap
                 </button>
@@ -643,8 +660,8 @@ const MediumNodeChallengePage = () => {
             )}
 
             {!isLockedMode && (
-              <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#111c23] shadow-[0_0_28px_rgba(99,241,227,0.08)]">
-                <div className="border-b border-[#263b44] bg-[#0c171d] px-6 py-4">
+              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
+                <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
@@ -668,7 +685,7 @@ const MediumNodeChallengePage = () => {
                   </div>
                 </div>
 
-                <div className="border-b border-[#263b44] px-6 py-7">
+                <div className="border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
                   <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                     {challenge.question}
                   </p>
@@ -702,7 +719,7 @@ const MediumNodeChallengePage = () => {
 
                 {dragDropChallenge && (
                   <div className="grid gap-5 p-6 lg:grid-cols-[1fr_260px]">
-                    <div className="rounded-xl border border-[#263b44] bg-[#0b151b] p-5">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-[#263b44] dark:bg-[#0b151b]">
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <p className="text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
@@ -717,13 +734,13 @@ const MediumNodeChallengePage = () => {
                           <button
                             type="button"
                             onClick={resetDragDropAnswers}
-                            className="rounded-lg border border-[#263b44] px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3]"
+                            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3] dark:border-[#263b44] dark:bg-transparent"
                           >
                             Reset
                           </button>
                         )}
                       </div>
-                      <div className="whitespace-pre-wrap rounded-xl border border-[#1f333c] bg-[#071217] p-4 font-mono text-[15px] leading-10 text-on-surface">
+                      <div className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-4 font-mono text-[15px] leading-10 text-on-surface dark:border-[#1f333c] dark:bg-[#071217]">
                         {renderTemplateParts(
                           dragDropChallenge.template,
                           (zoneId) => {
@@ -752,16 +769,16 @@ const MediumNodeChallengePage = () => {
                                   correct
                                     ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
                                     : wrong
-                                      ? "border-[#ef4444] bg-[#ef4444]/12 text-red-100"
+                                      ? "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#ef4444]/12 dark:text-red-100"
                                       : isDragTarget
                                         ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3] shadow-[0_0_24px_rgba(99,241,227,0.28)]"
                                         : selectedItemId
-                                          ? "border-blue-400 bg-blue-500/15 text-blue-100 shadow-[0_0_16px_rgba(59,130,246,0.16)]"
+                                          ? "border-blue-500 bg-blue-50 text-blue-950 shadow-[0_0_16px_rgba(37,99,235,0.12)] dark:border-blue-400 dark:bg-blue-500/15 dark:text-blue-100 dark:shadow-[0_0_16px_rgba(59,130,246,0.16)]"
                                           : isDraggingAnyItem
                                             ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
                                             : canAssign
-                                              ? "border-gray-400 bg-gray-500/15 text-gray-200 shadow-[0_0_14px_rgba(148,163,184,0.14)]"
-                                              : "border-dashed border-gray-500/70 bg-gray-500/10 text-gray-300"
+                                              ? "border-slate-400 bg-slate-100 text-slate-700 shadow-[0_0_14px_rgba(148,163,184,0.12)] dark:border-gray-400 dark:bg-gray-500/15 dark:text-gray-200 dark:shadow-[0_0_14px_rgba(148,163,184,0.14)]"
+                                              : "border-dashed border-slate-300 bg-white text-slate-600 dark:border-gray-500/70 dark:bg-gray-500/10 dark:text-gray-300"
                                 }`}
                               >
                                 <span className="flex flex-col items-center leading-tight">
@@ -783,7 +800,7 @@ const MediumNodeChallengePage = () => {
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-[#263b44] bg-[#0b151b] p-5">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-[#263b44] dark:bg-[#0b151b]">
                       <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
                         Pool Items
                       </p>
@@ -820,8 +837,8 @@ const MediumNodeChallengePage = () => {
                                   : selectedPoolItemId === item.id
                                     ? "cursor-grab border-[#63f1e3] bg-[#63f1e3]/12 text-[#63f1e3]"
                                     : used
-                                      ? "cursor-grab border-[#263b44] bg-[#10191f] text-on-surface-variant/55"
-                                      : "cursor-grab border-[#263b44] bg-[#10191f] text-on-surface-variant hover:text-on-surface"
+                                      ? "cursor-grab border-slate-200 bg-white text-slate-400 dark:border-[#263b44] dark:bg-[#10191f] dark:text-on-surface-variant/55"
+                                      : "cursor-grab border-slate-200 bg-white text-slate-700 hover:border-teal-500/50 hover:text-slate-950 dark:border-[#263b44] dark:bg-[#10191f] dark:text-on-surface-variant dark:hover:text-on-surface"
                               }`}
                             >
                               {item.text}
@@ -834,24 +851,24 @@ const MediumNodeChallengePage = () => {
                 )}
 
                 {submitError && (
-                  <p className="mx-6 mb-6 rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-3 text-[13px] text-red-100/80">
+                  <p className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 text-[13px] text-red-800 dark:border-red-400/20 dark:bg-red-400/10 dark:text-red-100/80">
                     {submitError}
                   </p>
                 )}
 
                 {result && !result.correct && (
-                  <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
+                  <div className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 dark:border-red-400/25 dark:bg-red-400/10">
                     <div className="flex items-start gap-3">
                       <LucideIcon
                         name="error"
-                        className="text-[20px] text-red-300"
+                        className="text-[20px] text-red-500 dark:text-red-300"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="font-bold text-red-100 text-[14px]">
+                        <p className="font-bold text-red-900 text-[14px] dark:text-red-100">
                           {result.message || "Not quite. Try again."}
                         </p>
                         {result.explanation && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
+                          <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
                             {result.explanation}
                           </p>
                         )}
@@ -884,16 +901,16 @@ const MediumNodeChallengePage = () => {
 
                 {/* Inline Explanation and Navigation Section */}
                 {(isReviewMode || (result && result.correct)) && (
-                  <div className="mx-6 mb-6 border-t border-[#263b44] pt-6 flex flex-col gap-4">
+                  <div className="mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
                     {/* Explanation box */}
-                    <div className="rounded-xl border border-[#63f1e3]/30 bg-[#10262c] p-6 shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
+                    <div className="rounded-xl border border-teal-500/30 bg-teal-50 p-6 shadow-[inset_0_0_12px_rgba(13,148,136,0.05)] dark:border-[#63f1e3]/30 dark:bg-[#10262c] dark:shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
                       <div className="mb-4 flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
                           <LucideIcon name="pets" className="text-[20px]" />
                         </div>
                         <div>
                           <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                            {petName} Companion Says
+                            {speakerName} Companion Says
                           </p>
                         </div>
                       </div>
@@ -909,7 +926,7 @@ const MediumNodeChallengePage = () => {
                     <div className="flex flex-wrap gap-4 mt-2">
                       <button
                         onClick={goBackToRoadmap}
-                        className="flex-1 min-w-[150px] rounded-xl border border-[#263b44] bg-[#1a2b36] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#203442] transition-colors"
+                        className="flex-1 min-w-[150px] rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:border-teal-500/50 hover:text-on-surface transition-colors dark:border-[#263b44] dark:bg-[#1a2b36] dark:hover:bg-[#203442]"
                       >
                         Back to Roadmap
                       </button>
@@ -964,33 +981,29 @@ const MediumNodeChallengePage = () => {
                           </p>
                         )}
                         <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                          {petName}
+                          {speakerName}
                         </p>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-7 grid grid-cols-2 gap-4">
-                    <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        Reward
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                        +{challenge.xp}
-                      </p>
-                      <p className="text-[18px] font-bold text-[#63f1e3]">XP</p>
-                    </div>
-                    <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        Bonus
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                        +10
-                      </p>
-                      <p className="text-[18px] font-bold text-[#f5c6ff]">
-                        Stars
-                      </p>
-                    </div>
+                    {rewardItems.map((item, index) => (
+                      <div
+                        key={`${item.type}-${item.label}-${index}`}
+                        className="rounded-lg bg-[#243932] px-4 py-4 text-center"
+                      >
+                        <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                          {item.label}
+                        </p>
+                        <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
+                          +{item.amount}
+                        </p>
+                        <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
+                          {item.type}
+                        </p>
+                      </div>
+                    ))}
                   </div>
 
                   <button

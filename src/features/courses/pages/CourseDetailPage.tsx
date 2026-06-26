@@ -167,19 +167,8 @@ const LessonCard = ({ lesson }) => {
 
 /* ───────────── Module Section ───────────── */
 const ModuleSection = ({ chapter, index, totalModules }) => {
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
-
+  const lessons = chapter.lessons || [];
   const isActive = chapter.status !== "locked";
-
-  useEffect(() => {
-    const chapterId = chapter._id || chapter.id;
-    courseApi
-      .getLessons(chapterId)
-      .then((data) => setLessons(data || []))
-      .catch(() => setLessons([]))
-      .finally(() => setLoading(false));
-  }, [chapter]);
 
   const getRankLabel = () => {
     const ranks = [
@@ -244,11 +233,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
 
       {/* Lessons List */}
       <div className="ml-0 md:ml-[72px] flex flex-col gap-3">
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <div className="w-7 h-7 border-2 border-primary-fixed-dim/60 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : lessons.length > 0 ? (
+        {lessons.length > 0 ? (
           lessons.map((lesson) => (
             <LessonCard key={lesson._id || lesson.id} lesson={lesson} />
           ))
@@ -279,16 +264,11 @@ const CourseDetailPage = () => {
     if (!courseId) return;
     setLoading(true);
     courseApi
-      .getCourses()
-      .then((courses) => {
-        const found = courses.find(
-          (c) => c.slug === courseId || c._id === courseId,
-        );
-        if (!found) throw new Error("Course not found");
-        setCourse(found);
-        return courseApi.getChapters(found._id);
+      .getCourseDetail(courseId)
+      .then((detail) => {
+        setCourse(detail.course);
+        setChapters(detail.chapters || []);
       })
-      .then((data) => setChapters(data || []))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [courseId]);
@@ -298,7 +278,8 @@ const CourseDetailPage = () => {
   }, [loadData]);
 
   const handleResetProgress = async () => {
-    if (!course?._id) return;
+    const currentCourseId = course?._id || course?.id;
+    if (!currentCourseId) return;
     if (
       !window.confirm(
         "Are you sure you want to reset your progress for this course? This action cannot be undone.",
@@ -308,7 +289,7 @@ const CourseDetailPage = () => {
     }
     setResetting(true);
     try {
-      await courseApi.resetCourseProgress(course._id);
+      await courseApi.resetCourseProgress(currentCourseId);
       loadData();
     } catch (err) {
       console.error("Failed to reset course progress:", err);
@@ -372,9 +353,10 @@ const CourseDetailPage = () => {
     0,
   );
   const overallPercent =
-    totalLessons > 0
+    course.progress?.percent ??
+    (totalLessons > 0
       ? Math.round((totalCompletedLessons / totalLessons) * 100)
-      : 0;
+      : 0);
   const totalUnlockedLessons =
     totalCompletedLessons < totalLessons
       ? totalCompletedLessons + 1
@@ -481,7 +463,7 @@ const CourseDetailPage = () => {
         <div className="relative">
           {chapters.map((chapter, index) => (
             <ModuleSection
-              key={chapter._id}
+              key={chapter._id || chapter.id}
               chapter={chapter}
               index={index}
               totalModules={chapters.length}

@@ -707,15 +707,6 @@ const WorldMapPage = () => {
                 </span>
               </div>
             </div>
-            <button
-              className="w-full rounded-xl py-3 text-[11px] font-extrabold uppercase tracking-wider text-on-surface transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-              style={{
-                background: cfg.gradient,
-                boxShadow: `0 4px 20px ${cfg.glowWeak}`,
-              }}
-            >
-              Upgrade to Pro
-            </button>
           </div>
         </div>
       </aside>

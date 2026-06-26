@@ -601,12 +601,6 @@ const LeaderboardPage = () => {
           </div>
         </div>
       </div>
-
-      {/* Fast Climb Mode Button */}
-      <button className="fixed bottom-8 right-8 z-50 bg-[#E9D8FD] text-[#44337A] px-6 py-3.5 rounded-full font-extrabold text-[14px] flex items-center gap-2 shadow-[0_8px_24px_rgba(233,216,253,0.4)] hover:-translate-y-1 transition-transform duration-300">
-        <LucideIcon name="bolt" className="text-[20px]" />
-        Fast Climb Mode
-      </button>
     </main>
   );
 };

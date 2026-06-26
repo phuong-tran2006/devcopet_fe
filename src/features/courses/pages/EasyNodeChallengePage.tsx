@@ -11,9 +11,19 @@ import {
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import { useAuthStore } from "../../users/store/auth.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
+import {
+  getNavigationForResponse,
+  getRewardItems,
+  getSpeakerName,
+} from "../utils/challengeResponse";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
 const CHECKPOINT_DURATION = "1 min";
+const CHALLENGE_ROUTES = {
+  easy: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+  medium: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+  hard: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+} as const;
 
 const sortOptions = (options: EasyNodeChallenge["options"] = []) =>
   [...options].sort(
@@ -79,8 +89,6 @@ const EasyNodeChallengePage = () => {
   const [wrongAttempt, setWrongAttempt] = useState<{
     optionId: EasyChallengeOptionId;
     message: string;
-    correctOptionId?: EasyChallengeOptionId;
-    explanation?: string;
   } | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -100,6 +108,16 @@ const EasyNodeChallengePage = () => {
   const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
   const codeSnippet =
     challenge?.promptType === "code_mcq" ? challenge.codeSnippet : undefined;
+  const activeNavigation = getNavigationForResponse(
+    result?.navigation,
+    data?.navigation,
+  );
+  const speakerName = getSpeakerName(
+    result?.explanationSpeaker?.name,
+    data?.explanationSpeaker?.name,
+    petName,
+  );
+  const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
 
   const options = useMemo(
     () => sortOptions(challenge?.options ?? []),
@@ -137,35 +155,31 @@ const EasyNodeChallengePage = () => {
   }, [nodeId]);
 
   const goBackToRoadmap = () => {
+    const target = activeNavigation?.returnToRoadmap;
     navigate({
       to: "/roadmap/$worldId",
-      params: { worldId: courseSlug || "python-basic" },
+      params: { worldId: target?.courseSlug || courseSlug || "python-basic" },
     });
   };
 
   const goToNextChallenge = () => {
     if (nextChallengeLoading || !data) return;
 
-    const nextNode = data.nextNode;
-    if (!nextNode) {
+    const nextChallenge = activeNavigation?.nextChallenge;
+    if (!nextChallenge) {
       goBackToRoadmap();
       return;
     }
 
     setNextChallengeLoading(true);
     try {
-      if (nextNode.status === "locked") {
-        goBackToRoadmap();
-        return;
-      }
-
       navigate({
-        to: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+        to: CHALLENGE_ROUTES[nextChallenge.mode],
         params: {
-          courseSlug: courseSlug || "python-basic",
-          nodeId: nextNode.id,
+          courseSlug: nextChallenge.courseSlug,
+          nodeId: nextChallenge.nodeId,
         },
-      });
+      } as any);
     } catch (err) {
       console.error("Unable to open next challenge:", err);
       goBackToRoadmap();
@@ -186,9 +200,10 @@ const EasyNodeChallengePage = () => {
     courseApi
       .submitEasyNodeChallenge(nodeId, selectedOptionId)
       .then((response) => {
-        const { xpAwarded, userProgress } = response;
-        if (xpAwarded && xpAwarded > 0) {
-          setXpToast(xpAwarded);
+        const { xpAwarded, userProgress, rewardSummary } = response;
+        const toastXp = rewardSummary?.xp ?? xpAwarded;
+        if (toastXp && toastXp > 0) {
+          setXpToast(toastXp);
           window.setTimeout(() => setXpToast(null), 3500);
         }
         if (userProgress) {
@@ -207,8 +222,6 @@ const EasyNodeChallengePage = () => {
         setWrongAttempt({
           optionId: selectedOptionId,
           message: response.message,
-          correctOptionId: response.correctOptionId,
-          explanation: response.explanation,
         });
         setSelectedOptionId(null);
       })
@@ -238,8 +251,7 @@ const EasyNodeChallengePage = () => {
     const selectedReviewOptionId = review?.selectedOptionId;
     const correctOptionId =
       review?.correctOptionId ??
-      result?.correctOptionId ??
-      wrongAttempt?.correctOptionId;
+      (result?.correct ? result.correctOptionId : undefined);
     const isSelected = selectedOptionId === optionId;
     const isCorrect = correctOptionId === optionId;
     const isWrongSelected =
@@ -247,29 +259,28 @@ const EasyNodeChallengePage = () => {
       (!!review && selectedReviewOptionId === optionId && !isCorrect);
 
     if (isCorrect) {
-      return "border-[#63f1e3] bg-[#172d31] text-[#63f1e3] shadow-[0_0_22px_rgba(99,241,227,0.22)]";
+      return "border-teal-600 bg-teal-50 text-teal-950 shadow-[0_0_22px_rgba(13,148,136,0.16)] dark:border-[#63f1e3] dark:bg-[#172d31] dark:text-[#63f1e3] dark:shadow-[0_0_22px_rgba(99,241,227,0.22)]";
     }
 
     if (isWrongSelected) {
-      return "border-[#ef4444] bg-[#2b171a] text-red-100 shadow-[0_0_18px_rgba(239,68,68,0.16)]";
+      return "border-red-500 bg-red-50 text-red-950 shadow-[0_0_18px_rgba(239,68,68,0.12)] dark:border-[#ef4444] dark:bg-[#2b171a] dark:text-red-100 dark:shadow-[0_0_18px_rgba(239,68,68,0.16)]";
     }
 
     if (isSelected) {
-      return "border-[#63f1e3] bg-[#13282d] text-on-surface shadow-[0_0_18px_rgba(99,241,227,0.18)]";
+      return "border-teal-600 bg-teal-50 text-slate-950 shadow-[0_0_18px_rgba(13,148,136,0.14)] dark:border-[#63f1e3] dark:bg-[#13282d] dark:text-on-surface dark:shadow-[0_0_18px_rgba(99,241,227,0.18)]";
     }
 
     if (isReviewMode) {
-      return "border-[#263b44] bg-[#10191f] text-on-surface-variant";
+      return "border-slate-200 bg-white text-slate-700 dark:border-[#263b44] dark:bg-[#10191f] dark:text-on-surface-variant";
     }
 
-    return "border-[#1c2b33] bg-[#10191f] text-on-surface-variant hover:border-[#63f1e3]/35 hover:text-on-surface";
+    return "border-slate-200 bg-white text-slate-800 hover:border-teal-500/60 hover:bg-teal-50/60 hover:text-slate-950 dark:border-[#1c2b33] dark:bg-[#10191f] dark:text-on-surface-variant dark:hover:border-[#63f1e3]/35 dark:hover:text-on-surface";
   };
 
   const isCorrectOption = (optionId: EasyChallengeOptionId) => {
     const correctOptionId =
       review?.correctOptionId ??
-      result?.correctOptionId ??
-      wrongAttempt?.correctOptionId;
+      (result?.correct ? result.correctOptionId : undefined);
     return correctOptionId === optionId;
   };
 
@@ -307,7 +318,7 @@ const EasyNodeChallengePage = () => {
   };
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
+    <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
       <div className="w-full max-w-[800px] flex flex-col">
         {/* Back navigation */}
         <div className="flex justify-between items-center mb-6 w-full">
@@ -341,7 +352,7 @@ const EasyNodeChallengePage = () => {
           )}
 
           {!loading && !error && data && isLockedMode && (
-            <div className="mx-auto mt-12 w-full rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
+            <div className="mx-auto mt-12 w-full rounded-xl border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
                 <LucideIcon name="lock" className="text-[32px]" />
               </div>
@@ -354,7 +365,7 @@ const EasyNodeChallengePage = () => {
               </p>
               <button
                 onClick={goBackToRoadmap}
-                className="mt-7 rounded-xl border border-[#263b44] bg-[#10191f] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:text-on-surface"
+                className="mt-7 rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-teal-500/50 hover:text-on-surface dark:border-[#263b44] dark:bg-[#10191f]"
               >
                 Back to Roadmap
               </button>
@@ -370,8 +381,8 @@ const EasyNodeChallengePage = () => {
                   </p>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#111c23] shadow-[0_0_28px_rgba(99,241,227,0.08)]">
-                  <div className="border-b border-[#263b44] bg-[#0c171d] px-6 py-4">
+                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
+                  <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
                         <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
@@ -391,14 +402,14 @@ const EasyNodeChallengePage = () => {
                     </div>
                   </div>
 
-                  <div className="border-b border-[#263b44] px-6 py-7">
+                  <div className="border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
                     <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                       {challenge.question}
                     </p>
 
                     {codeSnippet && (
-                      <div className="mt-5 overflow-hidden rounded-xl border border-[#263b44] bg-[#071217] shadow-[0_0_22px_rgba(99,241,227,0.08)]">
-                        <div className="flex items-center justify-between gap-3 border-b border-[#263b44] bg-[#0a161c] px-4 py-3">
+                      <div className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-[0_18px_36px_rgba(15,23,42,0.14)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
+                        <div className="flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-900 px-4 py-3 dark:border-[#263b44] dark:bg-[#0a161c]">
                           <div className="flex min-w-0 items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
                             <LucideIcon name="code" className="text-[18px]" />
                             <span>
@@ -408,7 +419,7 @@ const EasyNodeChallengePage = () => {
                           <button
                             type="button"
                             onClick={copyCodeSnippet}
-                            className="inline-flex items-center gap-2 rounded-lg border border-[#263b44] bg-[#101f25] px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3]"
+                            className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-200 transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3] dark:border-[#263b44] dark:bg-[#101f25] dark:text-on-surface-variant"
                           >
                             <LucideIcon
                               name={copiedCode ? "check" : "content_copy"}
@@ -417,7 +428,7 @@ const EasyNodeChallengePage = () => {
                             {copiedCode ? "Copied" : "Copy"}
                           </button>
                         </div>
-                        <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-[#d7f7f4] md:text-[16px]">
+                        <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-slate-100 md:text-[16px] dark:text-[#d7f7f4]">
                           <code>{codeSnippet.code}</code>
                         </pre>
                       </div>
@@ -465,25 +476,24 @@ const EasyNodeChallengePage = () => {
                   </div>
 
                   {submitError && (
-                    <p className="mx-6 mb-6 rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-3 text-[13px] text-red-100/80">
+                    <p className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 text-[13px] text-red-800 dark:border-red-400/20 dark:bg-red-400/10 dark:text-red-100/80">
                       {submitError}
                     </p>
                   )}
 
                   {wrongAttempt && (
-                    <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
+                    <div className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 dark:border-red-400/25 dark:bg-red-400/10">
                       <div className="flex items-start gap-3">
                         <LucideIcon
                           name="error"
-                          className=" text-[20px] text-red-300"
+                          className=" text-[20px] text-red-500 dark:text-red-300"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="text-[14px] font-bold text-red-100">
+                          <p className="text-[14px] font-bold text-red-900 dark:text-red-100">
                             {wrongAttempt.message || "Not quite. Try again."}
                           </p>
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
-                            {wrongAttempt.explanation ||
-                              "Pick another answer, then submit again."}
+                          <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
+                            Pick another answer, then submit again.
                           </p>
                         </div>
                       </div>
@@ -501,17 +511,17 @@ const EasyNodeChallengePage = () => {
                   )}
 
                   {/* Inline Explanation and Navigation Section */}
-                  {(isReviewMode || result) && (
-                    <div className="mx-6 mb-6 border-t border-[#263b44] pt-6 flex flex-col gap-4">
+                  {(isReviewMode || result?.correct) && (
+                    <div className="mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
                       {/* Explanation box */}
-                      <div className="rounded-xl border border-[#63f1e3]/30 bg-[#10262c] p-6 shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
+                      <div className="rounded-xl border border-teal-500/30 bg-teal-50 p-6 shadow-[inset_0_0_12px_rgba(13,148,136,0.05)] dark:border-[#63f1e3]/30 dark:bg-[#10262c] dark:shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
                         <div className="mb-4 flex items-center gap-3">
                           <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
                             <LucideIcon name="pets" className=" text-[20px]" />
                           </div>
                           <div>
                             <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                              {petName} Companion Says
+                              {speakerName} Companion Says
                             </p>
                           </div>
                         </div>
@@ -527,7 +537,7 @@ const EasyNodeChallengePage = () => {
                       <div className="flex flex-wrap gap-4 mt-2">
                         <button
                           onClick={goBackToRoadmap}
-                          className="flex-1 min-w-[150px] rounded-xl border border-[#263b44] bg-[#1a2b36] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#203442] transition-colors"
+                          className="flex-1 min-w-[150px] rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:border-teal-500/50 hover:text-on-surface transition-colors dark:border-[#263b44] dark:bg-[#1a2b36] dark:hover:bg-[#203442]"
                         >
                           Back to Roadmap
                         </button>
@@ -547,17 +557,17 @@ const EasyNodeChallengePage = () => {
               </section>
 
               {showSuccessModal && result?.correct && challenge && (
-                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-                  <div className="relative w-full max-w-[480px] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+                  <div className="relative w-full max-w-[480px] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
                     <button
                       onClick={() => setShowSuccessModal(false)}
-                      className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+                      className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-slate-100 hover:text-on-surface dark:hover:bg-white/8"
                       aria-label="Close result"
                     >
                       <LucideIcon name="close" className=" text-[22px]" />
                     </button>
 
-                    <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                    <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
                       <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
                         <LucideIcon name="star" className=" text-[46px]" />
                       </div>
@@ -568,7 +578,7 @@ const EasyNodeChallengePage = () => {
                         Accomplished
                       </h2>
 
-                      <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#1b3440]/70 p-4">
+                      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#1b3440]/70">
                         <div className="flex items-start gap-3">
                           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
                             <LucideIcon name="pets" className=" text-[24px]" />
@@ -583,35 +593,29 @@ const EasyNodeChallengePage = () => {
                               </p>
                             )}
                             <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                              {petName}
+                              {speakerName}
                             </p>
                           </div>
                         </div>
                       </div>
 
                       <div className="mt-7 grid grid-cols-2 gap-4">
-                        <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
-                          <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                            Reward
-                          </p>
-                          <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                            +{challenge.xp}
-                          </p>
-                          <p className="text-[18px] font-bold text-[#63f1e3]">
-                            XP
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                          <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                            Bonus
-                          </p>
-                          <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                            +10
-                          </p>
-                          <p className="text-[18px] font-bold text-[#f5c6ff]">
-                            Stars
-                          </p>
-                        </div>
+                        {rewardItems.map((item, index) => (
+                          <div
+                            key={`${item.type}-${item.label}-${index}`}
+                            className="rounded-lg bg-teal-50 px-4 py-4 text-center dark:bg-[#243932]"
+                          >
+                            <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                              {item.label}
+                            </p>
+                            <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
+                              +{item.amount}
+                            </p>
+                            <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
+                              {item.type}
+                            </p>
+                          </div>
+                        ))}
                       </div>
 
                       <button
@@ -663,7 +667,7 @@ const EasyNodeChallengePage = () => {
               animation: fadeInDown 3.5s ease-in-out forwards;
             }
           `}</style>
-          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+          <div className="animate-xp-toast bg-white/95 backdrop-blur-md border border-teal-500/40 text-teal-700 font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(13,148,136,0.18)] flex items-center gap-2 dark:bg-[#0f2630]/95 dark:border-[#63f1e3]/40 dark:text-[#63f1e3] dark:shadow-[0_0_30px_rgba(99,241,227,0.3)]">
             <LucideIcon name="stars" className=" text-[#63f1e3]" />
             <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
               +{xpToast} XP

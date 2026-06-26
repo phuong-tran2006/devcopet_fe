@@ -1,6 +1,6 @@
 import React from "react";
-import { mascotAxolotl } from "../../features/users/constants/authImages";
-import { useAuthStore } from "../../features/users/store/auth.store";
+import { mascotAxolotl } from "../../users/constants/authImages";
+import { useAuthStore } from "../../users/store/auth.store";
 
 interface PetStatusProps {
   theme: "light" | "dark";

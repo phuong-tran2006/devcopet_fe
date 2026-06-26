@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { mascotAxolotl } from "../../features/users/constants/authImages";
-import { useAuthStore } from "../../features/users/store/auth.store";
-import { api } from "../../services/axiosClient";
+import { mascotAxolotl } from "../../users/constants/authImages";
+import { useAuthStore } from "../../users/store/auth.store";
+import { api } from "../../../services/axiosClient";
 
 interface ProfileSettingsProps {
   theme: "light" | "dark";
@@ -84,17 +84,6 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
                 className="w-12 h-12 object-contain"
               />
             </div>
-            <button
-              className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all active:scale-95 ${
-                theme === "dark"
-                  ? "bg-[#142533] hover:bg-[#1c3245] text-slate-300 border-[#223a4d]"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300"
-              }`}
-            >
-              Update
-              <br />
-              Hash
-            </button>
           </div>
         </div>
 

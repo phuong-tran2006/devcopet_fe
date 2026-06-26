@@ -16,10 +16,20 @@ import {
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import { useAuthStore } from "../../users/store/auth.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
+import {
+  getNavigationForResponse,
+  getRewardItems,
+  getSpeakerName,
+} from "../utils/challengeResponse";
 
 // ── Template drop-zone helpers (same pattern as MediumNodeChallengePage) ──────
 const DROP_ZONE_REGEX =
   /\[([A-Za-z][A-Za-z0-9_-]*)\]|{{\s*([A-Za-z][A-Za-z0-9_-]*)\s*}}|\[\[\s*([A-Za-z][A-Za-z0-9_-]*)\s*\]\]|__([A-Za-z][A-Za-z0-9_-]*?)__/g;
+const CHALLENGE_ROUTES = {
+  easy: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+  medium: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+  hard: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+} as const;
 
 const getDropZoneKeyFromMatch = (match: RegExpMatchArray | RegExpExecArray) =>
   match[1] || match[2] || match[3] || match[4];
@@ -156,8 +166,8 @@ const CodeSnippetCard = ({
   if (!codeSnippet) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#1e3a5f] bg-[#0a1626] shadow-[0_0_22px_rgba(58,127,193,0.15)]">
-      <div className="border-b border-[#1e3a5f] bg-[#0c1a2d] px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#66b3ff]">
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-[0_18px_36px_rgba(15,23,42,0.14)] dark:border-[#1e3a5f] dark:bg-[#0a1626] dark:shadow-[0_0_22px_rgba(58,127,193,0.15)]">
+      <div className="border-b border-slate-800 bg-slate-900 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#66b3ff] dark:border-[#1e3a5f] dark:bg-[#0c1a2d]">
         {codeSnippet.language}
       </div>
       <pre className="overflow-x-auto px-5 py-4 font-mono text-[14px] font-semibold leading-7 text-[#dbeafe]">
@@ -205,6 +215,16 @@ const HardNodeChallengePage = () => {
   const isReviewMode = data?.node.status === "completed" && !!data.review;
   const isLockedMode = data?.node.status === "locked";
   const canEdit = !isLockedMode && !isReviewMode && !result;
+  const activeNavigation = getNavigationForResponse(
+    result?.navigation,
+    data?.navigation,
+  );
+  const speakerName = getSpeakerName(
+    result?.explanationSpeaker?.name,
+    data?.explanationSpeaker?.name,
+    petName,
+  );
+  const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
 
   const isOptionBased = [
     "multiple_choice",
@@ -333,14 +353,14 @@ const HardNodeChallengePage = () => {
           "group flex min-h-[52px] items-center gap-2 rounded-xl border px-3 py-2 transition-all",
           compact ? "inline-flex min-w-[150px] align-middle" : "w-full",
           isCorrect
-            ? "border-[#63f1e3] bg-[#10262c] text-[#63f1e3] shadow-[0_0_16px_rgba(99,241,227,0.18)]"
+            ? "border-teal-600 bg-teal-50 text-teal-950 shadow-[0_0_16px_rgba(13,148,136,0.14)] dark:border-[#63f1e3] dark:bg-[#10262c] dark:text-[#63f1e3] dark:shadow-[0_0_16px_rgba(99,241,227,0.18)]"
             : isIncorrect
-              ? "border-red-400/80 bg-red-400/10 text-red-100"
+              ? "border-red-500 bg-red-50 text-red-950 dark:border-red-400/80 dark:bg-red-400/10 dark:text-red-100"
               : assignedItemId
-                ? "border-[#66b3ff]/75 bg-[#123052] text-blue-50 shadow-[0_0_16px_rgba(58,127,193,0.16)]"
+                ? "border-blue-500/70 bg-blue-50 text-blue-950 shadow-[0_0_16px_rgba(37,99,235,0.12)] dark:border-[#66b3ff]/75 dark:bg-[#123052] dark:text-blue-50 dark:shadow-[0_0_16px_rgba(58,127,193,0.16)]"
                 : isReadyForSelection
-                  ? "border-[#66b3ff] bg-[#3a7fc1]/15 text-[#66b3ff] shadow-[0_0_18px_rgba(58,127,193,0.22)]"
-                  : "border-dashed border-slate-500/70 bg-[#071321] text-slate-300",
+                  ? "border-blue-500 bg-blue-50 text-blue-700 shadow-[0_0_18px_rgba(37,99,235,0.14)] dark:border-[#66b3ff] dark:bg-[#3a7fc1]/15 dark:text-[#66b3ff] dark:shadow-[0_0_18px_rgba(58,127,193,0.22)]"
+                  : "border-dashed border-slate-300 bg-white text-slate-600 dark:border-slate-500/70 dark:bg-[#071321] dark:text-slate-300",
         ].join(" ")}
       >
         <button
@@ -466,38 +486,31 @@ const HardNodeChallengePage = () => {
   }, [nodeId, courseSlug]);
 
   const goBackToRoadmap = () => {
+    const target = activeNavigation?.returnToRoadmap;
     navigate({
       to: "/roadmap/$worldId",
-      params: { worldId: courseSlug || "python-basic" },
+      params: { worldId: target?.courseSlug || courseSlug || "python-basic" },
     });
   };
 
-  const goToNextChallenge = async () => {
-    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+  const goToNextChallenge = () => {
+    if (nextChallengeLoading) return;
+
+    const nextChallenge = activeNavigation?.nextChallenge;
+    if (!nextChallenge) {
+      goBackToRoadmap();
+      return;
+    }
 
     setNextChallengeLoading(true);
     try {
-      const roadmap = await courseApi.getHardRoadmap(courseSlug);
-      const nodes = [...roadmap.chapters]
-        .sort((a, b) => a.order - b.order)
-        .flatMap((chapter) =>
-          [...chapter.nodes].sort((a, b) => a.order - b.order),
-        );
-      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
-      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
-
-      if (!nextNode) {
-        goBackToRoadmap();
-        return;
-      }
-
       navigate({
-        to: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+        to: CHALLENGE_ROUTES[nextChallenge.mode],
         params: {
-          courseSlug,
-          nodeId: nextNode.id,
+          courseSlug: nextChallenge.courseSlug,
+          nodeId: nextChallenge.nodeId,
         },
-      });
+      } as any);
     } catch (err) {
       console.error("Unable to open next Hard challenge:", err);
       goBackToRoadmap();
@@ -541,9 +554,10 @@ const HardNodeChallengePage = () => {
       const res = await courseApi.submitHardNodeChallenge(nodeId!, payload);
       setResult(res);
 
-      const { xpAwarded, userProgress } = res;
-      if (xpAwarded && xpAwarded > 0) {
-        setXpToast(xpAwarded);
+      const { xpAwarded, userProgress, rewardSummary } = res;
+      const toastXp = rewardSummary?.xp ?? xpAwarded;
+      if (toastXp && toastXp > 0) {
+        setXpToast(toastXp);
         window.setTimeout(() => setXpToast(null), 3500);
       }
       if (userProgress) {
@@ -610,7 +624,7 @@ const HardNodeChallengePage = () => {
   const hintText = challenge.hint || challenge.hints?.[0]?.text || "";
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
+    <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
       <div className="w-full max-w-[800px] flex flex-col">
         {/* Back navigation */}
         <div className="flex justify-between items-center mb-6 w-full">
@@ -635,7 +649,7 @@ const HardNodeChallengePage = () => {
           </div>
 
           {isLockedMode && (
-            <div className="mx-auto mt-12 w-full rounded-xl border border-[#1e3a5f] bg-[#081624] p-8 text-center shadow-[0_0_28px_rgba(58,127,193,0.08)]">
+            <div className="mx-auto mt-12 w-full rounded-xl border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_28px_rgba(58,127,193,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
                 <LucideIcon name="lock" className="text-[32px]" />
               </div>
@@ -648,7 +662,7 @@ const HardNodeChallengePage = () => {
               </p>
               <button
                 onClick={goBackToRoadmap}
-                className="mt-7 rounded-xl border border-[#1e3a5f] bg-[#0c1a2d] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:text-on-surface"
+                className="mt-7 rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-blue-500/50 hover:text-on-surface dark:border-[#1e3a5f] dark:bg-[#0c1a2d]"
               >
                 Back to Roadmap
               </button>
@@ -656,8 +670,8 @@ const HardNodeChallengePage = () => {
           )}
 
           {!isLockedMode && (
-            <div className="overflow-hidden rounded-xl border border-[#1e3a5f] bg-[#081624] shadow-[0_0_28px_rgba(58,127,193,0.08)]">
-              <div className="border-b border-[#1e3a5f] bg-[#0c1a2d] px-6 py-4">
+            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_28px_rgba(58,127,193,0.08)]">
+              <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#1e3a5f] dark:bg-[#0c1a2d]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
@@ -677,7 +691,7 @@ const HardNodeChallengePage = () => {
                 </div>
               </div>
 
-              <div className="border-b border-[#1e3a5f] px-6 py-7">
+              <div className="border-b border-slate-200 px-6 py-7 dark:border-[#1e3a5f]">
                 <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                   {challenge.question}
                 </p>
@@ -851,7 +865,7 @@ const HardNodeChallengePage = () => {
 
                 {isHardDragDrop && hardFillChallenge && (
                   <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
-                    <div className="rounded-2xl border border-[#1e3a5f] bg-[#081624] p-4 shadow-[0_0_24px_rgba(58,127,193,0.08)] sm:p-5">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-[0_18px_36px_rgba(15,23,42,0.08)] sm:p-5 dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_24px_rgba(58,127,193,0.08)]">
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
@@ -882,7 +896,7 @@ const HardNodeChallengePage = () => {
                             <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
                               Selected
                             </p>
-                            <p className="truncate text-[13px] font-bold text-blue-50">
+                            <p className="truncate text-[13px] font-bold text-blue-900 dark:text-blue-50">
                               {getDropPoolItemText(selectedPoolItemId)}
                             </p>
                           </div>
@@ -902,13 +916,13 @@ const HardNodeChallengePage = () => {
                           row.kind === "match" ? (
                             <div
                               key={row.id}
-                              className="grid gap-3 rounded-xl border border-white/8 bg-[#0b1d2f] p-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center"
+                              className="grid gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center dark:border-white/8 dark:bg-[#0b1d2f]"
                             >
-                              <div className="min-w-0 rounded-lg border border-white/8 bg-black/15 px-4 py-3">
+                              <div className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/8 dark:bg-black/15">
                                 <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
                                   Prompt
                                 </p>
-                                <p className="mt-1 break-words font-mono text-[13px] font-bold leading-6 text-[#dbeafe]">
+                                <p className="mt-1 break-words font-mono text-[13px] font-bold leading-6 text-slate-800 dark:text-[#dbeafe]">
                                   {row.prompt}
                                 </p>
                               </div>
@@ -917,7 +931,7 @@ const HardNodeChallengePage = () => {
                           ) : (
                             <div
                               key={row.id}
-                              className="rounded-xl border border-white/8 bg-[#0b1d2f] px-4 py-3 font-mono text-[13px] font-semibold leading-6 text-[#dbeafe]"
+                              className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-mono text-[13px] font-semibold leading-6 text-slate-800 dark:border-white/8 dark:bg-[#0b1d2f] dark:text-[#dbeafe]"
                             >
                               {renderTemplateParts(row.text, (zoneId) =>
                                 renderHardDropZone(zoneId, true),
@@ -928,7 +942,7 @@ const HardNodeChallengePage = () => {
                       </div>
                     </div>
 
-                    <aside className="rounded-2xl border border-[#1e3a5f] bg-[#081624] p-4 lg:sticky lg:top-24 lg:self-start">
+                    <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:sticky lg:top-24 lg:self-start dark:border-[#1e3a5f] dark:bg-[#081624]">
                       <p className="mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
                         Answers
                       </p>
@@ -956,7 +970,7 @@ const HardNodeChallengePage = () => {
                                   ? "cursor-not-allowed border-white/8 bg-white/5 text-slate-500"
                                   : isSelected
                                     ? "border-[#66b3ff] bg-[#3a7fc1]/20 text-[#66b3ff] shadow-[0_0_18px_rgba(58,127,193,0.28)]"
-                                    : "border-white/10 bg-[#0d2135] text-slate-200 hover:border-[#66b3ff]/60 hover:text-white",
+                                    : "border-slate-200 bg-white text-slate-700 hover:border-[#66b3ff]/60 hover:text-slate-950 dark:border-white/10 dark:bg-[#0d2135] dark:text-slate-200 dark:hover:text-white",
                               ].join(" ")}
                             >
                               <span>{item.text}</span>
@@ -1100,11 +1114,11 @@ const HardNodeChallengePage = () => {
                       className="text-[20px] text-red-300"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="font-bold text-red-100 text-[14px]">
+                      <p className="font-bold text-red-900 text-[14px] dark:text-red-100">
                         {result.message || "Not quite. Try again."}
                       </p>
                       {result.explanation && (
-                        <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
+                        <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
                           {result.explanation}
                         </p>
                       )}
@@ -1142,21 +1156,21 @@ const HardNodeChallengePage = () => {
 
               {/* Inline Explanation and Navigation Section */}
               {(isReviewMode || (result && result.correct)) && (
-                <div className="mx-6 mb-6 border-t border-[#1e3a5f] pt-6 flex flex-col gap-4">
+                <div className="mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#1e3a5f]">
                   {/* Explanation box */}
-                  <div className="rounded-xl border border-[#66b3ff]/30 bg-[#0c1a2d] p-6 shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
+                  <div className="rounded-xl border border-blue-500/30 bg-blue-50 p-6 shadow-[inset_0_0_12px_rgba(37,99,235,0.05)] dark:border-[#66b3ff]/30 dark:bg-[#0c1a2d] dark:shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
                     <div className="mb-4 flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
                         <LucideIcon name="pets" className="text-[20px]" />
                       </div>
                       <div>
                         <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                          {petName} Says
+                          {speakerName} Says
                         </p>
                       </div>
                     </div>
 
-                    <p className="text-[14px] leading-relaxed text-[#dbeafe]">
+                    <p className="text-[14px] leading-relaxed text-slate-700 dark:text-[#dbeafe]">
                       {isReviewMode && data.review
                         ? data.review.explanation
                         : result?.explanation}
@@ -1201,7 +1215,7 @@ const HardNodeChallengePage = () => {
                         <p className="text-[10px] font-bold uppercase tracking-widest text-[#fde047]">
                           Companion Feedback
                         </p>
-                        <p className="mt-2 text-[14px] leading-relaxed text-[#dbeafe]">
+                        <p className="mt-2 text-[14px] leading-relaxed text-slate-700 dark:text-[#dbeafe]">
                           {result?.petFeedback || data?.review?.petFeedback}
                         </p>
                       </div>
@@ -1212,7 +1226,7 @@ const HardNodeChallengePage = () => {
                   <div className="flex flex-wrap gap-4 mt-2">
                     <button
                       onClick={goBackToRoadmap}
-                      className="flex-1 min-w-[150px] rounded-xl border border-[#1e3a5f] bg-[#0d2135] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#152e46] transition-colors"
+                      className="flex-1 min-w-[150px] rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:border-blue-500/50 hover:text-on-surface transition-colors dark:border-[#1e3a5f] dark:bg-[#0d2135] dark:hover:bg-[#152e46]"
                     >
                       Back to Roadmap
                     </button>
@@ -1242,8 +1256,8 @@ const HardNodeChallengePage = () => {
       />
 
       {showSuccessModal && result?.correct && challenge && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-          <div className="relative w-full max-w-[480px] rounded-3xl bg-[#24384b] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+          <div className="relative w-full max-w-[480px] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#24384b] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
             <button
               onClick={() => setShowSuccessModal(false)}
               className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
@@ -1252,7 +1266,7 @@ const HardNodeChallengePage = () => {
               <LucideIcon name="close" className="text-[22px]" />
             </button>
 
-            <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
+            <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(37,99,235,0.05)] dark:bg-[#081624] dark:shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
               <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
                 <LucideIcon name="workspace_premium" className="text-[46px]" />
               </div>
@@ -1263,7 +1277,7 @@ const HardNodeChallengePage = () => {
                 Accomplished
               </h2>
 
-              <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
+              <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#0d2135]/80">
                 <div className="flex items-start gap-3">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
                     <LucideIcon name="psychology" className="text-[24px]" />
@@ -1278,31 +1292,29 @@ const HardNodeChallengePage = () => {
                       </p>
                     )}
                     <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
-                      {petName}
+                      {speakerName}
                     </p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-7 grid grid-cols-2 gap-4">
-                <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
-                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                    Reward
-                  </p>
-                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
-                    +{challenge.xp}
-                  </p>
-                  <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
-                </div>
-                <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                  <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                    Bonus
-                  </p>
-                  <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                    +10
-                  </p>
-                  <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
-                </div>
+                {rewardItems.map((item, index) => (
+                  <div
+                    key={`${item.type}-${item.label}-${index}`}
+                    className="rounded-lg bg-blue-50 px-4 py-4 text-center dark:bg-[#102a36]"
+                  >
+                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                      {item.label}
+                    </p>
+                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
+                      +{item.amount}
+                    </p>
+                    <p className="text-[18px] font-bold text-[#66b3ff] uppercase">
+                      {item.type}
+                    </p>
+                  </div>
+                ))}
               </div>
 
               <button
@@ -1338,7 +1350,7 @@ const HardNodeChallengePage = () => {
                 animation: fadeInDown 3.5s ease-in-out forwards;
               }
             `}</style>
-          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+          <div className="animate-xp-toast bg-white/95 backdrop-blur-md border border-blue-500/40 text-blue-700 font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(37,99,235,0.18)] flex items-center gap-2 dark:bg-[#0f2630]/95 dark:border-[#63f1e3]/40 dark:text-[#63f1e3] dark:shadow-[0_0_30px_rgba(99,241,227,0.3)]">
             <LucideIcon name="stars" className="text-[#63f1e3]" />
             <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
               +{xpToast} XP
