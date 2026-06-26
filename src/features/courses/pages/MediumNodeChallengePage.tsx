@@ -94,7 +94,7 @@ const CodeSnippetCard = ({
       <div className="border-b border-slate-800 bg-slate-900 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3] dark:border-[#263b44] dark:bg-[#0a161c]">
         {codeSnippet.language}
       </div>
-      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-[#d7f7f4]">
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-on-surface">
         <code>{codeSnippet.code}</code>
       </pre>
     </div>
@@ -634,7 +634,7 @@ const MediumNodeChallengePage = () => {
           <section className="w-full flex flex-col">
             <div className="mb-6 flex flex-col gap-2">
               <p className="text-[14px] text-on-surface-variant font-medium">
-                {data.node.label} • {data.node.title}
+                {data.node.title}
               </p>
             </div>
 
@@ -893,7 +893,7 @@ const MediumNodeChallengePage = () => {
                   <button
                     onClick={submitChallenge}
                     disabled={!canSubmit || submitting}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] transition hover:bg-[#86fff4] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-medium/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
                     {submitting ? "Submitting..." : "Submit Answer"}
                   </button>
@@ -933,7 +933,7 @@ const MediumNodeChallengePage = () => {
                       <button
                         onClick={goToNextChallenge}
                         disabled={nextChallengeLoading}
-                        className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 min-w-[150px] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white hover:bg-medium/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                       >
                         {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                       </button>
@@ -966,7 +966,7 @@ const MediumNodeChallengePage = () => {
                     Accomplished
                   </h2>
 
-                  <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#1b3440]/70 p-4">
+                  <div className="mt-6 rounded-lg border border-outline/20 bg-medium/5 p-4 transition-colors duration-300">
                     <div className="flex items-start gap-3">
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
                         <LucideIcon name="psychology" className="text-[24px]" />
@@ -1009,7 +1009,7 @@ const MediumNodeChallengePage = () => {
                   <button
                     onClick={goToNextChallenge}
                     disabled={nextChallengeLoading}
-                    className="mt-7 w-full rounded-lg bg-[#63f1e3] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#052023] shadow-[0_10px_28px_rgba(99,241,227,0.24)] transition hover:bg-[#86fff4] disabled:cursor-wait disabled:opacity-70"
+                    className="mt-7 w-full rounded-lg bg-medium px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-medium/80"
                   >
                     {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                     <span className="ml-2">→</span>

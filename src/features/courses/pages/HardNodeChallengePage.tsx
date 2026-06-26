@@ -644,7 +644,7 @@ const HardNodeChallengePage = () => {
         <section className="w-full flex flex-col">
           <div className="mb-6 flex flex-col gap-2">
             <p className="text-[14px] text-on-surface-variant font-medium">
-              {data?.node.label} • {data?.node.title}
+              {data?.node.title}
             </p>
           </div>
 
@@ -1148,7 +1148,7 @@ const HardNodeChallengePage = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitDisabled}
-                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] transition hover:bg-[#8cc8ff] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-hard/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                 >
                   {submitting ? "Checking..." : "Submit Answer"}
                 </button>
@@ -1233,7 +1233,7 @@ const HardNodeChallengePage = () => {
                     <button
                       onClick={goToNextChallenge}
                       disabled={nextChallengeLoading}
-                      className="flex-1 min-w-[150px] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] hover:bg-[#8cc8ff] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 min-w-[150px] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white hover:bg-hard/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                     >
                       {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                     </button>
@@ -1320,7 +1320,7 @@ const HardNodeChallengePage = () => {
               <button
                 onClick={goToNextChallenge}
                 disabled={nextChallengeLoading}
-                className="mt-7 w-full rounded-lg bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
+                className="mt-7 w-full rounded-lg bg-hard px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-hard/80"
               >
                 {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                 <span className="ml-2">→</span>

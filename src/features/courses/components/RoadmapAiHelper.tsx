@@ -82,8 +82,6 @@ const RoadmapAiHelper = ({
   // Theme-matching vibrant AI palette
   const aiPrimary = accentColor;
   const aiSecondary = accentColor;
-  const panelBgGradient =
-    "linear-gradient(145deg, rgba(7, 18, 23, 0.95) 0%, rgba(13, 35, 41, 0.95) 100%)";
   const headerBgGradient = `linear-gradient(90deg, ${accentColor}15, ${accentColor}05)`;
 
   const isHidden = !nodeId || nodeStatus === "locked";
@@ -104,11 +102,10 @@ const RoadmapAiHelper = ({
       <div
         ref={panelRef}
         id="ai-helper-panel"
-        className="ai-helper-panel fixed bottom-6 right-6 z-[110] flex w-[480px] h-[80vh] min-h-[500px] max-h-[900px] flex-col overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-[32px]"
+        className="ai-helper-panel fixed bottom-6 right-6 z-[110] flex w-[480px] h-[80vh] min-h-[500px] max-h-[900px] flex-col overflow-hidden rounded-2xl border shadow-2xl backdrop-blur-[32px] bg-surface/95 transition-colors duration-300"
         style={{
-          background: panelBgGradient,
           borderColor: `${aiPrimary}40`,
-          boxShadow: `0 24px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1), 0 0 40px ${aiPrimary}15`,
+          boxShadow: `0 24px 60px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05), 0 0 40px ${aiPrimary}15`,
         }}
       >
         <AiHelperHeader
@@ -223,20 +220,6 @@ const RoadmapAiHelper = ({
                 </span>
               </span>
             </div>
-            {asking && (
-              <div className="flex items-center gap-1.5">
-                <div
-                  className="h-1.5 w-1.5 rounded-full animate-pulse"
-                  style={{ backgroundColor: accentColor }}
-                />
-                <span
-                  className="text-[10px] font-bold uppercase tracking-wider"
-                  style={{ color: accentColor }}
-                >
-                  Thinking…
-                </span>
-              </div>
-            )}
           </div>
         )}
 

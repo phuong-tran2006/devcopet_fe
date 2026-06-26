@@ -13,7 +13,7 @@ const LeaderboardPage = () => {
     const fetchLeaderboard = async () => {
       try {
         const { api } = await import("../../../services/axiosClient");
-        const response = await api.get("/users/leaderboard");
+        const response = await api.get("/arena/leaderboard?limit=50");
         setUsers(response.data || []);
       } catch (err) {
         console.error("Failed to load leaderboard from backend", err);
@@ -212,6 +212,8 @@ const LeaderboardPage = () => {
       (u) => u._id === currentUser.id || u.username === currentUser.username,
     );
     const rankNum = index !== -1 ? index + 1 : 142;
+    const currentData =
+      index !== -1 ? sorted[index] : { arenaRating: 0, arenaRank: "Beginner" };
     return {
       rank: rankNum < 10 ? `0${rankNum}` : String(rankNum),
       name: currentUser.username || "You",

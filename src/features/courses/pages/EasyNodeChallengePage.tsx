@@ -377,7 +377,7 @@ const EasyNodeChallengePage = () => {
               <section className="w-full">
                 <div className="mb-6 flex flex-col gap-2">
                   <p className="text-[14px] text-on-surface-variant font-medium">
-                    {data.node.label} • {data.node.title}
+                    {data.node.title}
                   </p>
                 </div>
 
@@ -385,9 +385,6 @@ const EasyNodeChallengePage = () => {
                   <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
-                        <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
-                          Question 01
-                        </p>
                         <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                           {challenge.title}
                         </h2>
@@ -504,7 +501,7 @@ const EasyNodeChallengePage = () => {
                     <button
                       onClick={submitAnswer}
                       disabled={!selectedOptionId || submitting}
-                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] transition hover:bg-[#86fff4] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-easy px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-easy/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                     >
                       {submitting ? "Submitting..." : "Submit Answer"}
                     </button>
@@ -621,7 +618,7 @@ const EasyNodeChallengePage = () => {
                       <button
                         onClick={goToNextChallenge}
                         disabled={nextChallengeLoading}
-                        className="mt-7 w-full rounded-lg bg-[#63f1e3] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#052023] shadow-[0_10px_28px_rgba(99,241,227,0.24)] transition hover:bg-[#86fff4]"
+                        className="mt-7 w-full rounded-lg bg-easy px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-easy/80"
                       >
                         {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                         <span className="ml-2">→</span>

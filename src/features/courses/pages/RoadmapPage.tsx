@@ -101,13 +101,6 @@ const RoadmapPage = () => {
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 mt-4">
           {/* Card 1: Python */}
           <div className="bg-surface rounded-2xl border border-outline/30 p-6 flex flex-col hover:border-primary-fixed-dim/50 hover:shadow-[0_8px_30px_rgba(0,128,128,0.2)] transition-all duration-500 ease-out-cubic group relative overflow-hidden">
-            {/* Header Badge */}
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-[10px] text-primary bg-primary-fixed-dim/10 border border-primary-fixed-dim/30 font-bold px-2.5 py-0.5 rounded uppercase tracking-wider">
-                Lvl. 42 Master
-              </span>
-            </div>
-
             {/* Logo Wrapper */}
             <div className="h-[100px] w-full bg-primary-fixed-dim/10 border border-primary-fixed-dim/10 rounded-xl flex items-center justify-center mb-6 relative overflow-hidden group-hover:bg-primary-fixed-dim/20 transition-colors">
               <svg
@@ -129,7 +122,7 @@ const RoadmapPage = () => {
             {/* Title & Description */}
             <div className="flex flex-col gap-2 mb-6">
               <h2 className="font-headline-sm text-[22px] font-bold text-on-surface tracking-wide group-hover:text-primary transition-colors">
-                Python 1: Variables
+                Python World
               </h2>
               <p className="font-body-sm text-[12.5px] leading-relaxed text-on-surface-variant min-h-[54px] line-clamp-3">
                 The realm of Data Science, AI, and rapid prototyping. Master the
@@ -151,16 +144,6 @@ const RoadmapPage = () => {
                   style={{ width: `${pythonCompletion}%` }}
                 ></div>
               </div>
-            </div>
-
-            {/* Tags */}
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
-                SYSTEM
-              </span>
-              <span className="text-[9px] font-bold text-on-surface-variant bg-on-surface/5 border border-on-surface/10 px-2 py-0.5 rounded uppercase tracking-wider">
-                AI DRIVEN
-              </span>
             </div>
 
             {/* Action Button */}
