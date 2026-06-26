@@ -946,7 +946,7 @@ const MediumNodeChallengePage = () => {
 
           {showSuccessModal && result?.correct && (
             <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-              <div className="relative w-full max-w-[480px] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+              <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
                 <button
                   onClick={() => setShowSuccessModal(false)}
                   className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
@@ -955,7 +955,7 @@ const MediumNodeChallengePage = () => {
                   <LucideIcon name="close" className="text-[22px]" />
                 </button>
 
-                <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                <div className="overflow-y-auto rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
                   <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
                     <LucideIcon name="star" className="text-[46px]" />
                   </div>
@@ -987,23 +987,28 @@ const MediumNodeChallengePage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-7 grid grid-cols-2 gap-4">
-                    {rewardItems.map((item, index) => (
-                      <div
-                        key={`${item.type}-${item.label}-${index}`}
-                        className="rounded-lg bg-[#243932] px-4 py-4 text-center"
-                      >
-                        <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                          {item.label}
-                        </p>
-                        <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                          +{item.amount}
-                        </p>
-                        <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
-                          {item.type}
-                        </p>
-                      </div>
-                    ))}
+                  <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {rewardItems.map((item, index) => {
+                      const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
+                      return (
+                        <div
+                          key={`${item.type}-${item.label}-${index}`}
+                          className={`rounded-lg bg-[#243932] px-4 py-4 text-center ${
+                            isLastOdd ? "sm:col-span-2" : ""
+                          }`}
+                        >
+                          <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                            {item.label}
+                          </p>
+                          <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
+                            +{item.amount}
+                          </p>
+                          <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
+                            {item.type}
+                          </p>
+                        </div>
+                      );
+                    })}
                   </div>
 
                   <button

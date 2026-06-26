@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import LucideIcon from "../../../components/ui/LucideIcon";
-import { api } from "../../../services/axiosClient";
+import { profileApi } from "../api/profile.api";
 import { useAuthStore } from "../../users/store/auth.store";
 
 interface ProfileFormState {
@@ -10,36 +10,12 @@ interface ProfileFormState {
   avatarUrl: string;
 }
 
-interface RankSnapshot {
-  globalRank: number | null;
-  arenaRank: string | null;
-}
-
 const getInitialProfileForm = (user: Record<string, unknown> | null) => ({
   name: String(user?.name || ""),
   username: String(user?.username || ""),
   bio: String(user?.bio || ""),
   avatarUrl: String(user?.avatarUrl || ""),
 });
-
-const getResponseList = (data: any) =>
-  Array.isArray(data) ? data : data?.data || data?.items || [];
-
-const getUserId = (value: any) =>
-  value?.id || value?._id || value?.userId
-    ? String(value.id || value._id || value.userId)
-    : "";
-
-const findCurrentUserIndex = (items: any[], user: any) => {
-  const currentUserId = getUserId(user);
-  return items.findIndex((item) => {
-    const itemUserId = getUserId(item);
-    return (
-      (currentUserId && itemUserId === currentUserId) ||
-      (user?.username && item.username === user.username)
-    );
-  });
-};
 
 const ProfileHeader = () => {
   const { user, updateUser } = useAuthStore();
@@ -51,10 +27,6 @@ const ProfileHeader = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rankSnapshot, setRankSnapshot] = useState<RankSnapshot>({
-    globalRank: null,
-    arenaRank: null,
-  });
 
   useEffect(() => {
     let mounted = true;
@@ -62,46 +34,12 @@ const ProfileHeader = () => {
     const loadProfile = async () => {
       try {
         setIsLoading(true);
-        const response = await api.get("/users/me");
+        const response = await profileApi.getMe();
         if (!mounted) return;
         const freshUser = response.data;
         updateUser(freshUser);
         setForm(getInitialProfileForm(freshUser));
         setError(null);
-
-        const [leaderboardResponse, arenaLeaderboardResponse] =
-          await Promise.allSettled([
-            api.get("/users/leaderboard"),
-            api.get("/arena/leaderboard?limit=100"),
-          ]);
-
-        if (!mounted) return;
-
-        const leaderboard =
-          leaderboardResponse.status === "fulfilled"
-            ? getResponseList(leaderboardResponse.value.data)
-            : [];
-        const arenaLeaderboard =
-          arenaLeaderboardResponse.status === "fulfilled"
-            ? getResponseList(arenaLeaderboardResponse.value.data)
-            : [];
-
-        const globalIndex = findCurrentUserIndex(leaderboard, freshUser);
-        const arenaIndex = findCurrentUserIndex(arenaLeaderboard, freshUser);
-        const arenaEntry =
-          arenaIndex >= 0 ? arenaLeaderboard[arenaIndex] : freshUser;
-
-        setRankSnapshot({
-          globalRank:
-            globalIndex >= 0
-              ? Number(leaderboard[globalIndex]?.rank || globalIndex + 1)
-              : null,
-          arenaRank:
-            arenaEntry?.arenaRank ||
-            (arenaIndex >= 0
-              ? `#${arenaLeaderboard[arenaIndex]?.rank || arenaIndex + 1}`
-              : null),
-        });
       } catch (err) {
         console.error("Failed to load profile", err);
         if (mounted) setError("Could not load your latest profile.");
@@ -126,10 +64,14 @@ const ProfileHeader = () => {
     () => user?.name || user?.username || user?.email || "Architect",
     [user],
   );
-  const displayRank =
-    rankSnapshot.globalRank || Number(user?.rank || user?.leaderboardRank || 0);
-  const arenaRank =
-    rankSnapshot.arenaRank || String(user?.arenaRank || "Unranked");
+
+  const userLevel = Number(user?.level || 1);
+  const lifetimeXp = Number(user?.lifetimeXp || 0);
+  const currentXp = Number(user?.currentXp || 0);
+  const nextLevelXp = Number(user?.nextLevelXp || 1000);
+  const globalRank = Number(user?.globalRank || 0);
+  const arenaRank = String(user?.arenaRank || "Unranked");
+  const levelProgress = nextLevelXp > 0 ? Math.min(100, Math.round((lifetimeXp / nextLevelXp) * 100)) : 0;
 
   const handleInputChange =
     (field: keyof ProfileFormState) =>
@@ -148,6 +90,7 @@ const ProfileHeader = () => {
     setError(null);
 
     try {
+      const { api } = await import("../../../services/axiosClient");
       const payload = {
         name: form.name.trim(),
         username: form.username.trim(),
@@ -191,9 +134,13 @@ const ProfileHeader = () => {
         </div>
 
         <div className="flex shrink-0 flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 bg-secondary-fixed text-on-secondary-fixed px-4 py-2 rounded-lg font-medium text-sm border border-outline/20 transition-colors duration-300">
+            <LucideIcon name="star" className="text-[18px]" />
+            Level {userLevel}
+          </div>
           <div className="flex items-center gap-2 bg-primary-fixed text-on-primary-fixed px-4 py-2 rounded-lg font-medium text-sm border border-outline/20 transition-colors duration-300">
             <LucideIcon name="workspace_premium" className="text-[18px]" />
-            Global Rank: {displayRank ? `#${displayRank}` : "Unranked"}
+            Global Rank: {globalRank ? `#${globalRank}` : "Unranked"}
           </div>
           <div className="flex items-center gap-2 bg-surface-container-high text-on-surface px-4 py-2 rounded-lg font-medium text-sm border border-outline/20 transition-colors duration-300">
             <LucideIcon name="swords" className="text-[18px]" />
@@ -216,6 +163,44 @@ const ProfileHeader = () => {
           </button>
         </div>
       </div>
+
+      {/* XP Stats & Level Progress */}
+      {!isLoading && !isEditing ? (
+        <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="rounded-xl border border-outline/10 bg-surface-container/40 p-4">
+            <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+              Lifetime XP
+            </p>
+            <p className="text-xl font-extrabold text-on-surface font-mono">
+              {lifetimeXp.toLocaleString()}
+            </p>
+          </div>
+          <div className="rounded-xl border border-outline/10 bg-surface-container/40 p-4">
+            <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+              Available XP
+            </p>
+            <p className="text-xl font-extrabold text-primary-fixed-dim font-mono">
+              {currentXp.toLocaleString()}
+            </p>
+          </div>
+          <div className="rounded-xl border border-outline/10 bg-surface-container/40 p-4">
+            <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
+              Level Progress
+            </p>
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-2 bg-surface-container-high rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary-fixed-dim rounded-full transition-all duration-500"
+                  style={{ width: `${levelProgress}%` }}
+                />
+              </div>
+              <span className="text-xs font-bold text-on-surface-variant whitespace-nowrap">
+                {lifetimeXp.toLocaleString()} / {nextLevelXp.toLocaleString()}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {isLoading ? (
         <p className="mt-4 text-sm font-medium text-on-surface-variant">
@@ -301,3 +286,4 @@ const ProfileHeader = () => {
 };
 
 export default ProfileHeader;
+

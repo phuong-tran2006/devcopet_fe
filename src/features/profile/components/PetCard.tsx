@@ -1,16 +1,35 @@
 import React, { useEffect, useState } from "react";
 import { mascotAxolotl } from "../../users/constants/authImages";
 import { useAuthStore } from "../../users/store/auth.store";
-import { api } from "../../../services/axiosClient";
+import { profileApi } from "../api/profile.api";
 import LucideIcon from "../../../components/ui/LucideIcon";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 const PetCard = () => {
+  const { theme } = useTheme();
   const { user, updateUser } = useAuthStore();
-  const petName = String(user?.petName || "Axo-Script");
-  const level = Number(user?.level || 1);
-  const exp = Number(user?.exp || 0);
-  const nextLevelExp = 1000;
-  const levelProgress = Math.min(100, Math.round((exp % nextLevelExp) / 10));
+
+  const pet = user?.pet;
+  const petName = pet?.name || String(user?.petName || "Axo-Script");
+  const petLevel = Number(pet?.level || 1);
+  const petExp = Number(pet?.exp || 0);
+
+  const getPetLevelRequiredExp = (level: number) => {
+    let total = 0;
+    for (let n = 1; n <= level; n++) {
+      total += Math.pow(n, n) * 100;
+    }
+    return total;
+  };
+
+  const petNextLevelExp = Number(pet?.levelRequiredExp || getPetLevelRequiredExp(petLevel));
+  const petAvatar = pet?.avatar;
+  const availableXp = Number(user?.currentXp || 0);
+
+  const levelProgress = petNextLevelExp > 0
+    ? Math.min(100, Math.round((petExp / petNextLevelExp) * 100))
+    : 0;
+
   const [nextPetName, setNextPetName] = useState(petName);
   const [saving, setSaving] = useState(false);
   const [feeding, setFeeding] = useState(false);
@@ -20,18 +39,19 @@ const PetCard = () => {
     setNextPetName(petName);
   }, [petName]);
 
-  const updatePet = async () => {
+  const updatePetName = async () => {
     if (!nextPetName.trim() || saving) return;
 
     setSaving(true);
     setMessage(null);
     try {
+      const { api } = await import("../../../services/axiosClient");
       const response = await api.patch("/users/profile", {
         petName: nextPetName.trim(),
       });
       const updatedUser = response.data?.user || response.data;
       updateUser({ ...updatedUser, petName: nextPetName.trim() });
-      setMessage("Pet updated.");
+      setMessage("Pet name updated successfully!");
     } catch (err: any) {
       setMessage(err?.response?.data?.message || "Could not update pet.");
     } finally {
@@ -40,110 +60,240 @@ const PetCard = () => {
   };
 
   const feedPet = async () => {
-    if (feeding) return;
+    if (feeding || availableXp < 100) return;
 
     setFeeding(true);
     setMessage(null);
     try {
-      const response = await api.post("/pets/feed");
+      const response = await profileApi.feedPet();
       if (response.data?.user) {
         updateUser(response.data.user);
       }
-      setMessage(response.data?.message || "Pet fed.");
+      setMessage("Pet fed successfully!");
+
+      // Refetch profile to get updated currentXp, pet data, and rank
+      try {
+        const profileResponse = await profileApi.getMe();
+        updateUser(profileResponse.data);
+      } catch {
+        // Profile refetch failed silently — store already has feed response data
+      }
     } catch (err: any) {
-      setMessage(err?.response?.data?.message || "Feeding is unavailable.");
+      const status = err?.response?.status;
+      const errorMessage = err?.response?.data?.message || "";
+      if (status === 404) {
+        setMessage("Pet feed is not available yet.");
+      } else if (
+        status === 400 ||
+        errorMessage.toLowerCase().includes("insufficient") ||
+        errorMessage.toLowerCase().includes("not enough")
+      ) {
+        setMessage("Not enough XP to feed your pet.");
+      } else {
+        setMessage(errorMessage || "Feeding is unavailable.");
+      }
     } finally {
       setFeeding(false);
     }
   };
 
-  return (
-    <div className="bg-surface border border-outline/20 rounded-2xl p-6 flex flex-col w-full transition-colors duration-300 shadow-sm">
-      <div className="flex justify-between items-start mb-6">
-        <div>
-          <h2 className="text-xl font-bold text-on-surface transition-colors duration-300">
-            {petName}
-          </h2>
-          <p className="text-on-surface-variant text-sm transition-colors duration-300">
-            Level {level} companion
+  // 1. Profile loading state
+  if (!user) {
+    return (
+      <div
+        className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${
+          theme === "dark"
+            ? "bg-[#09141c] border-[#14232e]"
+            : "bg-white border-slate-200"
+        }`}
+      >
+        <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
+          🐾 Pet Companion
+        </h2>
+        <div className="py-8 text-center text-sm font-medium text-on-surface-variant animate-pulse">
+          Loading Pet Companion...
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Pet data missing state
+  if (!pet) {
+    return (
+      <div
+        className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${
+          theme === "dark"
+            ? "bg-[#09141c] border-[#14232e]"
+            : "bg-white border-slate-200"
+        }`}
+      >
+        <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
+          🐾 Pet Companion
+        </h2>
+        <div className="flex flex-col items-center justify-center p-6 border border-dashed border-outline/30 rounded-xl bg-surface-container/20">
+          <LucideIcon name="pets" className="text-4xl text-on-surface-variant/40 mb-3" />
+          <p className="text-sm font-semibold text-on-surface text-center mb-1">
+            Pet companion data missing
+          </p>
+          <p className="text-xs text-on-surface-variant text-center">
+            Please complete your onboarding or initialize your pet profile.
           </p>
         </div>
+      </div>
+    );
+  }
+
+  const cost = 100;
+  const isFeedDisabled = feeding || availableXp < cost;
+
+  let buttonText = `Feed Pet - Cost: ${cost} XP`;
+  if (feeding) {
+    buttonText = "Feeding...";
+  } else if (availableXp < cost) {
+    buttonText = `Not enough XP - Need ${cost} XP`;
+  }
+
+  return (
+    <div
+      className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${
+        theme === "dark"
+          ? "bg-[#09141c] border-[#14232e]"
+          : "bg-white border-slate-200"
+      }`}
+    >
+      <div className="flex justify-between items-center">
+        <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
+          🐾 Pet Companion
+        </h2>
         {user?.petProfileInitialized ? (
-          <div className="bg-primary-fixed text-primary-fixed-dim text-xs font-bold px-3 py-1 rounded uppercase tracking-wider transition-colors duration-300">
+          <span className="text-[10px] bg-[#1a2f26] border border-[#26543c] text-[#5cdb95] px-2.5 py-0.5 rounded-md font-mono font-bold tracking-wider">
             ACTIVE
-          </div>
+          </span>
         ) : null}
       </div>
 
-      <div className="w-full aspect-square bg-surface-container-lowest rounded-xl flex items-center justify-center mb-6 overflow-hidden transition-colors duration-300 border border-outline/10">
-        <img
-          src={mascotAxolotl}
-          alt={petName}
-          className="w-[80%] h-[80%] object-contain"
-        />
+      <div
+        className={`flex gap-4 p-4 border rounded-2xl items-center transition-colors ${
+          theme === "dark"
+            ? "bg-[#040d14] border-[#14232e]"
+            : "bg-slate-50 border-slate-100"
+        }`}
+      >
+        <div className="w-[84px] h-[94px] bg-[#0a1b26] border border-[#193245] rounded-xl p-1 flex items-center justify-center shrink-0 shadow-inner">
+          <img
+            src={petAvatar || mascotAxolotl}
+            alt={petName}
+            className="w-full h-full object-contain"
+          />
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-semibold text-on-surface-variant">
+            Pet Name: <span className="text-[#7fe3dd] font-bold">{petName}</span>
+          </p>
+          <p className="text-sm font-semibold text-on-surface-variant">
+            Pet Level: <span className="font-bold text-on-surface">{petLevel}</span>
+          </p>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        <div>
-          <div className="flex justify-between text-sm font-semibold text-on-surface-variant mb-2 transition-colors duration-300">
-            <span>Experience</span>
-            <span>{exp.toLocaleString()} XP</span>
+      <div className="space-y-4 pt-2">
+        <div className="space-y-1.5">
+          <div className="flex justify-between text-xs font-semibold">
+            <span className={theme === "dark" ? "text-slate-300" : "text-slate-600"}>
+              Pet EXP
+            </span>
+            <span className="text-[#7fe3dd] font-bold">
+              {petExp.toLocaleString()} / {petNextLevelExp.toLocaleString()} XP ({levelProgress}%)
+            </span>
           </div>
-          <div className="w-full h-2 bg-surface-container-high rounded-full overflow-hidden transition-colors duration-300">
+          <div
+            className={`w-full h-2 rounded-full ${
+              theme === "dark" ? "bg-[#14232e]" : "bg-slate-200"
+            }`}
+          >
             <div
-              className="h-full bg-primary-fixed-dim rounded-full transition-colors duration-300"
+              className="bg-[#7fe3dd] h-2 rounded-full shadow-[0_0_10px_rgba(127,227,221,0.6)] transition-all duration-500"
               style={{ width: `${levelProgress}%` }}
-            ></div>
+            />
           </div>
         </div>
 
-        <div className="rounded-xl border border-outline/20 bg-surface-container/40 p-4">
-          <h3 className="mb-4 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-primary-fixed-dim">
-            <LucideIcon name="pets" className="text-[18px]" />
-            Pet Care
-          </h3>
+        <div className="flex justify-between items-center py-2 px-4 rounded-xl border border-outline/10 bg-surface-container/20">
+          <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
+            Available XP
+          </span>
+          <span className="text-base font-extrabold text-primary-fixed-dim font-mono">
+            {availableXp.toLocaleString()} XP
+          </span>
+        </div>
+      </div>
 
-          <div className="flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={feedPet}
-              disabled={feeding}
-              className="flex items-center justify-center gap-2 rounded-lg bg-primary-fixed-dim px-4 py-3 text-sm font-bold text-on-primary transition-colors hover:bg-primary disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              <LucideIcon name="restaurant" className="text-[18px]" />
-              {feeding ? "Feeding..." : "Feed Pet"}
-            </button>
+      <div className="rounded-xl border border-outline/20 bg-surface-container/40 p-4 space-y-4">
+        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#76d6d5]">
+          <LucideIcon name="pets" className="text-[16px]" />
+          Pet Care
+        </h3>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-xs font-semibold text-on-surface-variant">
-                Pet name
-              </label>
-              <div className="flex gap-2">
-                <input
-                  value={nextPetName}
-                  onChange={(event) => {
-                    setNextPetName(event.target.value);
-                    setMessage(null);
-                  }}
-                  className="min-w-0 flex-1 rounded-lg border border-outline/20 bg-surface px-3 py-2 text-sm text-on-surface outline-none transition-colors focus:border-primary"
-                />
-                <button
-                  type="button"
-                  onClick={updatePet}
-                  disabled={saving || !nextPetName.trim()}
-                  className="shrink-0 rounded-lg border border-outline/20 px-3 py-2 text-sm font-bold text-on-surface transition-colors hover:bg-on-surface/5 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {saving ? "Saving" : "Update"}
-                </button>
-              </div>
+        <div className="flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={feedPet}
+            disabled={isFeedDisabled}
+            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-on-primary transition-all duration-200 ${
+              isFeedDisabled
+                ? "bg-[#14232e] text-on-surface-variant/40 cursor-not-allowed opacity-60 border border-outline/10"
+                : "bg-[#7fe3dd] hover:bg-[#5bc2bc] text-[#09141c]"
+            }`}
+          >
+            <LucideIcon name="restaurant" className="text-[18px]" />
+            {buttonText}
+          </button>
+
+          <p className="text-[11px] text-center text-on-surface-variant leading-relaxed font-medium">
+            Feeding pet spends Available XP. Your level will not go down.
+          </p>
+
+          <div className="flex flex-col gap-1.5 pt-2 border-t border-outline/10">
+            <label className="text-xs font-semibold text-on-surface-variant">
+              Update Pet Name
+            </label>
+            <div className="flex gap-2">
+              <input
+                value={nextPetName}
+                onChange={(event) => {
+                  setNextPetName(event.target.value);
+                  setMessage(null);
+                }}
+                className={`min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm text-on-surface outline-none transition-colors ${
+                  theme === "dark"
+                    ? "bg-[#040d14] border-[#14232e] focus:border-[#76d6d5]"
+                    : "bg-white border-slate-200 focus:border-primary"
+                }`}
+              />
+              <button
+                type="button"
+                onClick={updatePetName}
+                disabled={saving || !nextPetName.trim()}
+                className={`shrink-0 rounded-lg border px-3 py-2 text-sm font-bold transition-colors ${
+                  theme === "dark"
+                    ? "border-[#14232e] text-slate-300 hover:bg-white/5"
+                    : "border-slate-200 text-slate-700 hover:bg-slate-50"
+                } disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                {saving ? "Saving" : "Update"}
+              </button>
             </div>
-
-            {message ? (
-              <p className="text-xs font-semibold text-on-surface-variant">
-                {message}
-              </p>
-            ) : null}
           </div>
+
+          {message ? (
+            <p className={`text-xs font-semibold text-center mt-1 ${
+              message.includes("successfully") || message.includes("updated")
+                ? "text-success"
+                : "text-error"
+            }`}>
+              {message}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>

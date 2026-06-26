@@ -74,9 +74,10 @@ const QuizPage = () => {
 
   const q = mockQuestions[currentIdx];
   const userLevel = currentUser?.level ?? 1;
-  const userExp = currentUser?.exp ?? 0;
+  const userExp = Number(currentUser?.lifetimeXp ?? 0);
   const userStars = currentUser?.coins ?? 0;
-  const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
+  const nextLevelXp = Number(currentUser?.nextLevelXp ?? 1000);
+  const levelProgress = nextLevelXp > 0 ? Math.min(100, Math.round((userExp / nextLevelXp) * 100)) : 0;
 
   const handleNext = () => {
     if (currentIdx < mockQuestions.length - 1) {

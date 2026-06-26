@@ -1257,7 +1257,7 @@ const HardNodeChallengePage = () => {
 
       {showSuccessModal && result?.correct && challenge && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
-          <div className="relative w-full max-w-[480px] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#24384b] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+          <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#24384b] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
             <button
               onClick={() => setShowSuccessModal(false)}
               className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
@@ -1266,7 +1266,7 @@ const HardNodeChallengePage = () => {
               <LucideIcon name="close" className="text-[22px]" />
             </button>
 
-            <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(37,99,235,0.05)] dark:bg-[#081624] dark:shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
+            <div className="overflow-y-auto rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(37,99,235,0.05)] dark:bg-[#081624] dark:shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
               <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
                 <LucideIcon name="workspace_premium" className="text-[46px]" />
               </div>
@@ -1287,7 +1287,7 @@ const HardNodeChallengePage = () => {
                       “{result.message || "Correct. Nice work."}”
                     </p>
                     {result.explanation && (
-                      <p className="mt-2 line-clamp-4 text-[12px] leading-relaxed text-on-surface-variant/80">
+                      <p className="mt-2 text-[12px] leading-relaxed text-on-surface-variant/80">
                         {result.explanation}
                       </p>
                     )}
@@ -1298,23 +1298,28 @@ const HardNodeChallengePage = () => {
                 </div>
               </div>
 
-              <div className="mt-7 grid grid-cols-2 gap-4">
-                {rewardItems.map((item, index) => (
-                  <div
-                    key={`${item.type}-${item.label}-${index}`}
-                    className="rounded-lg bg-blue-50 px-4 py-4 text-center dark:bg-[#102a36]"
-                  >
-                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                      {item.label}
-                    </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
-                      +{item.amount}
-                    </p>
-                    <p className="text-[18px] font-bold text-[#66b3ff] uppercase">
-                      {item.type}
-                    </p>
-                  </div>
-                ))}
+              <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {rewardItems.map((item, index) => {
+                  const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
+                  return (
+                    <div
+                      key={`${item.type}-${item.label}-${index}`}
+                      className={`rounded-lg bg-blue-50 px-4 py-4 text-center dark:bg-[#102a36] ${
+                        isLastOdd ? "sm:col-span-2" : ""
+                      }`}
+                    >
+                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                        {item.label}
+                      </p>
+                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
+                        +{item.amount}
+                      </p>
+                      <p className="text-[18px] font-bold text-[#66b3ff] uppercase">
+                        {item.type}
+                      </p>
+                    </div>
+                  );
+                })}
               </div>
 
               <button

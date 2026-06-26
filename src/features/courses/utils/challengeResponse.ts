@@ -18,7 +18,19 @@ export const getRewardItems = (
     ...(rewardSummary.items || []),
   ];
 
-  return items.filter((item) => Number(item.amount) > 0);
+  const activeItems = items.filter((item) => Number(item.amount) > 0);
+  const seenTypes = new Set<string>();
+  const uniqueItems: typeof activeItems = [];
+
+  for (const item of activeItems) {
+    const normalizedType = item.type.toLowerCase();
+    if (!seenTypes.has(normalizedType)) {
+      seenTypes.add(normalizedType);
+      uniqueItems.push(item);
+    }
+  }
+
+  return uniqueItems;
 };
 
 export const getNavigationForResponse = (

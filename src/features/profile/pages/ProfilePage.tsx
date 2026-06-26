@@ -5,13 +5,10 @@ import { ProfileSettings } from "../components/ProfileSettings";
 import { AccountSecurity } from "../components/AccountSecurity";
 import { AppPreferences } from "../components/AppPreferences";
 import { useTheme } from "../../../contexts/ThemeContext";
-import { useAuthStore } from "../../users/store/auth.store";
 import MissionPanel from "../components/MissionPanel";
 
 const ProfilePage = () => {
   const { theme } = useTheme();
-  const user = useAuthStore((state) => state.user);
-  const hasPetProfile = Boolean(user?.petProfileInitialized);
 
   useEffect(() => {
     document.title = "Profile | Devcopet";
@@ -31,8 +28,8 @@ const ProfilePage = () => {
         </section>
 
         <aside className="space-y-6 xl:col-span-5">
-          {hasPetProfile ? <PetCard /> : null}
           <AppPreferences theme={theme} toggleTheme={() => {}} />
+          <PetCard />
         </aside>
       </div>
     </main>

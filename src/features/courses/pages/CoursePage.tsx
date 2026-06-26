@@ -260,7 +260,7 @@ const CoursePage = () => {
       });
   }, [courseStats, courses, difficulty, searchTerm, sortBy]);
 
-  const userXp = Number(currentUser?.exp || currentUser?.xp || 0);
+  const userXp = Number(currentUser?.lifetimeXp || currentUser?.currentXp || 0);
 
   return (
     <main className="w-full h-full relative pb-6 px-4 md:px-10 lg:px-16">

@@ -1,13 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuthStore } from "../../users/store/auth.store";
+import { profileApi } from "../../profile/api/profile.api";
 import LucideIcon from "../../../components/ui/LucideIcon";
 
 type LeaderboardUser = {
   _id?: string;
   id?: string;
   username?: string;
+  name?: string;
   level?: number;
-  exp?: number;
+  lifetimeXp?: number;
+  currentXp?: number;
+  rank?: number;
   avatarUrl?: string;
 };
 
@@ -16,14 +20,13 @@ type DisplayUser = {
   name: string;
   level: string;
   badge: string;
-  points: string;
+  currentXp: number;
+  currentXpFormatted: string;
   avatarUrl?: string;
-  progress: number;
 };
 
-const formatPoints = (value?: number) => String(value ?? 0);
-
-const getDisplayName = (user: LeaderboardUser) => user.username || "Unknown";
+const getDisplayName = (user: LeaderboardUser) =>
+  user.name || user.username || "Unknown";
 
 const getBadge = (level = 1) => {
   if (level >= 30) return "CODE NINJA";
@@ -31,17 +34,14 @@ const getBadge = (level = 1) => {
   return "NOVICE";
 };
 
-const getProgress = (exp = 0) =>
-  Math.min(100, Math.round(((exp % 1000) / 1000) * 100));
-
-const toDisplayUser = (user: LeaderboardUser, index: number): DisplayUser => ({
-  rank: index + 1,
+const toDisplayUser = (user: LeaderboardUser): DisplayUser => ({
+  rank: Number(user.rank || 0),
   name: getDisplayName(user),
   level: `Lvl ${user.level ?? 1}`,
   badge: getBadge(user.level),
-  points: formatPoints(user.exp),
+  currentXp: Number(user.currentXp ?? 0),
+  currentXpFormatted: Number(user.currentXp ?? 0).toLocaleString(),
   avatarUrl: user.avatarUrl,
-  progress: getProgress(user.exp),
 });
 
 const getPodiumStyle = (rank: number) => {
@@ -57,7 +57,7 @@ const getPodiumStyle = (rank: number) => {
       avatarSize: "h-32 w-32 text-3xl",
       badgeSize: "h-9 w-9 text-[18px]",
       title: "text-[24px]",
-      pointsLabel: "Total Points",
+      pointsLabel: "Available XP",
       icon: "emoji_events",
     };
   }
@@ -74,7 +74,7 @@ const getPodiumStyle = (rank: number) => {
       avatarSize: "h-24 w-24 text-[24px]",
       badgeSize: "h-7 w-7 text-[13px]",
       title: "text-[18px]",
-      pointsLabel: "Points",
+      pointsLabel: "Available XP",
       icon: null,
     };
   }
@@ -90,7 +90,7 @@ const getPodiumStyle = (rank: number) => {
     avatarSize: "h-24 w-24 text-2xl",
     badgeSize: "h-7 w-7 text-[13px]",
     title: "text-[18px]",
-    pointsLabel: "Points",
+    pointsLabel: "Available XP",
     icon: null,
   };
 };
@@ -109,36 +109,27 @@ const LeaderboardPage = () => {
   const [error, setError] = useState<string | null>(null);
   const { user: currentUser } = useAuthStore();
 
+  const fetchLeaderboard = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await profileApi.getLeaderboard();
+      const data = Array.isArray(response.data)
+        ? response.data
+        : response.data?.data || response.data?.items || [];
+
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      console.error("Failed to load leaderboard from backend", err);
+      setUsers([]);
+      setError("Could not load leaderboard.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let mounted = true;
-
-    const fetchLeaderboard = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const { api } = await import("../../../services/axiosClient");
-        const response = await api.get("/arena/leaderboard?limit=50");
-        const data = Array.isArray(response.data)
-          ? response.data
-          : response.data?.data || response.data?.items || [];
-
-        if (mounted) setUsers(Array.isArray(data) ? data : []);
-      } catch (err) {
-        console.error("Failed to load leaderboard from backend", err);
-        if (mounted) {
-          setUsers([]);
-          setError("Could not load leaderboard.");
-        }
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
     fetchLeaderboard();
-
-    return () => {
-      mounted = false;
-    };
   }, []);
 
   const displayUsers = useMemo(() => users.map(toDisplayUser), [users]);
@@ -148,23 +139,21 @@ const LeaderboardPage = () => {
   const currentUserRank = useMemo(() => {
     if (!currentUser) return null;
 
-    const index = users.findIndex(
+    const found = users.find(
       (user) =>
         user._id === currentUser.id ||
         user.id === currentUser.id ||
         user.username === currentUser.username,
     );
 
-    if (index === -1) return null;
+    if (!found) return null;
 
-    return toDisplayUser(
-      {
-        ...users[index],
-        username: currentUser.username || users[index].username,
-        avatarUrl: currentUser.avatarUrl || users[index].avatarUrl,
-      },
-      index,
-    );
+    return toDisplayUser({
+      ...found,
+      username: currentUser.username || found.username,
+      name: currentUser.name || found.name,
+      avatarUrl: currentUser.avatarUrl || found.avatarUrl,
+    });
   }, [users, currentUser]);
 
   const renderAvatar = (user: Pick<DisplayUser, "avatarUrl" | "name">) =>
@@ -314,7 +303,7 @@ const LeaderboardPage = () => {
                         {style.pointsLabel}
                       </span>
                       <span className="text-[20px] font-mono tracking-tight font-extrabold text-on-surface">
-                        {user.points}
+                        {user.currentXpFormatted}
                       </span>
                     </div>
                   </div>
@@ -377,22 +366,11 @@ const LeaderboardPage = () => {
                       <div className="flex items-center gap-8 ml-auto pl-4">
                         <div className="hidden md:flex flex-col items-end">
                           <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                            Points
+                            Available XP
                           </span>
                           <span className="text-[13px] font-mono font-semibold text-on-surface">
-                            {user.points}
+                            {user.currentXpFormatted}
                           </span>
-                        </div>
-                        <div className="w-24 lg:w-32 flex flex-col gap-1.5">
-                          <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                            Progress
-                          </span>
-                          <div className="h-1.5 bg-surface-variant rounded-full overflow-hidden">
-                            <div
-                              className="h-full bg-gradient-to-r from-primary-fixed-dim to-[#D8BFD8] rounded-full"
-                              style={{ width: `${user.progress}%` }}
-                            />
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -427,22 +405,11 @@ const LeaderboardPage = () => {
                   <div className="flex items-center gap-8 ml-auto pl-4">
                     <div className="hidden md:flex flex-col items-end">
                       <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                        Points
+                        Available XP
                       </span>
                       <span className="text-[13px] font-mono font-bold text-on-surface">
-                        {currentUserRank.points}
+                        {currentUserRank.currentXpFormatted}
                       </span>
-                    </div>
-                    <div className="w-24 lg:w-32 flex flex-col gap-1.5">
-                      <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                        Progress
-                      </span>
-                      <div className="h-1.5 bg-surface-variant rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-gradient-to-r from-primary-fixed-dim to-[#D8BFD8] rounded-full"
-                          style={{ width: `${currentUserRank.progress}%` }}
-                        />
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -471,3 +438,4 @@ const LeaderboardPage = () => {
 };
 
 export default LeaderboardPage;
+

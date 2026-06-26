@@ -103,9 +103,10 @@ const EasyNodeChallengePage = () => {
   const isLockedMode = data?.node.status === "locked";
   const canAnswer = data?.node.status === "available" && !!challenge;
   const userLevel = currentUser?.level ?? 1;
-  const userExp = currentUser?.exp ?? 0;
+  const userExp = Number(currentUser?.lifetimeXp ?? 0);
   const userStars = currentUser?.coins ?? 0;
-  const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
+  const nextLevelXp = Number(currentUser?.nextLevelXp ?? 1000);
+  const levelProgress = nextLevelXp > 0 ? Math.min(100, Math.round((userExp / nextLevelXp) * 100)) : 0;
   const codeSnippet =
     challenge?.promptType === "code_mcq" ? challenge.codeSnippet : undefined;
   const activeNavigation = getNavigationForResponse(
@@ -555,7 +556,7 @@ const EasyNodeChallengePage = () => {
 
               {showSuccessModal && result?.correct && challenge && (
                 <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
-                  <div className="relative w-full max-w-[480px] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                  <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
                     <button
                       onClick={() => setShowSuccessModal(false)}
                       className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-slate-100 hover:text-on-surface dark:hover:bg-white/8"
@@ -564,7 +565,7 @@ const EasyNodeChallengePage = () => {
                       <LucideIcon name="close" className=" text-[22px]" />
                     </button>
 
-                    <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                    <div className="overflow-y-auto rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
                       <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
                         <LucideIcon name="star" className=" text-[46px]" />
                       </div>
@@ -596,23 +597,28 @@ const EasyNodeChallengePage = () => {
                         </div>
                       </div>
 
-                      <div className="mt-7 grid grid-cols-2 gap-4">
-                        {rewardItems.map((item, index) => (
-                          <div
-                            key={`${item.type}-${item.label}-${index}`}
-                            className="rounded-lg bg-teal-50 px-4 py-4 text-center dark:bg-[#243932]"
-                          >
-                            <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                              {item.label}
-                            </p>
-                            <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                              +{item.amount}
-                            </p>
-                            <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
-                              {item.type}
-                            </p>
-                          </div>
-                        ))}
+                      <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {rewardItems.map((item, index) => {
+                          const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
+                          return (
+                            <div
+                              key={`${item.type}-${item.label}-${index}`}
+                              className={`rounded-lg bg-teal-50 px-4 py-4 text-center dark:bg-[#243932] ${
+                                isLastOdd ? "sm:col-span-2" : ""
+                              }`}
+                            >
+                              <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                                {item.label}
+                              </p>
+                              <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
+                                +{item.amount}
+                              </p>
+                              <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
+                                {item.type}
+                              </p>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       <button
