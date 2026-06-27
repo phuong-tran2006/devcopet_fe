@@ -4,6 +4,7 @@ import { useAuthStore } from "../../users/store/auth.store";
 import { profileApi } from "../api/profile.api";
 import LucideIcon from "../../../components/ui/LucideIcon";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { notifyMissionActivity } from "../utils/missionEvents";
 
 const PetCard = () => {
   const { theme } = useTheme();
@@ -22,13 +23,16 @@ const PetCard = () => {
     return total;
   };
 
-  const petNextLevelExp = Number(pet?.levelRequiredExp || getPetLevelRequiredExp(petLevel));
+  const petNextLevelExp = Number(
+    pet?.levelRequiredExp || getPetLevelRequiredExp(petLevel),
+  );
   const petAvatar = pet?.avatar;
   const availableXp = Number(user?.currentXp || 0);
 
-  const levelProgress = petNextLevelExp > 0
-    ? Math.min(100, Math.round((petExp / petNextLevelExp) * 100))
-    : 0;
+  const levelProgress =
+    petNextLevelExp > 0
+      ? Math.min(100, Math.round((petExp / petNextLevelExp) * 100))
+      : 0;
 
   const [nextPetName, setNextPetName] = useState(petName);
   const [saving, setSaving] = useState(false);
@@ -66,6 +70,7 @@ const PetCard = () => {
     setMessage(null);
     try {
       const response = await profileApi.feedPet();
+      notifyMissionActivity();
       if (response.data?.user) {
         updateUser(response.data.user);
       }
@@ -131,7 +136,10 @@ const PetCard = () => {
           🐾 Pet Companion
         </h2>
         <div className="flex flex-col items-center justify-center p-6 border border-dashed border-outline/30 rounded-xl bg-surface-container/20">
-          <LucideIcon name="pets" className="text-4xl text-on-surface-variant/40 mb-3" />
+          <LucideIcon
+            name="pets"
+            className="text-4xl text-on-surface-variant/40 mb-3"
+          />
           <p className="text-sm font-semibold text-on-surface text-center mb-1">
             Pet companion data missing
           </p>
@@ -188,10 +196,12 @@ const PetCard = () => {
         </div>
         <div className="space-y-1">
           <p className="text-sm font-semibold text-on-surface-variant">
-            Pet Name: <span className="text-[#7fe3dd] font-bold">{petName}</span>
+            Pet Name:{" "}
+            <span className="text-[#7fe3dd] font-bold">{petName}</span>
           </p>
           <p className="text-sm font-semibold text-on-surface-variant">
-            Pet Level: <span className="font-bold text-on-surface">{petLevel}</span>
+            Pet Level:{" "}
+            <span className="font-bold text-on-surface">{petLevel}</span>
           </p>
         </div>
       </div>
@@ -199,11 +209,14 @@ const PetCard = () => {
       <div className="space-y-4 pt-2">
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs font-semibold">
-            <span className={theme === "dark" ? "text-slate-300" : "text-slate-600"}>
+            <span
+              className={theme === "dark" ? "text-slate-300" : "text-slate-600"}
+            >
               Pet EXP
             </span>
             <span className="text-[#7fe3dd] font-bold">
-              {petExp.toLocaleString()} / {petNextLevelExp.toLocaleString()} XP ({levelProgress}%)
+              {petExp.toLocaleString()} / {petNextLevelExp.toLocaleString()} XP
+              ({levelProgress}%)
             </span>
           </div>
           <div
@@ -286,11 +299,13 @@ const PetCard = () => {
           </div>
 
           {message ? (
-            <p className={`text-xs font-semibold text-center mt-1 ${
-              message.includes("successfully") || message.includes("updated")
-                ? "text-success"
-                : "text-error"
-            }`}>
+            <p
+              className={`text-xs font-semibold text-center mt-1 ${
+                message.includes("successfully") || message.includes("updated")
+                  ? "text-success"
+                  : "text-error"
+              }`}
+            >
               {message}
             </p>
           ) : null}

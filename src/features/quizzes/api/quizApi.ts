@@ -1,4 +1,5 @@
 import { api } from "../../../services/axiosClient";
+import { notifyMissionActivity } from "../../profile/utils/missionEvents";
 
 interface AnswerPayload {
   questionIndex: number;
@@ -13,5 +14,6 @@ export const getQuizByLessonId = async (lessonId: string) => {
 
 export const submitQuiz = async (quizId: string, answers: AnswerPayload[]) => {
   const response = await api.post(`/quizzes/${quizId}/submit`, { answers });
+  notifyMissionActivity();
   return response.data;
 };

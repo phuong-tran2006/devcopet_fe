@@ -80,14 +80,7 @@ const Header = () => {
         <div className="flex items-center gap-6">
           {isAuthenticated ? (
             <>
-              {!isOnboarding && (
-                <button
-                  onClick={() => triggerHaptic(40)}
-                  className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
-                >
-                  <LucideIcon name="notifications" className="text-[20px]" />
-                </button>
-              )}
+              {!isOnboarding && <NotificationDropdown />}
               <button
                 onClick={toggleTheme}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"

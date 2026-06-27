@@ -1,4 +1,5 @@
 import { api } from "../../../services/axiosClient";
+import { notifyMissionActivity } from "../../profile/utils/missionEvents";
 
 export type EasyRoadmapNodeStatus = "locked" | "available" | "completed";
 export type RoadmapMode = "easy" | "medium" | "hard";
@@ -579,6 +580,7 @@ export const courseApi = {
       `/roadmaps/easy/nodes/${nodeId}/challenge/submit`,
       { selectedOptionId },
     );
+    notifyMissionActivity();
     return response.data;
   },
 
@@ -606,6 +608,7 @@ export const courseApi = {
       `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
       payload,
     );
+    notifyMissionActivity();
     return response.data;
   },
 
@@ -629,6 +632,7 @@ export const courseApi = {
       `/roadmaps/hard/nodes/${nodeId}/challenge/submit`,
       payload,
     );
+    notifyMissionActivity();
     return response.data;
   },
 
