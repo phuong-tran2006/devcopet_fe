@@ -3,16 +3,28 @@ import React, { useEffect, useState } from "react";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
+import type { SubmitQuizResult } from "../types/quiz.types";
 
 // ─── States ────────────────────────────────────────────────────────────────
-// idle | loading | active | submitting | finished | not_found
+// idle | loading | active | submitting | finished | not_found | locked | error
 
-const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
+interface LessonQuizProps {
+  lessonId: string;
+  onQuizPassed?: (result: SubmitQuizResult) => void;
+  onFinishReview?: (result: SubmitQuizResult) => void | Promise<void>;
+}
+
+const LessonQuiz = ({
+  lessonId,
+  onQuizPassed,
+  onFinishReview,
+}: LessonQuizProps) => {
   const [phase, setPhase] = useState("idle");
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
   const [result, setResult] = useState(null);
   const [submitError, setSubmitError] = useState(null);
+  const [loadError, setLoadError] = useState("");
   const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
 
@@ -22,6 +34,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
     setAnswers({});
     setResult(null);
     setSubmitError(null);
+    setLoadError("");
     setReviewQuestionIdx(0);
     setCurrentQuestionIdx(0);
   }, [lessonId]);
@@ -29,6 +42,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
   // ── Start Quiz ─────────────────────────────────────────────────────────
   const handleStart = async () => {
     setPhase("loading");
+    setLoadError("");
     try {
       const data = await getQuizByLessonId(lessonId);
       if (!data || !data.questions || data.questions.length === 0) {
@@ -41,11 +55,22 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
       setCurrentQuestionIdx(0);
       setPhase("active");
     } catch (err) {
-      if (err?.response?.status === 404) {
+      const status = err?.response?.status;
+      if (status === 404) {
         setPhase("not_found");
+      } else if (status === 403) {
+        setLoadError(
+          err?.response?.data?.message ||
+            "Complete the previous lesson to unlock this quiz.",
+        );
+        setPhase("locked");
       } else {
         console.error("Failed to load quiz:", err);
-        setPhase("not_found");
+        setLoadError(
+          err?.response?.data?.message ||
+            "The quiz could not be loaded. Please try again.",
+        );
+        setPhase("error");
       }
     }
   };
@@ -80,7 +105,9 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
         const res = await submitQuiz(quiz._id, answersPayload);
         setResult(res);
         if (res?.passed) {
-          onQuizPassed?.();
+          // Pass the progress object through so the lesson UI can update
+          // immediately without waiting for another API round-trip.
+          onQuizPassed?.(res);
         }
         setReviewQuestionIdx(0);
         setPhase("finished");
@@ -114,6 +141,7 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
     setAnswers({});
     setResult(null);
     setSubmitError(null);
+    setLoadError("");
     setCurrentQuestionIdx(0);
     setReviewQuestionIdx(0);
     setPhase("active");
@@ -359,6 +387,33 @@ const LessonQuiz = ({ lessonId, onQuizPassed, onFinishReview }) => {
           quiz
         </span>
         No quiz is available for this lesson yet.
+      </div>
+    );
+  }
+
+  if (phase === "locked" || phase === "error") {
+    const isLocked = phase === "locked";
+    return (
+      <div
+        className={`rounded-xl p-6 border text-center text-[14px] ${
+          isLocked
+            ? "bg-secondary-fixed-dim/5 border-secondary-fixed-dim/20 text-on-surface-variant"
+            : "bg-[#f87171]/10 border-[#f87171]/30 text-[#fca5a5]"
+        }`}
+      >
+        <span className="material-symbols-outlined text-3xl mb-2 block">
+          {isLocked ? "lock" : "cloud_off"}
+        </span>
+        <p>{loadError}</p>
+        {!isLocked && (
+          <button
+            type="button"
+            onClick={handleStart}
+            className="mt-4 rounded-lg border border-current px-5 py-2 font-bold hover:bg-white/5"
+          >
+            Try Again
+          </button>
+        )}
       </div>
     );
   }

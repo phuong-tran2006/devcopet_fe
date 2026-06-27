@@ -1,17 +1,21 @@
 import { api } from "../../../services/axiosClient";
+import type {
+  LessonQuizData,
+  QuizAnswerPayload,
+  SubmitQuizResult,
+} from "../types/quiz.types";
 
-interface AnswerPayload {
-  questionIndex: number;
-  selectedOptionIds: string[];
-  answerText: string;
-}
-
-export const getQuizByLessonId = async (lessonId: string) => {
+export const getQuizByLessonId = async (
+  lessonId: string,
+): Promise<LessonQuizData> => {
   const response = await api.get(`/lessons/${lessonId}/quiz`);
   return response.data;
 };
 
-export const submitQuiz = async (quizId: string, answers: AnswerPayload[]) => {
+export const submitQuiz = async (
+  quizId: string,
+  answers: QuizAnswerPayload[],
+): Promise<SubmitQuizResult> => {
   const response = await api.post(`/quizzes/${quizId}/submit`, { answers });
   return response.data;
 };

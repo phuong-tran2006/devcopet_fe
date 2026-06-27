@@ -65,6 +65,7 @@ const CourseSidebarChapter = ({
           ) : lessons.length > 0 ? (
             lessons.map((lesson, idx) => {
               const isActive = lesson._id === currentLessonId;
+              const canAccess = lesson.canAccess !== false && !lesson.locked;
 
               const isCompleted = isActive
                 ? currentLessonCompleted || lesson.status === "completed"
@@ -82,17 +83,8 @@ const CourseSidebarChapter = ({
                 ? 100
                 : Math.min(progress, 95);
 
-              return (
-                <Link
-                  key={lesson._id}
-                  to="/lesson/$lessonId"
-                  params={{ lessonId: lesson._id }}
-                  className={`flex items-center gap-3 px-6 py-3 transition-colors ${
-                    isActive
-                      ? "bg-primary-fixed-dim/15 border-l-2 border-primary-fixed-dim"
-                      : "hover:bg-surface-container border-l-2 border-transparent"
-                  }`}
-                >
+              const lessonContent = (
+                <>
                   <LessonProgressCircle
                     progress={displayProgress}
                     isActive={isActive}
@@ -104,19 +96,55 @@ const CourseSidebarChapter = ({
                       className={`font-body-md text-[13.5px] truncate ${
                         isActive
                           ? "text-primary-fixed-dim font-bold"
-                          : "text-on-surface-variant/90"
+                          : canAccess
+                            ? "text-on-surface-variant/90"
+                            : "text-on-surface-variant/45"
                       }`}
                     >
                       {index + 1}.{idx + 1} {lesson.title}
                     </h5>
                   </div>
 
-                  {lesson.estimatedMinutes && (
-                    <span className="font-mono text-[11px] text-on-surface-variant/50 shrink-0">
-                      {lesson.estimatedMinutes}m
+                  {canAccess ? (
+                    lesson.estimatedMinutes && (
+                      <span className="font-mono text-[11px] text-on-surface-variant/50 shrink-0">
+                        {lesson.estimatedMinutes}m
+                      </span>
+                    )
+                  ) : (
+                    <span className="material-symbols-outlined text-[17px] text-on-surface-variant/40">
+                      lock
                     </span>
                   )}
+                </>
+              );
+
+              const className = `flex items-center gap-3 px-6 py-3 transition-colors ${
+                isActive
+                  ? "bg-primary-fixed-dim/15 border-l-2 border-primary-fixed-dim"
+                  : canAccess
+                    ? "hover:bg-surface-container border-l-2 border-transparent"
+                    : "cursor-not-allowed border-l-2 border-transparent opacity-75"
+              }`;
+
+              return canAccess ? (
+                <Link
+                  key={lesson._id}
+                  to="/lesson/$lessonId"
+                  params={{ lessonId: lesson._id }}
+                  className={className}
+                >
+                  {lessonContent}
                 </Link>
+              ) : (
+                <div
+                  key={lesson._id}
+                  className={className}
+                  aria-disabled="true"
+                  title="Complete the previous lesson to unlock this lesson"
+                >
+                  {lessonContent}
+                </div>
               );
             })
           ) : (

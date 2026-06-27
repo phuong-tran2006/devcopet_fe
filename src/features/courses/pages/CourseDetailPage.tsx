@@ -86,13 +86,17 @@ const StatusBadge = ({ status }) => {
 /* ───────────── Lesson Card ───────────── */
 const LessonCard = ({ lesson }) => {
   const getStatus = () => {
-    if (lesson.status === "completed") return "mastered";
-    if (lesson.status === "available") return "in_progress";
+    if (lesson.status === "completed" || lesson.stateLabel === "MASTERED") {
+      return "mastered";
+    }
+    if (lesson.status === "available" || lesson.stateLabel === "IN_PROGRESS") {
+      return "in_progress";
+    }
     return "locked";
   };
 
   const status = getStatus();
-  const isClickable = lesson.canAccess;
+  const isClickable = lesson.canAccess !== false && !lesson.locked;
 
   const iconMap = {
     mastered: "check_circle",
@@ -170,7 +174,11 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
   const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const isActive = chapter.status !== "locked";
+  const isActive =
+    chapter.status !== "locked" &&
+    chapter.stateLabel !== "LOCKED" &&
+    chapter.locked !== true &&
+    chapter.canAccess !== false;
 
   useEffect(() => {
     const chapterId = chapter._id || chapter.id;
@@ -211,7 +219,8 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
             {isActive ? (
               <>
                 <span className="font-label-sm text-[11px] text-primary-fixed-dim tracking-[0.08em]">
-                  {chapter.progress ? `${chapter.progress.percent}%` : "0%"} Completed
+                  {chapter.progress ? `${chapter.progress.percent}%` : "0%"}{" "}
+                  Completed
                 </span>
                 <span className="text-on-surface-variant/40 text-[11px]">
                   •
@@ -248,10 +257,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
           </div>
         ) : lessons.length > 0 ? (
           lessons.map((lesson) => (
-            <LessonCard
-              key={lesson._id || lesson.id}
-              lesson={lesson}
-            />
+            <LessonCard key={lesson._id || lesson.id} lesson={lesson} />
           ))
         ) : (
           <div className="text-on-surface-variant/40 font-body-md text-[14px] py-4 pl-2">
@@ -300,7 +306,11 @@ const CourseDetailPage = () => {
 
   const handleResetProgress = async () => {
     if (!course?._id) return;
-    if (!window.confirm("Are you sure you want to reset your progress for this course? This action cannot be undone.")) {
+    if (
+      !window.confirm(
+        "Are you sure you want to reset your progress for this course? This action cannot be undone.",
+      )
+    ) {
       return;
     }
     setResetting(true);
@@ -314,7 +324,6 @@ const CourseDetailPage = () => {
       setResetting(false);
     }
   };
-
 
   useEffect(() => {
     document.title = course
@@ -369,9 +378,13 @@ const CourseDetailPage = () => {
     0,
   );
   const overallPercent =
-    totalLessons > 0 ? Math.round((totalCompletedLessons / totalLessons) * 100) : 0;
+    totalLessons > 0
+      ? Math.round((totalCompletedLessons / totalLessons) * 100)
+      : 0;
   const totalUnlockedLessons =
-    totalCompletedLessons < totalLessons ? totalCompletedLessons + 1 : totalCompletedLessons;
+    totalCompletedLessons < totalLessons
+      ? totalCompletedLessons + 1
+      : totalCompletedLessons;
 
   return (
     <main className="w-full relative pb-20 min-h-screen">
@@ -464,7 +477,9 @@ const CourseDetailPage = () => {
                 disabled={resetting}
                 className="w-full mt-5 bg-red-950/25 text-red-400 hover:bg-red-950/45 hover:text-red-300 border border-red-900/40 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                <span className="material-symbols-outlined text-[16px]">
+                  restart_alt
+                </span>
                 {resetting ? "Resetting..." : "Reset Course Progress"}
               </button>
             </div>

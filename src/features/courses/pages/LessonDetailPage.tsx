@@ -49,6 +49,7 @@ const LessonDetailPage = () => {
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [readingProgress, setReadingProgress] = useState(0);
@@ -65,6 +66,7 @@ const LessonDetailPage = () => {
     if (lessonId) {
       setLoading(true);
       setLesson(null);
+      setLoadError(null);
       setReadingProgress(0);
       setQuizPassed(false);
 
@@ -90,31 +92,23 @@ const LessonDetailPage = () => {
           }
           document.title = `${data.title} - Devcopet`;
         })
-        .catch((err) => console.error(err))
+        .catch((err) => {
+          console.error(err);
+          const status = err?.response?.status;
+          setLoadError({
+            status,
+            message:
+              err?.response?.data?.message ||
+              (status === 403
+                ? "Complete the previous lesson to unlock this lesson."
+                : status === 404
+                  ? "We couldn't find the lesson you were looking for."
+                  : "The lesson could not be loaded. Please try again."),
+          });
+        })
         .finally(() => setLoading(false));
     }
   }, [lessonId]);
-
-  useEffect(() => {
-    if (!lesson?._id) return;
-
-    setReadingProgress(0);
-    setQuizPassed(false);
-
-    requestAnimationFrame(() => {
-      if (contentScrollRef.current) {
-        contentScrollRef.current.scrollTo({
-          top: 0,
-          behavior: "auto",
-        });
-      }
-    });
-
-    lastScrollRef.current = {
-      scrollTop: 0,
-      time: Date.now(),
-    };
-  }, [lesson?._id]);
 
   const getOrderedCourseLessons = async (courseId) => {
     const chapters = await courseApi.getChapters(courseId);
@@ -139,9 +133,19 @@ const LessonDetailPage = () => {
     return lessonsByChapter.flat();
   };
 
-  const handleQuizPassed = () => {
+  const handleQuizPassed = (quizResult) => {
     setQuizPassed(true);
     setReadingProgress(100);
+    setLesson((current) =>
+      current
+        ? {
+            ...current,
+            status: "completed",
+            nextLessonId:
+              quizResult?.progress?.nextLessonId ?? current.nextLessonId,
+          }
+        : current,
+    );
     setSidebarRefreshKey((prev) => prev + 1);
   };
 
@@ -149,6 +153,15 @@ const LessonDetailPage = () => {
     if (!quizResult?.passed || !lesson?.courseId || !lesson?._id) return;
 
     try {
+      const unlockedNextLessonId = quizResult?.progress?.nextLessonId;
+      if (unlockedNextLessonId) {
+        navigate({
+          to: "/lesson/$lessonId",
+          params: { lessonId: String(unlockedNextLessonId) },
+        });
+        return;
+      }
+
       const orderedLessons = await getOrderedCourseLessons(lesson.courseId);
       const currentIndex = orderedLessons.findIndex(
         (item) => String(item._id || item.id) === String(lesson._id),
@@ -226,16 +239,18 @@ const LessonDetailPage = () => {
   }
 
   if (!lesson) {
+    const isLocked = loadError?.status === 403;
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
         <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
-          error
+          {isLocked ? "lock" : "error"}
         </span>
         <h2 className="font-headline-md text-on-surface mb-2">
-          Lesson Not Found
+          {isLocked ? "Lesson Locked" : "Lesson Unavailable"}
         </h2>
         <p className="text-on-surface-variant">
-          We couldn't find the lesson you were looking for.
+          {loadError?.message ||
+            "We couldn't find the lesson you were looking for."}
         </p>
         <button
           onClick={() => window.history.back()}
