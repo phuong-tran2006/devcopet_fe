@@ -4,6 +4,7 @@ import { profileApi } from "../../profile/api/profile.api";
 import LucideIcon from "../../../components/ui/LucideIcon";
 
 type LeaderboardUser = {
+  userId?: string;
   _id?: string;
   id?: string;
   username?: string;
@@ -12,6 +13,7 @@ type LeaderboardUser = {
   lifetimeXp?: number;
   currentXp?: number;
   rank?: number;
+  avatar?: string;
   avatarUrl?: string;
 };
 
@@ -41,7 +43,7 @@ const toDisplayUser = (user: LeaderboardUser): DisplayUser => ({
   badge: getBadge(user.level),
   currentXp: Number(user.lifetimeXp ?? 0),
   currentXpFormatted: Number(user.lifetimeXp ?? 0).toLocaleString(),
-  avatarUrl: user.avatarUrl,
+  avatarUrl: user.avatar || user.avatarUrl,
 });
 
 const getPodiumStyle = (rank: number) => {
@@ -139,19 +141,14 @@ const LeaderboardPage = () => {
     if (!currentUser) return null;
 
     const found = users.find(
-      (user) =>
-        user._id === currentUser.id ||
-        user.id === currentUser.id ||
-        user.username === currentUser.username,
+      (user) => user.userId === currentUser.id,
     );
 
     if (!found) return null;
 
     return toDisplayUser({
       ...found,
-      username: currentUser.username || found.username,
-      name: currentUser.name || found.name,
-      avatarUrl: currentUser.avatarUrl || found.avatarUrl,
+      avatarUrl: currentUser.avatarUrl || found.avatar || found.avatarUrl,
     });
   }, [users, currentUser]);
 
