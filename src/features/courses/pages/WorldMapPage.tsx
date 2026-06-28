@@ -53,21 +53,21 @@ const getDiffConfig = (diff: Difficulty, isLight: boolean) => {
     if (diff === "easy") {
       return {
         label: "Easy",
-        accent: "#0284c7",
-        glow: "rgba(2,132,199,0.65)",
-        glowWeak: "rgba(2,132,199,0.20)",
-        pathColor: "#0284c7",
-        gradient: "linear-gradient(90deg, #0284c7, #0369a1)",
+        accent: "#0f766e",
+        glow: "rgba(15,118,110,0.65)",
+        glowWeak: "rgba(15,118,110,0.20)",
+        pathColor: "#0f766e",
+        gradient: "linear-gradient(90deg, #5eead4, #2dd4bf)",
       };
     }
     if (diff === "medium") {
       return {
         label: "Medium",
-        accent: "#0369a1",
-        glow: "rgba(3,105,161,0.65)",
-        glowWeak: "rgba(3,105,161,0.20)",
-        pathColor: "#0369a1",
-        gradient: "linear-gradient(90deg, #0369a1, #075985)",
+        accent: "#6d28d9",
+        glow: "rgba(109,40,217,0.65)",
+        glowWeak: "rgba(109,40,217,0.20)",
+        pathColor: "#6d28d9",
+        gradient: "linear-gradient(90deg, #c4b5fd, #8b5cf6)",
       };
     }
     if (diff === "hard") {
@@ -136,7 +136,7 @@ const getNodeDynamicStyle = (
   } as any;
 
   if (nodeStatus === "completed") {
-    style.backgroundColor = cfg.accent;
+    style.background = isLight ? cfg.gradient : cfg.accent;
     style.borderColor = isLight
       ? "#475569"
       : difficulty === "easy"
@@ -684,29 +684,6 @@ const WorldMapPage = () => {
                 </button>
               );
             })}
-          </div>
-
-          <div className="flex shrink-0 flex-col gap-2 border-t border-on-surface/5 px-4 py-4">
-            <div
-              className="flex items-center gap-2.5 rounded-xl border px-3 py-2.5"
-              style={{
-                background: "rgba(255,224,82,0.06)",
-                borderColor: "rgba(255,224,82,0.2)",
-              }}
-            >
-              <LucideIcon
-                name="emoji_events"
-                className="text-[18px] text-[#FFE052]"
-              />
-              <div className="flex flex-col">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-on-surface-variant">
-                  Stars Collected
-                </span>
-                <span className="text-[13px] font-extrabold text-on-surface">
-                  12 / 150
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </aside>

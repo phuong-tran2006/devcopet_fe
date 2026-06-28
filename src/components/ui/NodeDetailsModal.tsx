@@ -44,6 +44,24 @@ const DIFF_CONFIG = {
   },
 } as const;
 
+const LIGHT_DIFF_CONFIG = {
+  ...DIFF_CONFIG,
+  easy: {
+    accent: "#0f766e",
+    gradient: "linear-gradient(90deg, #5eead4, #2dd4bf)",
+    glowWeak: "rgba(15,118,110,0.20)",
+    buttonHover: "#14b8a6",
+    textOnAccent: "#042f2e",
+  },
+  medium: {
+    accent: "#6d28d9",
+    gradient: "linear-gradient(90deg, #c4b5fd, #8b5cf6)",
+    glowWeak: "rgba(109,40,217,0.20)",
+    buttonHover: "#7c3aed",
+    textOnAccent: "#2e1065",
+  },
+} as const;
+
 const statusCopy = {
   completed: {
     label: "Completed",
@@ -119,7 +137,9 @@ const NodeDetailsModal = ({
       ? `${node.estimatedMinutes || 1} min`
       : EASY_CHECKPOINT_DURATION;
 
-  const cfg = DIFF_CONFIG[node.difficulty || "easy"];
+  const cfg = (isLight ? LIGHT_DIFF_CONFIG : DIFF_CONFIG)[
+    node.difficulty || "easy"
+  ];
 
   const openChallenge = () => {
     if (isActionDisabled) return;
@@ -251,7 +271,7 @@ const NodeDetailsModal = ({
             <span className="block text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">
               Reward XP
             </span>
-            <span className="text-[16px] font-extrabold text-[#FFE052]">
+            <span className="text-[16px] font-extrabold text-black dark:text-[#FFE052]">
               {node.xp || 0}
             </span>
           </div>

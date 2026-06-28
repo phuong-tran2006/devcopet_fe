@@ -4,16 +4,14 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import {
-  atomDark,
-  oneLight,
-} from "react-syntax-highlighter/dist/esm/styles/prism";
+import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import remarkGfm from "remark-gfm";
 import CodeRunnerBlock from "../../../components/CodeRunnerBlock";
 import CourseSidebar from "../components/CourseSidebar";
 import { courseApi } from "../api/course.api";
 import LessonQuiz from "../../quizzes/components/LessonQuiz";
 import { useTheme } from "../../../contexts/ThemeContext";
+import { highContrastLight } from "../../../styles/syntaxThemes";
 
 const createMarkdownComponents = (isLight: boolean) => ({
   code({ node, inline, className, children, ...props }) {
@@ -30,7 +28,7 @@ const createMarkdownComponents = (isLight: boolean) => ({
         <SyntaxHighlighter
           {...props}
           children={String(children).replace(/\n$/, "")}
-          style={isLight ? oneLight : atomDark}
+          style={isLight ? highContrastLight : atomDark}
           language={language}
           PreTag="div"
           customStyle={{
