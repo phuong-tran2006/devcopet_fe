@@ -5,6 +5,8 @@ import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { atomDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getQuizByLessonId, submitQuiz } from "../api/quizApi";
 import { useAuthStore } from "../../users/store/auth.store";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { highContrastLight } from "../../../styles/syntaxThemes";
 
 // ─── States ────────────────────────────────────────────────────────────────
 // idle | loading | active | submitting | finished | not_found
@@ -15,6 +17,8 @@ const LessonQuizInner = ({
   onFinishReview,
   onXpAwarded,
 }) => {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const [phase, setPhase] = useState("idle");
   const [quiz, setQuiz] = useState(null);
   const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
@@ -204,10 +208,12 @@ const LessonQuizInner = ({
         {q.codeSnippet && (
           <div className="mb-5">
             <SyntaxHighlighter
-              style={atomDark}
+              style={isLight ? highContrastLight : atomDark}
               language="python"
               PreTag="div"
-              className="rounded-xl border border-outline/20 !bg-[#0b1118] !text-[14px]"
+              className={`rounded-xl border border-outline/30 !text-[14px] ${
+                isLight ? "!bg-[#eef4f8]" : "!bg-[#0b1118]"
+              }`}
             >
               {q.codeSnippet}
             </SyntaxHighlighter>

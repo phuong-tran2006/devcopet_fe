@@ -70,7 +70,7 @@ export function AiHelperHeader({
           />
         </div>
         <div className="flex flex-1 flex-col min-w-0">
-          <span className="text-[15px] font-extrabold text-white truncate">
+          <span className="text-[15px] font-extrabold text-on-surface truncate">
             {user
               ? `${user.name || user.username || "User"}'s Pet Helper`
               : "Pet Helper"}

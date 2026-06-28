@@ -7,6 +7,16 @@ interface NotificationDropdownProps {
   onClose: () => void;
 }
 
+interface Notification {
+  id: number;
+  title: string;
+  description: string;
+  time: string;
+  icon: string;
+  type: string;
+  unread: boolean;
+}
+
 const NotificationDropdown = ({
   isOpen,
   onToggle,
@@ -28,35 +38,7 @@ const NotificationDropdown = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      title: "Pet Level Up!",
-      description: "Flagellate just reached Level 15. New abilities unlocked.",
-      time: "2m ago",
-      icon: "arrow_upward",
-      type: "level_up",
-      unread: true,
-    },
-    {
-      id: 2,
-      title: "New Lesson Available",
-      description: "Arrays & Objects in Python is now open.",
-      time: "45m ago",
-      icon: "menu_book",
-      type: "lesson",
-      unread: false,
-    },
-    {
-      id: 3,
-      title: "Quest Completed",
-      description: "You've earned 500 XP for completing the Daily Challenge.",
-      time: "2h ago",
-      icon: "military_tech",
-      type: "quest",
-      unread: false,
-    },
-  ]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   return (
     <div className="relative" ref={dropdownRef}>
@@ -86,12 +68,14 @@ const NotificationDropdown = ({
           <h3 className="font-headline-sm text-[18px] font-bold text-on-surface">
             Notifications
           </h3>
-          <button
-            onClick={() => setNotifications([])}
-            className="text-primary-fixed-dim text-[11px] font-bold tracking-widest uppercase hover:text-primary-fixed transition-colors"
-          >
-            MARK ALL AS READ
-          </button>
+          {notifications.length > 0 && (
+            <button
+              onClick={() => setNotifications([])}
+              className="text-primary-fixed-dim text-[11px] font-bold tracking-widest uppercase hover:text-primary-fixed transition-colors"
+            >
+              MARK ALL AS READ
+            </button>
+          )}
         </div>
 
         {/* List */}

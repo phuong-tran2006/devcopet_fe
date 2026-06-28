@@ -166,11 +166,11 @@ const CodeSnippetCard = ({
   if (!codeSnippet) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-[0_18px_36px_rgba(15,23,42,0.14)] dark:border-[#1e3a5f] dark:bg-[#0a1626] dark:shadow-[0_0_22px_rgba(58,127,193,0.15)]">
-      <div className="border-b border-slate-800 bg-slate-900 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#66b3ff] dark:border-[#1e3a5f] dark:bg-[#0c1a2d]">
+    <div className="overflow-hidden rounded-xl border border-slate-300 bg-slate-50 shadow-[0_12px_28px_rgba(15,23,42,0.10)] dark:border-[#1e3a5f] dark:bg-[#0a1626] dark:shadow-[0_0_22px_rgba(58,127,193,0.15)]">
+      <div className="border-b border-slate-300 bg-slate-100 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-blue-700 dark:border-[#1e3a5f] dark:bg-[#0c1a2d] dark:text-[#66b3ff]">
         {codeSnippet.language}
       </div>
-      <pre className="overflow-x-auto px-5 py-4 font-mono text-[14px] font-semibold leading-7 text-[#dbeafe]">
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[14px] font-semibold leading-7 text-slate-950 dark:text-[#dbeafe]">
         <code>{codeSnippet.code}</code>
       </pre>
     </div>
@@ -239,6 +239,7 @@ const HardNodeChallengePage = () => {
     petName,
   );
   const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
+  const xpReward = rewardItems.find((item) => item.type === "xp")?.amount ?? 0;
 
   const isOptionBased = [
     "multiple_choice",
@@ -530,7 +531,8 @@ const HardNodeChallengePage = () => {
     const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
 
     const updateTimer = () => {
-      const remaining = new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      const remaining =
+        new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
       if (remaining <= 0) {
         setRemainingTime(0);
         setIsExpired(true);
@@ -635,9 +637,16 @@ const HardNodeChallengePage = () => {
     }
 
     try {
-      const res = await courseApi.submitHardNodeChallenge(nodeId!, payload, sessionId);
-      
-      if (res.message === "TIME_EXPIRED" || (res as any).code === "TIME_EXPIRED") {
+      const res = await courseApi.submitHardNodeChallenge(
+        nodeId!,
+        payload,
+        sessionId,
+      );
+
+      if (
+        res.message === "TIME_EXPIRED" ||
+        (res as any).code === "TIME_EXPIRED"
+      ) {
         setSubmitError("Time expired");
         setTimeout(() => {
           goBackToRoadmap();
@@ -645,7 +654,10 @@ const HardNodeChallengePage = () => {
         return;
       }
 
-      if (res.message === "SESSION_REQUIRED" || (res as any).code === "SESSION_REQUIRED") {
+      if (
+        res.message === "SESSION_REQUIRED" ||
+        (res as any).code === "SESSION_REQUIRED"
+      ) {
         setSubmitError("Session required. Please refresh the page.");
         return;
       }
@@ -737,10 +749,17 @@ const HardNodeChallengePage = () => {
   }
 
   const hintText = challenge.hint || challenge.hints?.[0]?.text || "";
+  const shouldShowExplanation = Boolean(
+    isReviewMode || (result && result.correct),
+  );
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
-      <div className="w-full max-w-[800px] flex flex-col">
+      <div
+        className={`w-full flex flex-col transition-[max-width] duration-300 ${
+          shouldShowExplanation ? "max-w-[1400px]" : "max-w-[800px]"
+        }`}
+      >
         {/* Back navigation */}
         <div className="flex justify-between items-center mb-6 w-full">
           <button
@@ -790,11 +809,15 @@ const HardNodeChallengePage = () => {
           )}
 
           {!isLockedMode && (
-            <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_28px_rgba(58,127,193,0.08)]">
-              <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#1e3a5f] dark:bg-[#0c1a2d]">
+            <div
+              className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_28px_rgba(58,127,193,0.08)] ${
+                shouldShowExplanation ? "challenge-with-explanation" : ""
+              }`}
+            >
+              <div className="challenge-card-header border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#1e3a5f] dark:bg-[#0c1a2d]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
+                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-blue-700 dark:text-[#66b3ff]">
                       Question 01
                     </p>
                     <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
@@ -803,15 +826,15 @@ const HardNodeChallengePage = () => {
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
                     <span>{challenge.type.replace("_", " ")}</span>
-                    <span className="h-1 w-1 rounded-full bg-[#66b3ff]/70" />
+                    <span className="h-1 w-1 rounded-full bg-blue-700/70 dark:bg-[#66b3ff]/70" />
                     <span>{challenge.xp} XP</span>
-                    <span className="h-1 w-1 rounded-full bg-[#66b3ff]/70" />
+                    <span className="h-1 w-1 rounded-full bg-blue-700/70 dark:bg-[#66b3ff]/70" />
                     <span>{challenge.estimatedMinutes} min</span>
                   </div>
                 </div>
               </div>
 
-              <div className="border-b border-slate-200 px-6 py-7 dark:border-[#1e3a5f]">
+              <div className="challenge-question-section border-b border-slate-200 px-6 py-7 dark:border-[#1e3a5f]">
                 <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                   {challenge.question}
                 </p>
@@ -840,17 +863,17 @@ const HardNodeChallengePage = () => {
                           disabled={!canEdit}
                           className={`
                             relative flex items-center w-full px-5 py-4 text-left rounded-xl border-2 transition-all duration-200
-                            ${isSelected ? "border-[#3a7fc1] bg-[#1e3a5f]/40" : "border-on-surface/10 bg-surface-container hover:border-on-surface/20"}
-                            ${isCorrect ? "border-[#63f1e3] bg-[#10262c] shadow-[0_0_15px_rgba(99,241,227,0.15)]" : ""}
-                            ${isIncorrect ? "border-red-400 bg-red-400/10" : ""}
+                            ${isSelected ? "border-blue-700 bg-blue-50 text-slate-950 shadow-[0_0_0_1px_rgba(29,78,216,0.15)] dark:border-[#3a7fc1] dark:bg-[#1e3a5f]/40 dark:text-on-surface" : "border-slate-300 bg-white text-slate-900 hover:border-blue-500 hover:bg-blue-50/60 dark:border-on-surface/10 dark:bg-surface-container dark:text-on-surface dark:hover:border-on-surface/20"}
+                            ${isCorrect ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-[0_0_0_1px_rgba(5,150,105,0.12)] dark:border-[#63f1e3] dark:bg-[#10262c] dark:text-on-surface dark:shadow-[0_0_15px_rgba(99,241,227,0.15)]" : ""}
+                            ${isIncorrect ? "border-red-600 bg-red-50 text-red-950 dark:border-red-400 dark:bg-red-400/10 dark:text-on-surface" : ""}
                             ${!canEdit && !isCorrect && !isIncorrect ? "opacity-50" : ""}
                           `}
                         >
                           <div
                             className={`flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-bold mr-4
-                            ${isSelected ? "border-[#3a7fc1] bg-[#3a7fc1]/20 text-[#66b3ff]" : "border-on-surface/20 text-on-surface-variant"}
-                            ${isCorrect ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3]" : ""}
-                            ${isIncorrect ? "border-red-400 bg-red-400/20 text-red-300" : ""}
+                            ${isSelected ? "border-blue-700 bg-blue-100 text-blue-800 dark:border-[#3a7fc1] dark:bg-[#3a7fc1]/20 dark:text-[#66b3ff]" : "border-slate-400 text-slate-700 dark:border-on-surface/20 dark:text-on-surface-variant"}
+                            ${isCorrect ? "border-emerald-600 bg-emerald-100 text-emerald-700 dark:border-[#63f1e3] dark:bg-[#63f1e3]/20 dark:text-[#63f1e3]" : ""}
+                            ${isIncorrect ? "border-red-600 bg-red-100 text-red-700 dark:border-red-400 dark:bg-red-400/20 dark:text-red-300" : ""}
                           `}
                           >
                             {String.fromCharCode(65 + i)}
@@ -861,13 +884,13 @@ const HardNodeChallengePage = () => {
                           {isCorrect && (
                             <LucideIcon
                               name="check_circle"
-                              className="text-[#63f1e3]"
+                              className="text-emerald-700 dark:text-[#63f1e3]"
                             />
                           )}
                           {isIncorrect && (
                             <LucideIcon
                               name="cancel"
-                              className="text-red-400"
+                              className="text-red-700 dark:text-red-400"
                             />
                           )}
                         </button>
@@ -1264,19 +1287,23 @@ const HardNodeChallengePage = () => {
                 </button>
               )}
 
-              {(!isReviewMode && !result && !isLockedMode) && (
+              {!isReviewMode && !result && !isLockedMode && (
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitDisabled || isExpired || !sessionId}
                   className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-hard/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                 >
-                  {isExpired ? "Time expired" : submitting ? "Checking..." : "Submit Answer"}
+                  {isExpired
+                    ? "Time expired"
+                    : submitting
+                      ? "Checking..."
+                      : "Submit Answer"}
                 </button>
               )}
 
               {/* Inline Explanation and Navigation Section */}
-              {(isReviewMode || (result && result.correct)) && (
-                <div className="mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#1e3a5f]">
+              {shouldShowExplanation && (
+                <div className="challenge-explanation-panel mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#1e3a5f]">
                   {/* Explanation box */}
                   <div className="rounded-xl border border-blue-500/30 bg-blue-50 p-6 shadow-[inset_0_0_12px_rgba(37,99,235,0.05)] dark:border-[#66b3ff]/30 dark:bg-[#0c1a2d] dark:shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
                     <div className="mb-4 flex items-center gap-3">
@@ -1304,11 +1331,11 @@ const HardNodeChallengePage = () => {
                       <div className="mt-4 grid grid-cols-2 gap-3">
                         {(result?.timeComplexity ||
                           data?.review?.timeComplexity) && (
-                          <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
+                          <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 dark:border-[#9ca3af]/20 dark:bg-black/20">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
                               Time Complexity
                             </p>
-                            <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
+                            <p className="mt-1 font-mono text-[13px] text-slate-950 font-semibold dark:text-[#e5e7eb]">
                               {result?.timeComplexity ||
                                 data?.review?.timeComplexity}
                             </p>
@@ -1316,11 +1343,11 @@ const HardNodeChallengePage = () => {
                         )}
                         {(result?.spaceComplexity ||
                           data?.review?.spaceComplexity) && (
-                          <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
+                          <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 dark:border-[#9ca3af]/20 dark:bg-black/20">
                             <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
                               Space Complexity
                             </p>
-                            <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
+                            <p className="mt-1 font-mono text-[13px] text-slate-950 font-semibold dark:text-[#e5e7eb]">
                               {result?.spaceComplexity ||
                                 data?.review?.spaceComplexity}
                             </p>
@@ -1332,7 +1359,7 @@ const HardNodeChallengePage = () => {
                     {/* Pet feedback */}
                     {(result?.petFeedback || data?.review?.petFeedback) && (
                       <div className="mt-3 rounded-lg border border-[#eab308]/25 bg-[#eab308]/10 px-4 py-3">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-[#fde047]">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700 dark:text-[#fde047]">
                           Companion Feedback
                         </p>
                         <p className="mt-2 text-[14px] leading-relaxed text-slate-700 dark:text-[#dbeafe]">
@@ -1386,7 +1413,7 @@ const HardNodeChallengePage = () => {
               <LucideIcon name="close" className="text-[22px]" />
             </button>
 
-            <div className="overflow-y-auto rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(37,99,235,0.05)] dark:bg-[#081624] dark:shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
+            <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(37,99,235,0.05)] dark:bg-[#081624] dark:shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
               <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
                 <LucideIcon name="workspace_premium" className="text-[46px]" />
               </div>
@@ -1406,11 +1433,6 @@ const HardNodeChallengePage = () => {
                     <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
                       “{result.message || "Correct. Nice work."}”
                     </p>
-                    {result.explanation && (
-                      <p className="mt-2 text-[12px] leading-relaxed text-on-surface-variant/80">
-                        {result.explanation}
-                      </p>
-                    )}
                     <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
                       {speakerName}
                     </p>
@@ -1418,28 +1440,13 @@ const HardNodeChallengePage = () => {
                 </div>
               </div>
 
-              <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {rewardItems.map((item, index) => {
-                  const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
-                  return (
-                    <div
-                      key={`${item.type}-${item.label}-${index}`}
-                      className={`rounded-lg bg-blue-50 px-4 py-4 text-center dark:bg-[#102a36] ${
-                        isLastOdd ? "sm:col-span-2" : ""
-                      }`}
-                    >
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        {item.label}
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
-                        +{item.amount}
-                      </p>
-                      <p className="text-[18px] font-bold text-[#66b3ff] uppercase">
-                        {item.type}
-                      </p>
-                    </div>
-                  );
-                })}
+              <div className="mt-7 rounded-lg bg-blue-50 px-4 py-5 text-center dark:bg-[#102a36]">
+                <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                  XP Earned
+                </p>
+                <p className="mt-2 text-[28px] font-extrabold leading-none text-blue-700 dark:text-[#66b3ff]">
+                  +{xpReward} XP
+                </p>
               </div>
 
               <button

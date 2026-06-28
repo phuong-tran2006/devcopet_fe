@@ -90,11 +90,11 @@ const CodeSnippetCard = ({
   if (!codeSnippet) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-[0_18px_36px_rgba(15,23,42,0.14)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
-      <div className="border-b border-slate-800 bg-slate-900 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3] dark:border-[#263b44] dark:bg-[#0a161c]">
+    <div className="overflow-hidden rounded-xl border border-slate-300 bg-slate-50 shadow-[0_12px_28px_rgba(15,23,42,0.10)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
+      <div className="border-b border-slate-300 bg-slate-100 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-violet-700 dark:border-[#263b44] dark:bg-[#0a161c] dark:text-[#63f1e3]">
         {codeSnippet.language}
       </div>
-      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-on-surface">
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-slate-950 dark:text-on-surface">
         <code>{codeSnippet.code}</code>
       </pre>
     </div>
@@ -232,7 +232,8 @@ const MediumNodeChallengePage = () => {
   const dragDropChallenge = isDragDrop
     ? (challenge as MediumDragDropChallenge)
     : null;
-  const canEditDragDrop = !isLockedMode && !isReviewMode && !result && !isExpired;
+  const canEditDragDrop =
+    !isLockedMode && !isReviewMode && !result && !isExpired;
   const activeNavigation = getNavigationForResponse(
     result?.navigation,
     data?.navigation,
@@ -243,6 +244,7 @@ const MediumNodeChallengePage = () => {
     petName,
   );
   const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
+  const xpReward = rewardItems.find((item) => item.type === "xp")?.amount ?? 0;
 
   const options = useMemo(
     () => sortOptions(multipleChoiceChallenge?.options ?? []),
@@ -320,7 +322,7 @@ const MediumNodeChallengePage = () => {
         setSessionId(sessionRes.sessionId);
         setSessionExpiresAt(sessionRes.expiresAt);
         setSessionServerNow(sessionRes.serverNow);
-        
+
         setData(challengeRes);
         if (challengeRes.review?.selectedOptionId) {
           setSelectedOptionId(challengeRes.review.selectedOptionId);
@@ -338,7 +340,7 @@ const MediumNodeChallengePage = () => {
           err?.response?.data?.code ||
           err?.message ||
           "Unable to load challenge details.";
-        
+
         if (errMsg === "TIME_EXPIRED") {
           setError("Time expired");
           setTimeout(() => {
@@ -361,7 +363,8 @@ const MediumNodeChallengePage = () => {
     const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
 
     const updateTimer = () => {
-      const remaining = new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      const remaining =
+        new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
       if (remaining <= 0) {
         setRemainingTime(0);
         setIsExpired(true);
@@ -429,7 +432,15 @@ const MediumNodeChallengePage = () => {
   };
 
   const submitChallenge = () => {
-    if (!nodeId || !challenge || submitting || result || isReviewMode || isExpired) return;
+    if (
+      !nodeId ||
+      !challenge ||
+      submitting ||
+      result ||
+      isReviewMode ||
+      isExpired
+    )
+      return;
 
     if (!sessionId) {
       setSubmitError("Session required. Please refresh the page.");
@@ -457,7 +468,10 @@ const MediumNodeChallengePage = () => {
     courseApi
       .submitMediumNodeChallenge(nodeId, payload, sessionId)
       .then((response) => {
-        if (response.message === "TIME_EXPIRED" || (response as any).code === "TIME_EXPIRED") {
+        if (
+          response.message === "TIME_EXPIRED" ||
+          (response as any).code === "TIME_EXPIRED"
+        ) {
           setSubmitError("Time expired");
           setTimeout(() => {
             goBackToRoadmap();
@@ -465,7 +479,10 @@ const MediumNodeChallengePage = () => {
           return;
         }
 
-        if (response.message === "SESSION_REQUIRED" || (response as any).code === "SESSION_REQUIRED") {
+        if (
+          response.message === "SESSION_REQUIRED" ||
+          (response as any).code === "SESSION_REQUIRED"
+        ) {
           setSubmitError("Session required. Please refresh the page.");
           return;
         }
@@ -653,7 +670,7 @@ const MediumNodeChallengePage = () => {
       return "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#2b171a] dark:text-red-100";
     }
     if (isSelected) {
-      return "border-teal-600 bg-teal-50 text-slate-950 dark:border-[#63f1e3] dark:bg-[#13282d] dark:text-on-surface";
+      return "border-violet-700 bg-violet-50 text-slate-950 shadow-[0_0_0_1px_rgba(109,40,217,0.12)] dark:border-[#63f1e3] dark:bg-[#13282d] dark:text-on-surface";
     }
     return "border-slate-200 bg-white text-slate-800 hover:border-teal-500/60 hover:bg-teal-50/60 hover:text-slate-950 dark:border-[#1c2b33] dark:bg-[#10191f] dark:text-on-surface-variant dark:hover:border-[#63f1e3]/35 dark:hover:text-on-surface";
   };
@@ -711,6 +728,9 @@ const MediumNodeChallengePage = () => {
   const feedbackHint = shouldShowLearningDetails
     ? getChallengeHint(challenge)
     : "";
+  const shouldShowExplanation = Boolean(
+    isReviewMode || (result && result.correct),
+  );
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
@@ -730,7 +750,11 @@ const MediumNodeChallengePage = () => {
       )}
 
       {!loading && !error && data && challenge && (
-        <div className="w-full max-w-[800px] flex flex-col">
+        <div
+          className={`w-full flex flex-col transition-[max-width] duration-300 ${
+            shouldShowExplanation ? "max-w-[1400px]" : "max-w-[800px]"
+          }`}
+        >
           {/* Back navigation */}
           <div className="flex justify-between items-center mb-6 w-full">
             <button
@@ -780,8 +804,12 @@ const MediumNodeChallengePage = () => {
             )}
 
             {!isLockedMode && (
-              <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
-                <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
+              <div
+                className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)] ${
+                  shouldShowExplanation ? "challenge-with-explanation" : ""
+                }`}
+              >
+                <div className="challenge-card-header border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
@@ -805,7 +833,7 @@ const MediumNodeChallengePage = () => {
                   </div>
                 </div>
 
-                <div className="border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
+                <div className="challenge-question-section border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
                   <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                     {challenge.question}
                   </p>
@@ -826,12 +854,20 @@ const MediumNodeChallengePage = () => {
                         <span className="text-[15px] font-semibold">
                           {option.id}) {option.text}
                         </span>
-                        {correctOptionId === option.id && (
-                          <LucideIcon
-                            name="check_circle"
-                            className="text-[18px]"
-                          />
-                        )}
+                        <span
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                            correctOptionId === option.id
+                              ? "border-teal-600 bg-teal-600 text-white dark:border-[#63f1e3] dark:bg-[#63f1e3] dark:text-[#052023]"
+                              : selectedOptionId === option.id
+                                ? "border-violet-700 bg-violet-100 text-violet-700 dark:border-[#63f1e3] dark:bg-[#63f1e3]/15 dark:text-[#63f1e3]"
+                                : "border-slate-500 text-transparent dark:border-on-surface-variant"
+                          }`}
+                        >
+                          {(correctOptionId === option.id ||
+                            selectedOptionId === option.id) && (
+                            <LucideIcon name="check" className="text-[15px]" />
+                          )}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -1012,16 +1048,22 @@ const MediumNodeChallengePage = () => {
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
                     onClick={submitChallenge}
-                    disabled={!canSubmit || submitting || isExpired || !sessionId}
+                    disabled={
+                      !canSubmit || submitting || isExpired || !sessionId
+                    }
                     className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-medium/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
-                    {isExpired ? "Time expired" : submitting ? "Submitting..." : "Submit Answer"}
+                    {isExpired
+                      ? "Time expired"
+                      : submitting
+                        ? "Submitting..."
+                        : "Submit Answer"}
                   </button>
                 )}
 
                 {/* Inline Explanation and Navigation Section */}
                 {(isReviewMode || (result && result.correct)) && (
-                  <div className="mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
+                  <div className="challenge-explanation-panel mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
                     {/* Explanation box */}
                     <div className="rounded-xl border border-teal-500/30 bg-teal-50 p-6 shadow-[inset_0_0_12px_rgba(13,148,136,0.05)] dark:border-[#63f1e3]/30 dark:bg-[#10262c] dark:shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
                       <div className="mb-4 flex items-center gap-3">
@@ -1075,7 +1117,7 @@ const MediumNodeChallengePage = () => {
                   <LucideIcon name="close" className="text-[22px]" />
                 </button>
 
-                <div className="overflow-y-auto rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
                   <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
                     <LucideIcon name="star" className="text-[46px]" />
                   </div>
@@ -1095,11 +1137,6 @@ const MediumNodeChallengePage = () => {
                         <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
                           “{result.message || "Correct. Nice work."}”
                         </p>
-                        {result.explanation && (
-                          <p className="mt-2 text-[12px] leading-relaxed text-on-surface-variant/80">
-                            {result.explanation}
-                          </p>
-                        )}
                         <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
                           {speakerName}
                         </p>
@@ -1107,28 +1144,13 @@ const MediumNodeChallengePage = () => {
                     </div>
                   </div>
 
-                  <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {rewardItems.map((item, index) => {
-                      const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
-                      return (
-                        <div
-                          key={`${item.type}-${item.label}-${index}`}
-                          className={`rounded-lg bg-[#243932] px-4 py-4 text-center ${
-                            isLastOdd ? "sm:col-span-2" : ""
-                          }`}
-                        >
-                          <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                            {item.label}
-                          </p>
-                          <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                            +{item.amount}
-                          </p>
-                          <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
-                            {item.type}
-                          </p>
-                        </div>
-                      );
-                    })}
+                  <div className="mt-7 rounded-lg bg-[#243932] px-4 py-5 text-center">
+                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                      XP Earned
+                    </p>
+                    <p className="mt-2 text-[28px] font-extrabold leading-none text-[#63f1e3]">
+                      +{xpReward} XP
+                    </p>
                   </div>
 
                   <button

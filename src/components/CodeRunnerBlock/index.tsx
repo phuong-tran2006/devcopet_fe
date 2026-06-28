@@ -127,15 +127,15 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   };
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden border border-[#d8e2ec] bg-[#f5f8fb] shadow-sm">
+    <div className="my-6 rounded-xl overflow-hidden border border-outline/20 bg-surface-container shadow-sm transition-colors duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#edf3f8] border-b border-[#d8e2ec]">
+      <div className="flex items-center justify-between px-4 py-3 bg-surface-container-high border-b border-outline/20">
         <div className="flex items-center gap-2">
           <LucideIcon
             name="code_blocks"
-            className="text-[18px] text-[#207985]"
+            className="text-[18px] text-primary-fixed-dim"
           />
-          <span className="text-[12px] font-bold text-[#253447] tracking-widest uppercase">
+          <span className="text-[12px] font-bold text-on-surface tracking-widest uppercase">
             {title}
           </span>
         </div>
@@ -144,7 +144,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           <button
             onClick={handleReset}
             disabled={status === "running" || status === "loading"}
-            className="text-[12px] font-bold text-[#637386] hover:text-[#1f2f43] transition-colors disabled:opacity-50 flex items-center gap-1"
+            className="flex items-center gap-1 rounded-lg border border-outline/40 bg-surface-container-lowest px-3 py-1.5 text-[12px] font-bold text-on-surface shadow-sm transition-colors hover:border-primary hover:bg-surface-container disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             <LucideIcon name="refresh" className="text-[16px]" />
             RESET
@@ -153,7 +153,7 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           <button
             onClick={handleRun}
             disabled={status === "running" || status === "loading"}
-            className="flex items-center gap-1 bg-primary-fixed-dim hover:bg-primary-fixed text-on-primary-fixed text-[13px] font-bold px-4 py-1.5 rounded-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1 bg-primary hover:bg-primary/85 text-on-primary text-[13px] font-bold px-4 py-1.5 rounded-lg border border-primary shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-high"
           >
             {status === "running" || status === "loading" ? (
               <div className="w-3.5 h-3.5 border-2 border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
@@ -166,22 +166,22 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
       </div>
 
       {/* Editor */}
-      <div className="p-4 border-b border-[#d8e2ec] bg-[#f8fbfd] relative group">
+      <div className="p-4 border-b border-outline/20 bg-surface-container-low relative group">
         <textarea
           ref={textareaRef}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck="false"
-          className="custom-scrollbar w-full bg-transparent text-[#263447] placeholder:text-[#7b8da1] font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none selection:bg-[#cce7ee]"
+          className="custom-scrollbar code-runner-editor w-full bg-transparent text-on-surface placeholder:text-on-surface-variant font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none selection:bg-primary-fixed-dim/30"
           style={{ fontFamily: "Roboto Mono, monospace" }}
         />
       </div>
 
       {/* Output Panel */}
-      <div className="bg-[#eef4f8] p-4 relative">
+      <div className="bg-surface-container-high p-4 relative">
         <div className="flex items-center gap-2 mb-2">
-          <span className="text-[11px] font-bold text-[#637386] uppercase tracking-widest">
+          <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
             Output
           </span>
           {status === "loading" && (
@@ -191,14 +191,14 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
         <pre
           className={`font-mono text-[13.5px] leading-relaxed whitespace-pre-wrap ${
             status === "loading"
-              ? "animate-pulse text-[#207985]"
+              ? "animate-pulse text-primary-fixed-dim"
               : output.includes("timed out")
-                ? "text-amber-600"
+                ? "text-amber-500"
                 : status === "error"
-                  ? "text-red-600"
+                  ? "text-error"
                   : status === "done"
-                    ? "text-emerald-700"
-                    : "text-[#4c5e73]"
+                    ? "text-emerald-500"
+                    : "text-on-surface-variant"
           }`}
         >
           {output}

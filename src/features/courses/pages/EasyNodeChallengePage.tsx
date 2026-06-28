@@ -104,7 +104,7 @@ const EasyNodeChallengePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [xpToast, setXpToast] = useState<number | null>(null);
-  
+
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [sessionExpiresAt, setSessionExpiresAt] = useState<string | null>(null);
   const [sessionServerNow, setSessionServerNow] = useState<string | null>(null);
@@ -120,7 +120,10 @@ const EasyNodeChallengePage = () => {
   const userExp = Number(currentUser?.lifetimeXp ?? 0);
   const userStars = currentUser?.coins ?? 0;
   const nextLevelXp = Number(currentUser?.nextLevelXp ?? 1000);
-  const levelProgress = nextLevelXp > 0 ? Math.min(100, Math.round((userExp / nextLevelXp) * 100)) : 0;
+  const levelProgress =
+    nextLevelXp > 0
+      ? Math.min(100, Math.round((userExp / nextLevelXp) * 100))
+      : 0;
   const codeSnippet =
     challenge?.promptType === "code_mcq" ? challenge.codeSnippet : undefined;
   const activeNavigation = getNavigationForResponse(
@@ -133,6 +136,7 @@ const EasyNodeChallengePage = () => {
     petName,
   );
   const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
+  const xpReward = rewardItems.find((item) => item.type === "xp")?.amount ?? 0;
 
   const options = useMemo(
     () => sortOptions(challenge?.options ?? []),
@@ -177,7 +181,7 @@ const EasyNodeChallengePage = () => {
           err?.response?.data?.code ||
           err?.message ||
           "Unable to load challenge details.";
-        
+
         if (errMsg === "TIME_EXPIRED") {
           setError("Time expired");
           setTimeout(() => {
@@ -200,7 +204,8 @@ const EasyNodeChallengePage = () => {
     const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
 
     const updateTimer = () => {
-      const remaining = new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      const remaining =
+        new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
       if (remaining <= 0) {
         setRemainingTime(0);
         setIsExpired(true);
@@ -268,7 +273,14 @@ const EasyNodeChallengePage = () => {
   };
 
   const submitAnswer = () => {
-    if (!nodeId || !selectedOptionId || !canAnswer || submitting || result || isExpired) {
+    if (
+      !nodeId ||
+      !selectedOptionId ||
+      !canAnswer ||
+      submitting ||
+      result ||
+      isExpired
+    ) {
       return;
     }
 
@@ -284,7 +296,10 @@ const EasyNodeChallengePage = () => {
     courseApi
       .submitEasyNodeChallenge(nodeId, selectedOptionId, sessionId)
       .then((response) => {
-        if (response.message === "TIME_EXPIRED" || (response as any).code === "TIME_EXPIRED") {
+        if (
+          response.message === "TIME_EXPIRED" ||
+          (response as any).code === "TIME_EXPIRED"
+        ) {
           setSubmitError("Time expired");
           setTimeout(() => {
             goBackToRoadmap();
@@ -292,7 +307,10 @@ const EasyNodeChallengePage = () => {
           return;
         }
 
-        if (response.message === "SESSION_REQUIRED" || (response as any).code === "SESSION_REQUIRED") {
+        if (
+          response.message === "SESSION_REQUIRED" ||
+          (response as any).code === "SESSION_REQUIRED"
+        ) {
           setSubmitError("Session required. Please refresh the page.");
           return;
         }
@@ -429,9 +447,15 @@ const EasyNodeChallengePage = () => {
     setSelectedOptionId(null);
   };
 
+  const shouldShowExplanation = Boolean(isReviewMode || result?.correct);
+
   return (
     <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
-      <div className="w-full max-w-[800px] flex flex-col">
+      <div
+        className={`w-full flex flex-col transition-[max-width] duration-300 ${
+          shouldShowExplanation ? "max-w-[1400px]" : "max-w-[800px]"
+        }`}
+      >
         {/* Back navigation */}
         <div className="flex justify-between items-center mb-6 w-full">
           <button
@@ -498,8 +522,12 @@ const EasyNodeChallengePage = () => {
                   </p>
                 </div>
 
-                <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
-                  <div className="border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
+                <div
+                  className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)] ${
+                    shouldShowExplanation ? "challenge-with-explanation" : ""
+                  }`}
+                >
+                  <div className="challenge-card-header border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div className="min-w-0">
                         <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
@@ -516,15 +544,15 @@ const EasyNodeChallengePage = () => {
                     </div>
                   </div>
 
-                  <div className="border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
+                  <div className="challenge-question-section border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
                     <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                       {challenge.question}
                     </p>
 
                     {codeSnippet && (
-                      <div className="mt-5 overflow-hidden rounded-xl border border-slate-200 bg-slate-950 shadow-[0_18px_36px_rgba(15,23,42,0.14)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
-                        <div className="flex items-center justify-between gap-3 border-b border-slate-800 bg-slate-900 px-4 py-3 dark:border-[#263b44] dark:bg-[#0a161c]">
-                          <div className="flex min-w-0 items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                      <div className="mt-5 overflow-hidden rounded-xl border border-slate-300 bg-slate-50 shadow-[0_12px_28px_rgba(15,23,42,0.10)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
+                        <div className="flex items-center justify-between gap-3 border-b border-slate-300 bg-slate-100 px-4 py-3 dark:border-[#263b44] dark:bg-[#0a161c]">
+                          <div className="flex min-w-0 items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-teal-700 dark:text-[#63f1e3]">
                             <LucideIcon name="code" className="text-[18px]" />
                             <span>
                               {formatCodeLanguage(codeSnippet.language)}
@@ -533,7 +561,7 @@ const EasyNodeChallengePage = () => {
                           <button
                             type="button"
                             onClick={copyCodeSnippet}
-                            className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800 px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-200 transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3] dark:border-[#263b44] dark:bg-[#101f25] dark:text-on-surface-variant"
+                            className="inline-flex items-center gap-2 rounded-lg border border-slate-400 bg-white px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-slate-800 transition hover:border-teal-600 hover:text-teal-700 dark:border-[#263b44] dark:bg-[#101f25] dark:text-on-surface-variant dark:hover:border-[#63f1e3]/45 dark:hover:text-[#63f1e3]"
                           >
                             <LucideIcon
                               name={copiedCode ? "check" : "content_copy"}
@@ -542,7 +570,7 @@ const EasyNodeChallengePage = () => {
                             {copiedCode ? "Copied" : "Copy"}
                           </button>
                         </div>
-                        <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-slate-100 md:text-[16px] dark:text-[#d7f7f4]">
+                        <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-slate-950 md:text-[16px] dark:text-[#d7f7f4]">
                           <code>{codeSnippet.code}</code>
                         </pre>
                       </div>
@@ -559,7 +587,11 @@ const EasyNodeChallengePage = () => {
                         key={option.id}
                         type="button"
                         disabled={
-                          !canAnswer || isReviewMode || !!result || submitting || isExpired
+                          !canAnswer ||
+                          isReviewMode ||
+                          !!result ||
+                          submitting ||
+                          isExpired
                         }
                         onClick={() => {
                           if (!canAnswer || isReviewMode || result) return;
@@ -577,11 +609,12 @@ const EasyNodeChallengePage = () => {
                             isCorrectOption(option.id)
                               ? "border-[#63f1e3] bg-[#63f1e3] text-[#052023]"
                               : selectedOptionId === option.id
-                                ? "border-[#63f1e3]"
-                                : "border-on-surface-variant"
+                                ? "border-teal-600 bg-teal-100 text-teal-700 dark:border-[#63f1e3] dark:bg-[#63f1e3]/15 dark:text-[#63f1e3]"
+                                : "border-slate-500 dark:border-on-surface-variant"
                           }`}
                         >
-                          {isCorrectOption(option.id) && (
+                          {(isCorrectOption(option.id) ||
+                            selectedOptionId === option.id) && (
                             <LucideIcon name="check" className=" text-[15px]" />
                           )}
                         </span>
@@ -617,16 +650,25 @@ const EasyNodeChallengePage = () => {
                   {canAnswer && !result && !isReviewMode && (
                     <button
                       onClick={submitAnswer}
-                      disabled={!selectedOptionId || submitting || isExpired || !sessionId}
+                      disabled={
+                        !selectedOptionId ||
+                        submitting ||
+                        isExpired ||
+                        !sessionId
+                      }
                       className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-easy px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-easy/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                     >
-                      {isExpired ? "Time expired" : submitting ? "Submitting..." : "Submit Answer"}
+                      {isExpired
+                        ? "Time expired"
+                        : submitting
+                          ? "Submitting..."
+                          : "Submit Answer"}
                     </button>
                   )}
 
                   {/* Inline Explanation and Navigation Section */}
                   {(isReviewMode || result?.correct) && (
-                    <div className="mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
+                    <div className="challenge-explanation-panel mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
                       {/* Explanation box */}
                       <div className="rounded-xl border border-teal-500/30 bg-teal-50 p-6 shadow-[inset_0_0_12px_rgba(13,148,136,0.05)] dark:border-[#63f1e3]/30 dark:bg-[#10262c] dark:shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
                         <div className="mb-4 flex items-center gap-3">
@@ -681,7 +723,7 @@ const EasyNodeChallengePage = () => {
                       <LucideIcon name="close" className=" text-[22px]" />
                     </button>
 
-                    <div className="overflow-y-auto rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                    <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
                       <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
                         <LucideIcon name="star" className=" text-[46px]" />
                       </div>
@@ -701,11 +743,6 @@ const EasyNodeChallengePage = () => {
                             <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
                               “{result.message}”
                             </p>
-                            {result.explanation && (
-                              <p className="mt-2 text-[12px] leading-relaxed text-on-surface-variant/80">
-                                {result.explanation}
-                              </p>
-                            )}
                             <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
                               {speakerName}
                             </p>
@@ -713,28 +750,13 @@ const EasyNodeChallengePage = () => {
                         </div>
                       </div>
 
-                      <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {rewardItems.map((item, index) => {
-                          const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
-                          return (
-                            <div
-                              key={`${item.type}-${item.label}-${index}`}
-                              className={`rounded-lg bg-teal-50 px-4 py-4 text-center dark:bg-[#243932] ${
-                                isLastOdd ? "sm:col-span-2" : ""
-                              }`}
-                            >
-                              <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                                {item.label}
-                              </p>
-                              <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                                +{item.amount}
-                              </p>
-                              <p className="text-[18px] font-bold text-[#63f1e3] uppercase">
-                                {item.type}
-                              </p>
-                            </div>
-                          );
-                        })}
+                      <div className="mt-7 rounded-lg bg-teal-50 px-4 py-5 text-center dark:bg-[#243932]">
+                        <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                          XP Earned
+                        </p>
+                        <p className="mt-2 text-[28px] font-extrabold leading-none text-teal-700 dark:text-[#63f1e3]">
+                          +{xpReward} XP
+                        </p>
                       </div>
 
                       <button
