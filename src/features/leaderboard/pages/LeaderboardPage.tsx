@@ -39,8 +39,8 @@ const toDisplayUser = (user: LeaderboardUser): DisplayUser => ({
   name: getDisplayName(user),
   level: `Lvl ${user.level ?? 1}`,
   badge: getBadge(user.level),
-  currentXp: Number(user.currentXp ?? 0),
-  currentXpFormatted: Number(user.currentXp ?? 0).toLocaleString(),
+  currentXp: Number(user.lifetimeXp ?? 0),
+  currentXpFormatted: Number(user.lifetimeXp ?? 0).toLocaleString(),
   avatarUrl: user.avatarUrl,
 });
 
@@ -57,7 +57,7 @@ const getPodiumStyle = (rank: number) => {
       avatarSize: "h-32 w-32 text-3xl",
       badgeSize: "h-9 w-9 text-[18px]",
       title: "text-[24px]",
-      pointsLabel: "Available XP",
+      pointsLabel: "Lifetime XP",
       icon: "emoji_events",
     };
   }
@@ -74,7 +74,7 @@ const getPodiumStyle = (rank: number) => {
       avatarSize: "h-24 w-24 text-[24px]",
       badgeSize: "h-7 w-7 text-[13px]",
       title: "text-[18px]",
-      pointsLabel: "Available XP",
+      pointsLabel: "Lifetime XP",
       icon: null,
     };
   }
@@ -90,7 +90,7 @@ const getPodiumStyle = (rank: number) => {
     avatarSize: "h-24 w-24 text-2xl",
     badgeSize: "h-7 w-7 text-[13px]",
     title: "text-[18px]",
-    pointsLabel: "Available XP",
+    pointsLabel: "Lifetime XP",
     icon: null,
   };
 };
@@ -366,7 +366,7 @@ const LeaderboardPage = () => {
                       <div className="flex items-center gap-8 ml-auto pl-4">
                         <div className="hidden md:flex flex-col items-end">
                           <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                            Available XP
+                            Lifetime XP
                           </span>
                           <span className="text-[13px] font-mono font-semibold text-on-surface">
                             {user.currentXpFormatted}
@@ -405,7 +405,7 @@ const LeaderboardPage = () => {
                   <div className="flex items-center gap-8 ml-auto pl-4">
                     <div className="hidden md:flex flex-col items-end">
                       <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                        Available XP
+                        Lifetime XP
                       </span>
                       <span className="text-[13px] font-mono font-bold text-on-surface">
                         {currentUserRank.currentXpFormatted}

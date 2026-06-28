@@ -16,7 +16,7 @@ const PlayerCard = ({
   petUrl = "/axolotl.png",
 }: PlayerCardProps) => {
   return (
-    <div className="relative w-full max-w-[280px] aspect-[4/3] rounded-2xl dark:bg-[#1a252e] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-colors duration-300">
+    <div className="relative w-full max-w-[280px] min-h-[210px] py-4 rounded-2xl dark:bg-[#1a252e] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-colors duration-300">
       <div className="absolute inset-0 dark:bg-gradient-to-br dark:from-[#00ffff]/5 dark:to-transparent bg-gradient-to-br from-primary/5 to-transparent pointer-events-none" />
 
       <div className="absolute top-3 right-3 dark:bg-[#41697e] bg-primary/20 dark:text-[#b8f5f5] text-primary text-[10px] font-black px-2.5 py-1 rounded-lg tracking-wider transition-colors duration-300">

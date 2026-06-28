@@ -528,6 +528,14 @@ export interface SubmitHardNodeChallengeResponse {
   navigation?: ChallengeNavigation;
 }
 
+export interface StartChallengeSessionResponse {
+  sessionId: string;
+  startedAt: string;
+  expiresAt: string;
+  serverNow: string;
+  timeLimitSeconds: number;
+}
+
 export const courseApi = {
   getCourses: async () => {
     const response = await api.get(`/courses`);
@@ -571,13 +579,25 @@ export const courseApi = {
     return response.data;
   },
 
+  startRoadmapChallengeSession: async (
+    courseSlug: string,
+    mode: RoadmapMode,
+    nodeId: string,
+  ): Promise<StartChallengeSessionResponse> => {
+    const response = await api.post(
+      `/roadmaps/${courseSlug}/${mode}/nodes/${nodeId}/session/start`,
+    );
+    return response.data;
+  },
+
   submitEasyNodeChallenge: async (
     nodeId: string,
     selectedOptionId: EasyChallengeOptionId,
+    sessionId?: string,
   ): Promise<SubmitEasyNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/easy/nodes/${nodeId}/challenge/submit`,
-      { selectedOptionId },
+      { selectedOptionId, sessionId, answer: selectedOptionId },
     );
     return response.data;
   },
@@ -601,10 +621,11 @@ export const courseApi = {
   submitMediumNodeChallenge: async (
     nodeId: string,
     payload: SubmitMediumNodeChallengePayload,
+    sessionId?: string,
   ): Promise<SubmitMediumNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
-      payload,
+      { ...payload, sessionId, answer: payload },
     );
     return response.data;
   },
@@ -624,10 +645,11 @@ export const courseApi = {
   submitHardNodeChallenge: async (
     nodeId: string,
     payload: SubmitHardNodeChallengePayload,
+    sessionId?: string,
   ): Promise<SubmitHardNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/hard/nodes/${nodeId}/challenge/submit`,
-      payload,
+      { ...payload, sessionId, answer: payload },
     );
     return response.data;
   },

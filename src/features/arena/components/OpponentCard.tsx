@@ -13,7 +13,7 @@ interface OpponentCardProps {
 const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
   return (
     <div
-      className={`relative w-full max-w-[280px] aspect-[4/3] rounded-2xl dark:bg-[#1e262f] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${status === "idle" ? "opacity-70" : "opacity-90"}`}
+      className={`relative w-full max-w-[280px] min-h-[210px] py-4 rounded-2xl dark:bg-[#1e262f] bg-surface-container-high border dark:border-white/5 border-outline/10 shadow-xl flex flex-col items-center justify-center overflow-hidden transition-all duration-300 ${status === "idle" ? "opacity-70" : "opacity-90"}`}
     >
       <div className="absolute top-3 left-3 dark:bg-[#3d2a32] bg-error/20 dark:text-[#d69ba2] text-error text-[10px] font-black px-2.5 py-1 rounded-lg tracking-wider transition-colors duration-300">
         RIVAL

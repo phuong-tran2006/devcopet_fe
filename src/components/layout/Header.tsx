@@ -10,6 +10,7 @@ import {
 import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
 import NotificationDropdown from "./NotificationDropdown";
+import DailyMissionDropdown from "./DailyMissionDropdown";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
@@ -32,6 +33,18 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isOnboarding = location.pathname === "/onboarding";
+
+  const [activeDropdown, setActiveDropdown] = React.useState<"notifications" | "missions" | null>(null);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActiveDropdown(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -81,12 +94,24 @@ const Header = () => {
           {isAuthenticated ? (
             <>
               {!isOnboarding && (
-                <button
-                  onClick={() => triggerHaptic(40)}
-                  className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
-                >
-                  <LucideIcon name="notifications" className="text-[20px]" />
-                </button>
+                <>
+                  <NotificationDropdown
+                    isOpen={activeDropdown === "notifications"}
+                    onToggle={() => {
+                      triggerHaptic(40);
+                      setActiveDropdown(activeDropdown === "notifications" ? null : "notifications");
+                    }}
+                    onClose={() => setActiveDropdown(null)}
+                  />
+                  <DailyMissionDropdown
+                    isOpen={activeDropdown === "missions"}
+                    onToggle={() => {
+                      triggerHaptic(40);
+                      setActiveDropdown(activeDropdown === "missions" ? null : "missions");
+                    }}
+                    onClose={() => setActiveDropdown(null)}
+                  />
+                </>
               )}
               <button
                 onClick={toggleTheme}

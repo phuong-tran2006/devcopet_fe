@@ -36,11 +36,18 @@ const MatchmakingPage = () => {
     if (status === "accepting") {
       setModalTimeLeft(acceptTimeoutSeconds || 5);
       const interval = setInterval(() => {
-        setModalTimeLeft((prev) => Math.max(0, prev - 1));
+        setModalTimeLeft((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            declineMatch();
+            return 0;
+          }
+          return prev - 1;
+        });
       }, 1000);
       return () => clearInterval(interval);
     }
-  }, [status, acceptTimeoutSeconds]);
+  }, [status, acceptTimeoutSeconds, declineMatch]);
 
   // Automatically navigate to active battle room when match starts
   useEffect(() => {
@@ -101,8 +108,8 @@ const MatchmakingPage = () => {
         </p>
       </div>
 
-      <div className="relative flex items-center justify-center gap-4 sm:gap-6 lg:gap-10 w-full max-w-4xl">
-        <div className="flex-1 flex justify-end">
+      <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 md:gap-10 items-center justify-items-center px-4">
+        <div className="w-full flex justify-center md:justify-end">
           <PlayerCard
             name={
               me?.username ||
@@ -117,7 +124,7 @@ const MatchmakingPage = () => {
           />
         </div>
 
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-1.5 pointer-events-none">
+        <div className="flex flex-col items-center gap-1.5 z-20 my-4 md:my-0">
           <div
             className="w-12 h-12 rounded-full dark:bg-[#1e2e38] bg-surface-container-high border-4 dark:border-[#081015] border-surface shadow-2xl flex items-center justify-center transition-colors duration-300"
             style={{ color: "var(--md-sys-color-primary)" }}
@@ -132,7 +139,7 @@ const MatchmakingPage = () => {
           </span>
         </div>
 
-        <div className="flex-1 flex justify-start">
+        <div className="w-full flex justify-center md:justify-start">
           <OpponentCard status={visualStatus} opponent={opponent} />
         </div>
       </div>
@@ -149,7 +156,7 @@ const MatchmakingPage = () => {
           </div>
         )}
 
-        {status === "idle" && (
+        {(status === "idle" || status === "error") && (
           <button
             type="button"
             onClick={handleStartSearch}
@@ -186,45 +193,47 @@ const MatchmakingPage = () => {
             </div>
 
             {/* Circular Timer Visual */}
-            <div className="relative w-20 h-20 flex items-center justify-center mb-6">
-              <svg className="w-full h-full transform -rotate-90">
+            <div className="relative w-[120px] h-[120px] flex items-center justify-center mb-6">
+              <svg className="w-full h-full transform -rotate-90 overflow-visible" viewBox="0 0 120 120">
                 <circle
-                  cx="40"
-                  cy="40"
-                  r="34"
+                  cx="60"
+                  cy="60"
+                  r="50"
                   className="stroke-surface-container-high fill-none"
-                  strokeWidth="6"
+                  strokeWidth="8"
                 />
                 <circle
-                  cx="40"
-                  cy="40"
-                  r="34"
+                  cx="60"
+                  cy="60"
+                  r="50"
                   className="stroke-error fill-none transition-all duration-1000 ease-linear"
-                  strokeWidth="6"
-                  strokeDasharray="213.6"
+                  strokeWidth="8"
+                  strokeDasharray="314.16"
                   strokeDashoffset={
-                    213.6 -
-                    (213.6 * modalTimeLeft) / (acceptTimeoutSeconds || 5)
+                    314.16 -
+                    (314.16 * modalTimeLeft) / (acceptTimeoutSeconds || 5)
                   }
                   strokeLinecap="round"
                 />
               </svg>
-              <span className="absolute text-2xl font-mono font-black text-on-surface">
+              <span className="absolute inset-0 flex items-center justify-center text-3xl font-mono font-black text-on-surface">
                 {modalTimeLeft}
               </span>
             </div>
 
             {/* 2 Player Cards VS Container inside Modal */}
-            <div className="flex items-center justify-center gap-4 sm:gap-6 w-full max-w-lg mb-8">
-              <PlayerCard
-                name={me?.username || currentUser?.username || "You"}
-                level={Number(currentUser?.level) || 1}
-                rank={me?.arenaRank || matchTier || "Beginner"}
-                rating={me?.arenaRating}
-                avatarUrl={me?.avatarUrl || (currentUser?.avatarUrl as string)}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-6 items-center justify-items-center w-full max-w-xl mb-8">
+              <div className="w-full flex justify-center md:justify-end">
+                <PlayerCard
+                  name={me?.username || currentUser?.username || "You"}
+                  level={Number(currentUser?.level) || 1}
+                  rank={me?.arenaRank || matchTier || "Beginner"}
+                  rating={me?.arenaRating}
+                  avatarUrl={me?.avatarUrl || (currentUser?.avatarUrl as string)}
+                />
+              </div>
 
-              <div className="flex flex-col items-center gap-1.5 shrink-0">
+              <div className="flex flex-col items-center gap-1.5 shrink-0 my-2 md:my-0">
                 <div className="w-10 h-10 rounded-full bg-error-container border-2 border-error/30 flex items-center justify-center text-error animate-pulse">
                   <LucideIcon name="bolt" className="text-[20px]" />
                 </div>
@@ -233,7 +242,9 @@ const MatchmakingPage = () => {
                 </span>
               </div>
 
-              <OpponentCard status="found" opponent={opponent} />
+              <div className="w-full flex justify-center md:justify-start">
+                <OpponentCard status="found" opponent={opponent} />
+              </div>
             </div>
 
             {/* Action buttons inside Modal */}

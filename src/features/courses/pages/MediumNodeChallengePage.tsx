@@ -176,6 +176,14 @@ const FeedbackPanel = ({
   );
 };
 
+const formatTime = (ms: number | null) => {
+  if (ms === null) return "--:--";
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+
 const MediumNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -207,6 +215,12 @@ const MediumNodeChallengePage = () => {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [xpToast, setXpToast] = useState<number | null>(null);
 
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<string | null>(null);
+  const [sessionServerNow, setSessionServerNow] = useState<string | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
+
   const challenge = data?.challenge ?? null;
   const isReviewMode = data?.node.status === "completed" && !!data.review;
   const isLockedMode = data?.node.status === "locked";
@@ -218,7 +232,7 @@ const MediumNodeChallengePage = () => {
   const dragDropChallenge = isDragDrop
     ? (challenge as MediumDragDropChallenge)
     : null;
-  const canEditDragDrop = !isLockedMode && !isReviewMode && !result;
+  const canEditDragDrop = !isLockedMode && !isReviewMode && !result && !isExpired;
   const activeNavigation = getNavigationForResponse(
     result?.navigation,
     data?.navigation,
@@ -290,30 +304,95 @@ const MediumNodeChallengePage = () => {
     setResult(null);
     setShowSuccessModal(false);
     setSubmitError(null);
+    setSessionId(null);
+    setSessionExpiresAt(null);
+    setSessionServerNow(null);
+    setRemainingTime(null);
+    setIsExpired(false);
 
-    courseApi
-      .getMediumNodeChallenge(nodeId)
-      .then((response) => {
-        setData(response);
-        if (response.review?.selectedOptionId) {
-          setSelectedOptionId(response.review.selectedOptionId);
+    const safeCourseSlug = courseSlug || "python-basic";
+
+    Promise.all([
+      courseApi.startRoadmapChallengeSession(safeCourseSlug, "medium", nodeId),
+      courseApi.getMediumNodeChallenge(nodeId),
+    ])
+      .then(([sessionRes, challengeRes]) => {
+        setSessionId(sessionRes.sessionId);
+        setSessionExpiresAt(sessionRes.expiresAt);
+        setSessionServerNow(sessionRes.serverNow);
+        
+        setData(challengeRes);
+        if (challengeRes.review?.selectedOptionId) {
+          setSelectedOptionId(challengeRes.review.selectedOptionId);
         }
         if (
-          response.review?.challengeType === "drag_drop" &&
-          response.review.selectedDropZoneMap
+          challengeRes.review?.challengeType === "drag_drop" &&
+          challengeRes.review.selectedDropZoneMap
         ) {
-          setDropZoneMap(response.review.selectedDropZoneMap);
+          setDropZoneMap(challengeRes.review.selectedDropZoneMap);
         }
       })
       .catch((err) => {
-        setError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to load challenge details.",
-        );
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to load challenge details.";
+        
+        if (errMsg === "TIME_EXPIRED") {
+          setError("Time expired");
+          setTimeout(() => {
+            navigate({
+              to: "/roadmap/$worldId",
+              params: { worldId: courseSlug || "python-basic" },
+            });
+          }, 2000);
+        } else {
+          setError(errMsg);
+        }
       })
       .finally(() => setLoading(false));
-  }, [nodeId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeId, courseSlug]);
+
+  useEffect(() => {
+    if (!sessionExpiresAt || !sessionServerNow) return;
+
+    const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
+
+    const updateTimer = () => {
+      const remaining = new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      if (remaining <= 0) {
+        setRemainingTime(0);
+        setIsExpired(true);
+        return true;
+      }
+      setRemainingTime(remaining);
+      return false;
+    };
+
+    const expired = updateTimer();
+    if (expired) return;
+
+    const interval = setInterval(() => {
+      const expired = updateTimer();
+      if (expired) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sessionExpiresAt, sessionServerNow]);
+
+  useEffect(() => {
+    if (isExpired) {
+      const timer = setTimeout(() => {
+        goBackToRoadmap();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpired]);
 
   const goBackToRoadmap = () => {
     const target = activeNavigation?.returnToRoadmap;
@@ -350,7 +429,12 @@ const MediumNodeChallengePage = () => {
   };
 
   const submitChallenge = () => {
-    if (!nodeId || !challenge || submitting || result || isReviewMode) return;
+    if (!nodeId || !challenge || submitting || result || isReviewMode || isExpired) return;
+
+    if (!sessionId) {
+      setSubmitError("Session required. Please refresh the page.");
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError(null);
@@ -371,8 +455,21 @@ const MediumNodeChallengePage = () => {
     }
 
     courseApi
-      .submitMediumNodeChallenge(nodeId, payload)
+      .submitMediumNodeChallenge(nodeId, payload, sessionId)
       .then((response) => {
+        if (response.message === "TIME_EXPIRED" || (response as any).code === "TIME_EXPIRED") {
+          setSubmitError("Time expired");
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+          return;
+        }
+
+        if (response.message === "SESSION_REQUIRED" || (response as any).code === "SESSION_REQUIRED") {
+          setSubmitError("Session required. Please refresh the page.");
+          return;
+        }
+
         const { xpAwarded, userProgress, rewardSummary } = response;
         const toastXp = rewardSummary?.xp ?? xpAwarded;
         if (toastXp && toastXp > 0) {
@@ -388,13 +485,30 @@ const MediumNodeChallengePage = () => {
 
         setResult(response);
         setShowSuccessModal(response.correct);
+
+        if (!response.correct) {
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+        }
       })
       .catch((err) => {
-        setSubmitError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to submit this challenge.",
-        );
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to submit this challenge.";
+
+        if (errMsg === "TIME_EXPIRED") {
+          setSubmitError("Time expired");
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+        } else if (errMsg === "SESSION_REQUIRED") {
+          setSubmitError("Session required. Please refresh the page.");
+        } else {
+          setSubmitError(errMsg);
+        }
       })
       .finally(() => setSubmitting(false));
   };
@@ -566,6 +680,7 @@ const MediumNodeChallengePage = () => {
     !isLockedMode &&
     !isReviewMode &&
     !result &&
+    !isExpired &&
     (isMultipleChoice
       ? !!selectedOptionId
       : dropZoneIds.length > 0 &&
@@ -626,7 +741,12 @@ const MediumNodeChallengePage = () => {
               Back to Roadmap
             </button>
 
-            <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+            <div className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+              {remainingTime !== null && (
+                <span className="font-mono text-amber-500 dark:text-amber-400">
+                  {formatTime(remainingTime)}
+                </span>
+              )}
               <span>Medium Checkpoint</span>
             </div>
           </div>
@@ -699,7 +819,7 @@ const MediumNodeChallengePage = () => {
                     {options.map((option) => (
                       <button
                         key={option.id}
-                        disabled={isReviewMode || !!result}
+                        disabled={isReviewMode || !!result || isExpired}
                         onClick={() => setSelectedOptionId(option.id)}
                         className={`flex min-h-[68px] items-center justify-between rounded-lg border px-5 text-left transition duration-200 ${getOptionClass(option.id)}`}
                       >
@@ -892,10 +1012,10 @@ const MediumNodeChallengePage = () => {
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
                     onClick={submitChallenge}
-                    disabled={!canSubmit || submitting}
+                    disabled={!canSubmit || submitting || isExpired || !sessionId}
                     className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-medium/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
-                    {submitting ? "Submitting..." : "Submit Answer"}
+                    {isExpired ? "Time expired" : submitting ? "Submitting..." : "Submit Answer"}
                   </button>
                 )}
 

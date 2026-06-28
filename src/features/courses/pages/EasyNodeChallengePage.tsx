@@ -73,6 +73,14 @@ const normalizeChallengeResponse = (
   return review ? { ...response, review } : response;
 };
 
+const formatTime = (ms: number | null) => {
+  if (ms === null) return "--:--";
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+
 const EasyNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -96,6 +104,12 @@ const EasyNodeChallengePage = () => {
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [xpToast, setXpToast] = useState<number | null>(null);
+  
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<string | null>(null);
+  const [sessionServerNow, setSessionServerNow] = useState<string | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
 
   const challenge = data?.challenge ?? null;
   const review = data?.review ?? null;
@@ -139,21 +153,85 @@ const EasyNodeChallengePage = () => {
     setShowSuccessModal(false);
     setWrongAttempt(null);
     setSubmitError(null);
+    setSessionId(null);
+    setSessionExpiresAt(null);
+    setSessionServerNow(null);
+    setRemainingTime(null);
+    setIsExpired(false);
 
-    courseApi
-      .getEasyNodeChallenge(nodeId)
-      .then((response) => {
-        setData(normalizeChallengeResponse(response));
+    const safeCourseSlug = courseSlug || "python-basic";
+
+    Promise.all([
+      courseApi.startRoadmapChallengeSession(safeCourseSlug, "easy", nodeId),
+      courseApi.getEasyNodeChallenge(nodeId),
+    ])
+      .then(([sessionRes, challengeRes]) => {
+        setSessionId(sessionRes.sessionId);
+        setSessionExpiresAt(sessionRes.expiresAt);
+        setSessionServerNow(sessionRes.serverNow);
+        setData(normalizeChallengeResponse(challengeRes));
       })
       .catch((err) => {
-        setError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to load challenge details.",
-        );
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to load challenge details.";
+        
+        if (errMsg === "TIME_EXPIRED") {
+          setError("Time expired");
+          setTimeout(() => {
+            navigate({
+              to: "/roadmap/$worldId",
+              params: { worldId: courseSlug || "python-basic" },
+            });
+          }, 2000);
+        } else {
+          setError(errMsg);
+        }
       })
       .finally(() => setLoading(false));
-  }, [nodeId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nodeId, courseSlug]);
+
+  useEffect(() => {
+    if (!sessionExpiresAt || !sessionServerNow) return;
+
+    const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
+
+    const updateTimer = () => {
+      const remaining = new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      if (remaining <= 0) {
+        setRemainingTime(0);
+        setIsExpired(true);
+        return true;
+      }
+      setRemainingTime(remaining);
+      return false;
+    };
+
+    const expired = updateTimer();
+    if (expired) return;
+
+    const interval = setInterval(() => {
+      const expired = updateTimer();
+      if (expired) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sessionExpiresAt, sessionServerNow]);
+
+  useEffect(() => {
+    if (isExpired) {
+      const timer = setTimeout(() => {
+        goBackToRoadmap();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpired]);
 
   const goBackToRoadmap = () => {
     const target = activeNavigation?.returnToRoadmap;
@@ -190,7 +268,12 @@ const EasyNodeChallengePage = () => {
   };
 
   const submitAnswer = () => {
-    if (!nodeId || !selectedOptionId || !canAnswer || submitting || result) {
+    if (!nodeId || !selectedOptionId || !canAnswer || submitting || result || isExpired) {
+      return;
+    }
+
+    if (!sessionId) {
+      setSubmitError("Session required. Please refresh the page.");
       return;
     }
 
@@ -199,8 +282,21 @@ const EasyNodeChallengePage = () => {
     setWrongAttempt(null);
 
     courseApi
-      .submitEasyNodeChallenge(nodeId, selectedOptionId)
+      .submitEasyNodeChallenge(nodeId, selectedOptionId, sessionId)
       .then((response) => {
+        if (response.message === "TIME_EXPIRED" || (response as any).code === "TIME_EXPIRED") {
+          setSubmitError("Time expired");
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+          return;
+        }
+
+        if (response.message === "SESSION_REQUIRED" || (response as any).code === "SESSION_REQUIRED") {
+          setSubmitError("Session required. Please refresh the page.");
+          return;
+        }
+
         const { xpAwarded, userProgress, rewardSummary } = response;
         const toastXp = rewardSummary?.xp ?? xpAwarded;
         if (toastXp && toastXp > 0) {
@@ -222,16 +318,31 @@ const EasyNodeChallengePage = () => {
 
         setWrongAttempt({
           optionId: selectedOptionId,
-          message: response.message,
+          message: response.message || "Incorrect answer",
         });
         setSelectedOptionId(null);
+
+        setTimeout(() => {
+          goBackToRoadmap();
+        }, 2000);
       })
       .catch((err) => {
-        setSubmitError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to submit your answer.",
-        );
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to submit your answer.";
+
+        if (errMsg === "TIME_EXPIRED") {
+          setSubmitError("Time expired");
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+        } else if (errMsg === "SESSION_REQUIRED") {
+          setSubmitError("Session required. Please refresh the page.");
+        } else {
+          setSubmitError(errMsg);
+        }
       })
       .finally(() => setSubmitting(false));
   };
@@ -331,7 +442,12 @@ const EasyNodeChallengePage = () => {
             Back to Roadmap
           </button>
 
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+          <div className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+            {remainingTime !== null && (
+              <span className="font-mono text-amber-500 dark:text-amber-400">
+                {formatTime(remainingTime)}
+              </span>
+            )}
             <span>Easy Checkpoint</span>
           </div>
         </div>
@@ -443,7 +559,7 @@ const EasyNodeChallengePage = () => {
                         key={option.id}
                         type="button"
                         disabled={
-                          !canAnswer || isReviewMode || !!result || submitting
+                          !canAnswer || isReviewMode || !!result || submitting || isExpired
                         }
                         onClick={() => {
                           if (!canAnswer || isReviewMode || result) return;
@@ -501,10 +617,10 @@ const EasyNodeChallengePage = () => {
                   {canAnswer && !result && !isReviewMode && (
                     <button
                       onClick={submitAnswer}
-                      disabled={!selectedOptionId || submitting}
+                      disabled={!selectedOptionId || submitting || isExpired || !sessionId}
                       className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-easy px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-easy/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                     >
-                      {submitting ? "Submitting..." : "Submit Answer"}
+                      {isExpired ? "Time expired" : submitting ? "Submitting..." : "Submit Answer"}
                     </button>
                   )}
 

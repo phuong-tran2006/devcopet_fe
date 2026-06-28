@@ -1,8 +1,17 @@
 import { useState, useRef, useEffect } from "react";
 import LucideIcon from "../ui/LucideIcon";
 
-const NotificationDropdown = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface NotificationDropdownProps {
+  isOpen: boolean;
+  onToggle: () => void;
+  onClose: () => void;
+}
+
+const NotificationDropdown = ({
+  isOpen,
+  onToggle,
+  onClose,
+}: NotificationDropdownProps) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Close when clicking outside
@@ -12,12 +21,12 @@ const NotificationDropdown = () => {
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsOpen(false);
+        onClose();
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  }, [onClose]);
 
   const [notifications, setNotifications] = useState([
     {
@@ -52,7 +61,7 @@ const NotificationDropdown = () => {
   return (
     <div className="relative" ref={dropdownRef}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={onToggle}
         className={`w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center transition-all text-on-surface relative ${
           isOpen ? "bg-on-surface/10" : "hover:bg-on-surface/10"
         }`}
