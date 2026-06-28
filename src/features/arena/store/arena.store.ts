@@ -198,7 +198,6 @@ export const useArenaStore = create<ArenaState>((set, get) => {
 
     socketService.on("arena:match_found", (data) => {
       clearSearchInterval();
-      console.log("Socket Event: arena:match_found", data);
       set({
         status: data.status || "accepting",
         roomId: data.roomId,
@@ -225,7 +224,6 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     socketService.on("arena:match_started", (data) => {
       if (data?.roomId && data.roomId !== get().roomId) return;
       clearSearchInterval();
-      console.log("Socket Event: arena:match_started", data);
       set({
         status: "countdown",
         roomId: data?.roomId || get().roomId,
@@ -235,7 +233,6 @@ export const useArenaStore = create<ArenaState>((set, get) => {
     socketService.on("arena:match_cancelled", (data) => {
       if (data?.roomId && data.roomId !== get().roomId) return;
       clearSearchInterval();
-      console.log("Socket Event: arena:match_cancelled", data);
       set({
         ...initialArenaState,
         status: "idle",
@@ -244,7 +241,6 @@ export const useArenaStore = create<ArenaState>((set, get) => {
 
     socketService.on("arena:countdown", (data) => {
       if (data?.roomId && data.roomId !== get().roomId) return;
-      console.log("Socket Event: arena:countdown", data);
       set({
         status: "countdown",
         roomId: data.roomId,

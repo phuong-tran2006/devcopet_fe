@@ -10,6 +10,7 @@ import {
 import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
 import NotificationDropdown from "./NotificationDropdown";
+import DailyMissionDropdown from "./DailyMissionDropdown";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
@@ -32,6 +33,7 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isOnboarding = location.pathname === "/onboarding";
+  const [activeDropdown, setActiveDropdown] = React.useState<"notifications" | "missions" | null>(null);
 
   const handleLogout = () => {
     logout();
@@ -81,12 +83,34 @@ const Header = () => {
           {isAuthenticated ? (
             <>
               {!isOnboarding && (
-                <button
-                  onClick={() => triggerHaptic(40)}
-                  className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center hover:bg-on-surface/5 transition-all text-on-surface"
-                >
-                  <LucideIcon name="notifications" className="text-[20px]" />
-                </button>
+                <>
+                  <NotificationDropdown
+                    isOpen={activeDropdown === "notifications"}
+                    onToggle={() =>
+                      setActiveDropdown((prev) =>
+                        prev === "notifications" ? null : "notifications",
+                      )
+                    }
+                    onClose={() =>
+                      setActiveDropdown((curr) =>
+                        curr === "notifications" ? null : curr,
+                      )
+                    }
+                  />
+                  <DailyMissionDropdown
+                    isOpen={activeDropdown === "missions"}
+                    onToggle={() =>
+                      setActiveDropdown((prev) =>
+                        prev === "missions" ? null : "missions",
+                      )
+                    }
+                    onClose={() =>
+                      setActiveDropdown((curr) =>
+                        curr === "missions" ? null : curr,
+                      )
+                    }
+                  />
+                </>
               )}
               <button
                 onClick={toggleTheme}

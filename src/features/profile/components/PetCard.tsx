@@ -250,7 +250,7 @@ const PetCard = () => {
           </button>
 
           <p className="text-[11px] text-center text-on-surface-variant leading-relaxed font-medium">
-            Feeding pet spends Available XP. Your level will not go down.
+            Feeding pet spends Available XP. Your level and leaderboard rank will not go down.
           </p>
 
           <div className="flex flex-col gap-1.5 pt-2 border-t border-outline/10">

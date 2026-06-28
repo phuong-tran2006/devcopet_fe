@@ -174,6 +174,9 @@ const ProfileHeader = () => {
             <p className="text-xl font-extrabold text-on-surface font-mono">
               {lifetimeXp.toLocaleString()}
             </p>
+            <p className="text-[10px] text-on-surface-variant/70 mt-1">
+              Used for level and rank
+            </p>
           </div>
           <div className="rounded-xl border border-outline/10 bg-surface-container/40 p-4">
             <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold mb-1">
@@ -181,6 +184,9 @@ const ProfileHeader = () => {
             </p>
             <p className="text-xl font-extrabold text-primary-fixed-dim font-mono">
               {currentXp.toLocaleString()}
+            </p>
+            <p className="text-[10px] text-on-surface-variant/70 mt-1">
+              Used for feeding pet
             </p>
           </div>
           <div className="rounded-xl border border-outline/10 bg-surface-container/40 p-4">

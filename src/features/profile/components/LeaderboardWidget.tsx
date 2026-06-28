@@ -9,6 +9,7 @@ interface LeaderboardEntry {
   username?: string;
   name?: string;
   rank?: number;
+  lifetimeXp?: number;
   currentXp?: number;
   avatarUrl?: string;
 }
@@ -74,7 +75,7 @@ const LeaderboardWidget = () => {
             const isMe = isCurrentUser(entry);
             const displayName = entry.name || entry.username || "Unknown";
             const rank = Number(entry.rank || 0);
-            const xp = Number(entry.currentXp || 0);
+            const xp = Number(entry.lifetimeXp ?? entry.currentXp ?? 0);
 
             return (
               <div
