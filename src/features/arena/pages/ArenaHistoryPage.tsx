@@ -97,18 +97,21 @@ const ArenaHistoryPage = () => {
     const isCompletedOrFinished =
       match.status === "finished" ||
       match.status === "completed" ||
-      match.status === "cancelled" ||
       match.status === "disconnected";
+    const isCancelled =
+      match.status === "cancelled" || match.resultType === "cancelled";
     const isDraw =
       match.resultType === "draw" ||
       (!match.resultType && !match.winnerUserId && isCompletedOrFinished);
-    const result = isDraw
-      ? "DRAW"
-      : match.winnerUserId === meId
-        ? "WIN"
-        : isCompletedOrFinished
-          ? "DEFEAT"
-          : (match.status || "UNKNOWN").toUpperCase();
+    const result = isCancelled
+      ? "CANCELLED"
+      : isDraw
+        ? "DRAW"
+        : match.winnerUserId === meId
+          ? "WIN"
+          : isCompletedOrFinished
+            ? "DEFEAT"
+            : (match.status || "UNKNOWN").toUpperCase();
     const ratingChange =
       match.ratingChanges?.find((item) => item.userId === meId)?.delta ??
       me?.ratingDelta ??

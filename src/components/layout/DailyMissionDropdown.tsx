@@ -95,7 +95,7 @@ const DailyMissionDropdown = ({
   };
 
   const completedNormal = data?.progress?.completedNormal ?? 0;
-  const totalNormal = data?.progress?.totalNormal ?? 4;
+  const totalNormal = data?.progress?.totalNormal ?? 5;
   const missions = data?.missions ?? [];
 
   const getStatusColor = (status: string) => {
@@ -197,18 +197,13 @@ const DailyMissionDropdown = ({
             </div>
           ) : (
             missions.map((mission) => {
-              const isHardcore = mission.missionKind === "HARDCORE";
               const isLocked = mission.status === "LOCKED";
               const isExpanded = expandedMissionId === mission.id;
 
               return (
                 <div
                   key={mission.id}
-                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex flex-col gap-3 relative transition-all ${
-                    isHardcore
-                      ? "border-red-500/20 bg-gradient-to-br from-red-500/5 to-transparent"
-                      : ""
-                  } ${isLocked ? "opacity-60" : ""}`}
+                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex flex-col gap-3 relative transition-all ${isLocked ? "opacity-60" : ""}`}
                 >
                   {/* Top row: Badges and Title */}
                   <div className="flex justify-between items-start gap-2">
@@ -218,11 +213,6 @@ const DailyMissionDropdown = ({
                       >
                         {mission.status}
                       </span>
-                      {isHardcore && (
-                        <span className="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded border border-red-500/40 bg-red-500/10 text-red-400">
-                          HARDCORE
-                        </span>
-                      )}
                       {mission.sourceType === "STARTER" && (
                         <span className="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded border border-cyan-500/40 bg-cyan-500/10 text-cyan-400">
                           STARTER
