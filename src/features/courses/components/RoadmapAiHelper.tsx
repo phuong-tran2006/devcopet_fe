@@ -60,13 +60,27 @@ const RoadmapAiHelper = ({
 
   const displayedAnswer = useTypewriter(answer, asking, 3);
 
-  // Scroll to bottom when typing
+  // Scroll behavior
   useEffect(() => {
-    if (scrollContainerRef.current) {
-      scrollContainerRef.current.scrollTop =
-        scrollContainerRef.current.scrollHeight;
+    if (asking && scrollContainerRef.current) {
+      // Scroll to bottom to show loading shimmer
+      scrollContainerRef.current.scrollTo({
+        top: scrollContainerRef.current.scrollHeight,
+        behavior: "smooth",
+      });
+    } else if (
+      !asking &&
+      answer &&
+      answerRef.current &&
+      scrollContainerRef.current
+    ) {
+      // Scroll to the top of the answer bubble so user can read from the beginning
+      answerRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
     }
-  }, [answer, displayedAnswer, asking, history]);
+  }, [asking, answer, history]);
 
   // Navigate to related lesson
   const goToLesson = useCallback(
@@ -180,16 +194,19 @@ const RoadmapAiHelper = ({
             nodeTitle={nodeTitle}
           />
 
-          {!loadingPrompts && prompts.length > 0 && (
-            <AiHelperPrompts
-              activePromptId={activePromptId}
-              prompts={prompts}
-              chipsDisabled={chipsDisabled}
-              aiPrimary={aiPrimary}
-              usage={usage}
-              handleAskPrompt={handleAskPrompt}
-            />
-          )}
+          {!loadingPrompts &&
+            prompts.length > 0 &&
+            !asking &&
+            (!answer || displayedAnswer === answer) && (
+              <AiHelperPrompts
+                activePromptId={activePromptId}
+                prompts={prompts}
+                chipsDisabled={chipsDisabled}
+                aiPrimary={aiPrimary}
+                usage={usage}
+                handleAskPrompt={handleAskPrompt}
+              />
+            )}
         </div>
 
         {/* Footer: Usage bar */}
