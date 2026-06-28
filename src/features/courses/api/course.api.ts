@@ -139,6 +139,7 @@ export interface EasyNodeChallenge {
   }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export interface EasyNodeChallengeReview {
@@ -253,6 +254,7 @@ export interface MediumMultipleChoiceChallenge {
   }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export interface MediumDragDropChallenge {
@@ -271,6 +273,7 @@ export interface MediumDragDropChallenge {
   }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export type MediumNodeChallenge =
@@ -307,10 +310,12 @@ export type SubmitMediumNodeChallengePayload =
   | {
       type: "multiple_choice";
       selectedOptionId: EasyChallengeOptionId;
+      timeout?: boolean;
     }
   | {
       type: "drag_drop";
       dropZoneMap: Record<string, string>;
+      timeout?: boolean;
     };
 
 export interface SubmitMediumNodeChallengeResponse {
@@ -401,6 +406,7 @@ export interface HardMultipleChoiceChallenge {
   }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export interface HardDragDropChallenge {
@@ -416,6 +422,7 @@ export interface HardDragDropChallenge {
   choices: Array<{ id: string; text: string }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export interface HardOrderingChallenge {
@@ -431,6 +438,7 @@ export interface HardOrderingChallenge {
   poolItems?: Array<{ id: string; text: string }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export interface HardFillTemplateChallenge {
@@ -446,6 +454,7 @@ export interface HardFillTemplateChallenge {
   poolItems: Array<{ id: string; text: string }>;
   xp: number;
   estimatedMinutes: number;
+  timeLimitSeconds?: number;
 }
 
 export type HardNodeChallenge =
@@ -488,21 +497,25 @@ export interface OptionPayload {
     | "simulation"
     | "fill_missing_line";
   selectedOptionId: string;
+  timeout?: boolean;
 }
 
 export interface MatchingPayload {
   type: "drag_drop_matching";
   matchingMap: Record<string, string>;
+  timeout?: boolean;
 }
 
 export interface DragDropPayload {
   type: "drag_drop";
   dropZoneMap: Record<string, string>;
+  timeout?: boolean;
 }
 
 export interface OrderingPayload {
   type: "ordering_steps" | "ranking";
   orderedIds: string[];
+  timeout?: boolean;
 }
 
 export type SubmitHardNodeChallengePayload =
@@ -574,11 +587,11 @@ export const courseApi = {
 
   submitEasyNodeChallenge: async (
     nodeId: string,
-    selectedOptionId: EasyChallengeOptionId,
+    payload: { selectedOptionId?: EasyChallengeOptionId; timeout?: boolean },
   ): Promise<SubmitEasyNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/easy/nodes/${nodeId}/challenge/submit`,
-      { selectedOptionId },
+      payload,
     );
     notifyMissionActivity();
     return response.data;

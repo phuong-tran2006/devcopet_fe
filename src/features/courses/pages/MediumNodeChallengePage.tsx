@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { KeyboardEvent, PointerEvent, ReactNode } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
@@ -11,6 +11,7 @@ import {
   type SubmitMediumNodeChallengeResponse,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
+import ChallengeTimer from "../components/ChallengeTimer";
 import LucideIcon from "../../../components/ui/LucideIcon";
 
 import { useAuthStore } from "../../users/store/auth.store";
@@ -200,6 +201,10 @@ const MediumNodeChallengePage = () => {
   const [result, setResult] =
     useState<SubmitMediumNodeChallengeResponse | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailedModal, setShowFailedModal] = useState(false);
+  const [failedReason, setFailedReason] = useState<
+    "timeout" | "wrong_answer" | null
+  >(null);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -289,6 +294,8 @@ const MediumNodeChallengePage = () => {
     setDropZoneMap({});
     setResult(null);
     setShowSuccessModal(false);
+    setShowFailedModal(false);
+    setFailedReason(null);
     setSubmitError(null);
 
     courseApi
@@ -349,55 +356,99 @@ const MediumNodeChallengePage = () => {
     }
   };
 
-  const submitChallenge = () => {
-    if (!nodeId || !challenge || submitting || result || isReviewMode) return;
+  const canSubmit =
+    !isLockedMode &&
+    !isReviewMode &&
+    !result &&
+    (isMultipleChoice
+      ? !!selectedOptionId
+      : dropZoneIds.length > 0 &&
+        dropZoneIds.every((zoneId) => !!dropZoneMap[zoneId]));
 
-    setSubmitting(true);
-    setSubmitError(null);
+  const submitChallenge = useCallback(
+    (isTimeout = false) => {
+      if (!nodeId || !challenge || submitting || result || isReviewMode) return;
 
-    const requiredDropZoneMap = Object.fromEntries(
-      dropZoneIds.map((zoneId) => [zoneId, dropZoneMap[zoneId] ?? ""]),
-    );
+      setSubmitting(true);
+      setSubmitError(null);
 
-    const payload = isMultipleChoice
-      ? selectedOptionId
-        ? { type: "multiple_choice" as const, selectedOptionId }
-        : null
-      : { type: "drag_drop" as const, dropZoneMap: requiredDropZoneMap };
+      const requiredDropZoneMap = Object.fromEntries(
+        dropZoneIds.map((zoneId) => [zoneId, dropZoneMap[zoneId] ?? ""]),
+      );
 
-    if (!payload) {
-      setSubmitting(false);
-      return;
-    }
+      let payload: any = null;
 
-    courseApi
-      .submitMediumNodeChallenge(nodeId, payload)
-      .then((response) => {
-        const { xpAwarded, userProgress, rewardSummary } = response;
-        const toastXp = rewardSummary?.xp ?? xpAwarded;
-        if (toastXp && toastXp > 0) {
-          setXpToast(toastXp);
-          window.setTimeout(() => setXpToast(null), 3500);
+      if (isMultipleChoice) {
+        if (selectedOptionId || isTimeout) {
+          payload = {
+            type: "multiple_choice",
+            selectedOptionId: selectedOptionId || "A",
+            timeout: isTimeout,
+          };
         }
-        if (userProgress) {
-          useAuthStore.getState().updateUser({
-            exp: userProgress.exp,
-            level: userProgress.level,
-          });
+      } else {
+        if (canSubmit || isTimeout) {
+          payload = {
+            type: "drag_drop",
+            dropZoneMap: requiredDropZoneMap,
+            timeout: isTimeout,
+          };
         }
+      }
 
-        setResult(response);
-        setShowSuccessModal(response.correct);
-      })
-      .catch((err) => {
-        setSubmitError(
-          err?.response?.data?.message ||
-            err?.message ||
-            "Unable to submit this challenge.",
-        );
-      })
-      .finally(() => setSubmitting(false));
-  };
+      if (!payload) {
+        setSubmitting(false);
+        return;
+      }
+
+      courseApi
+        .submitMediumNodeChallenge(nodeId, payload)
+        .then((response) => {
+          const { xpAwarded, userProgress, rewardSummary } = response;
+          const toastXp = rewardSummary?.xp ?? xpAwarded;
+          if (toastXp && toastXp > 0) {
+            setXpToast(toastXp);
+            window.setTimeout(() => setXpToast(null), 3500);
+          }
+          if (userProgress) {
+            useAuthStore.getState().updateUser({
+              exp: userProgress.exp,
+              level: userProgress.level,
+            });
+          }
+
+          if (response.correct) {
+            setResult(response);
+            setShowSuccessModal(true);
+            return;
+          }
+
+          setResult(response);
+          setFailedReason(isTimeout ? "timeout" : "wrong_answer");
+          setShowFailedModal(true);
+        })
+        .catch((err) => {
+          setSubmitError(
+            err?.response?.data?.message ||
+              err?.message ||
+              "Unable to submit this challenge.",
+          );
+        })
+        .finally(() => setSubmitting(false));
+    },
+    [
+      nodeId,
+      challenge,
+      submitting,
+      result,
+      isReviewMode,
+      dropZoneIds,
+      dropZoneMap,
+      isMultipleChoice,
+      selectedOptionId,
+      canSubmit,
+    ],
+  );
 
   const assignPoolItemToZone = (zoneId: string, itemId: string) => {
     if (!canEditDragDrop) return;
@@ -562,14 +613,6 @@ const MediumNodeChallengePage = () => {
     );
   };
 
-  const canSubmit =
-    !isLockedMode &&
-    !isReviewMode &&
-    !result &&
-    (isMultipleChoice
-      ? !!selectedOptionId
-      : dropZoneIds.length > 0 &&
-        dropZoneIds.every((zoneId) => !!dropZoneMap[zoneId]));
   const feedbackState = result
     ? result.correct
       ? "correct"
@@ -626,8 +669,17 @@ const MediumNodeChallengePage = () => {
               Back to Roadmap
             </button>
 
-            <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-              <span>Medium Checkpoint</span>
+            <div className="flex items-center gap-4">
+              {canSubmit && !result && !isReviewMode && (
+                <ChallengeTimer
+                  timeLimitSeconds={challenge?.timeLimitSeconds}
+                  onTimeout={() => submitChallenge(true)}
+                  paused={submitting || showSuccessModal || showFailedModal}
+                />
+              )}
+              <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                <span>Medium Checkpoint</span>
+              </div>
             </div>
           </div>
 
@@ -856,42 +908,11 @@ const MediumNodeChallengePage = () => {
                   </p>
                 )}
 
-                {result && !result.correct && (
-                  <div className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 dark:border-red-400/25 dark:bg-red-400/10">
-                    <div className="flex items-start gap-3">
-                      <LucideIcon
-                        name="error"
-                        className="text-[20px] text-red-500 dark:text-red-300"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <p className="font-bold text-red-900 text-[14px] dark:text-red-100">
-                          {result.message || "Not quite. Try again."}
-                        </p>
-                        {result.explanation && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
-                            {result.explanation}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {result &&
-                  !result.correct &&
-                  !isReviewMode &&
-                  !isLockedMode && (
-                    <button
-                      onClick={handleTryAgain}
-                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
-                    >
-                      Try Again
-                    </button>
-                  )}
+                {/* Try Again inline box removed for Modal */}
 
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
-                    onClick={submitChallenge}
+                    onClick={() => submitChallenge(false)}
                     disabled={!canSubmit || submitting}
                     className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-medium/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
@@ -989,7 +1010,9 @@ const MediumNodeChallengePage = () => {
 
                   <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {rewardItems.map((item, index) => {
-                      const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
+                      const isLastOdd =
+                        rewardItems.length % 2 !== 0 &&
+                        index === rewardItems.length - 1;
                       return (
                         <div
                           key={`${item.type}-${item.label}-${index}`}
@@ -1025,6 +1048,60 @@ const MediumNodeChallengePage = () => {
                     className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
                   >
                     Review Mission
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showFailedModal && result && challenge && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+              <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                <div className="overflow-y-auto rounded-xl bg-red-950/30 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)] dark:border-red-400 dark:text-red-400">
+                    <LucideIcon
+                      name={failedReason === "timeout" ? "timer_off" : "close"}
+                      className="text-[46px]"
+                    />
+                  </div>
+
+                  <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-white">
+                    {failedReason === "timeout" ? (
+                      <>
+                        Time's
+                        <br />
+                        Up
+                      </>
+                    ) : (
+                      <>
+                        Mission
+                        <br />
+                        Failed
+                      </>
+                    )}
+                  </h2>
+
+                  <div className="mt-6 rounded-lg border border-red-900/30 bg-[#1f1013]/70 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                        <LucideIcon name="warning" className="text-[24px]" />
+                      </div>
+                      <div>
+                        <p className="text-[13px] italic leading-relaxed text-slate-300">
+                          “{result.message}”
+                        </p>
+                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-red-400">
+                          {speakerName}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={goBackToRoadmap}
+                    className="mt-7 w-full rounded-lg bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                  >
+                    Return to Roadmap
                   </button>
                 </div>
               </div>

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   courseApi,
@@ -9,6 +9,7 @@ import {
   type SubmitEasyNodeChallengeResponse,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
+import ChallengeTimer from "../components/ChallengeTimer";
 import { useAuthStore } from "../../users/store/auth.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
 import {
@@ -85,6 +86,10 @@ const EasyNodeChallengePage = () => {
     null,
   );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailedModal, setShowFailedModal] = useState(false);
+  const [failedReason, setFailedReason] = useState<
+    "timeout" | "wrong_answer" | null
+  >(null);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [wrongAttempt, setWrongAttempt] = useState<{
     optionId: EasyChallengeOptionId;
@@ -106,7 +111,10 @@ const EasyNodeChallengePage = () => {
   const userExp = Number(currentUser?.lifetimeXp ?? 0);
   const userStars = currentUser?.coins ?? 0;
   const nextLevelXp = Number(currentUser?.nextLevelXp ?? 1000);
-  const levelProgress = nextLevelXp > 0 ? Math.min(100, Math.round((userExp / nextLevelXp) * 100)) : 0;
+  const levelProgress =
+    nextLevelXp > 0
+      ? Math.min(100, Math.round((userExp / nextLevelXp) * 100))
+      : 0;
   const codeSnippet =
     challenge?.promptType === "code_mcq" ? challenge.codeSnippet : undefined;
   const activeNavigation = getNavigationForResponse(
@@ -137,6 +145,8 @@ const EasyNodeChallengePage = () => {
     setSelectedOptionId(null);
     setResult(null);
     setShowSuccessModal(false);
+    setShowFailedModal(false);
+    setFailedReason(null);
     setWrongAttempt(null);
     setSubmitError(null);
 
@@ -189,52 +199,66 @@ const EasyNodeChallengePage = () => {
     }
   };
 
-  const submitAnswer = () => {
-    if (!nodeId || !selectedOptionId || !canAnswer || submitting || result) {
-      return;
-    }
+  const submitAnswer = useCallback(
+    (isTimeout = false) => {
+      if (
+        !nodeId ||
+        (!selectedOptionId && !isTimeout) ||
+        !canAnswer ||
+        submitting ||
+        result
+      ) {
+        return;
+      }
 
-    setSubmitting(true);
-    setSubmitError(null);
-    setWrongAttempt(null);
+      setSubmitting(true);
+      setSubmitError(null);
+      setWrongAttempt(null);
 
-    courseApi
-      .submitEasyNodeChallenge(nodeId, selectedOptionId)
-      .then((response) => {
-        const { xpAwarded, userProgress, rewardSummary } = response;
-        const toastXp = rewardSummary?.xp ?? xpAwarded;
-        if (toastXp && toastXp > 0) {
-          setXpToast(toastXp);
-          window.setTimeout(() => setXpToast(null), 3500);
-        }
-        if (userProgress) {
-          useAuthStore.getState().updateUser({
-            exp: userProgress.exp,
-            level: userProgress.level,
-          });
-        }
+      // If timeout and no option selected, we just pass "A" and let the backend timeout logic fail it.
+      const optionToSubmit = selectedOptionId || "A";
 
-        if (response.correct) {
+      courseApi
+        .submitEasyNodeChallenge(nodeId, {
+          selectedOptionId: optionToSubmit,
+          timeout: isTimeout,
+        })
+        .then((response) => {
+          const { xpAwarded, userProgress, rewardSummary } = response;
+          const toastXp = rewardSummary?.xp ?? xpAwarded;
+          if (toastXp && toastXp > 0) {
+            setXpToast(toastXp);
+            window.setTimeout(() => setXpToast(null), 3500);
+          }
+          if (userProgress) {
+            useAuthStore.getState().updateUser({
+              exp: userProgress.exp,
+              level: userProgress.level,
+            });
+          }
+
+          if (response.correct) {
+            setResult(response);
+            setShowSuccessModal(true);
+            return;
+          }
+
+          // Handle strict failure instead of allowing retry
           setResult(response);
-          setShowSuccessModal(true);
-          return;
-        }
-
-        setWrongAttempt({
-          optionId: selectedOptionId,
-          message: response.message,
-        });
-        setSelectedOptionId(null);
-      })
-      .catch((err) => {
-        setSubmitError(
-          err?.response?.data?.message ||
-            err?.message ||
-            "Unable to submit your answer.",
-        );
-      })
-      .finally(() => setSubmitting(false));
-  };
+          setFailedReason(isTimeout ? "timeout" : "wrong_answer");
+          setShowFailedModal(true);
+        })
+        .catch((err) => {
+          setSubmitError(
+            err?.response?.data?.message ||
+              err?.message ||
+              "Unable to submit your answer.",
+          );
+        })
+        .finally(() => setSubmitting(false));
+    },
+    [nodeId, selectedOptionId, canAnswer, submitting, result],
+  );
 
   const copyCodeSnippet = async () => {
     if (!codeSnippet?.code) return;
@@ -331,8 +355,17 @@ const EasyNodeChallengePage = () => {
             Back to Roadmap
           </button>
 
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-            <span>Easy Checkpoint</span>
+          <div className="flex items-center gap-4">
+            {canAnswer && !result && !isReviewMode && (
+              <ChallengeTimer
+                timeLimitSeconds={challenge?.timeLimitSeconds}
+                onTimeout={() => submitAnswer(true)}
+                paused={submitting || showSuccessModal || showFailedModal}
+              />
+            )}
+            <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+              <span>Easy Checkpoint</span>
+            </div>
           </div>
         </div>
 
@@ -500,7 +533,7 @@ const EasyNodeChallengePage = () => {
 
                   {canAnswer && !result && !isReviewMode && (
                     <button
-                      onClick={submitAnswer}
+                      onClick={() => submitAnswer(false)}
                       disabled={!selectedOptionId || submitting}
                       className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-easy px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-easy/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                     >
@@ -599,7 +632,9 @@ const EasyNodeChallengePage = () => {
 
                       <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {rewardItems.map((item, index) => {
-                          const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
+                          const isLastOdd =
+                            rewardItems.length % 2 !== 0 &&
+                            index === rewardItems.length - 1;
                           return (
                             <div
                               key={`${item.type}-${item.label}-${index}`}
@@ -635,6 +670,65 @@ const EasyNodeChallengePage = () => {
                         className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
                       >
                         Review Mission
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {showFailedModal && result && challenge && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+                  <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                    <div className="overflow-y-auto rounded-xl bg-red-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.05)] dark:bg-[#2e151b] dark:shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+                      <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)] dark:border-red-400 dark:text-red-400">
+                        <LucideIcon
+                          name={
+                            failedReason === "timeout" ? "timer_off" : "close"
+                          }
+                          className=" text-[46px]"
+                        />
+                      </div>
+
+                      <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                        {failedReason === "timeout" ? (
+                          <>
+                            Time's
+                            <br />
+                            Up
+                          </>
+                        ) : (
+                          <>
+                            Mission
+                            <br />
+                            Failed
+                          </>
+                        )}
+                      </h2>
+
+                      <div className="mt-6 rounded-lg border border-red-200 bg-white p-4 dark:border-red-900/30 dark:bg-[#1f1013]/70">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                            <LucideIcon
+                              name="warning"
+                              className=" text-[24px]"
+                            />
+                          </div>
+                          <div>
+                            <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                              “{result.message}”
+                            </p>
+                            <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-red-500 dark:text-red-400">
+                              {speakerName}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={goBackToRoadmap}
+                        className="mt-7 w-full rounded-lg bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+                      >
+                        Return to Roadmap
                       </button>
                     </div>
                   </div>

@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import {
@@ -14,6 +14,7 @@ import {
   type OrderingPayload,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
+import ChallengeTimer from "../components/ChallengeTimer";
 import { useAuthStore } from "../../users/store/auth.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
 import {
@@ -204,6 +205,10 @@ const HardNodeChallengePage = () => {
     null,
   );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailedModal, setShowFailedModal] = useState(false);
+  const [failedReason, setFailedReason] = useState<
+    "timeout" | "wrong_answer" | null
+  >(null);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -426,6 +431,8 @@ const HardNodeChallengePage = () => {
     setSelectedPoolItemId(null);
     setResult(null);
     setShowSuccessModal(false);
+    setShowFailedModal(false);
+    setFailedReason(null);
 
     Promise.all([
       courseApi.getHardNodeChallenge(nodeId),
@@ -519,66 +526,6 @@ const HardNodeChallengePage = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (isSubmitDisabled || !challenge) return;
-    setSubmitting(true);
-    setSubmitError(null);
-
-    let payload: SubmitHardNodeChallengePayload;
-    if (isOptionBased && selectedOptionId) {
-      payload = {
-        type: challenge.type as OptionPayload["type"],
-        selectedOptionId,
-      };
-    } else if (isDragDropMatching) {
-      payload = {
-        type: "drag_drop_matching",
-        matchingMap,
-      };
-    } else if (isHardDragDrop) {
-      payload = {
-        type: "drag_drop",
-        dropZoneMap,
-      };
-    } else if (isOrdering) {
-      payload = {
-        type: challenge.type as OrderingPayload["type"],
-        orderedIds,
-      };
-    } else {
-      setSubmitting(false);
-      return;
-    }
-
-    try {
-      const res = await courseApi.submitHardNodeChallenge(nodeId!, payload);
-      setResult(res);
-
-      const { xpAwarded, userProgress, rewardSummary } = res;
-      const toastXp = rewardSummary?.xp ?? xpAwarded;
-      if (toastXp && toastXp > 0) {
-        setXpToast(toastXp);
-        window.setTimeout(() => setXpToast(null), 3500);
-      }
-      if (userProgress) {
-        useAuthStore.getState().updateUser({
-          exp: userProgress.exp,
-          level: userProgress.level,
-        });
-      }
-
-      if (res.correct) {
-        setShowSuccessModal(true);
-      }
-    } catch (err: any) {
-      setSubmitError(
-        err?.response?.data?.message || err?.message || "Submission failed",
-      );
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
   const isSubmitDisabled =
     submitting ||
     !canEdit ||
@@ -588,6 +535,101 @@ const HardNodeChallengePage = () => {
       dropZoneIds.length > 0 &&
       Object.keys(dropZoneMap).length < dropZoneIds.length) ||
     (isOrdering && orderedIds.length < orderingItems.length);
+
+  const handleSubmit = useCallback(
+    async (isTimeout = false) => {
+      if ((isSubmitDisabled && !isTimeout) || !challenge) return;
+      setSubmitting(true);
+      setSubmitError(null);
+
+      let payload: any = null;
+      if (isOptionBased) {
+        if (selectedOptionId || isTimeout) {
+          payload = {
+            type: challenge.type,
+            selectedOptionId: selectedOptionId || "A",
+            timeout: isTimeout,
+          };
+        }
+      } else if (isDragDropMatching) {
+        if (Object.keys(matchingMap).length > 0 || isTimeout) {
+          payload = {
+            type: "drag_drop_matching",
+            matchingMap,
+            timeout: isTimeout,
+          };
+        }
+      } else if (isHardDragDrop) {
+        if (canEdit || isTimeout) {
+          payload = {
+            type: "drag_drop",
+            dropZoneMap,
+            timeout: isTimeout,
+          };
+        }
+      } else if (isOrdering) {
+        if (orderedIds.length === orderingItems.length || isTimeout) {
+          payload = {
+            type: challenge.type,
+            orderedIds: orderedIds.length ? orderedIds : ["A"],
+            timeout: isTimeout,
+          };
+        }
+      }
+
+      if (!payload) {
+        setSubmitting(false);
+        return;
+      }
+
+      try {
+        const res = await courseApi.submitHardNodeChallenge(nodeId!, payload);
+        setResult(res);
+
+        const { xpAwarded, userProgress, rewardSummary } = res;
+        const toastXp = rewardSummary?.xp ?? xpAwarded;
+        if (toastXp && toastXp > 0) {
+          setXpToast(toastXp);
+          window.setTimeout(() => setXpToast(null), 3500);
+        }
+        if (userProgress) {
+          useAuthStore.getState().updateUser({
+            exp: userProgress.exp,
+            level: userProgress.level,
+          });
+        }
+
+        if (res.correct) {
+          setShowSuccessModal(true);
+        } else {
+          setFailedReason(isTimeout ? "timeout" : "wrong_answer");
+          setShowFailedModal(true);
+        }
+      } catch (err: any) {
+        setSubmitError(
+          err?.response?.data?.message || err?.message || "Submission failed",
+        );
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [
+      challenge,
+      isSubmitDisabled,
+      submitting,
+      isOptionBased,
+      selectedOptionId,
+      isDragDropMatching,
+      matchingMap,
+      isHardDragDrop,
+      dropZoneMap,
+      isOrdering,
+      orderedIds,
+      orderingItems,
+      nodeId,
+      canEdit,
+    ],
+  );
 
   if (loading) {
     return (
@@ -636,8 +678,17 @@ const HardNodeChallengePage = () => {
             Back to Roadmap
           </button>
 
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
-            <span>Hard Checkpoint</span>
+          <div className="flex items-center gap-4">
+            {canEdit && (
+              <ChallengeTimer
+                timeLimitSeconds={challenge?.timeLimitSeconds}
+                onTimeout={() => handleSubmit(true)}
+                paused={submitting || showSuccessModal || showFailedModal}
+              />
+            )}
+            <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+              <span>Hard Checkpoint</span>
+            </div>
           </div>
         </div>
 
@@ -1106,47 +1157,11 @@ const HardNodeChallengePage = () => {
                 </div>
               )}
 
-              {result && !result.correct && (
-                <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
-                  <div className="flex items-start gap-3">
-                    <LucideIcon
-                      name="error"
-                      className="text-[20px] text-red-300"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="font-bold text-red-900 text-[14px] dark:text-red-100">
-                        {result.message || "Not quite. Try again."}
-                      </p>
-                      {result.explanation && (
-                        <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
-                          {result.explanation}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {result && !result.correct && !isReviewMode && (
-                <button
-                  onClick={() => {
-                    setResult(null);
-                    setSelectedOptionId(null);
-                    setMatchingMap({});
-                    setDropZoneMap({});
-                    setSelectedPoolItemId(null);
-                    if (orderingChallenge)
-                      setOrderedIds(orderingItems.map((s) => s.id));
-                  }}
-                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#66b3ff]/45 bg-[#66b3ff]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:bg-[#66b3ff]/15"
-                >
-                  Try Again
-                </button>
-              )}
+              {/* Removed Inline Retry section for modal */}
 
               {canEdit && (
                 <button
-                  onClick={handleSubmit}
+                  onClick={() => handleSubmit(false)}
                   disabled={isSubmitDisabled}
                   className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-hard/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                 >
@@ -1300,7 +1315,9 @@ const HardNodeChallengePage = () => {
 
               <div className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {rewardItems.map((item, index) => {
-                  const isLastOdd = rewardItems.length % 2 !== 0 && index === rewardItems.length - 1;
+                  const isLastOdd =
+                    rewardItems.length % 2 !== 0 &&
+                    index === rewardItems.length - 1;
                   return (
                     <div
                       key={`${item.type}-${item.label}-${index}`}
@@ -1336,6 +1353,60 @@ const HardNodeChallengePage = () => {
                 className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
               >
                 Review Mission
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showFailedModal && result && challenge && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+          <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#24384b] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+            <div className="overflow-y-auto rounded-xl bg-red-950/30 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+              <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)] dark:border-red-400 dark:text-red-400">
+                <LucideIcon
+                  name={failedReason === "timeout" ? "timer_off" : "close"}
+                  className="text-[46px]"
+                />
+              </div>
+
+              <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-white">
+                {failedReason === "timeout" ? (
+                  <>
+                    Time's
+                    <br />
+                    Up
+                  </>
+                ) : (
+                  <>
+                    Mission
+                    <br />
+                    Failed
+                  </>
+                )}
+              </h2>
+
+              <div className="mt-6 rounded-lg border border-red-900/30 bg-[#1f1013]/70 p-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                    <LucideIcon name="warning" className="text-[24px]" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] italic leading-relaxed text-slate-300">
+                      “{result.message}”
+                    </p>
+                    <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-red-400">
+                      {speakerName}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={goBackToRoadmap}
+                className="mt-7 w-full rounded-lg bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-red-600 dark:bg-red-600 dark:hover:bg-red-700"
+              >
+                Return to Roadmap
               </button>
             </div>
           </div>
