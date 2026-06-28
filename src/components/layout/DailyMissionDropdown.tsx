@@ -63,13 +63,39 @@ const DailyMissionDropdown = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
+  const resolveDailyMissionCtaPath = (ctaPath?: string): string => {
+    if (!ctaPath) return "/course";
+
+    if (ctaPath.startsWith("/lessons/") || ctaPath.startsWith("/lessons")) {
+      return "/course";
+    }
+
+    const allowedPrefixes = [
+      "/course",
+      "/courses",
+      "/roadmap",
+      "/profile",
+      "/arena",
+      "/leaderboard",
+    ];
+
+    if (
+      allowedPrefixes.some(
+        (prefix) => ctaPath === prefix || ctaPath.startsWith(prefix + "/"),
+      )
+    ) {
+      return ctaPath;
+    }
+
+    return "/course";
+  };
+
   const handleStart = async (id: string, ctaPath?: string) => {
     triggerHaptic(40);
     try {
       await dailyQuestsApi.markDailyMissionOpened(id);
-      if (ctaPath) {
-        navigate({ to: ctaPath });
-      }
+      const safePath = resolveDailyMissionCtaPath(ctaPath);
+      navigate({ to: safePath });
       onClose();
     } catch (err) {
       console.error("Failed to start mission:", err);
@@ -78,9 +104,8 @@ const DailyMissionDropdown = ({
 
   const handleContinue = (ctaPath?: string) => {
     triggerHaptic(40);
-    if (ctaPath) {
-      navigate({ to: ctaPath });
-    }
+    const safePath = resolveDailyMissionCtaPath(ctaPath);
+    navigate({ to: safePath });
     onClose();
   };
 
@@ -208,10 +233,10 @@ const DailyMissionDropdown = ({
 
                   {/* Title & Message */}
                   <div className="flex flex-col">
-                    <span className="text-[14px] font-black text-on-surface leading-snug">
+                    <span className="text-[14px] font-black text-on-surface leading-snug line-clamp-2 break-words">
                       {mission.title}
                     </span>
-                    <span className="text-[12.5px] text-on-surface-variant leading-relaxed mt-1">
+                    <span className="text-[12.5px] text-on-surface-variant leading-relaxed mt-1 line-clamp-2 break-words">
                       {mission.message}
                     </span>
 
