@@ -25,7 +25,9 @@ const DailyMissionDropdown = ({
   const [data, setData] = useState<TodayDailyMissionsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
-  const [expandedMissionId, setExpandedMissionId] = useState<string | null>(null);
+  const [expandedMissionId, setExpandedMissionId] = useState<string | null>(
+    null,
+  );
 
   // Fetch missions function
   const fetchMissions = async () => {
@@ -63,12 +65,20 @@ const DailyMissionDropdown = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
+  const sanitizePath = (path: string) => {
+    return path
+      .replace(/^\/roadmaps/, "/roadmap")
+      .replace(/^\/lessons/, "/lesson")
+      .replace(/^\/courses/, "/course")
+      .replace(/^\/quizzes/, "/quiz");
+  };
+
   const handleStart = async (id: string, ctaPath?: string) => {
     triggerHaptic(40);
     try {
       await dailyQuestsApi.markDailyMissionOpened(id);
       if (ctaPath) {
-        navigate({ to: ctaPath });
+        navigate({ to: sanitizePath(ctaPath) });
       }
       onClose();
     } catch (err) {
@@ -79,7 +89,7 @@ const DailyMissionDropdown = ({
   const handleContinue = (ctaPath?: string) => {
     triggerHaptic(40);
     if (ctaPath) {
-      navigate({ to: ctaPath });
+      navigate({ to: sanitizePath(ctaPath) });
     }
     onClose();
   };
@@ -112,12 +122,16 @@ const DailyMissionDropdown = ({
       <button
         onClick={onToggle}
         className={`w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center transition-all text-on-surface relative ${
-          isOpen ? "bg-on-surface/10 border-primary-fixed-dim/45 shadow-[0_0_15px_rgba(0,218,248,0.25)]" : "hover:bg-on-surface/10"
+          isOpen
+            ? "bg-on-surface/10 border-primary-fixed-dim/45 shadow-[0_0_15px_rgba(0,218,248,0.25)]"
+            : "hover:bg-on-surface/10"
         }`}
       >
         <LucideIcon name="assignment" className="text-[20px]" />
         {/* Active/In-Progress Badge */}
-        {missions.some((m) => m.status === "OPENED" || m.status === "PENDING") && (
+        {missions.some(
+          (m) => m.status === "OPENED" || m.status === "PENDING",
+        ) && (
           <span className="absolute top-2 right-2.5 w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
         )}
       </button>
@@ -145,7 +159,10 @@ const DailyMissionDropdown = ({
             disabled={loading}
             className="w-8 h-8 rounded-lg border border-outline/10 flex items-center justify-center hover:bg-on-surface/5 text-on-surface-variant transition-colors disabled:opacity-55"
           >
-            <LucideIcon name="refresh" className={`text-[16px] ${loading ? "animate-spin" : ""}`} />
+            <LucideIcon
+              name="refresh"
+              className={`text-[16px] ${loading ? "animate-spin" : ""}`}
+            />
           </button>
         </div>
 
@@ -154,11 +171,15 @@ const DailyMissionDropdown = ({
           {loading && !data ? (
             <div className="py-12 flex flex-col items-center justify-center gap-3 text-on-surface-variant">
               <div className="w-8 h-8 border-2 border-primary-fixed-dim border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-[13px] font-semibold tracking-wider">Loading daily missions...</span>
+              <span className="text-[13px] font-semibold tracking-wider">
+                Loading daily missions...
+              </span>
             </div>
           ) : error ? (
             <div className="py-10 text-center flex flex-col items-center justify-center gap-4">
-              <span className="text-[13px] text-error font-semibold">Could not load daily missions.</span>
+              <span className="text-[13px] text-error font-semibold">
+                Could not load daily missions.
+              </span>
               <button
                 onClick={fetchMissions}
                 className="px-4 py-2 rounded-lg bg-primary-fixed-dim text-on-primary-fixed text-[12px] font-bold tracking-widest hover:bg-primary-container transition-colors"
@@ -169,7 +190,9 @@ const DailyMissionDropdown = ({
           ) : missions.length === 0 ? (
             <div className="py-12 text-center flex flex-col items-center justify-center gap-2 text-on-surface-variant">
               <LucideIcon name="info" className="text-[28px] opacity-45" />
-              <span className="text-[14px] font-bold text-on-surface">No daily missions yet.</span>
+              <span className="text-[14px] font-bold text-on-surface">
+                No daily missions yet.
+              </span>
               <span className="text-[12px] italic">Try again later.</span>
             </div>
           ) : (
@@ -190,7 +213,9 @@ const DailyMissionDropdown = ({
                   {/* Top row: Badges and Title */}
                   <div className="flex justify-between items-start gap-2">
                     <div className="flex flex-wrap gap-1.5 items-center">
-                      <span className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded border ${getStatusColor(mission.status)}`}>
+                      <span
+                        className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded border ${getStatusColor(mission.status)}`}
+                      >
                         {mission.status}
                       </span>
                       {isHardcore && (
@@ -235,7 +260,14 @@ const DailyMissionDropdown = ({
                         className="text-[11px] font-bold text-primary-fixed-dim hover:text-primary-fixed uppercase tracking-wider flex items-center gap-1"
                       >
                         {isExpanded ? "Show Less" : "View More"}
-                        <LucideIcon name={isExpanded ? "keyboard_arrow_up" : "keyboard_arrow_down"} className="text-[12px]" />
+                        <LucideIcon
+                          name={
+                            isExpanded
+                              ? "keyboard_arrow_up"
+                              : "keyboard_arrow_down"
+                          }
+                          className="text-[12px]"
+                        />
                       </button>
                     ) : (
                       <div />
@@ -245,7 +277,9 @@ const DailyMissionDropdown = ({
                     <div className="flex items-center gap-2">
                       {mission.status === "PENDING" && (
                         <button
-                          onClick={() => handleStart(mission.id, mission.ctaPath)}
+                          onClick={() =>
+                            handleStart(mission.id, mission.ctaPath)
+                          }
                           disabled={!mission.ctaPath}
                           className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 text-[11px] font-black uppercase tracking-wider transition-colors"
                         >
