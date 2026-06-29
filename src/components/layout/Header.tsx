@@ -11,7 +11,6 @@ import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
 import NotificationDropdown from "./NotificationDropdown";
 import DailyMissionDropdown from "./DailyMissionDropdown";
-import { mascotAxolotl } from "../../features/users/constants/authImages";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
@@ -61,14 +60,9 @@ const Header = () => {
           <Link
             to="/"
             onClick={() => triggerHaptic(40)}
-            className="flex items-center rounded-full transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim"
-            aria-label="DevCopet home"
+            className="font-headline-sm text-headline-sm tracking-tighter text-primary-fixed-dim font-bold"
           >
-            <img
-              src={user?.pet?.avatar || mascotAxolotl}
-              alt=""
-              className="h-11 w-11 rounded-full object-cover object-top"
-            />
+            DevCopet
           </Link>
           {!isOnboarding && (
             <div className="hidden md:flex gap-8 items-center">
