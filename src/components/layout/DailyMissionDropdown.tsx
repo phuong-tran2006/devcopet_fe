@@ -133,25 +133,12 @@ const DailyMissionDropdown = ({
     triggerHaptic(40);
     const originalPath = originalCtaPath;
 
-    if (import.meta.env.DEV) {
-      console.log("[DailyMission] START clicked", { id, originalCtaPath });
-      console.log("[DailyMission] original ctaPath", originalPath);
-    }
-
     try {
       setOpeningMissionId(id);
       const response = (await dailyQuestsApi.markDailyMissionOpened(id)) as any;
       
-      if (import.meta.env.DEV) {
-        console.log("[DailyMission] PATCH opened response", response);
-      }
-
       const updatedMission = extractMissionFromResponse(response, id);
       
-      if (import.meta.env.DEV) {
-        console.log("[DailyMission] extracted updated mission", updatedMission);
-      }
-
       // Update local state in background or immediately if payload is complete
       if (response && (response.missions || response.data?.missions)) {
         const payload = response.data || response;
@@ -180,10 +167,6 @@ const DailyMissionDropdown = ({
       const pathToSend = finalMission.ctaPath || originalPath;
       const targetPath = resolveDailyMissionCtaPath(pathToSend);
 
-      if (import.meta.env.DEV) {
-        console.log("[DailyMission] final targetPath", targetPath);
-      }
-
       if (!targetPath) {
         alert("Route unavailable");
         return;
@@ -202,10 +185,6 @@ const DailyMissionDropdown = ({
   const handleContinue = (ctaPath?: string) => {
     triggerHaptic(40);
     const targetPath = resolveDailyMissionCtaPath(ctaPath);
-    if (import.meta.env.DEV) {
-      console.log("[DailyMission] CONTINUE clicked", { ctaPath });
-      console.log("[DailyMission] final targetPath", targetPath);
-    }
     if (targetPath) {
       router.history.push(targetPath);
       onClose();

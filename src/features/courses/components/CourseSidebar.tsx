@@ -18,7 +18,7 @@ const CourseSidebarChapter = ({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (lessons.length === 0) setLoading(true);
+    setLoading(true);
     courseApi
       .getLessons(chapter._id)
       .then((data) => {
@@ -144,7 +144,7 @@ const CourseSidebar = ({
 
   useEffect(() => {
     if (!courseId) return;
-    if (!course || chapters.length === 0) setLoading(true);
+    setLoading(true);
 
     // Lấy thông tin khoá học (để lấy tên) và danh sách chương
     Promise.all([
