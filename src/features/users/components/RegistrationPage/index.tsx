@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import Button from "../../../../components/ui/Button";
 import EditText from "../../../../components/ui/EditText";
@@ -18,6 +18,29 @@ import mascotVideo from "../../../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../../../components/ui/TransparentVideo";
 import VerifyEmailModal from "../VerifyEmailModal";
 
+const formatDateOfBirthInput = (value: string) => {
+  const digits = value.replace(/\D/g, "").slice(0, 8);
+  const day = digits.slice(0, 2);
+  const month = digits.slice(2, 4);
+  const year = digits.slice(4);
+
+  return [day, month, year].filter(Boolean).join("/");
+};
+
+const displayDateToIso = (value: string) => {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value);
+  if (!match) return "";
+
+  const [, day, month, year] = match;
+  const date = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+  const isValid =
+    date.getUTCFullYear() === Number(year) &&
+    date.getUTCMonth() === Number(month) - 1 &&
+    date.getUTCDate() === Number(day);
+
+  return isValid ? `${year}-${month}-${day}` : "";
+};
+
 const RegistrationPage = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -33,6 +56,7 @@ const RegistrationPage = () => {
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [showVerifyModal, setShowVerifyModal] = useState(false);
+  const datePickerRef = useRef<HTMLInputElement>(null);
 
   const { setAuth, isAuthenticated } = useAuthStore();
   const navigate = useNavigate();
@@ -78,6 +102,25 @@ const RegistrationPage = () => {
     }
   };
 
+  const handleDateOfBirthChange = (e: any) => {
+    const value = formatDateOfBirthInput(e.target.value);
+    setFormData((prev) => ({ ...prev, dateOfBirth: value }));
+    if (errors.dateOfBirth) {
+      setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+    }
+  };
+
+  const handleDatePickerChange = (e: any) => {
+    const [year, month, day] = e.target.value.split("-");
+    if (year && month && day) {
+      setFormData((prev) => ({
+        ...prev,
+        dateOfBirth: `${day}/${month}/${year}`,
+      }));
+      setErrors((prev) => ({ ...prev, dateOfBirth: "" }));
+    }
+  };
+
   const handleSubmit = async (e: any) => {
     e?.preventDefault();
     const nextErrors: any = {};
@@ -90,6 +133,8 @@ const RegistrationPage = () => {
     }
     if (!formData?.dateOfBirth)
       nextErrors.dateOfBirth = "Date of birth is required.";
+    else if (!displayDateToIso(formData.dateOfBirth))
+      nextErrors.dateOfBirth = "Enter a valid date in DD/MM/YYYY format.";
     if (!formData?.codingExperience)
       nextErrors.codingExperience = "Select your experience level.";
     if (!formData?.email?.trim()) nextErrors.email = "Email is required.";
@@ -250,17 +295,59 @@ const RegistrationPage = () => {
                           <label className="text-sm font-normal text-on-surface pl-1">
                             Date of Birth
                           </label>
-                          <EditText
-                            name="dateOfBirth"
-                            type="date"
-                            lang="en-GB"
-                            placeholder="dd/mm/yyyy"
-                            value={formData?.dateOfBirth}
-                            onChange={handleInputChange}
-                            required
-                            id="dateOfBirth"
-                            error={errors?.dateOfBirth}
-                          />
+                          <div className="relative">
+                            <EditText
+                              name="dateOfBirth"
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="bday"
+                              placeholder="dd/mm/yyyy"
+                              maxLength={10}
+                              value={formData?.dateOfBirth}
+                              onChange={handleDateOfBirthChange}
+                              required
+                              id="dateOfBirth"
+                              error={errors?.dateOfBirth}
+                              className="pr-12"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const picker = datePickerRef.current;
+                                if (picker?.showPicker) picker.showPicker();
+                                else picker?.click();
+                              }}
+                              className="absolute right-4 top-6 -translate-y-1/2 text-on-surface/70 transition-colors hover:text-on-surface"
+                              aria-label="Choose date of birth"
+                            >
+                              <svg
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                className="h-5 w-5"
+                                aria-hidden="true"
+                              >
+                                <path d="M8 2v4M16 2v4M3 9h18" />
+                                <rect
+                                  x="3"
+                                  y="4"
+                                  width="18"
+                                  height="18"
+                                  rx="2"
+                                />
+                              </svg>
+                            </button>
+                            <input
+                              ref={datePickerRef}
+                              type="date"
+                              value={displayDateToIso(formData.dateOfBirth)}
+                              onChange={handleDatePickerChange}
+                              tabIndex={-1}
+                              aria-hidden="true"
+                              className="pointer-events-none absolute h-px w-px opacity-0"
+                            />
+                          </div>
                         </div>
                         <div className="w-full flex flex-col gap-1">
                           <label className="text-sm font-normal text-on-surface pl-1">
