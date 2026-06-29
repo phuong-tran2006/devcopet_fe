@@ -253,6 +253,8 @@ const RegistrationPage = () => {
                           <EditText
                             name="dateOfBirth"
                             type="date"
+                            lang="en-GB"
+                            placeholder="dd/mm/yyyy"
                             value={formData?.dateOfBirth}
                             onChange={handleInputChange}
                             required
