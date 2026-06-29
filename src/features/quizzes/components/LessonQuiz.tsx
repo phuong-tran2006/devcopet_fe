@@ -24,6 +24,7 @@ const LessonQuizInner = ({
   const [answers, setAnswers] = useState({}); // { questionIndex: optionId }
   const [result, setResult] = useState(null);
   const [submitError, setSubmitError] = useState(null);
+  const [loadError, setLoadError] = useState("");
   const [reviewQuestionIdx, setReviewQuestionIdx] = useState(0);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
 
@@ -33,6 +34,7 @@ const LessonQuizInner = ({
     setAnswers({});
     setResult(null);
     setSubmitError(null);
+    setLoadError("");
     setReviewQuestionIdx(0);
     setCurrentQuestionIdx(0);
   }, [lessonId]);
@@ -40,6 +42,7 @@ const LessonQuizInner = ({
   // ── Start Quiz ─────────────────────────────────────────────────────────
   const handleStart = async () => {
     setPhase("loading");
+    setLoadError("");
     try {
       const data = await getQuizByLessonId(lessonId);
       if (!data || !data.questions || data.questions.length === 0) {
@@ -52,11 +55,22 @@ const LessonQuizInner = ({
       setCurrentQuestionIdx(0);
       setPhase("active");
     } catch (err) {
-      if (err?.response?.status === 404) {
+      const status = err?.response?.status;
+      if (status === 404) {
         setPhase("not_found");
+      } else if (status === 403) {
+        setLoadError(
+          err?.response?.data?.message ||
+            "Complete the previous lesson to unlock this quiz.",
+        );
+        setPhase("locked");
       } else {
         console.error("Failed to load quiz:", err);
-        setPhase("not_found");
+        setLoadError(
+          err?.response?.data?.message ||
+            "The quiz could not be loaded. Please try again.",
+        );
+        setPhase("error");
       }
     }
   };
@@ -103,7 +117,9 @@ const LessonQuizInner = ({
         }
 
         if (res?.passed) {
-          onQuizPassed?.();
+          // Pass the progress object through so the lesson UI can update
+          // immediately without waiting for another API round-trip.
+          onQuizPassed?.(res);
         }
         setReviewQuestionIdx(0);
         setPhase("finished");
@@ -137,6 +153,7 @@ const LessonQuizInner = ({
     setAnswers({});
     setResult(null);
     setSubmitError(null);
+    setLoadError("");
     setCurrentQuestionIdx(0);
     setReviewQuestionIdx(0);
     setPhase("active");
@@ -383,6 +400,33 @@ const LessonQuizInner = ({
       <div className="bg-surface-container rounded-xl p-6 border border-outline/20 text-center text-on-surface-variant text-[14px]">
         <LucideIcon name="quiz" className=" text-3xl mb-2 block" />
         No quiz is available for this lesson yet.
+      </div>
+    );
+  }
+
+  if (phase === "locked" || phase === "error") {
+    const isLocked = phase === "locked";
+    return (
+      <div
+        className={`rounded-xl p-6 border text-center text-[14px] ${
+          isLocked
+            ? "bg-secondary-fixed-dim/5 border-secondary-fixed-dim/20 text-on-surface-variant"
+            : "bg-[#f87171]/10 border-[#f87171]/30 text-[#fca5a5]"
+        }`}
+      >
+        <span className="material-symbols-outlined text-3xl mb-2 block">
+          {isLocked ? "lock" : "cloud_off"}
+        </span>
+        <p>{loadError}</p>
+        {!isLocked && (
+          <button
+            type="button"
+            onClick={handleStart}
+            className="mt-4 rounded-lg border border-current px-5 py-2 font-bold hover:bg-white/5"
+          >
+            Try Again
+          </button>
+        )}
       </div>
     );
   }

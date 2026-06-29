@@ -6,8 +6,11 @@ import {
   useNavigate,
 } from "@tanstack/react-router";
 import LessonQuiz from "../../features/quizzes/components/LessonQuiz";
+import { requireAuth } from "../-requireAuth";
 
 export const Route = createFileRoute("/lesson/$lessonId/quiz")({
+  beforeLoad: ({ params }) =>
+    requireAuth(`/lesson/${encodeURIComponent(params.lessonId)}/quiz`),
   component: LessonQuizRoutePage,
 });
 

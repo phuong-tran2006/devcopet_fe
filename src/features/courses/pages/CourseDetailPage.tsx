@@ -87,13 +87,17 @@ const StatusBadge = ({ status }) => {
 /* ───────────── Lesson Card ───────────── */
 const LessonCard = ({ lesson }) => {
   const getStatus = () => {
-    if (lesson.status === "completed") return "mastered";
-    if (lesson.status === "available") return "in_progress";
+    if (lesson.status === "completed" || lesson.stateLabel === "MASTERED") {
+      return "mastered";
+    }
+    if (lesson.status === "available" || lesson.stateLabel === "IN_PROGRESS") {
+      return "in_progress";
+    }
     return "locked";
   };
 
   const status = getStatus();
-  const isClickable = lesson.canAccess;
+  const isClickable = lesson.canAccess !== false && !lesson.locked;
 
   const iconMap = {
     mastered: "check_circle",
