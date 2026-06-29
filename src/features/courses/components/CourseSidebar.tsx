@@ -83,17 +83,8 @@ const CourseSidebarChapter = ({
                 ? 100
                 : Math.min(progress, 95);
 
-              return (
-                <Link
-                  key={lesson._id}
-                  to="/lesson/$lessonId"
-                  params={{ lessonId: lesson._id }}
-                  className={`flex items-center gap-3 px-6 py-3 transition-colors ${
-                    isActive
-                      ? "bg-teal-500/10 dark:bg-primary-fixed-dim/15 border-l-2 border-teal-600 dark:border-primary-fixed-dim"
-                      : "hover:bg-slate-50 dark:hover:bg-surface-container border-l-2 border-transparent"
-                  }`}
-                >
+              const lessonContent = (
+                <>
                   <LessonProgressCircle
                     progress={displayProgress}
                     isActive={isActive}
@@ -119,18 +110,19 @@ const CourseSidebarChapter = ({
                       </span>
                     )
                   ) : (
-                    <span className="material-symbols-outlined text-[17px] text-on-surface-variant/40">
-                      lock
-                    </span>
+                    <LucideIcon
+                      name="lock"
+                      className="shrink-0 text-[17px] text-on-surface-variant/40"
+                    />
                   )}
                 </>
               );
 
               const className = `flex items-center gap-3 px-6 py-3 transition-colors ${
                 isActive
-                  ? "bg-primary-fixed-dim/15 border-l-2 border-primary-fixed-dim"
+                  ? "bg-teal-500/10 dark:bg-primary-fixed-dim/15 border-l-2 border-teal-600 dark:border-primary-fixed-dim"
                   : canAccess
-                    ? "hover:bg-surface-container border-l-2 border-transparent"
+                    ? "hover:bg-slate-50 dark:hover:bg-surface-container border-l-2 border-transparent"
                     : "cursor-not-allowed border-l-2 border-transparent opacity-75"
               }`;
 
