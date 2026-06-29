@@ -5,7 +5,6 @@ import Button from "../../../../components/ui/Button";
 import EditText from "../../../../components/ui/EditText";
 import Dropdown from "../../../../components/ui/Dropdown";
 import CheckBox from "../../../../components/ui/CheckBox";
-import EmailProviderIcon from "../../../../components/ui/EmailProviderIcon";
 import { EmailIcon, LockIcon } from "../../../../components/ui/icons";
 import { useAuthStore } from "../../store/auth.store";
 import { authApi } from "../../api/auth.api";
@@ -164,7 +163,9 @@ const RegistrationPage = () => {
   };
 
   const handleSocialLogin = (provider: string) => {
-    const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? "http://localhost:3000" : "");
+    const apiUrl =
+      import.meta.env.VITE_API_URL ||
+      (import.meta.env.DEV ? "http://localhost:3000" : "");
     window.location.href = `${apiUrl}/auth/${provider}`;
   };
 
@@ -437,17 +438,6 @@ const RegistrationPage = () => {
                             <img
                               src={facebookIcon}
                               alt=""
-                              className={socialIconClassName}
-                            />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => navigate({ to: "/login" })}
-                            disabled={loading}
-                            className="flex h-12 w-12 items-center justify-center rounded-lg border border-on-surface/10 bg-transparent p-3 text-on-surface transition-all duration-200 hover:bg-on-surface/10 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim disabled:opacity-50 disabled:cursor-not-allowed"
-                            aria-label="Sign up with Email"
-                          >
-                            <EmailProviderIcon
                               className={socialIconClassName}
                             />
                           </button>
