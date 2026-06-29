@@ -159,15 +159,6 @@ const RegistrationPage = () => {
 
     setLoading(true);
     try {
-      const formatDate = (dateString: string) => {
-        if (!dateString) return "";
-        const parts = dateString.split("-");
-        if (parts.length === 3) {
-          return `${parts[2]}/${parts[1]}/${parts[0]}`; // YYYY-MM-DD -> DD/MM/YYYY
-        }
-        return dateString;
-      };
-
       const selectedLevel = codingExperienceLevels.find(
         (item) => item.value === formData.codingExperience,
       );
@@ -182,7 +173,7 @@ const RegistrationPage = () => {
         confirmPassword: formData.confirmPassword,
         name: formData.fullName,
         username: formData.username,
-        dateOfBirth: formatDate(formData.dateOfBirth),
+        dateOfBirth: displayDateToIso(formData.dateOfBirth),
         experienceLevel: experienceLevel,
         termsAccepted: formData.agreeToTerms,
       });
