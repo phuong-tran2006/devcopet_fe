@@ -15,6 +15,7 @@ import LucideIcon from "../../../components/ui/LucideIcon";
 
 import { useAuthStore } from "../../users/store/auth.store";
 import {
+  formatQuestionNumber,
   getNavigationForResponse,
   getRewardItems,
   getSpeakerName,
@@ -258,19 +259,8 @@ const MediumNodeChallengePage = () => {
     [dragDropChallenge],
   );
 
-  const initialAssignedMap = useMemo(() => {
-    if (!data?.review) return {};
-
-    const isMatchReview =
-      data.review.challengeType === "drag_drop" &&
-      !!data.review.selectedDropZoneMap;
-    if (!isMatchReview) return {};
-
-    return data.review.selectedDropZoneMap!;
-  }, [data]);
-
   const reviewDropZoneMap =
-    data?.review && "dropZoneMap" in data.review ? data.review.dropZoneMap : {};
+    data?.review?.selectedDropZoneMap ?? data?.review?.dropZoneMap ?? {};
   const canRevealAnswerDetails = isReviewMode || result?.correct === true;
   const correctDropZoneMap =
     canRevealAnswerDetails && result?.correctDropZoneMap
@@ -319,11 +309,24 @@ const MediumNodeChallengePage = () => {
     Promise.all([
       courseApi.startRoadmapChallengeSession(safeCourseSlug, "medium", nodeId),
       courseApi.getMediumNodeChallenge(nodeId),
+      courseApi.getMediumRoadmap(safeCourseSlug).catch(() => null),
     ])
-      .then(([sessionRes, challengeRes]) => {
+      .then(([sessionRes, challengeRes, roadmap]) => {
         setSessionId(sessionRes.sessionId);
         setSessionExpiresAt(sessionRes.expiresAt);
         setSessionServerNow(sessionRes.serverNow);
+
+        if (roadmap) {
+          const nodes = [...roadmap.chapters]
+            .sort((a, b) => a.order - b.order)
+            .flatMap((chapter) =>
+              [...chapter.nodes].sort((a, b) => a.order - b.order),
+            );
+          const index = nodes.findIndex((node) => node.id === nodeId);
+          if (index >= 0) {
+            challengeRes.node.label = String(index + 1);
+          }
+        }
 
         setData(challengeRes);
         if (challengeRes.review?.selectedOptionId) {
@@ -547,11 +550,22 @@ const MediumNodeChallengePage = () => {
     });
   };
 
-  const assignSelectedPoolItem = (zoneId: string) => {
-    if (!selectedPoolItemId) return;
+  const handleDropZoneClick = (zoneId: string) => {
+    if (!canEditDragDrop) return;
 
-    assignPoolItemToZone(zoneId, selectedPoolItemId);
-    setSelectedPoolItemId(null);
+    if (selectedPoolItemId) {
+      assignPoolItemToZone(zoneId, selectedPoolItemId);
+      setSelectedPoolItemId(null);
+      return;
+    }
+
+    setDropZoneMap((prev) => {
+      if (!prev[zoneId]) return prev;
+
+      const next = { ...prev };
+      delete next[zoneId];
+      return next;
+    });
   };
 
   const startPointerPoolItemDrag = (
@@ -765,11 +779,17 @@ const MediumNodeChallengePage = () => {
               Back to Roadmap
             </button>
 
-            <div className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+            <div className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
               {remainingTime !== null && (
-                <span className="font-mono text-amber-500 dark:text-amber-400">
-                  {formatTime(remainingTime)}
-                </span>
+                <div className="flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-amber-600 shadow-sm dark:bg-amber-400/10 dark:text-amber-300">
+                  <LucideIcon name="schedule" className="text-[18px]" />
+                  <span className="hidden text-[10px] tracking-wider sm:inline">
+                    Time left
+                  </span>
+                  <span className="min-w-[3.5rem] font-mono text-[20px] font-black leading-none tracking-normal tabular-nums">
+                    {formatTime(remainingTime)}
+                  </span>
+                </div>
               )}
               <span>Medium Checkpoint</span>
             </div>
@@ -813,7 +833,7 @@ const MediumNodeChallengePage = () => {
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
-                        Question 01
+                        Question {formatQuestionNumber(data.node.label)}
                       </p>
                       <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                         {challenge.title}
@@ -896,63 +916,72 @@ const MediumNodeChallengePage = () => {
                           </button>
                         )}
                       </div>
-                      <div className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-4 font-mono text-[15px] leading-10 text-on-surface dark:border-[#1f333c] dark:bg-[#071217]">
-                        {renderTemplateParts(
-                          dragDropChallenge.template,
-                          (zoneId) => {
-                            const selectedMap = isReviewMode
-                              ? reviewDropZoneMap
-                              : dropZoneMap;
-                            const selectedItemId = selectedMap?.[zoneId];
-                            const correctItemId = correctDropZoneMap?.[zoneId];
-                            const correct = isDropZoneCorrect(zoneId);
-                            const wrong = isDropZoneWrong(zoneId);
-                            const canAssign =
-                              canEditDragDrop &&
-                              (!!selectedPoolItemId || !!draggingPoolItemId);
-                            const isDragTarget = dragOverZoneId === zoneId;
-                            const isDraggingAnyItem =
-                              canEditDragDrop && !!draggingPoolItemId;
+                      <div className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-4 font-mono text-[15px] text-on-surface dark:border-[#1f333c] dark:bg-[#071217]">
+                        {dragDropChallenge.template
+                          .split("\n")
+                          .map((templateLine, lineIndex) => (
+                            <div
+                              key={`${lineIndex}-${templateLine}`}
+                              className="flex min-h-[56px] flex-wrap items-center gap-x-2 gap-y-2 py-1 leading-6"
+                            >
+                              {renderTemplateParts(templateLine, (zoneId) => {
+                                const selectedMap = isReviewMode
+                                  ? reviewDropZoneMap
+                                  : dropZoneMap;
+                                const selectedItemId = selectedMap?.[zoneId];
+                                const correctItemId =
+                                  correctDropZoneMap?.[zoneId];
+                                const correct = isDropZoneCorrect(zoneId);
+                                const wrong = isDropZoneWrong(zoneId);
+                                const canAssign =
+                                  canEditDragDrop &&
+                                  (!!selectedPoolItemId ||
+                                    !!draggingPoolItemId);
+                                const isDragTarget = dragOverZoneId === zoneId;
+                                const isDraggingAnyItem =
+                                  canEditDragDrop && !!draggingPoolItemId;
 
-                            return (
-                              <button
-                                key={zoneId}
-                                data-drop-zone-id={zoneId}
-                                type="button"
-                                onClick={() => assignSelectedPoolItem(zoneId)}
-                                disabled={!canEditDragDrop}
-                                className={`mx-1 inline-flex min-h-[46px] w-[156px] items-center justify-center rounded-lg border px-3 py-2 align-middle font-sans text-[13px] font-bold transition disabled:cursor-default ${
-                                  correct
-                                    ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
-                                    : wrong
-                                      ? "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#ef4444]/12 dark:text-red-100"
-                                      : isDragTarget
-                                        ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3] shadow-[0_0_24px_rgba(99,241,227,0.28)]"
-                                        : selectedItemId
-                                          ? "border-blue-500 bg-blue-50 text-blue-950 shadow-[0_0_16px_rgba(37,99,235,0.12)] dark:border-blue-400 dark:bg-blue-500/15 dark:text-blue-100 dark:shadow-[0_0_16px_rgba(59,130,246,0.16)]"
-                                          : isDraggingAnyItem
-                                            ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
-                                            : canAssign
-                                              ? "border-slate-400 bg-slate-100 text-slate-700 shadow-[0_0_14px_rgba(148,163,184,0.12)] dark:border-gray-400 dark:bg-gray-500/15 dark:text-gray-200 dark:shadow-[0_0_14px_rgba(148,163,184,0.14)]"
-                                              : "border-dashed border-slate-300 bg-white text-slate-600 dark:border-gray-500/70 dark:bg-gray-500/10 dark:text-gray-300"
-                                }`}
-                              >
-                                <span className="flex flex-col items-center leading-tight">
-                                  <span>
-                                    {selectedItemId
-                                      ? getPoolItemText(selectedItemId)
-                                      : zoneId}
-                                  </span>
-                                  {wrong && correctItemId && (
-                                    <span className="mt-1 text-[10px] font-semibold text-[#63f1e3]">
-                                      Correct: {getPoolItemText(correctItemId)}
+                                return (
+                                  <button
+                                    key={zoneId}
+                                    data-drop-zone-id={zoneId}
+                                    type="button"
+                                    onClick={() => handleDropZoneClick(zoneId)}
+                                    disabled={!canEditDragDrop}
+                                    className={`inline-flex min-h-[46px] min-w-[156px] max-w-full items-center justify-center rounded-lg border px-3 py-2 align-middle font-sans text-[13px] font-bold transition disabled:cursor-default ${
+                                      correct
+                                        ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
+                                        : wrong
+                                          ? "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#ef4444]/12 dark:text-red-100"
+                                          : isDragTarget
+                                            ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3] shadow-[0_0_24px_rgba(99,241,227,0.28)]"
+                                            : selectedItemId
+                                              ? "border-blue-500 bg-blue-50 text-blue-950 shadow-[0_0_16px_rgba(37,99,235,0.12)] dark:border-blue-400 dark:bg-blue-500/15 dark:text-blue-100 dark:shadow-[0_0_16px_rgba(59,130,246,0.16)]"
+                                              : isDraggingAnyItem
+                                                ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
+                                                : canAssign
+                                                  ? "border-slate-400 bg-slate-100 text-slate-700 shadow-[0_0_14px_rgba(148,163,184,0.12)] dark:border-gray-400 dark:bg-gray-500/15 dark:text-gray-200 dark:shadow-[0_0_14px_rgba(148,163,184,0.14)]"
+                                                  : "border-dashed border-slate-300 bg-white text-slate-600 dark:border-gray-500/70 dark:bg-gray-500/10 dark:text-gray-300"
+                                    }`}
+                                  >
+                                    <span className="flex flex-col items-center leading-tight">
+                                      <span>
+                                        {selectedItemId
+                                          ? getPoolItemText(selectedItemId)
+                                          : "Drop here"}
+                                      </span>
+                                      {wrong && correctItemId && (
+                                        <span className="mt-1 text-[10px] font-semibold text-[#63f1e3]">
+                                          Correct:{" "}
+                                          {getPoolItemText(correctItemId)}
+                                        </span>
+                                      )}
                                     </span>
-                                  )}
-                                </span>
-                              </button>
-                            );
-                          },
-                        )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ))}
                       </div>
                     </div>
 
@@ -1107,18 +1136,18 @@ const MediumNodeChallengePage = () => {
           </section>
 
           {showSuccessModal && result?.correct && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-              <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+              <div className="relative flex max-h-[calc(100vh-48px)] w-full max-w-[480px] flex-col rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
                 <button
                   onClick={() => setShowSuccessModal(false)}
-                  className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+                  className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-slate-200 hover:text-on-surface dark:hover:bg-white/8"
                   aria-label="Close result"
                 >
                   <LucideIcon name="close" className="text-[22px]" />
                 </button>
 
-                <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
-                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
+                <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-teal-500 bg-teal-500/10 text-teal-600 shadow-[0_0_30px_rgba(13,148,136,0.16)] dark:border-[#00c7bd] dark:text-[#9afff7] dark:shadow-[0_0_30px_rgba(0,199,189,0.2)]">
                     <LucideIcon name="star" className="text-[46px]" />
                   </div>
 
@@ -1128,27 +1157,27 @@ const MediumNodeChallengePage = () => {
                     Accomplished
                   </h2>
 
-                  <div className="mt-6 rounded-lg border border-outline/20 bg-medium/5 p-4 transition-colors duration-300">
+                  <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 transition-colors duration-300 dark:border-on-surface/10 dark:bg-[#1b3440]/70">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-teal-500/25 bg-teal-500/10 text-teal-600 dark:border-[#63f1e3]/25 dark:bg-[#63f1e3]/12 dark:text-[#63f1e3]">
                         <LucideIcon name="psychology" className="text-[24px]" />
                       </div>
                       <div>
                         <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
                           “{result.message || "Correct. Nice work."}”
                         </p>
-                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-teal-700 dark:text-[#63f1e3]">
                           {speakerName}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-7 rounded-lg bg-[#243932] px-4 py-5 text-center">
+                  <div className="mt-7 rounded-lg bg-teal-50 px-4 py-5 text-center dark:bg-[#243932]">
                     <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
                       XP Earned
                     </p>
-                    <p className="mt-2 text-[28px] font-extrabold leading-none text-[#63f1e3]">
+                    <p className="mt-2 text-[28px] font-extrabold leading-none text-teal-700 dark:text-[#63f1e3]">
                       +{xpReward} XP
                     </p>
                   </div>
@@ -1174,9 +1203,9 @@ const MediumNodeChallengePage = () => {
           )}
 
           {showFailureModal && result && !result.correct && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-              <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)] border border-red-500/20">
-                <div className="rounded-xl bg-[#2b171a] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+              <div className="relative flex max-h-[calc(100vh-48px)] w-full max-w-[480px] flex-col rounded-3xl border border-red-500/20 bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.05)] dark:bg-[#2b171a] dark:shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
                   <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
                     <LucideIcon name="close" className="text-[46px]" />
                   </div>
@@ -1187,14 +1216,17 @@ const MediumNodeChallengePage = () => {
                     Failed
                   </h2>
 
-                  <div className="mt-6 rounded-lg border border-outline/20 bg-red-500/5 p-4">
+                  <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#1b2732]/70">
                     <div className="flex items-start gap-3">
                       <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
                         <LucideIcon name="error" className="text-[24px]" />
                       </div>
                       <div className="min-w-0 flex-1">
                         <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
-                          “{result.message || "Not quite. Return to the roadmap and try this checkpoint again."}”
+                          “
+                          {result.message ||
+                            "Not quite. Return to the roadmap and try this checkpoint again."}
+                          ”
                         </p>
                       </div>
                     </div>
@@ -1253,7 +1285,7 @@ const MediumNodeChallengePage = () => {
               animation: fadeInDown 3.5s ease-in-out forwards;
             }
           `}</style>
-          <div className="animate-xp-toast bg-[#0f2630]/95 backdrop-blur-md border border-[#63f1e3]/40 text-[#63f1e3] font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(99,241,227,0.3)] flex items-center gap-2">
+          <div className="animate-xp-toast flex items-center gap-2 rounded-full border border-teal-500/40 bg-white/95 px-6 py-3 font-black text-teal-700 shadow-[0_0_30px_rgba(13,148,136,0.18)] backdrop-blur-md dark:border-[#63f1e3]/40 dark:bg-[#0f2630]/95 dark:text-[#63f1e3] dark:shadow-[0_0_30px_rgba(99,241,227,0.3)]">
             <LucideIcon name="stars" className="text-[#63f1e3]" />
             <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
               +{xpToast} XP

@@ -169,7 +169,8 @@ const EasyNodeChallengePage = () => {
 
     const safeCourseSlug = courseSlug || "python-basic";
 
-    courseApi.getEasyNodeChallenge(nodeId)
+    courseApi
+      .getEasyNodeChallenge(nodeId)
       .then((challengeRes) => {
         const normalized = normalizeChallengeResponse(challengeRes);
         setData(normalized);
@@ -177,7 +178,8 @@ const EasyNodeChallengePage = () => {
         if (normalized.node.status === "completed") {
           setTimerStopped(true);
         } else {
-          return courseApi.startRoadmapChallengeSession(safeCourseSlug, "easy", nodeId)
+          return courseApi
+            .startRoadmapChallengeSession(safeCourseSlug, "easy", nodeId)
             .then((sessionRes) => {
               setSessionId(sessionRes.sessionId);
               setSessionExpiresAt(sessionRes.expiresAt);
@@ -477,15 +479,21 @@ const EasyNodeChallengePage = () => {
             Back to Roadmap
           </button>
 
-          <div className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+          <div className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
             {isReviewMode || (timerStopped && result?.correct) ? (
               <span>Completed · Easy Checkpoint</span>
             ) : (
               <>
                 {remainingTime !== null && (
-                  <span className="font-mono text-amber-500 dark:text-amber-400">
-                    {formatTime(remainingTime)}
-                  </span>
+                  <div className="flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-amber-600 shadow-sm dark:bg-amber-400/10 dark:text-amber-300">
+                    <LucideIcon name="schedule" className="text-[18px]" />
+                    <span className="hidden text-[10px] tracking-wider sm:inline">
+                      Time left
+                    </span>
+                    <span className="min-w-[3.5rem] font-mono text-[20px] font-black leading-none tracking-normal tabular-nums">
+                      {formatTime(remainingTime)}
+                    </span>
+                  </div>
                 )}
                 <span>Easy Checkpoint</span>
               </>
@@ -817,7 +825,10 @@ const EasyNodeChallengePage = () => {
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
-                              “{wrongAttempt.message || "Not quite. Return to the roadmap and try this checkpoint again."}”
+                              “
+                              {wrongAttempt.message ||
+                                "Not quite. Return to the roadmap and try this checkpoint again."}
+                              ”
                             </p>
                           </div>
                         </div>

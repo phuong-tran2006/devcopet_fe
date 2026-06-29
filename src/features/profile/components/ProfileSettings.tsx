@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { mascotAxolotl } from "../../users/constants/authImages";
 import { useAuthStore } from "../../users/store/auth.store";
 import { api } from "../../../services/axiosClient";
-import petVideo from "../../../assets/videos/conpet.webm";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 interface ProfileSettingsProps {
   theme: "light" | "dark";
@@ -13,7 +12,6 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
   const [systemName, setSystemName] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
-  const [videoError, setVideoError] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
     isError: boolean;
@@ -80,23 +78,18 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
                   : "border-slate-300 bg-slate-100"
               }`}
             >
-              {!videoError ? (
-                <video
-                  src={petVideo}
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  onError={() => setVideoError(true)}
-                  className="w-full h-full object-contain rounded-2xl"
-                />
-              ) : (
-                <div className={`w-full h-full flex items-center justify-center rounded-2xl font-bold text-lg ${
-                  theme === "dark" ? "text-[#7fe3dd]" : "text-teal-600"
-                }`}>
-                  {user?.petName?.charAt(0).toUpperCase() || "A"}
-                </div>
-              )}
+              <UserAvatar
+                user={user ?? { username: "User" }}
+                size="xl"
+                className={`!h-full !w-full rounded-[20px] ${
+                  theme === "dark"
+                    ? "bg-[#10232f] text-[#7fe3dd]"
+                    : "bg-teal-50 text-teal-700"
+                }`}
+                imgProps={{
+                  referrerPolicy: "no-referrer",
+                }}
+              />
             </div>
           </div>
         </div>

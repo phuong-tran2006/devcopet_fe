@@ -43,3 +43,8 @@ export const getSpeakerName = (
   challengeSpeakerName?: string,
   fallbackName = "Axo-Script",
 ) => responseSpeakerName || challengeSpeakerName || fallbackName;
+
+export const formatQuestionNumber = (nodeLabel: string) => {
+  const numericPart = nodeLabel.match(/\d+/)?.[0] ?? nodeLabel;
+  return numericPart.padStart(2, "0");
+};

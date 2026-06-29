@@ -17,6 +17,7 @@ import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import { useAuthStore } from "../../users/store/auth.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
 import {
+  formatQuestionNumber,
   getNavigationForResponse,
   getRewardItems,
   getSpeakerName,
@@ -770,11 +771,17 @@ const HardNodeChallengePage = () => {
             Back to Roadmap
           </button>
 
-          <div className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+          <div className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
             {remainingTime !== null && (
-              <span className="font-mono text-amber-500 dark:text-amber-400">
-                {formatTime(remainingTime)}
-              </span>
+              <div className="flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-amber-600 shadow-sm dark:bg-amber-400/10 dark:text-amber-300">
+                <LucideIcon name="schedule" className="text-[18px]" />
+                <span className="hidden text-[10px] tracking-wider sm:inline">
+                  Time left
+                </span>
+                <span className="min-w-[3.5rem] font-mono text-[20px] font-black leading-none tracking-normal tabular-nums">
+                  {formatTime(remainingTime)}
+                </span>
+              </div>
             )}
             <span>Hard Checkpoint</span>
           </div>
@@ -818,7 +825,7 @@ const HardNodeChallengePage = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-[11px] font-extrabold uppercase tracking-widest text-blue-700 dark:text-[#66b3ff]">
-                      Question 01
+                      Question {formatQuestionNumber(data?.node.label ?? "1")}
                     </p>
                     <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                       {challenge.title}
@@ -1490,7 +1497,10 @@ const HardNodeChallengePage = () => {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
-                      “{result.message || "Not quite. Return to the roadmap and try this checkpoint again."}”
+                      “
+                      {result.message ||
+                        "Not quite. Return to the roadmap and try this checkpoint again."}
+                      ”
                     </p>
                   </div>
                 </div>
