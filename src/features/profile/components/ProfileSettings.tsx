@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { mascotAxolotl } from "../../users/constants/authImages";
 import { useAuthStore } from "../../users/store/auth.store";
 import { api } from "../../../services/axiosClient";
+import petVideo from "../../../assets/videos/conpet.webm";
 
 interface ProfileSettingsProps {
   theme: "light" | "dark";
@@ -12,6 +13,7 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
   const [systemName, setSystemName] = useState("");
   const [bio, setBio] = useState("");
   const [saving, setSaving] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const [message, setMessage] = useState<{
     text: string;
     isError: boolean;
@@ -72,17 +74,29 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
           <div className="flex items-center gap-4">
             {/* Khung viền Squircle bo bầu độc đáo theo đúng ảnh chụp */}
             <div
-              className={`w-[74px] h-[84px] rounded-[28px] border-2 p-2 flex items-center justify-center transition-colors ${
+              className={`w-[74px] h-[84px] rounded-[28px] border-2 p-2 flex items-center justify-center transition-colors overflow-hidden ${
                 theme === "dark"
                   ? "border-[#1c3242] bg-[#040d14]"
                   : "border-slate-300 bg-slate-100"
               }`}
             >
-              <img
-                src={mascotAxolotl}
-                alt={`${user?.petName || "Axo-Script"} Avatar`}
-                className="w-12 h-12 object-contain"
-              />
+              {!videoError ? (
+                <video
+                  src={petVideo}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  onError={() => setVideoError(true)}
+                  className="w-full h-full object-contain rounded-2xl"
+                />
+              ) : (
+                <div className={`w-full h-full flex items-center justify-center rounded-2xl font-bold text-lg ${
+                  theme === "dark" ? "text-[#7fe3dd]" : "text-teal-600"
+                }`}>
+                  {user?.petName?.charAt(0).toUpperCase() || "A"}
+                </div>
+              )}
             </div>
           </div>
         </div>

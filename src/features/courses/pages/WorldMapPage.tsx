@@ -129,7 +129,7 @@ const getNodeDynamicStyle = (
   if (nodeStatus === "locked") return {};
 
   const style: React.CSSProperties = {
-    boxShadow: `0 0 24px ${cfg.glowWeak}`,
+    boxShadow: isLight ? "0 4px 12px rgba(0,0,0,0.08)" : `0 0 24px ${cfg.glowWeak}`,
     "--node-accent": cfg.accent,
     "--node-glow": cfg.glow,
     "--node-glow-weak": cfg.glowWeak,
@@ -143,18 +143,14 @@ const getNodeDynamicStyle = (
         ? "#c7f0f7"
         : `${cfg.accent}80`;
     style.color = isLight
-      ? "#000000"
-      : difficulty === "easy"
-        ? "#001e2e"
-        : "#ffffff";
+      ? (difficulty === "hard" ? "#ffffff" : "#0f172a")
+      : (difficulty === "easy" ? "#001e2e" : "#ffffff");
   } else if (nodeStatus === "available") {
     style.background = cfg.gradient;
     style.borderColor = "var(--color-background)";
     style.color = isLight
-      ? "#000000"
-      : difficulty === "easy"
-        ? "#001e2e"
-        : "#ffffff";
+      ? (difficulty === "hard" ? "#ffffff" : "#0f172a")
+      : (difficulty === "easy" ? "#001e2e" : "#ffffff");
   }
 
   return style;
@@ -468,7 +464,7 @@ const WorldMapPage = () => {
         }`}
       >
         <div
-          className={`flex h-full w-[320px] flex-col border-r border-on-surface/8 bg-surface shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
+          className={`flex h-full w-[320px] flex-col border-r border-slate-100 dark:border-on-surface/8 bg-white dark:bg-surface shadow-sm dark:shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
             drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"
           }`}
         >
@@ -479,47 +475,47 @@ const WorldMapPage = () => {
                 style={{
                   background: cfg.glowWeak,
                   borderColor: `${cfg.accent}40`,
-                  boxShadow: `0 0 15px ${cfg.glowWeak}`,
+                  boxShadow: isLight ? "none" : `0 0 15px ${cfg.glowWeak}`,
                 }}
               >
                 <LucideIcon name="psychology" className="text-[25px]" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[15px] font-extrabold text-on-surface">
+                <span className="text-[15px] font-extrabold text-slate-800 dark:text-on-surface">
                   Level {userLevel}
                 </span>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-on-surface-variant">
                   {userTitle}
                 </span>
               </div>
             </div>
 
             <div className="mb-3 grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-100 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/80 px-3 py-2.5">
                 <LucideIcon
                   name="monetization_on"
                   className="text-[16px]"
                   style={{ color: cfg.accent }}
                 />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-slate-400 dark:text-on-surface-variant/70">
                     Roadmap XP
                   </span>
-                  <span className="text-[13px] font-bold text-on-surface">
+                  <span className="text-[13px] font-bold text-slate-800 dark:text-on-surface">
                     {totalXp || "--"} XP
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
+              <div className="flex items-center gap-2 rounded-xl border border-slate-100 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/80 px-3 py-2.5">
                 <LucideIcon
                   name="route"
                   className="text-[16px] text-[#FFE052]"
                 />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-slate-400 dark:text-on-surface-variant/70">
                     Nodes
                   </span>
-                  <span className="text-[13px] font-bold text-on-surface">
+                  <span className="text-[13px] font-bold text-slate-800 dark:text-on-surface">
                     {totalNodes || "--"}
                   </span>
                 </div>
@@ -531,13 +527,13 @@ const WorldMapPage = () => {
                 <span>{difficulty.toUpperCase()} PROGRESS</span>
                 <span>{completionPct}%</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-surface-container">
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-surface-container">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${completionPct}%`,
                     background: cfg.gradient,
-                    boxShadow: `0 0 10px ${cfg.glowWeak}`,
+                    boxShadow: isLight ? "none" : `0 0 10px ${cfg.glowWeak}`,
                   }}
                 />
               </div>
@@ -581,11 +577,11 @@ const WorldMapPage = () => {
                   disabled={isLocked}
                   className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200 ${
                     isCompleted
-                      ? "border-on-surface/10 hover:border-on-surface/20 bg-on-surface/4 hover:bg-on-surface/8 cursor-pointer"
+                      ? "border-slate-200/60 hover:border-slate-300 dark:border-on-surface/10 dark:hover:border-on-surface/20 bg-slate-50/50 hover:bg-slate-50 dark:bg-on-surface/4 dark:hover:bg-on-surface/8 cursor-pointer"
                       : ""
                   } ${isInProgress ? "ring-1 cursor-pointer" : ""} ${
                     isLocked
-                      ? "bg-transparent border-on-surface/5 opacity-35 cursor-not-allowed"
+                      ? "bg-transparent border-slate-100 dark:border-on-surface/5 opacity-35 cursor-not-allowed"
                       : ""
                   }`}
                   style={
@@ -593,7 +589,7 @@ const WorldMapPage = () => {
                       ? {
                           background: `${cfg.glowWeak}`,
                           borderColor: `${cfg.accent}50`,
-                          boxShadow: `0 0 12px ${cfg.glowWeak}`,
+                          boxShadow: isLight ? "none" : `0 0 12px ${cfg.glowWeak}`,
                           ["--tw-ring-color" as string]: cfg.accent,
                         }
                       : {}
@@ -602,7 +598,7 @@ const WorldMapPage = () => {
                   <div
                     className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold ${
                       isLocked
-                        ? "bg-surface-container text-on-surface/20 border border-on-surface/10"
+                        ? "bg-slate-100 dark:bg-surface-container text-slate-400 dark:text-on-surface/20 border border-slate-200 dark:border-on-surface/10"
                         : ""
                     }`}
                     style={
@@ -614,7 +610,7 @@ const WorldMapPage = () => {
                                 ? "#c7f0f7"
                                 : `${cfg.accent}80`,
                             color: isLight
-                              ? "#000000"
+                              ? "#ffffff"
                               : difficulty === "easy"
                                 ? "#001e2e"
                                 : "#ffffff",
@@ -624,8 +620,8 @@ const WorldMapPage = () => {
                         : isInProgress
                           ? {
                               background: cfg.gradient,
-                              color: isLight ? "#000000" : "#fff",
-                              boxShadow: `0 0 10px ${cfg.glowWeak}`,
+                              color: isLight ? (difficulty === "hard" ? "#ffffff" : "#0d1117") : "#fff",
+                              boxShadow: isLight ? "none" : `0 0 10px ${cfg.glowWeak}`,
                             }
                           : {}
                     }
@@ -690,7 +686,7 @@ const WorldMapPage = () => {
 
       <button
         onClick={() => setDrawerOpen(!drawerOpen)}
-        className={`fixed top-[96px] z-50 hidden h-10 w-10 items-center justify-center rounded-full border border-outline/30 bg-surface-container text-on-surface-variant shadow-lg transition-all duration-300 hover:border-primary-fixed-dim hover:bg-[#17212d] hover:text-primary-fixed-dim lg:flex ${
+        className={`fixed top-[96px] z-50 hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-outline/30 bg-white dark:bg-surface-container text-slate-500 dark:text-on-surface-variant shadow-md transition-all duration-300 hover:border-teal-500 dark:hover:border-primary-fixed-dim hover:bg-slate-50 dark:hover:bg-[#17212d] hover:text-teal-600 dark:hover:text-primary-fixed-dim lg:flex ${
           drawerOpen ? "left-[335px]" : "left-4"
         }`}
         aria-label={drawerOpen ? "Collapse sidebar" : "Expand sidebar"}
@@ -715,7 +711,7 @@ const WorldMapPage = () => {
                   style={{
                     background: cfg.glowWeak,
                     borderColor: `${cfg.accent}50`,
-                    boxShadow: `0 0 20px ${cfg.glowWeak}`,
+                    boxShadow: isLight ? "none" : `0 0 20px ${cfg.glowWeak}`,
                   }}
                 >
                   <LucideIcon
@@ -741,7 +737,7 @@ const WorldMapPage = () => {
                 </div>
               </div>
 
-              <div className="flex gap-0.5 rounded-xl border border-on-surface/10 bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
+              <div className="flex gap-0.5 rounded-xl border border-slate-200 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
                 {(["easy", "medium", "hard"] as Difficulty[]).map((d) => {
                   const isLocked =
                     d === "medium"
@@ -758,16 +754,17 @@ const WorldMapPage = () => {
                       onClick={() => !isLocked && setDifficulty(d)}
                       className={`rounded-lg px-5 py-2 transition-all duration-200 flex items-center gap-1.5 ${
                         difficulty === d
-                          ? "text-[#0d1117] shadow-md font-extrabold"
+                          ? "shadow-md font-extrabold"
                           : isLocked
                             ? "text-on-surface-variant/30 cursor-not-allowed opacity-50"
-                            : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
+                            : "text-slate-600 dark:text-on-surface-variant hover:bg-slate-200/50 dark:hover:bg-on-surface/8 hover:text-slate-900 dark:hover:text-on-surface"
                       }`}
                       style={
                         difficulty === d
                           ? {
                               background: dCfg.gradient,
-                              boxShadow: `0 2px 12px ${dCfg.glowWeak}`,
+                              color: (isLight && d === "hard") ? "#ffffff" : "#0d1117",
+                              boxShadow: isLight ? "none" : `0 2px 12px ${dCfg.glowWeak}`,
                             }
                           : {}
                       }
@@ -782,20 +779,20 @@ const WorldMapPage = () => {
               </div>
             </div>
 
-            <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-on-surface/10 bg-surface-container/60 px-5 py-4">
-              <div className="flex items-center justify-between text-[13px] font-bold tracking-wider text-on-surface-variant">
+            <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-slate-200 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/60 px-5 py-4">
+              <div className="flex items-center justify-between text-[13px] font-bold tracking-wider text-slate-500 dark:text-on-surface-variant">
                 <span>{DIFF_CONFIG[difficulty].label} Completion</span>
                 <span className="text-[15px]" style={{ color: cfg.accent }}>
                   {completionPct}%
                 </span>
               </div>
-              <div className="h-3 overflow-hidden rounded-full bg-surface-container">
+              <div className="h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-surface-container">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${completionPct}%`,
                     background: cfg.gradient,
-                    boxShadow: `0 0 14px ${cfg.glow}`,
+                    boxShadow: isLight ? "none" : `0 0 14px ${cfg.glow}`,
                   }}
                 />
               </div>
@@ -931,7 +928,7 @@ const WorldMapPage = () => {
                         stroke={getDiffConfig("easy", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-easy-roadmap)"
+                        filter={isLight ? undefined : "url(#glow-easy-roadmap)"}
                       />
                     )}
                     {lockedD && (
@@ -1129,7 +1126,7 @@ const WorldMapPage = () => {
                         stroke={getDiffConfig("medium", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-medium-roadmap)"
+                        filter={isLight ? undefined : "url(#glow-medium-roadmap)"}
                       />
                     )}
                     {lockedD && (
@@ -1295,7 +1292,7 @@ const WorldMapPage = () => {
                         stroke={getDiffConfig("hard", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-hard-roadmap)"
+                        filter={isLight ? undefined : "url(#glow-hard-roadmap)"}
                       />
                     )}
                     {lockedD && (
@@ -1441,8 +1438,10 @@ const WorldMapPage = () => {
             disabled={!firstAvailableNodeId}
             style={{
               background: cfg.gradient,
-              boxShadow: `0 4px 20px ${cfg.glowWeak}`,
-              color: isLight ? "#000000" : "#fff",
+              boxShadow: isLight ? "0 4px 14px rgba(0,0,0,0.15)" : `0 4px 20px ${cfg.glowWeak}`,
+              color: isLight
+                ? (difficulty === "hard" ? "#ffffff" : "#0f172a")
+                : "#ffffff",
             }}
           >
             <LucideIcon
@@ -1461,7 +1460,7 @@ const WorldMapPage = () => {
             <button
               onClick={scrollToTop}
               title="Scroll to top"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-on-surface/10 bg-surface-container/90 text-on-surface-variant shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-on-surface/25 hover:text-on-surface active:scale-95"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 dark:border-on-surface/10 bg-white dark:bg-surface-container/90 text-slate-500 dark:text-on-surface-variant shadow-md backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-slate-300 dark:hover:border-on-surface/25 hover:text-slate-800 dark:hover:text-on-surface active:scale-95"
             >
               <LucideIcon name="arrow_upward" className=" text-[20px]" />
             </button>

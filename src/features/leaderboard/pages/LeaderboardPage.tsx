@@ -53,7 +53,7 @@ const getPodiumStyle = (rank: number) => {
       width: "md:w-[320px]",
       padding: "p-8",
       offset: "md:-translate-y-4 hover:-translate-y-6",
-      border: "border-[#F687B3]/30",
+      border: "border-pink-300 dark:border-[#F687B3]/30",
       color: "#F687B3",
       text: "text-[#F687B3]",
       avatarSize: "h-32 w-32 text-3xl",
@@ -70,7 +70,7 @@ const getPodiumStyle = (rank: number) => {
       width: "md:w-[280px]",
       padding: "p-6",
       offset: "hover:-translate-y-1",
-      border: "border-[#4FD1C5]/20",
+      border: "border-teal-300 dark:border-[#4FD1C5]/20",
       color: "#4FD1C5",
       text: "text-[#4FD1C5]",
       avatarSize: "h-24 w-24 text-[24px]",
@@ -86,7 +86,7 @@ const getPodiumStyle = (rank: number) => {
     width: "md:w-[280px]",
     padding: "p-6",
     offset: "hover:-translate-y-1",
-    border: "border-[#A0AEC0]/20",
+    border: "border-slate-300 dark:border-[#A0AEC0]/20",
     color: "#A0AEC0",
     text: "text-[#A0AEC0]",
     avatarSize: "h-24 w-24 text-2xl",
@@ -189,8 +189,8 @@ const LeaderboardPage = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-surface-container/50 border border-on-surface/10 p-1.5 rounded-xl shadow-sm">
-            <div className="px-5 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center justify-center bg-primary-fixed-dim/20 text-primary border border-primary-fixed-dim/30 shadow-md">
+          <div className="flex items-center gap-2 bg-white dark:bg-surface-container/50 border border-slate-200 dark:border-on-surface/10 p-1.5 rounded-xl shadow-sm">
+            <div className="px-5 py-2.5 rounded-lg text-[13px] font-bold transition-all duration-300 flex items-center justify-center bg-teal-50 dark:bg-primary-fixed-dim/20 text-teal-700 dark:text-primary border border-teal-200 dark:border-primary-fixed-dim/30 shadow-sm dark:shadow-md">
               <div className="text-center">
                 Python
                 <br className="hidden md:block" />
@@ -242,7 +242,7 @@ const LeaderboardPage = () => {
                 return (
                   <div
                     key={`${user.rank}-${user.name}`}
-                    className={`w-full ${style.width} ${style.order} ${style.padding} ${style.offset} bg-surface-container/50 backdrop-blur-md rounded-3xl border ${style.border} flex flex-col items-center relative transition-transform duration-300`}
+                    className={`w-full ${style.width} ${style.order} ${style.padding} ${style.offset} bg-white/75 dark:bg-surface-container/50 backdrop-blur-md rounded-3xl border ${style.border} flex flex-col items-center relative transition-all duration-300 shadow-sm hover:shadow-md dark:shadow-none`}
                   >
                     {style.icon && (
                       <LucideIcon
@@ -288,7 +288,7 @@ const LeaderboardPage = () => {
               })}
             </div>
 
-            <div className="bg-surface-container/50 border border-on-surface/10 rounded-[24px] p-6 lg:p-8 relative">
+            <div className="bg-white dark:bg-surface-container/50 border border-slate-300 dark:border-on-surface/10 rounded-[24px] p-6 lg:p-8 relative shadow-sm">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <h2 className="text-[24px] font-extrabold tracking-tight text-on-surface">
                   Main Rankings
@@ -308,7 +308,7 @@ const LeaderboardPage = () => {
 
               <div className="flex flex-col gap-2">
                 {rankings.length === 0 && (
-                  <div className="rounded-xl border border-on-surface/10 bg-surface/60 px-4 py-6 text-center text-[13px] font-semibold text-on-surface-variant">
+                  <div className="rounded-xl border border-slate-200 dark:border-on-surface/10 bg-slate-50 dark:bg-surface/60 px-4 py-6 text-center text-[13px] font-semibold text-on-surface-variant">
                     No additional rankings yet.
                   </div>
                 )}
@@ -318,12 +318,12 @@ const LeaderboardPage = () => {
                   .map((user) => (
                     <div
                       key={`${user.rank}-${user.name}`}
-                      className="flex items-center gap-4 py-4 border-b border-on-surface/5 last:border-0 hover:bg-surface-container/80 px-4 -mx-4 rounded-xl transition-colors group"
+                      className="flex items-center gap-4 py-4 border-b border-slate-100 dark:border-on-surface/5 last:border-0 hover:bg-slate-50 dark:hover:bg-surface-container/80 px-4 -mx-4 rounded-xl transition-colors group"
                     >
                       <div className="w-8 text-[15px] font-mono font-bold text-on-surface-variant/60 group-hover:text-primary transition-colors">
                         {user.rank < 10 ? `0${user.rank}` : user.rank}
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-surface border border-on-surface/10 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
+                      <div className="w-10 h-10 rounded-full bg-surface border border-slate-200 dark:border-on-surface/10 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
                         {renderAvatar(user)}
                       </div>
                       <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
@@ -355,14 +355,14 @@ const LeaderboardPage = () => {
               </div>
 
               {currentUserRank && (
-                <div className="mt-8 -mx-4 px-4 py-4 rounded-xl border-2 border-primary-fixed-dim/50 bg-primary-fixed-dim/5 shadow-[0_0_20px_rgba(0,128,128,0.1)] flex items-center gap-4 relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-1 h-full bg-primary-fixed-dim" />
-                  <div className="w-8 text-[15px] font-mono font-extrabold text-primary-fixed-dim transition-colors">
+                <div className="mt-8 -mx-4 px-4 py-4 rounded-xl border-2 border-slate-300 dark:border-primary-fixed-dim/50 bg-slate-50 dark:bg-primary-fixed-dim/5 shadow-sm dark:shadow-[0_0_20px_rgba(0,128,128,0.1)] flex items-center gap-4 relative overflow-hidden group">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-600 dark:bg-primary-fixed-dim" />
+                  <div className="w-8 text-[15px] font-mono font-extrabold text-teal-600 dark:text-primary-fixed-dim transition-colors">
                     {currentUserRank.rank < 10
                       ? `0${currentUserRank.rank}`
                       : currentUserRank.rank}
                   </div>
-                  <div className="w-10 h-10 rounded-full bg-surface border-2 border-primary-fixed-dim/40 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
+                  <div className="w-10 h-10 rounded-full bg-surface border border-teal-200 dark:border-primary-fixed-dim/40 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
                     {renderAvatar(currentUserRank)}
                   </div>
                   <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">

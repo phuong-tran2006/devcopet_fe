@@ -130,14 +130,21 @@ const Header = () => {
                       {user?.avatarUrl ? (
                         <img
                           src={user.avatarUrl}
-                          alt="avatar"
+                          alt={user?.name || user?.username || "User"}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.style.display = "none";
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerText = (user?.name || user?.username || "U").charAt(0).toUpperCase();
+                            }
+                          }}
                         />
                       ) : (
                         <>
-                          {user?.username?.charAt(0)?.toUpperCase() ||
-                            user?.email?.charAt(0)?.toUpperCase() ||
-                            "U"}
+                          {(user?.name || user?.username || user?.email || "U")
+                            .charAt(0)
+                            ?.toUpperCase()}
                         </>
                       )}
                     </div>

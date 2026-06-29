@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import LucideIcon from "../ui/LucideIcon";
 import {
   dailyQuestsApi,
@@ -21,10 +21,12 @@ const DailyMissionDropdown = ({
 }: DailyMissionDropdownProps) => {
   const { triggerHaptic } = useTheme();
   const navigate = useNavigate();
+  const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<TodayDailyMissionsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [openingMissionId, setOpeningMissionId] = useState<string | null>(null);
   const [expandedMissionId, setExpandedMissionId] = useState<string | null>(
     null,
   );
@@ -44,11 +46,21 @@ const DailyMissionDropdown = ({
     }
   };
 
-  // Fetch when dropdown opens
+  // Fetch when dropdown opens or window gains focus
   useEffect(() => {
     if (isOpen) {
       fetchMissions();
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleFocus = () => {
+      if (isOpen) {
+        fetchMissions();
+      }
+    };
+    window.addEventListener("focus", handleFocus);
+    return () => window.removeEventListener("focus", handleFocus);
   }, [isOpen]);
 
   // Click outside listener
@@ -66,36 +78,144 @@ const DailyMissionDropdown = ({
   }, [onClose]);
 
   const sanitizePath = (path: string) => {
-    return path
+    let p = path.trim();
+    if (!p.startsWith("/")) {
+      p = "/" + p;
+    }
+    return p
       .replace(/^\/roadmaps/, "/roadmap")
       .replace(/^\/lessons/, "/lesson")
       .replace(/^\/courses/, "/course")
       .replace(/^\/quizzes/, "/quiz");
   };
 
-  const handleStart = async (id: string, ctaPath?: string) => {
+  // Helper to extract a single mission from various backend response shapes
+  const extractMissionFromResponse = (response: any, id: string): DailyMission | null => {
+    if (!response) return null;
+    if (Array.isArray(response)) {
+      return response.find((m: any) => (m.id || m._id) === id) || null;
+    }
+    const missions = response.missions || response.data?.missions;
+    if (Array.isArray(missions)) {
+      return missions.find((m: any) => (m.id || m._id) === id) || null;
+    }
+    if ((response.id || response._id) === id) {
+      return response;
+    }
+    if (response.status && response.title) {
+      return response;
+    }
+    return null;
+  };
+
+  // Helper to validate and resolve ctaPath with fallbacks
+  const resolveDailyMissionCtaPath = (path?: string): string | null => {
+    if (!path) return null;
+    const sanitized = sanitizePath(path);
+    const allowedPrefixes = [
+      "/",
+      "/course",
+      "/courses",
+      "/lesson",
+      "/lessons",
+      "/roadmap",
+      "/profile",
+      "/arena",
+      "/leaderboard",
+    ];
+    if (allowedPrefixes.some((prefix) => sanitized.startsWith(prefix))) {
+      return sanitized;
+    }
+    return null;
+  };
+
+  const handleStart = async (id: string, originalCtaPath?: string) => {
     triggerHaptic(40);
+    const originalPath = originalCtaPath;
+
+    if (import.meta.env.DEV) {
+      console.log("[DailyMission] START clicked", { id, originalCtaPath });
+      console.log("[DailyMission] original ctaPath", originalPath);
+    }
+
     try {
-      await dailyQuestsApi.markDailyMissionOpened(id);
-      if (ctaPath) {
-        navigate({ to: sanitizePath(ctaPath) });
+      setOpeningMissionId(id);
+      const response = (await dailyQuestsApi.markDailyMissionOpened(id)) as any;
+      
+      if (import.meta.env.DEV) {
+        console.log("[DailyMission] PATCH opened response", response);
       }
+
+      const updatedMission = extractMissionFromResponse(response, id);
+      
+      if (import.meta.env.DEV) {
+        console.log("[DailyMission] extracted updated mission", updatedMission);
+      }
+
+      // Update local state in background or immediately if payload is complete
+      if (response && (response.missions || response.data?.missions)) {
+        const payload = response.data || response;
+        setData(payload);
+      } else {
+        // Do not await this to avoid blocking navigation
+        dailyQuestsApi.getTodayDailyMissions()
+          .then((freshData) => {
+            setData(freshData);
+          })
+          .catch((err) => console.error("Failed to background refetch missions:", err));
+      }
+
+      const finalMission = updatedMission || { id, status: "OPENED", ctaPath: originalPath };
+
+      if (finalMission.status === "COMPLETED") {
+        // Refetch in background to sync UI
+        dailyQuestsApi.getTodayDailyMissions()
+          .then((freshData) => {
+            setData(freshData);
+          })
+          .catch((err) => console.error(err));
+        return;
+      }
+
+      const pathToSend = finalMission.ctaPath || originalPath;
+      const targetPath = resolveDailyMissionCtaPath(pathToSend);
+
+      if (import.meta.env.DEV) {
+        console.log("[DailyMission] final targetPath", targetPath);
+      }
+
+      if (!targetPath) {
+        alert("Route unavailable");
+        return;
+      }
+
+      router.history.push(targetPath);
       onClose();
     } catch (err) {
       console.error("Failed to start mission:", err);
+      alert("Failed to start mission. Please try again.");
+    } finally {
+      setOpeningMissionId(null);
     }
   };
 
   const handleContinue = (ctaPath?: string) => {
     triggerHaptic(40);
-    if (ctaPath) {
-      navigate({ to: sanitizePath(ctaPath) });
+    const targetPath = resolveDailyMissionCtaPath(ctaPath);
+    if (import.meta.env.DEV) {
+      console.log("[DailyMission] CONTINUE clicked", { ctaPath });
+      console.log("[DailyMission] final targetPath", targetPath);
     }
-    onClose();
+    if (targetPath) {
+      router.history.push(targetPath);
+      onClose();
+    } else {
+      alert("Route unavailable");
+    }
   };
 
   const completedNormal = data?.progress?.completedNormal ?? 0;
-  const totalNormal = data?.progress?.totalNormal ?? 4;
+  const totalNormal = data?.progress?.totalNormal ?? 5;
   const missions = data?.missions ?? [];
 
   const getStatusColor = (status: string) => {
@@ -122,8 +242,8 @@ const DailyMissionDropdown = ({
       <button
         onClick={onToggle}
         className={`w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center transition-all text-on-surface relative ${isOpen
-            ? "bg-on-surface/10 border-primary-fixed-dim/45 shadow-[0_0_15px_rgba(0,218,248,0.25)]"
-            : "hover:bg-on-surface/10"
+          ? "bg-on-surface/10 border-primary-fixed-dim/45 shadow-[0_0_15px_rgba(0,218,248,0.25)]"
+          : "hover:bg-on-surface/10"
           }`}
       >
         <LucideIcon name="assignment" className="text-[20px]" />
@@ -138,8 +258,8 @@ const DailyMissionDropdown = ({
       {/* Dropdown Panel */}
       <div
         className={`absolute top-[52px] right-[-80px] sm:right-[-40px] w-[350px] sm:w-[380px] bg-surface-container-high/95 backdrop-blur-xl border border-on-surface/10 rounded-[1.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 origin-top-right z-50 ${isOpen
-            ? "opacity-100 scale-100 visible"
-            : "opacity-0 scale-95 invisible"
+          ? "opacity-100 scale-100 visible"
+          : "opacity-0 scale-95 invisible"
           }`}
       >
         {/* Header */}
@@ -195,17 +315,13 @@ const DailyMissionDropdown = ({
             </div>
           ) : (
             missions.map((mission) => {
-              const isHardcore = mission.missionKind === "HARDCORE";
               const isLocked = mission.status === "LOCKED";
               const isExpanded = expandedMissionId === mission.id;
 
               return (
                 <div
                   key={mission.id}
-                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex flex-col gap-3 relative transition-all ${isHardcore
-                      ? "border-red-500/20 bg-gradient-to-br from-red-500/5 to-transparent"
-                      : ""
-                    } ${isLocked ? "opacity-60" : ""}`}
+                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex flex-col gap-3 relative transition-all ${isLocked ? "opacity-60" : ""}`}
                 >
                   {/* Top row: Badges and Title */}
                   <div className="flex justify-between items-start gap-2">
@@ -215,11 +331,6 @@ const DailyMissionDropdown = ({
                       >
                         {mission.status}
                       </span>
-                      {isHardcore && (
-                        <span className="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded border border-red-500/40 bg-red-500/10 text-red-400">
-                          HARDCORE
-                        </span>
-                      )}
                       {mission.sourceType === "STARTER" && (
                         <span className="text-[9px] font-black tracking-widest uppercase px-2 py-0.5 rounded border border-cyan-500/40 bg-cyan-500/10 text-cyan-400">
                           STARTER
@@ -277,10 +388,14 @@ const DailyMissionDropdown = ({
                           onClick={() =>
                             handleStart(mission.id, mission.ctaPath)
                           }
-                          disabled={!mission.ctaPath}
+                          disabled={openingMissionId === mission.id || !mission.ctaPath}
                           className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 disabled:bg-slate-800 disabled:text-slate-500 text-slate-950 text-[11px] font-black uppercase tracking-wider transition-colors"
                         >
-                          {mission.ctaPath ? "Start" : "Route unavailable"}
+                          {openingMissionId === mission.id
+                            ? "Opening..."
+                            : mission.ctaPath
+                            ? "Start"
+                            : "Route unavailable"}
                         </button>
                       )}
                       {mission.status === "OPENED" && (

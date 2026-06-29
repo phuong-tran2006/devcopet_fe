@@ -341,9 +341,9 @@ const LessonQuizInner = ({
         </div>
         <button
           onClick={handleStart}
-          className="w-full md:w-auto flex-shrink-0 bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)] whitespace-nowrap"
+          className="w-full md:w-auto flex-shrink-0 bg-teal-600 hover:bg-teal-700 text-white font-bold px-6 py-3 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md dark:bg-primary-fixed-dim dark:text-on-primary-fixed dark:hover:bg-primary-fixed dark:shadow-[0_0_15px_rgba(0,218,248,0.4)] whitespace-nowrap"
         >
-          <LucideIcon name="assignment" className=" text-[20px]" />
+          <LucideIcon name="assignment" className="text-[18px]" />
           Start Quiz
         </button>
       </div>
@@ -366,9 +366,9 @@ const LessonQuizInner = ({
         </div>
         <button
           disabled
-          className="w-full md:w-auto flex-shrink-0 bg-primary-fixed-dim/50 text-on-primary-fixed/70 font-bold px-8 py-3.5 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap cursor-not-allowed"
+          className="w-full md:w-auto flex-shrink-0 bg-teal-600/50 text-white/70 font-bold px-6 py-3 rounded-xl flex items-center justify-center gap-2 whitespace-nowrap cursor-not-allowed dark:bg-primary-fixed-dim/50 dark:text-on-primary-fixed/70"
         >
-          <div className="w-4 h-4 border-2 border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
+          <div className="w-4 h-4 border-2 border-white/60 dark:border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
           Loading Quiz...
         </button>
       </div>

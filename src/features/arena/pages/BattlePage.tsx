@@ -167,7 +167,7 @@ const BattlePage = () => {
         <MiniPlayerCard
           name={opponent?.username || "Opponent"}
           avatarUrl={
-            opponent?.avatarUrl || "https://i.pravatar.cc/150?u=arena-opponent"
+            opponent?.avatarUrl || ""
           }
           hpPercentage={Math.min(
             100,
@@ -194,7 +194,7 @@ const BattlePage = () => {
           avatarUrl={
             me?.avatarUrl ||
             (currentUser?.avatarUrl as string) ||
-            "/axolotl.png"
+            ""
           }
           hpPercentage={Math.min(
             100,

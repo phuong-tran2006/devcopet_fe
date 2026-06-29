@@ -93,6 +93,7 @@ const EasyNodeChallengePage = () => {
     null,
   );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailureModal, setShowFailureModal] = useState(false);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [wrongAttempt, setWrongAttempt] = useState<{
     optionId: EasyChallengeOptionId;
@@ -110,6 +111,7 @@ const EasyNodeChallengePage = () => {
   const [sessionServerNow, setSessionServerNow] = useState<string | null>(null);
   const [remainingTime, setRemainingTime] = useState<number | null>(null);
   const [isExpired, setIsExpired] = useState(false);
+  const [timerStopped, setTimerStopped] = useState(false);
 
   const challenge = data?.challenge ?? null;
   const review = data?.review ?? null;
@@ -155,6 +157,7 @@ const EasyNodeChallengePage = () => {
     setSelectedOptionId(null);
     setResult(null);
     setShowSuccessModal(false);
+    setShowFailureModal(false);
     setWrongAttempt(null);
     setSubmitError(null);
     setSessionId(null);
@@ -162,18 +165,25 @@ const EasyNodeChallengePage = () => {
     setSessionServerNow(null);
     setRemainingTime(null);
     setIsExpired(false);
+    setTimerStopped(false);
 
     const safeCourseSlug = courseSlug || "python-basic";
 
-    Promise.all([
-      courseApi.startRoadmapChallengeSession(safeCourseSlug, "easy", nodeId),
-      courseApi.getEasyNodeChallenge(nodeId),
-    ])
-      .then(([sessionRes, challengeRes]) => {
-        setSessionId(sessionRes.sessionId);
-        setSessionExpiresAt(sessionRes.expiresAt);
-        setSessionServerNow(sessionRes.serverNow);
-        setData(normalizeChallengeResponse(challengeRes));
+    courseApi.getEasyNodeChallenge(nodeId)
+      .then((challengeRes) => {
+        const normalized = normalizeChallengeResponse(challengeRes);
+        setData(normalized);
+
+        if (normalized.node.status === "completed") {
+          setTimerStopped(true);
+        } else {
+          return courseApi.startRoadmapChallengeSession(safeCourseSlug, "easy", nodeId)
+            .then((sessionRes) => {
+              setSessionId(sessionRes.sessionId);
+              setSessionExpiresAt(sessionRes.expiresAt);
+              setSessionServerNow(sessionRes.serverNow);
+            });
+        }
       })
       .catch((err) => {
         const errMsg =
@@ -199,7 +209,7 @@ const EasyNodeChallengePage = () => {
   }, [nodeId, courseSlug]);
 
   useEffect(() => {
-    if (!sessionExpiresAt || !sessionServerNow) return;
+    if (!sessionExpiresAt || !sessionServerNow || timerStopped) return;
 
     const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
 
@@ -209,6 +219,7 @@ const EasyNodeChallengePage = () => {
       if (remaining <= 0) {
         setRemainingTime(0);
         setIsExpired(true);
+        setTimerStopped(true);
         return true;
       }
       setRemainingTime(remaining);
@@ -226,7 +237,7 @@ const EasyNodeChallengePage = () => {
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [sessionExpiresAt, sessionServerNow]);
+  }, [sessionExpiresAt, sessionServerNow, timerStopped]);
 
   useEffect(() => {
     if (isExpired) {
@@ -300,6 +311,7 @@ const EasyNodeChallengePage = () => {
           response.message === "TIME_EXPIRED" ||
           (response as any).code === "TIME_EXPIRED"
         ) {
+          setTimerStopped(true);
           setSubmitError("Time expired");
           setTimeout(() => {
             goBackToRoadmap();
@@ -329,20 +341,18 @@ const EasyNodeChallengePage = () => {
         }
 
         if (response.correct) {
+          setTimerStopped(true);
           setResult(response);
           setShowSuccessModal(true);
           return;
         }
 
+        setTimerStopped(true);
         setWrongAttempt({
           optionId: selectedOptionId,
           message: response.message || "Incorrect answer",
         });
-        setSelectedOptionId(null);
-
-        setTimeout(() => {
-          goBackToRoadmap();
-        }, 2000);
+        setShowFailureModal(true);
       })
       .catch((err) => {
         const errMsg =
@@ -352,6 +362,7 @@ const EasyNodeChallengePage = () => {
           "Unable to submit your answer.";
 
         if (errMsg === "TIME_EXPIRED") {
+          setTimerStopped(true);
           setSubmitError("Time expired");
           setTimeout(() => {
             goBackToRoadmap();
@@ -467,12 +478,18 @@ const EasyNodeChallengePage = () => {
           </button>
 
           <div className="flex items-center gap-4 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-            {remainingTime !== null && (
-              <span className="font-mono text-amber-500 dark:text-amber-400">
-                {formatTime(remainingTime)}
-              </span>
+            {isReviewMode || (timerStopped && result?.correct) ? (
+              <span>Completed · Easy Checkpoint</span>
+            ) : (
+              <>
+                {remainingTime !== null && (
+                  <span className="font-mono text-amber-500 dark:text-amber-400">
+                    {formatTime(remainingTime)}
+                  </span>
+                )}
+                <span>Easy Checkpoint</span>
+              </>
             )}
-            <span>Easy Checkpoint</span>
           </div>
         </div>
 
@@ -773,6 +790,47 @@ const EasyNodeChallengePage = () => {
                         className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
                       >
                         Review Mission
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {showFailureModal && wrongAttempt && (
+                <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+                  <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)] border border-red-500/20">
+                    <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.05)] dark:bg-[#2b171a] dark:shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+                      <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                        <LucideIcon name="close" className=" text-[46px]" />
+                      </div>
+
+                      <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                        Mission
+                        <br />
+                        Failed
+                      </h2>
+
+                      <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#1b2732]/70">
+                        <div className="flex items-start gap-3">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                            <LucideIcon name="error" className=" text-[24px]" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                              “{wrongAttempt.message || "Not quite. Return to the roadmap and try this checkpoint again."}”
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setShowFailureModal(false);
+                          goBackToRoadmap();
+                        }}
+                        className="mt-7 w-full rounded-lg bg-red-600 hover:bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition-all duration-200"
+                      >
+                        Return to Roadmap
                       </button>
                     </div>
                   </div>

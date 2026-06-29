@@ -40,10 +40,10 @@ const CourseSidebarChapter = ({
         className="w-full flex items-center justify-between py-4 px-4 hover:bg-surface-container-high transition-colors"
       >
         <div className="flex flex-col items-start pr-4 text-left">
-          <h4 className="font-headline-sm text-[14px] font-bold text-on-surface group-hover:text-primary-fixed transition-colors">
+          <h4 className="font-headline-sm text-[14px] font-bold text-slate-800 dark:text-on-surface group-hover:text-teal-600 dark:group-hover:text-primary-fixed transition-colors">
             {index + 1}. {chapter.title}
           </h4>
-          <span className="font-label-sm text-[11px] text-on-surface-variant mt-1 tracking-wider uppercase">
+          <span className="font-label-sm text-[11px] text-slate-500 dark:text-on-surface-variant mt-1 tracking-wider uppercase">
             {lessons.length} Lesson
           </span>
         </div>
@@ -89,8 +89,8 @@ const CourseSidebarChapter = ({
                   params={{ lessonId: lesson._id }}
                   className={`flex items-center gap-3 px-6 py-3 transition-colors ${
                     isActive
-                      ? "bg-primary-fixed-dim/15 border-l-2 border-primary-fixed-dim"
-                      : "hover:bg-surface-container border-l-2 border-transparent"
+                      ? "bg-teal-500/10 dark:bg-primary-fixed-dim/15 border-l-2 border-teal-600 dark:border-primary-fixed-dim"
+                      : "hover:bg-slate-50 dark:hover:bg-surface-container border-l-2 border-transparent"
                   }`}
                 >
                   <LessonProgressCircle
@@ -103,8 +103,8 @@ const CourseSidebarChapter = ({
                     <h5
                       className={`font-body-md text-[13.5px] truncate ${
                         isActive
-                          ? "text-primary-fixed-dim font-bold"
-                          : "text-on-surface-variant/90"
+                          ? "text-teal-600 dark:text-primary-fixed-dim font-bold"
+                          : "text-slate-700 dark:text-on-surface-variant/90"
                       }`}
                     >
                       {index + 1}.{idx + 1} {lesson.title}
@@ -136,7 +136,7 @@ const CourseSidebar = ({
   currentLessonProgress = 0,
   currentLessonCompleted = false,
   refreshKey = 0,
-  className = "hidden lg:flex w-[380px] shrink-0 bg-surface-container-low border-r border-outline-variant h-full flex-col z-20",
+  className = "hidden lg:flex w-[380px] shrink-0 bg-white dark:bg-surface-container-low border-r border-slate-100 dark:border-outline-variant h-full flex-col z-20",
 }) => {
   const [course, setCourse] = useState(null);
   const [chapters, setChapters] = useState([]);
@@ -179,26 +179,26 @@ const CourseSidebar = ({
   return (
     <div className={className}>
       {/* Header Info */}
-      <div className="p-5 border-b border-outline-variant bg-surface">
+      <div className="p-5 border-b border-slate-100 dark:border-outline-variant bg-white dark:bg-surface">
         {/* <Link to="/course" className="inline-flex items-center gap-1.5 text-on-surface-variant hover:text-white font-label-sm tracking-widest uppercase text-[10px] mb-3 transition-colors">
           <LucideIcon name="arrow_back" className="text-[14px]" />
           Trở về khoá học
         </Link> */}
-        <h2 className="font-headline-sm text-[18px] font-bold text-on-surface mb-4 line-clamp-2">
+        <h2 className="font-headline-sm text-[18px] font-bold text-slate-800 dark:text-on-surface mb-4 line-clamp-2">
           {course ? course.title : "Đang tải..."}
         </h2>
 
         <div className="flex items-center justify-between mb-2">
-          <span className="font-label-sm text-[11px] tracking-wider text-on-surface-variant/80 uppercase">
+          <span className="font-label-sm text-[11px] tracking-wider text-slate-500 dark:text-on-surface-variant/80 uppercase">
             {completedLessons} / {totalLessons || "--"} lesson
           </span>
-          <span className="font-bold text-[12px] text-primary-fixed-dim">
+          <span className="font-bold text-[12px] text-teal-600 dark:text-primary-fixed-dim">
             {progressPercent}%
           </span>
         </div>
-        <div className="h-[4px] bg-surface-container-highest rounded-full overflow-hidden">
+        <div className="h-[4px] bg-slate-100 dark:bg-surface-container-highest rounded-full overflow-hidden">
           <div
-            className="h-full bg-primary-fixed-dim rounded-full shadow-[0_0_10px_rgba(0,218,248,0.4)] transition-all duration-500"
+            className="h-full bg-teal-600 dark:bg-primary-fixed-dim rounded-full shadow-[0_0_8px_rgba(13,148,136,0.3)] dark:shadow-[0_0_10px_rgba(0,218,248,0.4)] transition-all duration-500"
             style={{ width: `${progressPercent}%` }}
           />
         </div>

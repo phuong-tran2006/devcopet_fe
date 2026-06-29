@@ -15,7 +15,7 @@ interface LeaderboardItem {
   arenaDraws: number;
 }
 
-const getInitials = (username: string) => username.slice(0, 2).toUpperCase();
+const getInitials = (username: string) => username.charAt(0).toUpperCase() || "?";
 const getWinRate = (player: LeaderboardItem) => {
   if (!player.arenaTotalMatches) return "0%";
   return `${Math.round((player.arenaWins / player.arenaTotalMatches) * 100)}%`;
@@ -118,6 +118,13 @@ const ArenaRankingPage = () => {
                       src={player.avatarUrl}
                       alt={player.username}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                        const parent = e.currentTarget.parentElement;
+                        if (parent) {
+                          parent.innerText = getInitials(player.username);
+                        }
+                      }}
                     />
                   ) : (
                     getInitials(player.username)

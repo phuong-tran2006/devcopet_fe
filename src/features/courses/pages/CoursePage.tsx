@@ -85,22 +85,24 @@ const CourseCard = ({
   const buttonLabel = stats.percent > 0 ? "Continue" : "Start Course";
 
   return (
-    <div className="bg-surface-container rounded-xl overflow-hidden border border-on-surface/10 flex flex-col hover:border-primary-fixed-dim/50 transition-colors group relative shadow-[0_0_20px_rgba(0,0,0,0.5)] w-full flex-shrink-0">
-      <div className="h-[90px] bg-primary-container relative flex items-center justify-center">
+    <div className="bg-white dark:bg-surface-container rounded-2xl overflow-hidden border border-slate-200 dark:border-on-surface/10 flex flex-col hover:border-teal-500/50 dark:hover:border-primary-fixed-dim/50 transition-all duration-300 group relative shadow-sm hover:shadow-md dark:shadow-[0_0_20px_rgba(0,0,0,0.5)] w-full flex-shrink-0">
+      <div className="h-[100px] bg-gradient-to-br from-cyan-50 via-teal-50 to-sky-100 dark:bg-none dark:bg-primary-container relative flex items-center justify-center border-b border-slate-100 dark:border-none">
         {featured && (
-          <div className="absolute top-2 left-2 bg-primary-fixed-dim/20 border border-primary-fixed-dim/40 text-primary-fixed-dim text-[8px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase backdrop-blur-sm shadow-[0_0_10px_rgba(0,218,248,0.2)]">
+          <div className="absolute top-3 left-3 bg-teal-600/10 dark:bg-primary-fixed-dim/20 border border-teal-600/20 dark:border-primary-fixed-dim/40 text-teal-700 dark:text-primary-fixed-dim text-[8px] font-black px-2.5 py-1 rounded-full tracking-widest uppercase backdrop-blur-sm shadow-sm dark:shadow-[0_0_10px_rgba(0,218,248,0.2)]">
             Popular
           </div>
         )}
-        <CourseIcon course={course} />
+        <div className="rounded-2xl bg-white/90 dark:bg-slate-950/40 p-2.5 shadow-sm dark:shadow-none border border-slate-200/40 dark:border-cyan-500/10 transition-all duration-300 group-hover:scale-105">
+          <CourseIcon course={course} />
+        </div>
       </div>
 
       <div className="p-4 flex-1 flex flex-col">
-        <div className="flex justify-between items-start mb-1 gap-3">
-          <h3 className="font-headline-sm text-[16px] text-on-surface line-clamp-2">
+        <div className="flex justify-between items-start mb-2.5 gap-3">
+          <h3 className="font-headline-sm text-[16.5px] font-bold text-slate-900 dark:text-on-surface line-clamp-2 leading-snug">
             {course?.title || "Untitled Course"}
           </h3>
-          <div className="bg-surface-container text-on-surface-variant p-1.5 rounded-lg flex items-center justify-center shrink-0">
+          <div className="bg-slate-50 dark:bg-surface-container border border-slate-100 dark:border-none text-slate-500 dark:text-on-surface-variant p-2 rounded-lg flex items-center justify-center shrink-0">
             <LucideIcon
               name={
                 (course?.programmingLanguage || "").toLowerCase() === "python"
@@ -112,38 +114,38 @@ const CourseCard = ({
           </div>
         </div>
 
-        <p className="font-body-sm text-on-surface-variant text-[11px] leading-relaxed mb-3 line-clamp-2 min-h-[32px]">
+        <p className="font-body-sm text-slate-600 dark:text-on-surface-variant text-[12px] leading-relaxed mb-4 line-clamp-2 min-h-[36px]">
           {course?.description ||
             "Master the fundamentals and unlock each lesson through practice."}
         </p>
 
-        <div className="flex gap-2 mb-3">
-          <div className="bg-surface-container rounded-lg p-2 flex-1">
-            <div className="font-label-sm text-[8px] text-on-surface-variant tracking-widest mb-0.5 uppercase">
+        <div className="flex gap-2.5 mb-4">
+          <div className="bg-slate-50 dark:bg-surface-container border border-slate-100 dark:border-none rounded-xl p-2.5 flex-1">
+            <div className="font-label-sm text-[8px] text-slate-400 dark:text-on-surface-variant tracking-widest mb-0.5 uppercase font-bold">
               Units
             </div>
-            <div className="text-on-surface text-[12px] font-semibold">
+            <div className="text-slate-800 dark:text-on-surface text-[12.5px] font-bold">
               {stats.totalLessons} Units
             </div>
           </div>
-          <div className="bg-surface-container rounded-lg p-2 flex-1">
-            <div className="font-label-sm text-[8px] text-on-surface-variant tracking-widest mb-0.5 uppercase">
+          <div className="bg-slate-50 dark:bg-surface-container border border-slate-100 dark:border-none rounded-xl p-2.5 flex-1">
+            <div className="font-label-sm text-[8px] text-slate-400 dark:text-on-surface-variant tracking-widest mb-0.5 uppercase font-bold">
               Level
             </div>
-            <div className="text-on-surface text-[12px] font-semibold capitalize truncate">
+            <div className="text-slate-800 dark:text-on-surface text-[12.5px] font-bold capitalize truncate">
               {level}
             </div>
           </div>
         </div>
 
         <div className="mt-auto">
-          <div className="flex justify-between text-[10px] font-bold mb-1.5">
-            <span className="text-on-surface">Progress</span>
-            <span className="text-primary-fixed-dim">{stats.percent}%</span>
+          <div className="flex justify-between text-[11px] font-black mb-1.5">
+            <span className="text-slate-700 dark:text-on-surface">Progress</span>
+            <span className="text-teal-600 dark:text-primary-fixed-dim">{stats.percent}%</span>
           </div>
-          <div className="h-1 bg-surface-container rounded-full overflow-hidden mb-3">
+          <div className="h-1.5 bg-slate-100 dark:bg-surface-container rounded-full overflow-hidden mb-4">
             <div
-              className="h-full bg-primary-fixed-dim rounded-full shadow-[0_0_10px_rgba(0,218,248,0.5)] transition-all duration-500"
+              className="h-full bg-teal-600 dark:bg-primary-fixed-dim rounded-full shadow-[0_0_8px_rgba(13,148,136,0.3)] dark:shadow-[0_0_10px_rgba(0,218,248,0.5)] transition-all duration-500"
               style={{ width: `${stats.percent}%` }}
             />
           </div>
@@ -151,7 +153,7 @@ const CourseCard = ({
           <Link
             to="/courses/$courseId"
             params={{ courseId: courseKey }}
-            className="w-full bg-primary-fixed-dim text-on-primary-fixed font-bold text-[12px] py-2 rounded-xl hover:opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,128,128,0.3)]"
+            className="w-full bg-teal-700 hover:bg-teal-800 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold text-[12px] py-2.5 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.15)] dark:shadow-[0_0_15px_rgba(0,128,128,0.3)]"
           >
             {buttonLabel}
             <LucideIcon name="arrow_forward" className="text-[14px]" />

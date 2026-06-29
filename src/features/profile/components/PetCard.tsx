@@ -4,10 +4,12 @@ import { useAuthStore } from "../../users/store/auth.store";
 import { profileApi } from "../api/profile.api";
 import LucideIcon from "../../../components/ui/LucideIcon";
 import { useTheme } from "../../../contexts/ThemeContext";
+import petVideo from "../../../assets/videos/conpet.webm";
 
 const PetCard = () => {
   const { theme } = useTheme();
   const { user, updateUser } = useAuthStore();
+  const [videoError, setVideoError] = useState(false);
 
   const pet = user?.pet;
   const petName = pet?.name || String(user?.petName || "Axo-Script");
@@ -101,11 +103,10 @@ const PetCard = () => {
   if (!user) {
     return (
       <div
-        className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${
-          theme === "dark"
+        className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${theme === "dark"
             ? "bg-[#09141c] border-[#14232e]"
             : "bg-white border-slate-200"
-        }`}
+          }`}
       >
         <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
           🐾 Pet Companion
@@ -121,11 +122,10 @@ const PetCard = () => {
   if (!pet) {
     return (
       <div
-        className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${
-          theme === "dark"
+        className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${theme === "dark"
             ? "bg-[#09141c] border-[#14232e]"
             : "bg-white border-slate-200"
-        }`}
+          }`}
       >
         <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
           🐾 Pet Companion
@@ -155,40 +155,56 @@ const PetCard = () => {
 
   return (
     <div
-      className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${
-        theme === "dark"
+      className={`border p-6 rounded-2xl space-y-6 shadow-xl transition-colors ${theme === "dark"
           ? "bg-[#09141c] border-[#14232e]"
           : "bg-white border-slate-200"
-      }`}
+        }`}
     >
       <div className="flex justify-between items-center">
-        <h2 className="text-sm font-bold tracking-widest uppercase text-[#76d6d5] flex items-center gap-2">
+        <h2 className={`text-sm font-bold tracking-widest uppercase flex items-center gap-2 ${theme === "dark" ? "text-[#76d6d5]" : "text-teal-600"}`}>
           🐾 Pet Companion
         </h2>
         {user?.petProfileInitialized ? (
-          <span className="text-[10px] bg-[#1a2f26] border border-[#26543c] text-[#5cdb95] px-2.5 py-0.5 rounded-md font-mono font-bold tracking-wider">
+          <span className={`text-[10px] border px-2.5 py-0.5 rounded-md font-mono font-bold tracking-wider ${
+            theme === "dark"
+              ? "bg-[#1a2f26] border-[#26543c] text-[#5cdb95]"
+              : "bg-teal-50 border-teal-200 text-teal-700"
+          }`}>
             ACTIVE
           </span>
         ) : null}
       </div>
 
       <div
-        className={`flex gap-4 p-4 border rounded-2xl items-center transition-colors ${
-          theme === "dark"
+        className={`flex gap-4 p-4 border rounded-2xl items-center transition-colors ${theme === "dark"
             ? "bg-[#040d14] border-[#14232e]"
             : "bg-slate-50 border-slate-100"
-        }`}
+          }`}
       >
-        <div className="w-[84px] h-[94px] bg-[#0a1b26] border border-[#193245] rounded-xl p-1 flex items-center justify-center shrink-0 shadow-inner">
-          <img
-            src={petAvatar || mascotAxolotl}
-            alt={petName}
-            className="w-full h-full object-contain"
-          />
+        <div className={`w-[84px] h-[94px] border rounded-xl p-1 flex items-center justify-center shrink-0 shadow-inner overflow-hidden ${
+          theme === "dark" ? "bg-[#0a1b26] border-[#193245]" : "bg-slate-100 border-slate-200"
+        }`}>
+          {!videoError ? (
+            <video
+              src={petVideo}
+              autoPlay
+              loop
+              muted
+              playsInline
+              onError={() => setVideoError(true)}
+              className="w-full h-full object-contain rounded-lg"
+            />
+          ) : (
+            <div className={`w-full h-full flex items-center justify-center rounded-lg font-bold text-lg ${
+              theme === "dark" ? "bg-[#0a1b26] text-[#7fe3dd]" : "bg-slate-200 text-teal-600"
+            }`}>
+              {petName.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
         <div className="space-y-1">
           <p className="text-sm font-semibold text-on-surface-variant">
-            Pet Name: <span className="text-[#7fe3dd] font-bold">{petName}</span>
+            Pet Name: <span className={`font-bold ${theme === "dark" ? "text-[#7fe3dd]" : "text-teal-600"}`}>{petName}</span>
           </p>
           <p className="text-sm font-semibold text-on-surface-variant">
             Pet Level: <span className="font-bold text-on-surface">{petLevel}</span>
@@ -202,34 +218,45 @@ const PetCard = () => {
             <span className={theme === "dark" ? "text-slate-300" : "text-slate-600"}>
               Pet EXP
             </span>
-            <span className="text-[#7fe3dd] font-bold">
+            <span className={`font-bold ${theme === "dark" ? "text-[#7fe3dd]" : "text-teal-600"}`}>
               {petExp.toLocaleString()} / {petNextLevelExp.toLocaleString()} XP ({levelProgress}%)
             </span>
           </div>
           <div
-            className={`w-full h-2 rounded-full ${
-              theme === "dark" ? "bg-[#14232e]" : "bg-slate-200"
-            }`}
+            className={`w-full h-2 rounded-full ${theme === "dark" ? "bg-[#14232e]" : "bg-slate-200"
+              }`}
           >
             <div
-              className="bg-[#7fe3dd] h-2 rounded-full shadow-[0_0_10px_rgba(127,227,221,0.6)] transition-all duration-500"
+              className={`h-2 rounded-full transition-all duration-500 ${
+                theme === "dark" 
+                  ? "bg-[#7fe3dd] shadow-[0_0_10px_rgba(127,227,221,0.6)]" 
+                  : "bg-teal-500"
+              }`}
               style={{ width: `${levelProgress}%` }}
             />
           </div>
         </div>
 
-        <div className="flex justify-between items-center py-2 px-4 rounded-xl border border-outline/10 bg-surface-container/20">
+        <div className={`flex justify-between items-center py-2 px-4 rounded-xl border ${
+          theme === "dark" ? "border-outline/10 bg-surface-container/20" : "border-slate-200 bg-slate-50"
+        }`}>
           <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">
             Available XP
           </span>
-          <span className="text-base font-extrabold text-primary-fixed-dim font-mono">
+          <span className={`text-base font-extrabold font-mono ${
+            theme === "dark" ? "text-primary-fixed-dim" : "text-teal-600"
+          }`}>
             {availableXp.toLocaleString()} XP
           </span>
         </div>
       </div>
 
-      <div className="rounded-xl border border-outline/20 bg-surface-container/40 p-4 space-y-4">
-        <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#76d6d5]">
+      <div className={`rounded-xl border p-4 space-y-4 ${
+        theme === "dark" ? "border-outline/20 bg-surface-container/40" : "border-slate-200 bg-slate-50"
+      }`}>
+        <h3 className={`flex items-center gap-2 text-xs font-bold uppercase tracking-widest ${
+          theme === "dark" ? "text-[#76d6d5]" : "text-teal-600"
+        }`}>
           <LucideIcon name="pets" className="text-[16px]" />
           Pet Care
         </h3>
@@ -239,10 +266,14 @@ const PetCard = () => {
             type="button"
             onClick={feedPet}
             disabled={isFeedDisabled}
-            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold text-on-primary transition-all duration-200 ${
+            className={`flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-sm font-bold transition-all duration-200 ${
               isFeedDisabled
-                ? "bg-[#14232e] text-on-surface-variant/40 cursor-not-allowed opacity-60 border border-outline/10"
-                : "bg-[#7fe3dd] hover:bg-[#5bc2bc] text-[#09141c]"
+                ? theme === "dark"
+                  ? "bg-[#14232e] text-on-surface-variant/40 cursor-not-allowed opacity-60 border border-outline/10"
+                  : "bg-slate-200 text-slate-400 cursor-not-allowed opacity-60 border border-slate-300"
+                : theme === "dark"
+                  ? "bg-[#7fe3dd] hover:bg-[#5bc2bc] text-[#09141c] text-on-primary"
+                  : "bg-teal-500 hover:bg-teal-600 text-white"
             }`}
           >
             <LucideIcon name="restaurant" className="text-[18px]" />
@@ -264,21 +295,19 @@ const PetCard = () => {
                   setNextPetName(event.target.value);
                   setMessage(null);
                 }}
-                className={`min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm text-on-surface outline-none transition-colors ${
-                  theme === "dark"
+                className={`min-w-0 flex-1 rounded-lg border px-3 py-2 text-sm text-on-surface outline-none transition-colors ${theme === "dark"
                     ? "bg-[#040d14] border-[#14232e] focus:border-[#76d6d5]"
-                    : "bg-white border-slate-200 focus:border-primary"
-                }`}
+                    : "bg-white border-slate-200 focus:border-teal-500"
+                  }`}
               />
               <button
                 type="button"
                 onClick={updatePetName}
                 disabled={saving || !nextPetName.trim()}
-                className={`shrink-0 rounded-lg border px-3 py-2 text-sm font-bold transition-colors ${
-                  theme === "dark"
+                className={`shrink-0 rounded-lg border px-3 py-2 text-sm font-bold transition-colors ${theme === "dark"
                     ? "border-[#14232e] text-slate-300 hover:bg-white/5"
                     : "border-slate-200 text-slate-700 hover:bg-slate-50"
-                } disabled:cursor-not-allowed disabled:opacity-50`}
+                  } disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 {saving ? "Saving" : "Update"}
               </button>
@@ -286,11 +315,10 @@ const PetCard = () => {
           </div>
 
           {message ? (
-            <p className={`text-xs font-semibold text-center mt-1 ${
-              message.includes("successfully") || message.includes("updated")
+            <p className={`text-xs font-semibold text-center mt-1 ${message.includes("successfully") || message.includes("updated")
                 ? "text-success"
                 : "text-error"
-            }`}>
+              }`}>
               {message}
             </p>
           ) : null}

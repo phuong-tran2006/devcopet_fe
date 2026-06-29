@@ -5,7 +5,14 @@ export interface DailyMission {
   _id: string;
   missionIndex?: number;
   missionKind?: "NORMAL" | "HARDCORE";
-  status: "PENDING" | "generating" | "OPENED" | "COMPLETED" | "DISMISSED" | "LOCKED" | "FAILED";
+  status:
+    | "PENDING"
+    | "generating"
+    | "OPENED"
+    | "COMPLETED"
+    | "DISMISSED"
+    | "LOCKED"
+    | "FAILED";
   actionType?: string;
   targetType?: string;
   targetId?: string;
@@ -25,8 +32,6 @@ export interface TodayDailyMissionsResponse {
     completedNormal: number;
     totalNormal: number;
     resolvedNormal: number;
-    hardcoreUnlocked: boolean;
-    hardcoreCompleted: boolean;
   };
   activeMission: DailyMission | null;
   missions: DailyMission[];

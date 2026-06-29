@@ -37,21 +37,33 @@ export const AppPreferences: React.FC<AppPreferencesProps> = () => {
           <label className="text-xs text-on-surface-variant font-medium block">
             {t("themeMode")}
           </label>
-          <button
-            onClick={toggleTheme}
-            className={`w-full text-left border rounded-xl px-4 py-2.5 text-sm font-semibold transition-all flex items-center justify-between ${
+          <div
+            className={`w-full border rounded-xl px-4 py-3 text-sm font-semibold transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
               theme === "dark"
-                ? "bg-[#040d14] border-[#14232e] text-[#7fe3dd] hover:border-[#7fe3dd]"
-                : "bg-slate-50 border-slate-200 text-slate-800 hover:border-slate-400"
+                ? "bg-[#040d14] border-[#14232e] text-slate-300"
+                : "bg-slate-50 border-slate-200 text-slate-800"
             }`}
           >
-            <span>
-              {theme === "dark" ? t("cyberpunkDark") : t("cleanLight")}
-            </span>
-            <span className="text-xs text-on-surface-variant">
-              {t("clickToToggle")}
-            </span>
-          </button>
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-on-surface">
+                {theme === "dark" ? "Cyberpunk Dark" : "Clean Light"}
+              </span>
+              <span className="text-[11px] text-teal-400 font-medium mt-0.5">
+                Active Theme
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors shrink-0 ${
+                theme === "dark"
+                  ? "bg-[#7fe3dd]/10 hover:bg-[#7fe3dd]/20 text-[#7fe3dd] border border-[#7fe3dd]/30"
+                  : "bg-slate-200 hover:bg-slate-300 text-slate-800 border border-slate-300"
+              }`}
+            >
+              Switch Theme
+            </button>
+          </div>
         </div>
 
         {/* 2. Core Language */}
@@ -70,7 +82,6 @@ export const AppPreferences: React.FC<AppPreferencesProps> = () => {
               }`}
             >
               <option value="English (US)">English (US)</option>
-              <option value="Tiếng Việt (VN)">Tiếng Việt (VN)</option>
             </select>
             <span className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-on-surface-variant text-xs">
               ▼

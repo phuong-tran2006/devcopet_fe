@@ -57,15 +57,15 @@ const ArenaSidebar = () => {
             {currentUser?.avatarUrl ? (
               <img
                 src={currentUser.avatarUrl}
-                alt="Avatar"
+                alt={currentUser?.name || currentUser?.username || "User"}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   e.currentTarget.style.display = "none";
                   const parent = e.currentTarget.parentElement;
                   if (parent) {
                     parent.innerText = (
-                      currentUser?.username ||
                       currentUser?.name ||
+                      currentUser?.username ||
                       "U"
                     )
                       .charAt(0)
@@ -75,7 +75,7 @@ const ArenaSidebar = () => {
               />
             ) : (
               <span>
-                {(currentUser?.username || currentUser?.name || "U")
+                {(currentUser?.name || currentUser?.username || "U")
                   .charAt(0)
                   .toUpperCase()}
               </span>

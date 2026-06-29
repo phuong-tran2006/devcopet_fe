@@ -208,6 +208,7 @@ const MediumNodeChallengePage = () => {
   const [result, setResult] =
     useState<SubmitMediumNodeChallengeResponse | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailureModal, setShowFailureModal] = useState(false);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -305,6 +306,7 @@ const MediumNodeChallengePage = () => {
     setDropZoneMap({});
     setResult(null);
     setShowSuccessModal(false);
+    setShowFailureModal(false);
     setSubmitError(null);
     setSessionId(null);
     setSessionExpiresAt(null);
@@ -501,12 +503,10 @@ const MediumNodeChallengePage = () => {
         }
 
         setResult(response);
-        setShowSuccessModal(response.correct);
-
-        if (!response.correct) {
-          setTimeout(() => {
-            goBackToRoadmap();
-          }, 2000);
+        if (response.correct) {
+          setShowSuccessModal(true);
+        } else {
+          setShowFailureModal(true);
         }
       })
       .catch((err) => {
@@ -1167,6 +1167,47 @@ const MediumNodeChallengePage = () => {
                     className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
                   >
                     Review Mission
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showFailureModal && result && !result.correct && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
+              <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)] border border-red-500/20">
+                <div className="rounded-xl bg-[#2b171a] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                    <LucideIcon name="close" className="text-[46px]" />
+                  </div>
+
+                  <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                    Mission
+                    <br />
+                    Failed
+                  </h2>
+
+                  <div className="mt-6 rounded-lg border border-outline/20 bg-red-500/5 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                        <LucideIcon name="error" className="text-[24px]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                          “{result.message || "Not quite. Return to the roadmap and try this checkpoint again."}”
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowFailureModal(false);
+                      goBackToRoadmap();
+                    }}
+                    className="mt-7 w-full rounded-lg bg-red-600 hover:bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition-all duration-200"
+                  >
+                    Return to Roadmap
                   </button>
                 </div>
               </div>

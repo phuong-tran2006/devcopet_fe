@@ -196,6 +196,8 @@ const RoadmapAiHelper = ({
 
           {!loadingPrompts &&
             prompts.length > 0 &&
+            !activePromptId &&
+            history.length === 0 &&
             !asking &&
             (!answer || displayedAnswer === answer) && (
               <AiHelperPrompts
