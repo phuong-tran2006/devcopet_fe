@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useAuthStore } from "../../users/store/auth.store";
 
 interface AccountSecurityProps {
   theme: "light" | "dark";
@@ -7,6 +8,7 @@ interface AccountSecurityProps {
 export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
   // State quản lý nút bật/tắt bảo mật 2 lớp (2FA)
   const [isTwoFactor, setIsTwoFactor] = useState(true);
+  const user = useAuthStore((state) => state.user);
 
   return (
     <div
@@ -37,7 +39,7 @@ export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
             <p
               className={`text-sm mt-0.5 ${theme === "dark" ? "text-slate-200" : "text-slate-800"}`}
             >
-              admin@devcopet.io
+              {user?.email || "No email connected"}
             </p>
           </div>
           <button
@@ -62,9 +64,6 @@ export const AccountSecurity: React.FC<AccountSecurityProps> = ({ theme }) => {
           <div>
             <p className="text-xs text-on-surface-variant font-semibold">
               Master Password
-            </p>
-            <p className="text-xs text-on-surface-variant mt-1">
-              Last updated 14 cycles ago
             </p>
           </div>
           <button

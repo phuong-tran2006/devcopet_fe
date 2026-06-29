@@ -1,42 +1,36 @@
 import React, { useEffect } from "react";
 import ProfileHeader from "../components/ProfileHeader";
 import PetCard from "../components/PetCard";
-import DailyQuests from "../components/DailyQuests";
-import SkillMastery from "../components/SkillMastery";
-import ActiveWorlds from "../components/ActiveWorlds";
-import LeaderboardWidget from "../components/LeaderboardWidget";
+import { ProfileSettings } from "../components/ProfileSettings";
+import { AccountSecurity } from "../components/AccountSecurity";
+import { AppPreferences } from "../components/AppPreferences";
+import { useTheme } from "../../../contexts/ThemeContext";
+import MissionPanel from "../components/MissionPanel";
 
 const ProfilePage = () => {
+  const { theme } = useTheme();
+
   useEffect(() => {
-    document.title = "Arena | Devcopet";
+    document.title = "Profile | Devcopet";
   }, []);
 
   return (
-    <main className="min-h-screen bg-background text-on-surface p-6 md:p-10 lg:p-14 pb-24 transition-colors duration-300">
-      <div className="max-w-[1200px] mx-auto">
-        <ProfileHeader />
+    <main className="min-h-screen bg-background text-on-surface px-4 py-6 md:px-8 lg:px-10 pb-24 transition-colors duration-300">
+      <div className="mx-auto grid max-w-[1240px] grid-cols-1 gap-6 xl:grid-cols-12 xl:items-start">
+        <section className="xl:col-span-12">
+          <ProfileHeader />
+        </section>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mt-12">
-          {/* Left Column: Pet Info (approx 4/12 width) */}
-          <div className="lg:col-span-4 flex flex-col gap-6">
-            <PetCard />
-          </div>
+        <section className="space-y-6 xl:col-span-7">
+          <ProfileSettings theme={theme} />
+          <MissionPanel />
+          <AccountSecurity theme={theme} />
+        </section>
 
-          {/* Middle/Right Column: Quests, Skills, Worlds, Leaderboard (approx 8/12 width) */}
-          <div className="lg:col-span-8 flex flex-col gap-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <DailyQuests />
-              <div className="flex flex-col gap-6 w-full">
-                <SkillMastery />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <ActiveWorlds />
-              <LeaderboardWidget />
-            </div>
-          </div>
-        </div>
+        <aside className="space-y-6 xl:col-span-5">
+          <AppPreferences theme={theme} toggleTheme={() => {}} />
+          <PetCard />
+        </aside>
       </div>
     </main>
   );

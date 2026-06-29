@@ -6,6 +6,7 @@ import type {
   MediumRoadmapNode,
   HardRoadmapNode,
 } from "../../features/courses/api/course.api";
+import LucideIcon from "./LucideIcon";
 
 type RoadmapDetailNode =
   | (EasyRoadmapNode & { difficulty?: "easy" })
@@ -40,6 +41,24 @@ const DIFF_CONFIG = {
     glowWeak: "rgba(2,69,122,0.25)",
     buttonHover: "#4e96db",
     textOnAccent: "#ffffff",
+  },
+} as const;
+
+const LIGHT_DIFF_CONFIG = {
+  ...DIFF_CONFIG,
+  easy: {
+    accent: "#0f766e",
+    gradient: "linear-gradient(90deg, #5eead4, #2dd4bf)",
+    glowWeak: "rgba(15,118,110,0.20)",
+    buttonHover: "#14b8a6",
+    textOnAccent: "#042f2e",
+  },
+  medium: {
+    accent: "#6d28d9",
+    gradient: "linear-gradient(90deg, #c4b5fd, #8b5cf6)",
+    glowWeak: "rgba(109,40,217,0.20)",
+    buttonHover: "#7c3aed",
+    textOnAccent: "#2e1065",
   },
 } as const;
 
@@ -118,7 +137,9 @@ const NodeDetailsModal = ({
       ? `${node.estimatedMinutes || 1} min`
       : EASY_CHECKPOINT_DURATION;
 
-  const cfg = DIFF_CONFIG[node.difficulty || "easy"];
+  const cfg = (isLight ? LIGHT_DIFF_CONFIG : DIFF_CONFIG)[
+    node.difficulty || "easy"
+  ];
 
   const openChallenge = () => {
     if (isActionDisabled) return;
@@ -175,7 +196,7 @@ const NodeDetailsModal = ({
           className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-full transition-colors"
           aria-label="Close lesson details"
         >
-          <span className="material-symbols-outlined text-[20px]">close</span>
+          <LucideIcon name="close" className="text-[20px]" />
         </button>
 
         <div className="flex items-center gap-2 mb-5">
@@ -201,9 +222,7 @@ const NodeDetailsModal = ({
                 : {}
             }
           >
-            <span className="material-symbols-outlined text-[14px]">
-              {copy.icon}
-            </span>
+            <LucideIcon name={copy.icon} className="text-[14px]" />
             {copy.label}
           </span>
           {(isMediumNode || isHardNode) && (
@@ -215,18 +234,22 @@ const NodeDetailsModal = ({
                 color: cfg.accent,
               }}
             >
-              <span className="material-symbols-outlined text-[14px]">
-                {node.type === "drag_drop" || node.type === "drag_drop_matching"
-                  ? "drag_indicator"
-                  : node.type.includes("ordering") ||
-                      node.type.includes("ranking")
-                    ? "sort"
-                    : node.type.includes("code") ||
-                        node.type.includes("bug") ||
-                        node.type === "fill_missing_line"
-                      ? "code"
-                      : "quiz"}
-              </span>
+              <LucideIcon
+                name={
+                  node.type === "drag_drop" ||
+                  node.type === "drag_drop_matching"
+                    ? "drag_indicator"
+                    : node.type.includes("ordering") ||
+                        node.type.includes("ranking")
+                      ? "sort"
+                      : node.type.includes("code") ||
+                          node.type.includes("bug") ||
+                          node.type === "fill_missing_line"
+                        ? "code"
+                        : "quiz"
+                }
+                className="text-[14px]"
+              />
               {isHardNode
                 ? node.type.replace(/_/g, " ")
                 : getTypeLabel(node.type)}
@@ -248,7 +271,7 @@ const NodeDetailsModal = ({
             <span className="block text-[10px] font-bold tracking-widest text-on-surface-variant uppercase mb-1">
               Reward XP
             </span>
-            <span className="text-[16px] font-extrabold text-[#FFE052]">
+            <span className="text-[16px] font-extrabold text-black dark:text-[#FFE052]">
               {node.xp || 0}
             </span>
           </div>

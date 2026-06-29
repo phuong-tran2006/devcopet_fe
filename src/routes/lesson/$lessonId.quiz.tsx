@@ -1,3 +1,5 @@
+// @ts-nocheck
+import LucideIcon from "../../components/ui/LucideIcon";
 import {
   createFileRoute,
   useParams,
@@ -26,9 +28,7 @@ function LessonQuizRoutePage() {
           }
           className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-on-surface transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
         >
-          <span className="material-symbols-outlined text-[14px]">
-            arrow_back
-          </span>
+          <LucideIcon name="arrow_back" className="text-[14px]" />
           Back to Lesson
         </button>
 

@@ -15,10 +15,22 @@ import {
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
 import { useAuthStore } from "../../users/store/auth.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
+import {
+  formatQuestionNumber,
+  getNavigationForResponse,
+  getRewardItems,
+  getSpeakerName,
+} from "../utils/challengeResponse";
 
 // ── Template drop-zone helpers (same pattern as MediumNodeChallengePage) ──────
 const DROP_ZONE_REGEX =
   /\[([A-Za-z][A-Za-z0-9_-]*)\]|{{\s*([A-Za-z][A-Za-z0-9_-]*)\s*}}|\[\[\s*([A-Za-z][A-Za-z0-9_-]*)\s*\]\]|__([A-Za-z][A-Za-z0-9_-]*?)__/g;
+const CHALLENGE_ROUTES = {
+  easy: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+  medium: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+  hard: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+} as const;
 
 const getDropZoneKeyFromMatch = (match: RegExpMatchArray | RegExpExecArray) =>
   match[1] || match[2] || match[3] || match[4];
@@ -100,10 +112,7 @@ const buildTemplateRows = (template: string): TemplateRow[] => {
       );
 
       // Replace 3+ underscores with synthetic blank drop zones
-      line = line.replace(
-        /_{3,}/g,
-        () => `[blank_${anonymousBlankIndex++}]`,
-      );
+      line = line.replace(/_{3,}/g, () => `[blank_${anonymousBlankIndex++}]`);
 
       // 3. Inspect matches after all normalizations are done
       const matches = [...line.matchAll(DROP_ZONE_REGEX)];
@@ -158,18 +167,24 @@ const CodeSnippetCard = ({
   if (!codeSnippet) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#1e3a5f] bg-[#0a1626] shadow-[0_0_22px_rgba(58,127,193,0.15)]">
-      <div className="border-b border-[#1e3a5f] bg-[#0c1a2d] px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#66b3ff]">
+    <div className="overflow-hidden rounded-xl border border-slate-300 bg-slate-50 shadow-[0_12px_28px_rgba(15,23,42,0.10)] dark:border-[#1e3a5f] dark:bg-[#0a1626] dark:shadow-[0_0_22px_rgba(58,127,193,0.15)]">
+      <div className="border-b border-slate-300 bg-slate-100 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-blue-700 dark:border-[#1e3a5f] dark:bg-[#0c1a2d] dark:text-[#66b3ff]">
         {codeSnippet.language}
       </div>
-      <pre className="overflow-x-auto px-5 py-4 font-mono text-[14px] font-semibold leading-7 text-[#dbeafe]">
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[14px] font-semibold leading-7 text-slate-950 dark:text-[#dbeafe]">
         <code>{codeSnippet.code}</code>
       </pre>
     </div>
   );
 };
 
-
+const formatTime = (ms: number | null) => {
+  if (ms === null) return "--:--";
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
 
 const HardNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
@@ -198,16 +213,35 @@ const HardNodeChallengePage = () => {
     null,
   );
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailureModal, setShowFailureModal] = useState(false);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [xpToast, setXpToast] = useState<number | null>(null);
+
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<string | null>(null);
+  const [sessionServerNow, setSessionServerNow] = useState<string | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
 
   const challenge = data?.challenge ?? null;
   const isReviewMode = data?.node.status === "completed" && !!data.review;
   const isLockedMode = data?.node.status === "locked";
-  const canEdit = !isLockedMode && !isReviewMode && !result;
+  const canEdit = !isLockedMode && !isReviewMode && !result && !isExpired;
+  const activeNavigation = getNavigationForResponse(
+    result?.navigation,
+    data?.navigation,
+  );
+  const speakerName = getSpeakerName(
+    result?.explanationSpeaker?.name,
+    data?.explanationSpeaker?.name,
+    petName,
+  );
+  const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
+  const xpReward = rewardItems.find((item) => item.type === "xp")?.amount ?? 0;
 
   const isOptionBased = [
     "multiple_choice",
@@ -336,14 +370,14 @@ const HardNodeChallengePage = () => {
           "group flex min-h-[52px] items-center gap-2 rounded-xl border px-3 py-2 transition-all",
           compact ? "inline-flex min-w-[150px] align-middle" : "w-full",
           isCorrect
-            ? "border-[#63f1e3] bg-[#10262c] text-[#63f1e3] shadow-[0_0_16px_rgba(99,241,227,0.18)]"
+            ? "border-teal-600 bg-teal-50 text-teal-950 shadow-[0_0_16px_rgba(13,148,136,0.14)] dark:border-[#63f1e3] dark:bg-[#10262c] dark:text-[#63f1e3] dark:shadow-[0_0_16px_rgba(99,241,227,0.18)]"
             : isIncorrect
-              ? "border-red-400/80 bg-red-400/10 text-red-100"
+              ? "border-red-500 bg-red-50 text-red-950 dark:border-red-400/80 dark:bg-red-400/10 dark:text-red-100"
               : assignedItemId
-                ? "border-[#66b3ff]/75 bg-[#123052] text-blue-50 shadow-[0_0_16px_rgba(58,127,193,0.16)]"
+                ? "border-blue-500/70 bg-blue-50 text-blue-950 shadow-[0_0_16px_rgba(37,99,235,0.12)] dark:border-[#66b3ff]/75 dark:bg-[#123052] dark:text-blue-50 dark:shadow-[0_0_16px_rgba(58,127,193,0.16)]"
                 : isReadyForSelection
-                  ? "border-[#66b3ff] bg-[#3a7fc1]/15 text-[#66b3ff] shadow-[0_0_18px_rgba(58,127,193,0.22)]"
-                  : "border-dashed border-slate-500/70 bg-[#071321] text-slate-300",
+                  ? "border-blue-500 bg-blue-50 text-blue-700 shadow-[0_0_18px_rgba(37,99,235,0.14)] dark:border-[#66b3ff] dark:bg-[#3a7fc1]/15 dark:text-[#66b3ff] dark:shadow-[0_0_18px_rgba(58,127,193,0.22)]"
+                  : "border-dashed border-slate-300 bg-white text-slate-600 dark:border-slate-500/70 dark:bg-[#071321] dark:text-slate-300",
         ].join(" ")}
       >
         <button
@@ -369,9 +403,12 @@ const HardNodeChallengePage = () => {
               </span>
             )}
           </span>
-          <span className="material-symbols-outlined text-[18px] opacity-80">
-            {isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"}
-          </span>
+          <LucideIcon
+            name={
+              isCorrect ? "check_circle" : isIncorrect ? "cancel" : "ads_click"
+            }
+            className="text-[18px] opacity-80"
+          />
         </button>
 
         {canEdit && assignedItemId && (
@@ -381,7 +418,7 @@ const HardNodeChallengePage = () => {
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-red-400/15 hover:text-red-200"
             aria-label={`Clear ${zoneId}`}
           >
-            <span className="material-symbols-outlined text-[17px]">close</span>
+            <LucideIcon name="close" className="text-[17px]" />
           </button>
         )}
       </div>
@@ -406,13 +443,26 @@ const HardNodeChallengePage = () => {
     setSelectedPoolItemId(null);
     setResult(null);
     setShowSuccessModal(false);
+    setShowFailureModal(false);
+    setSessionId(null);
+    setSessionExpiresAt(null);
+    setSessionServerNow(null);
+    setRemainingTime(null);
+    setIsExpired(false);
+
+    const safeCourseSlug = courseSlug || "python-basic";
 
     Promise.all([
+      courseApi.startRoadmapChallengeSession(safeCourseSlug, "hard", nodeId),
       courseApi.getHardNodeChallenge(nodeId),
       courseSlug ? courseApi.getHardRoadmap(courseSlug) : Promise.resolve(null),
     ])
-      .then(([response, roadmap]) => {
+      .then(([sessionRes, response, roadmap]) => {
         if (!alive) return;
+        setSessionId(sessionRes.sessionId);
+        setSessionExpiresAt(sessionRes.expiresAt);
+        setSessionServerNow(sessionRes.serverNow);
+
         if (roadmap) {
           const nodes = [...roadmap.chapters]
             .sort((a, b) => a.order - b.order)
@@ -450,11 +500,23 @@ const HardNodeChallengePage = () => {
       })
       .catch((err) => {
         if (!alive) return;
-        setError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to load challenge details.",
-        );
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to load challenge details.";
+
+        if (errMsg === "TIME_EXPIRED") {
+          setError("Time expired");
+          setTimeout(() => {
+            navigate({
+              to: "/roadmap/$worldId",
+              params: { worldId: courseSlug || "python-basic" },
+            });
+          }, 2000);
+        } else {
+          setError(errMsg);
+        }
       })
       .finally(() => {
         if (alive) setLoading(false);
@@ -463,41 +525,75 @@ const HardNodeChallengePage = () => {
     return () => {
       alive = false;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodeId, courseSlug]);
 
+  useEffect(() => {
+    if (!sessionExpiresAt || !sessionServerNow) return;
+
+    const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
+
+    const updateTimer = () => {
+      const remaining =
+        new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      if (remaining <= 0) {
+        setRemainingTime(0);
+        setIsExpired(true);
+        return true;
+      }
+      setRemainingTime(remaining);
+      return false;
+    };
+
+    const expired = updateTimer();
+    if (expired) return;
+
+    const interval = setInterval(() => {
+      const expired = updateTimer();
+      if (expired) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sessionExpiresAt, sessionServerNow]);
+
+  useEffect(() => {
+    if (isExpired) {
+      const timer = setTimeout(() => {
+        goBackToRoadmap();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpired]);
+
   const goBackToRoadmap = () => {
+    const target = activeNavigation?.returnToRoadmap;
     navigate({
       to: "/roadmap/$worldId",
-      params: { worldId: courseSlug || "python-basic" },
+      params: { worldId: target?.courseSlug || courseSlug || "python-basic" },
     });
   };
 
-  const goToNextChallenge = async () => {
-    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+  const goToNextChallenge = () => {
+    if (nextChallengeLoading) return;
+
+    const nextChallenge = activeNavigation?.nextChallenge;
+    if (!nextChallenge) {
+      goBackToRoadmap();
+      return;
+    }
 
     setNextChallengeLoading(true);
     try {
-      const roadmap = await courseApi.getHardRoadmap(courseSlug);
-      const nodes = [...roadmap.chapters]
-        .sort((a, b) => a.order - b.order)
-        .flatMap((chapter) =>
-          [...chapter.nodes].sort((a, b) => a.order - b.order),
-        );
-      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
-      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
-
-      if (!nextNode) {
-        goBackToRoadmap();
-        return;
-      }
-
       navigate({
-        to: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+        to: CHALLENGE_ROUTES[nextChallenge.mode],
         params: {
-          courseSlug,
-          nodeId: nextNode.id,
+          courseSlug: nextChallenge.courseSlug,
+          nodeId: nextChallenge.nodeId,
         },
-      });
+      } as any);
     } catch (err) {
       console.error("Unable to open next Hard challenge:", err);
       goBackToRoadmap();
@@ -507,7 +603,13 @@ const HardNodeChallengePage = () => {
   };
 
   const handleSubmit = async () => {
-    if (isSubmitDisabled || !challenge) return;
+    if (isSubmitDisabled || !challenge || isExpired) return;
+
+    if (!sessionId) {
+      setSubmitError("Session required. Please refresh the page.");
+      return;
+    }
+
     setSubmitting(true);
     setSubmitError(null);
 
@@ -538,15 +640,68 @@ const HardNodeChallengePage = () => {
     }
 
     try {
-      const res = await courseApi.submitHardNodeChallenge(nodeId!, payload);
+      const res = await courseApi.submitHardNodeChallenge(
+        nodeId!,
+        payload,
+        sessionId,
+      );
+
+      if (
+        res.message === "TIME_EXPIRED" ||
+        (res as any).code === "TIME_EXPIRED"
+      ) {
+        setSubmitError("Time expired");
+        setTimeout(() => {
+          goBackToRoadmap();
+        }, 2000);
+        return;
+      }
+
+      if (
+        res.message === "SESSION_REQUIRED" ||
+        (res as any).code === "SESSION_REQUIRED"
+      ) {
+        setSubmitError("Session required. Please refresh the page.");
+        return;
+      }
+
       setResult(res);
+
+      const { xpAwarded, userProgress, rewardSummary } = res;
+      const toastXp = rewardSummary?.xp ?? xpAwarded;
+      if (toastXp && toastXp > 0) {
+        setXpToast(toastXp);
+        window.setTimeout(() => setXpToast(null), 3500);
+      }
+      if (userProgress) {
+        useAuthStore.getState().updateUser({
+          exp: userProgress.exp,
+          level: userProgress.level,
+        });
+      }
+
       if (res.correct) {
         setShowSuccessModal(true);
+      } else {
+        setShowFailureModal(true);
       }
     } catch (err: any) {
-      setSubmitError(
-        err?.response?.data?.message || err?.message || "Submission failed",
-      );
+      const errMsg =
+        err?.response?.data?.message ||
+        err?.response?.data?.code ||
+        err?.message ||
+        "Submission failed";
+
+      if (errMsg === "TIME_EXPIRED") {
+        setSubmitError("Time expired");
+        setTimeout(() => {
+          goBackToRoadmap();
+        }, 2000);
+      } else if (errMsg === "SESSION_REQUIRED") {
+        setSubmitError("Session required. Please refresh the page.");
+      } else {
+        setSubmitError(errMsg);
+      }
     } finally {
       setSubmitting(false);
     }
@@ -595,21 +750,39 @@ const HardNodeChallengePage = () => {
   }
 
   const hintText = challenge.hint || challenge.hints?.[0]?.text || "";
+  const shouldShowExplanation = Boolean(
+    isReviewMode || (result && result.correct),
+  );
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
-      <div className="w-full max-w-[800px] flex flex-col">
+    <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
+      <div
+        className={`w-full flex flex-col transition-[max-width] duration-300 ${
+          shouldShowExplanation ? "max-w-[1400px]" : "max-w-[800px]"
+        }`}
+      >
         {/* Back navigation */}
         <div className="flex justify-between items-center mb-6 w-full">
           <button
             onClick={goBackToRoadmap}
             className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+            <LucideIcon name="arrow_back" className="text-[16px]" />
             Back to Roadmap
           </button>
-          
-          <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+
+          <div className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+            {remainingTime !== null && (
+              <div className="flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-amber-600 shadow-sm dark:bg-amber-400/10 dark:text-amber-300">
+                <LucideIcon name="schedule" className="text-[18px]" />
+                <span className="hidden text-[10px] tracking-wider sm:inline">
+                  Time left
+                </span>
+                <span className="min-w-[3.5rem] font-mono text-[20px] font-black leading-none tracking-normal tabular-nums">
+                  {formatTime(remainingTime)}
+                </span>
+              </div>
+            )}
             <span>Hard Checkpoint</span>
           </div>
         </div>
@@ -617,16 +790,14 @@ const HardNodeChallengePage = () => {
         <section className="w-full flex flex-col">
           <div className="mb-6 flex flex-col gap-2">
             <p className="text-[14px] text-on-surface-variant font-medium">
-              {data?.node.label} • {data?.node.title}
+              {data?.node.title}
             </p>
           </div>
 
           {isLockedMode && (
-            <div className="mx-auto mt-12 w-full rounded-xl border border-[#1e3a5f] bg-[#081624] p-8 text-center shadow-[0_0_28px_rgba(58,127,193,0.08)]">
+            <div className="mx-auto mt-12 w-full rounded-xl border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_28px_rgba(58,127,193,0.08)]">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
-                <span className="material-symbols-outlined text-[32px]">
-                  lock
-                </span>
+                <LucideIcon name="lock" className="text-[32px]" />
               </div>
               <h1 className="mt-5 text-[28px] font-extrabold">
                 Checkpoint Locked
@@ -637,7 +808,7 @@ const HardNodeChallengePage = () => {
               </p>
               <button
                 onClick={goBackToRoadmap}
-                className="mt-7 rounded-xl border border-[#1e3a5f] bg-[#0c1a2d] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:text-on-surface"
+                className="mt-7 rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-blue-500/50 hover:text-on-surface dark:border-[#1e3a5f] dark:bg-[#0c1a2d]"
               >
                 Back to Roadmap
               </button>
@@ -645,12 +816,16 @@ const HardNodeChallengePage = () => {
           )}
 
           {!isLockedMode && (
-            <div className="overflow-hidden rounded-xl border border-[#1e3a5f] bg-[#081624] shadow-[0_0_28px_rgba(58,127,193,0.08)]">
-              <div className="border-b border-[#1e3a5f] bg-[#0c1a2d] px-6 py-4">
+            <div
+              className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_28px_rgba(58,127,193,0.08)] ${
+                shouldShowExplanation ? "challenge-with-explanation" : ""
+              }`}
+            >
+              <div className="challenge-card-header border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#1e3a5f] dark:bg-[#0c1a2d]">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
-                      Question 01
+                    <p className="text-[11px] font-extrabold uppercase tracking-widest text-blue-700 dark:text-[#66b3ff]">
+                      Question {formatQuestionNumber(data?.node.label ?? "1")}
                     </p>
                     <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                       {challenge.title}
@@ -658,15 +833,15 @@ const HardNodeChallengePage = () => {
                   </div>
                   <div className="flex shrink-0 items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
                     <span>{challenge.type.replace("_", " ")}</span>
-                    <span className="h-1 w-1 rounded-full bg-[#66b3ff]/70" />
+                    <span className="h-1 w-1 rounded-full bg-blue-700/70 dark:bg-[#66b3ff]/70" />
                     <span>{challenge.xp} XP</span>
-                    <span className="h-1 w-1 rounded-full bg-[#66b3ff]/70" />
+                    <span className="h-1 w-1 rounded-full bg-blue-700/70 dark:bg-[#66b3ff]/70" />
                     <span>{challenge.estimatedMinutes} min</span>
                   </div>
                 </div>
               </div>
 
-              <div className="border-b border-[#1e3a5f] px-6 py-7">
+              <div className="challenge-question-section border-b border-slate-200 px-6 py-7 dark:border-[#1e3a5f]">
                 <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                   {challenge.question}
                 </p>
@@ -695,17 +870,17 @@ const HardNodeChallengePage = () => {
                           disabled={!canEdit}
                           className={`
                             relative flex items-center w-full px-5 py-4 text-left rounded-xl border-2 transition-all duration-200
-                            ${isSelected ? "border-[#3a7fc1] bg-[#1e3a5f]/40" : "border-on-surface/10 bg-surface-container hover:border-on-surface/20"}
-                            ${isCorrect ? "border-[#63f1e3] bg-[#10262c] shadow-[0_0_15px_rgba(99,241,227,0.15)]" : ""}
-                            ${isIncorrect ? "border-red-400 bg-red-400/10" : ""}
+                            ${isSelected ? "border-blue-700 bg-blue-50 text-slate-950 shadow-[0_0_0_1px_rgba(29,78,216,0.15)] dark:border-[#3a7fc1] dark:bg-[#1e3a5f]/40 dark:text-on-surface" : "border-slate-300 bg-white text-slate-900 hover:border-blue-500 hover:bg-blue-50/60 dark:border-on-surface/10 dark:bg-surface-container dark:text-on-surface dark:hover:border-on-surface/20"}
+                            ${isCorrect ? "border-emerald-600 bg-emerald-50 text-emerald-950 shadow-[0_0_0_1px_rgba(5,150,105,0.12)] dark:border-[#63f1e3] dark:bg-[#10262c] dark:text-on-surface dark:shadow-[0_0_15px_rgba(99,241,227,0.15)]" : ""}
+                            ${isIncorrect ? "border-red-600 bg-red-50 text-red-950 dark:border-red-400 dark:bg-red-400/10 dark:text-on-surface" : ""}
                             ${!canEdit && !isCorrect && !isIncorrect ? "opacity-50" : ""}
                           `}
                         >
                           <div
                             className={`flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-bold mr-4
-                            ${isSelected ? "border-[#3a7fc1] bg-[#3a7fc1]/20 text-[#66b3ff]" : "border-on-surface/20 text-on-surface-variant"}
-                            ${isCorrect ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3]" : ""}
-                            ${isIncorrect ? "border-red-400 bg-red-400/20 text-red-300" : ""}
+                            ${isSelected ? "border-blue-700 bg-blue-100 text-blue-800 dark:border-[#3a7fc1] dark:bg-[#3a7fc1]/20 dark:text-[#66b3ff]" : "border-slate-400 text-slate-700 dark:border-on-surface/20 dark:text-on-surface-variant"}
+                            ${isCorrect ? "border-emerald-600 bg-emerald-100 text-emerald-700 dark:border-[#63f1e3] dark:bg-[#63f1e3]/20 dark:text-[#63f1e3]" : ""}
+                            ${isIncorrect ? "border-red-600 bg-red-100 text-red-700 dark:border-red-400 dark:bg-red-400/20 dark:text-red-300" : ""}
                           `}
                           >
                             {String.fromCharCode(65 + i)}
@@ -714,14 +889,16 @@ const HardNodeChallengePage = () => {
                             {opt.text}
                           </span>
                           {isCorrect && (
-                            <span className="material-symbols-outlined text-[#63f1e3]">
-                              check_circle
-                            </span>
+                            <LucideIcon
+                              name="check_circle"
+                              className="text-emerald-700 dark:text-[#63f1e3]"
+                            />
                           )}
                           {isIncorrect && (
-                            <span className="material-symbols-outlined text-red-400">
-                              cancel
-                            </span>
+                            <LucideIcon
+                              name="cancel"
+                              className="text-red-700 dark:text-red-400"
+                            />
                           )}
                         </button>
                       );
@@ -732,8 +909,8 @@ const HardNodeChallengePage = () => {
                 {isDragDropMatching && dragDropChallenge && (
                   <div className="flex flex-col gap-6">
                     <p className="text-[13px] text-on-surface-variant font-medium">
-                      Select an item on the left, then a choice on the right to match
-                      them.
+                      Select an item on the left, then a choice on the right to
+                      match them.
                     </p>
                     <div className="grid grid-cols-2 gap-6">
                       <div className="flex flex-col gap-3">
@@ -745,7 +922,9 @@ const HardNodeChallengePage = () => {
                               key={item.id}
                               onClick={() =>
                                 canEdit &&
-                                setSelectedMatchItem(isSelected ? null : item.id)
+                                setSelectedMatchItem(
+                                  isSelected ? null : item.id,
+                                )
                               }
                               disabled={!canEdit}
                               className={`
@@ -766,22 +945,26 @@ const HardNodeChallengePage = () => {
                       </div>
                       <div className="flex flex-col gap-3">
                         {dragDropChallenge.choices.map((choice) => {
-                          const matchedItemId = Object.keys(activeMatchingMap).find(
-                            (k) => activeMatchingMap[k] === choice.id,
-                          );
+                          const matchedItemId = Object.keys(
+                            activeMatchingMap,
+                          ).find((k) => activeMatchingMap[k] === choice.id);
                           const matchedItem = dragDropChallenge.items.find(
                             (i) => i.id === matchedItemId,
                           );
                           const isCorrectMatch =
                             canRevealAnswerDetails &&
-                            correctMatchingMap?.[matchedItemId || ""] === choice.id;
+                            correctMatchingMap?.[matchedItemId || ""] ===
+                              choice.id;
                           const isIncorrectMatch =
                             canRevealAnswerDetails &&
                             matchedItemId &&
                             !isCorrectMatch;
 
                           return (
-                            <div key={choice.id} className="flex items-center gap-3">
+                            <div
+                              key={choice.id}
+                              className="flex items-center gap-3"
+                            >
                               <button
                                 onClick={() => {
                                   if (!canEdit) return;
@@ -813,9 +996,10 @@ const HardNodeChallengePage = () => {
                                         {matchedItem?.text}
                                       </span>
                                       {canEdit && (
-                                        <span className="material-symbols-outlined text-[16px] text-on-surface-variant hover:text-red-400">
-                                          close
-                                        </span>
+                                        <LucideIcon
+                                          name="close"
+                                          className="text-[16px] text-on-surface-variant hover:text-red-400"
+                                        />
                                       )}
                                     </div>
                                   )}
@@ -831,7 +1015,7 @@ const HardNodeChallengePage = () => {
 
                 {isHardDragDrop && hardFillChallenge && (
                   <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px]">
-                    <div className="rounded-2xl border border-[#1e3a5f] bg-[#081624] p-4 shadow-[0_0_24px_rgba(58,127,193,0.08)] sm:p-5">
+                    <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 shadow-[0_18px_36px_rgba(15,23,42,0.08)] sm:p-5 dark:border-[#1e3a5f] dark:bg-[#081624] dark:shadow-[0_0_24px_rgba(58,127,193,0.08)]">
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
@@ -862,7 +1046,7 @@ const HardNodeChallengePage = () => {
                             <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
                               Selected
                             </p>
-                            <p className="truncate text-[13px] font-bold text-blue-50">
+                            <p className="truncate text-[13px] font-bold text-blue-900 dark:text-blue-50">
                               {getDropPoolItemText(selectedPoolItemId)}
                             </p>
                           </div>
@@ -872,9 +1056,7 @@ const HardNodeChallengePage = () => {
                             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-slate-300 transition hover:bg-white/10 hover:text-white"
                             aria-label="Clear selected item"
                           >
-                            <span className="material-symbols-outlined text-[18px]">
-                              close
-                            </span>
+                            <LucideIcon name="close" className="text-[18px]" />
                           </button>
                         </div>
                       )}
@@ -884,13 +1066,13 @@ const HardNodeChallengePage = () => {
                           row.kind === "match" ? (
                             <div
                               key={row.id}
-                              className="grid gap-3 rounded-xl border border-white/8 bg-[#0b1d2f] p-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center"
+                              className="grid gap-3 rounded-xl border border-slate-200 bg-white p-3 sm:grid-cols-[minmax(0,1fr)_220px] sm:items-center dark:border-white/8 dark:bg-[#0b1d2f]"
                             >
-                              <div className="min-w-0 rounded-lg border border-white/8 bg-black/15 px-4 py-3">
+                              <div className="min-w-0 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 dark:border-white/8 dark:bg-black/15">
                                 <p className="text-[10px] font-extrabold uppercase tracking-widest text-slate-500">
                                   Prompt
                                 </p>
-                                <p className="mt-1 break-words font-mono text-[13px] font-bold leading-6 text-[#dbeafe]">
+                                <p className="mt-1 break-words font-mono text-[13px] font-bold leading-6 text-slate-800 dark:text-[#dbeafe]">
                                   {row.prompt}
                                 </p>
                               </div>
@@ -899,7 +1081,7 @@ const HardNodeChallengePage = () => {
                           ) : (
                             <div
                               key={row.id}
-                              className="rounded-xl border border-white/8 bg-[#0b1d2f] px-4 py-3 font-mono text-[13px] font-semibold leading-6 text-[#dbeafe]"
+                              className="rounded-xl border border-slate-200 bg-white px-4 py-3 font-mono text-[13px] font-semibold leading-6 text-slate-800 dark:border-white/8 dark:bg-[#0b1d2f] dark:text-[#dbeafe]"
                             >
                               {renderTemplateParts(row.text, (zoneId) =>
                                 renderHardDropZone(zoneId, true),
@@ -910,15 +1092,15 @@ const HardNodeChallengePage = () => {
                       </div>
                     </div>
 
-                    <aside className="rounded-2xl border border-[#1e3a5f] bg-[#081624] p-4 lg:sticky lg:top-24 lg:self-start">
+                    <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-4 lg:sticky lg:top-24 lg:self-start dark:border-[#1e3a5f] dark:bg-[#081624]">
                       <p className="mb-3 text-[11px] font-extrabold uppercase tracking-widest text-[#66b3ff]">
                         Answers
                       </p>
                       <div className="flex flex-col gap-2">
                         {hardFillChallenge.poolItems.map((item) => {
-                          const isUsed = Object.values(activeDropZoneMap).includes(
-                            item.id,
-                          );
+                          const isUsed = Object.values(
+                            activeDropZoneMap,
+                          ).includes(item.id);
                           const isSelected = selectedPoolItemId === item.id;
 
                           return (
@@ -927,7 +1109,9 @@ const HardNodeChallengePage = () => {
                               type="button"
                               onClick={() => {
                                 if (!canEdit || isUsed) return;
-                                setSelectedPoolItemId(isSelected ? null : item.id);
+                                setSelectedPoolItemId(
+                                  isSelected ? null : item.id,
+                                );
                               }}
                               disabled={!canEdit || isUsed}
                               className={[
@@ -936,17 +1120,20 @@ const HardNodeChallengePage = () => {
                                   ? "cursor-not-allowed border-white/8 bg-white/5 text-slate-500"
                                   : isSelected
                                     ? "border-[#66b3ff] bg-[#3a7fc1]/20 text-[#66b3ff] shadow-[0_0_18px_rgba(58,127,193,0.28)]"
-                                    : "border-white/10 bg-[#0d2135] text-slate-200 hover:border-[#66b3ff]/60 hover:text-white",
+                                    : "border-slate-200 bg-white text-slate-700 hover:border-[#66b3ff]/60 hover:text-slate-950 dark:border-white/10 dark:bg-[#0d2135] dark:text-slate-200 dark:hover:text-white",
                               ].join(" ")}
                             >
                               <span>{item.text}</span>
-                              <span className="material-symbols-outlined text-[17px] opacity-70">
-                                {isUsed
-                                  ? "check"
-                                  : isSelected
-                                    ? "radio_button_checked"
-                                    : "radio_button_unchecked"}
-                              </span>
+                              <LucideIcon
+                                name={
+                                  isUsed
+                                    ? "check"
+                                    : isSelected
+                                      ? "radio_button_checked"
+                                      : "radio_button_unchecked"
+                                }
+                                className="text-[17px] opacity-70"
+                              />
                             </button>
                           );
                         })}
@@ -964,7 +1151,8 @@ const HardNodeChallengePage = () => {
                       const step = orderingItems.find((s) => s.id === id);
                       if (!step) return null;
                       const isCorrect =
-                        canRevealAnswerDetails && correctOrderedIds?.[index] === id;
+                        canRevealAnswerDetails &&
+                        correctOrderedIds?.[index] === id;
                       const isIncorrect =
                         canRevealAnswerDetails &&
                         correctOrderedIds &&
@@ -982,319 +1170,379 @@ const HardNodeChallengePage = () => {
                           <div className="flex flex-col gap-1">
                             <button
                               onClick={() => {
-                                  if (!canEdit || index === 0) return;
-                                  const newIds = [...orderedIds];
-                                  [newIds[index - 1], newIds[index]] = [
-                                    newIds[index],
-                                    newIds[index - 1],
-                                  ];
-                                  setOrderedIds(newIds);
-                                }}
-                                disabled={!canEdit || index === 0}
-                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  keyboard_arrow_up
-                                </span>
-                              </button>
-                              <button
-                                onClick={() => {
-                                  if (!canEdit || index === orderedIds.length - 1)
-                                    return;
-                                  const newIds = [...orderedIds];
-                                  [newIds[index + 1], newIds[index]] = [
-                                    newIds[index],
-                                    newIds[index + 1],
-                                  ];
-                                  setOrderedIds(newIds);
-                                }}
-                                disabled={!canEdit || index === orderedIds.length - 1}
-                                className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
-                              >
-                                <span className="material-symbols-outlined text-[18px]">
-                                  keyboard_arrow_down
-                                </span>
-                              </button>
-                            </div>
-                            <div className="w-6 h-6 rounded-full bg-on-surface/10 flex items-center justify-center text-[11px] font-bold text-on-surface-variant">
-                              {index + 1}
-                            </div>
-                            <span className="text-[14px] font-semibold flex-1">
-                              {step.text}
-                            </span>
-                            {isCorrect && (
-                              <span className="material-symbols-outlined text-[#63f1e3]">
-                                check_circle
-                              </span>
-                            )}
-                            {isIncorrect && (
-                              <span className="material-symbols-outlined text-red-400">
-                                cancel
-                              </span>
-                            )}
+                                if (!canEdit || index === 0) return;
+                                const newIds = [...orderedIds];
+                                [newIds[index - 1], newIds[index]] = [
+                                  newIds[index],
+                                  newIds[index - 1],
+                                ];
+                                setOrderedIds(newIds);
+                              }}
+                              disabled={!canEdit || index === 0}
+                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
+                            >
+                              <LucideIcon
+                                name="keyboard_arrow_up"
+                                className="text-[18px]"
+                              />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (!canEdit || index === orderedIds.length - 1)
+                                  return;
+                                const newIds = [...orderedIds];
+                                [newIds[index + 1], newIds[index]] = [
+                                  newIds[index],
+                                  newIds[index + 1],
+                                ];
+                                setOrderedIds(newIds);
+                              }}
+                              disabled={
+                                !canEdit || index === orderedIds.length - 1
+                              }
+                              className="w-6 h-6 flex items-center justify-center rounded hover:bg-on-surface/10 disabled:opacity-30 disabled:hover:bg-transparent"
+                            >
+                              <LucideIcon
+                                name="keyboard_arrow_down"
+                                className="text-[18px]"
+                              />
+                            </button>
                           </div>
-                        );
-                      })}
+                          <div className="w-6 h-6 rounded-full bg-on-surface/10 flex items-center justify-center text-[11px] font-bold text-on-surface-variant">
+                            {index + 1}
+                          </div>
+                          <span className="text-[14px] font-semibold flex-1">
+                            {step.text}
+                          </span>
+                          {isCorrect && (
+                            <LucideIcon
+                              name="check_circle"
+                              className="text-[#63f1e3]"
+                            />
+                          )}
+                          {isIncorrect && (
+                            <LucideIcon
+                              name="cancel"
+                              className="text-red-400"
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {!isOptionBased &&
+                  !isDragDropMatching &&
+                  !isHardDragDrop &&
+                  !isOrdering && (
+                    <div className="rounded-xl border border-on-surface/10 bg-surface-container/60 px-5 py-6 text-center">
+                      <p className="font-bold text-on-surface">
+                        Unsupported Challenge Type
+                      </p>
+                      <p className="text-[13px] text-on-surface-variant mt-1">
+                        Please return to the roadmap.
+                      </p>
                     </div>
                   )}
-
-                  {!isOptionBased &&
-                    !isDragDropMatching &&
-                    !isHardDragDrop &&
-                    !isOrdering && (
-                      <div className="rounded-xl border border-on-surface/10 bg-surface-container/60 px-5 py-6 text-center">
-                        <p className="font-bold text-on-surface">
-                          Unsupported Challenge Type
-                        </p>
-                        <p className="text-[13px] text-on-surface-variant mt-1">
-                          Please return to the roadmap.
-                        </p>
-                      </div>
-                    )}
-                </div>
-
-                {submitError && (
-                  <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-5 py-4 flex items-center gap-3">
-                    <span className="material-symbols-outlined text-red-300">
-                      error
-                    </span>
-                    <p className="text-[13px] font-bold text-red-200">{submitError}</p>
-                  </div>
-                )}
-
-                {result && !result.correct && (
-                  <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
-                    <div className="flex items-start gap-3">
-                      <span className="material-symbols-outlined text-[20px] text-red-300">
-                        error
-                      </span>
-                      <div className="min-w-0 flex-1">
-                        <p className="font-bold text-red-100 text-[14px]">
-                          {result.message || "Not quite. Try again."}
-                        </p>
-                        {result.explanation && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
-                            {result.explanation}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {result && !result.correct && !isReviewMode && (
-                  <button
-                    onClick={() => {
-                      setResult(null);
-                      setSelectedOptionId(null);
-                      setMatchingMap({});
-                      setDropZoneMap({});
-                      setSelectedPoolItemId(null);
-                      if (orderingChallenge)
-                        setOrderedIds(orderingItems.map((s) => s.id));
-                    }}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#66b3ff]/45 bg-[#66b3ff]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:bg-[#66b3ff]/15"
-                  >
-                    Try Again
-                  </button>
-                )}
-
-                {canEdit && (
-                  <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitDisabled}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] transition hover:bg-[#8cc8ff] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
-                  >
-                    {submitting ? "Checking..." : "Submit Answer"}
-                  </button>
-                )}
-
-                {/* Inline Explanation and Navigation Section */}
-                {(isReviewMode || (result && result.correct)) && (
-                  <div className="mx-6 mb-6 border-t border-[#1e3a5f] pt-6 flex flex-col gap-4">
-                    {/* Explanation box */}
-                    <div className="rounded-xl border border-[#66b3ff]/30 bg-[#0c1a2d] p-6 shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
-                      <div className="mb-4 flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
-                          <span className="material-symbols-outlined text-[20px]">
-                            pets
-                          </span>
-                        </div>
-                        <div>
-                          <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                            {petName} Says
-                          </p>
-                        </div>
-                      </div>
-
-                      <p className="text-[14px] leading-relaxed text-[#dbeafe]">
-                        {isReviewMode && data.review ? data.review.explanation : result?.explanation}
-                      </p>
-
-                      {/* Complexities */}
-                      {(result?.timeComplexity || data?.review?.timeComplexity || result?.spaceComplexity || data?.review?.spaceComplexity) && (
-                        <div className="mt-4 grid grid-cols-2 gap-3">
-                          {(result?.timeComplexity || data?.review?.timeComplexity) && (
-                            <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                                Time Complexity
-                              </p>
-                              <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
-                                {result?.timeComplexity || data?.review?.timeComplexity}
-                              </p>
-                            </div>
-                          )}
-                          {(result?.spaceComplexity || data?.review?.spaceComplexity) && (
-                            <div className="rounded-lg border border-[#9ca3af]/20 bg-black/20 px-4 py-3">
-                              <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-                                Space Complexity
-                              </p>
-                              <p className="mt-1 font-mono text-[13px] text-[#e5e7eb] font-semibold">
-                                {result?.spaceComplexity || data?.review?.spaceComplexity}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Pet feedback */}
-                      {(result?.petFeedback || data?.review?.petFeedback) && (
-                        <div className="mt-3 rounded-lg border border-[#eab308]/25 bg-[#eab308]/10 px-4 py-3">
-                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#fde047]">
-                            Companion Feedback
-                          </p>
-                          <p className="mt-2 text-[14px] leading-relaxed text-[#dbeafe]">
-                            {result?.petFeedback || data?.review?.petFeedback}
-                          </p>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Navigation buttons */}
-                    <div className="flex flex-wrap gap-4 mt-2">
-                      <button
-                        onClick={goBackToRoadmap}
-                        className="flex-1 min-w-[150px] rounded-xl border border-[#1e3a5f] bg-[#0d2135] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#152e46] transition-colors"
-                      >
-                        Back to Roadmap
-                      </button>
-                      <button
-                        onClick={goToNextChallenge}
-                        disabled={nextChallengeLoading}
-                        className="flex-1 min-w-[150px] rounded-xl bg-[#66b3ff] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#061524] hover:bg-[#8cc8ff] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {nextChallengeLoading ? "Loading..." : "Next Challenge"}
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
-            )}
-          </section>
-        </div>
 
-        <RoadmapAiHelper
-          nodeId={nodeId!}
-          nodeTitle={challenge.title}
-          nodeStatus={data?.node.status || "available"}
-          mode="hard"
-          accentColor="#3a7fc1"
-          accentGradient="linear-gradient(90deg, #3a7fc1, #02457A)"
-          accentGlowWeak="rgba(2,69,122,0.25)"
-        />
-
-        {showSuccessModal && result?.correct && challenge && (
-          <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-            <div className="relative w-full max-w-[480px] rounded-3xl bg-[#24384b] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
-              <button
-                onClick={() => setShowSuccessModal(false)}
-                className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
-                aria-label="Close result"
-              >
-                <span className="material-symbols-outlined text-[22px]">
-                  close
-                </span>
-              </button>
-
-              <div className="rounded-xl bg-[#081624] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
-                <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
-                  <span className="material-symbols-outlined text-[46px]">
-                    workspace_premium
-                  </span>
+              {submitError && (
+                <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/20 bg-red-400/10 px-5 py-4 flex items-center gap-3">
+                  <LucideIcon name="error" className="text-red-300" />
+                  <p className="text-[13px] font-bold text-red-200">
+                    {submitError}
+                  </p>
                 </div>
+              )}
 
-                <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
-                  Mission
-                  <br />
-                  Accomplished
-                </h2>
-
-                <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#0d2135]/80 p-4">
+              {result && !result.correct && (
+                <div className="mx-6 mb-6 mt-4 rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
-                      <span className="material-symbols-outlined text-[24px]">
-                        psychology
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
-                        “{result.message || "Correct. Nice work."}”
+                    <LucideIcon
+                      name="error"
+                      className="text-[20px] text-red-300"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-bold text-red-900 text-[14px] dark:text-red-100">
+                        {result.message || "Not quite. Try again."}
                       </p>
                       {result.explanation && (
-                        <p className="mt-2 line-clamp-4 text-[12px] leading-relaxed text-on-surface-variant/80">
+                        <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
                           {result.explanation}
                         </p>
                       )}
-                      <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
-                        {petName}
-                      </p>
                     </div>
                   </div>
                 </div>
+              )}
 
-                <div className="mt-7 grid grid-cols-2 gap-4">
-                  <div className="rounded-lg bg-[#102a36] px-4 py-4 text-center">
-                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                      Reward
+              {result && !result.correct && !isReviewMode && (
+                <button
+                  onClick={() => {
+                    setResult(null);
+                    setSelectedOptionId(null);
+                    setMatchingMap({});
+                    setDropZoneMap({});
+                    setSelectedPoolItemId(null);
+                    if (orderingChallenge)
+                      setOrderedIds(orderingItems.map((s) => s.id));
+                  }}
+                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#66b3ff]/45 bg-[#66b3ff]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#66b3ff] transition hover:bg-[#66b3ff]/15"
+                >
+                  Try Again
+                </button>
+              )}
+
+              {!isReviewMode && !result && !isLockedMode && (
+                <button
+                  onClick={handleSubmit}
+                  disabled={isSubmitDisabled || isExpired || !sessionId}
+                  className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-hard/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                >
+                  {isExpired
+                    ? "Time expired"
+                    : submitting
+                      ? "Checking..."
+                      : "Submit Answer"}
+                </button>
+              )}
+
+              {/* Inline Explanation and Navigation Section */}
+              {shouldShowExplanation && (
+                <div className="challenge-explanation-panel mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#1e3a5f]">
+                  {/* Explanation box */}
+                  <div className="rounded-xl border border-blue-500/30 bg-blue-50 p-6 shadow-[inset_0_0_12px_rgba(37,99,235,0.05)] dark:border-[#66b3ff]/30 dark:bg-[#0c1a2d] dark:shadow-[inset_0_0_12px_rgba(58,127,193,0.06)]">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#66b3ff] bg-[#66b3ff]/10 text-[#66b3ff]">
+                        <LucideIcon name="pets" className="text-[20px]" />
+                      </div>
+                      <div>
+                        <p className="font-bold text-on-surface text-[14px] tracking-wide">
+                          {speakerName} Says
+                        </p>
+                      </div>
+                    </div>
+
+                    <p className="text-[14px] leading-relaxed text-slate-700 dark:text-[#dbeafe]">
+                      {isReviewMode && data.review
+                        ? data.review.explanation
+                        : result?.explanation}
                     </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#66b3ff]">
-                      +{challenge.xp}
-                    </p>
-                    <p className="text-[18px] font-bold text-[#66b3ff]">XP</p>
+
+                    {/* Complexities */}
+                    {(result?.timeComplexity ||
+                      data?.review?.timeComplexity ||
+                      result?.spaceComplexity ||
+                      data?.review?.spaceComplexity) && (
+                      <div className="mt-4 grid grid-cols-2 gap-3">
+                        {(result?.timeComplexity ||
+                          data?.review?.timeComplexity) && (
+                          <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 dark:border-[#9ca3af]/20 dark:bg-black/20">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                              Time Complexity
+                            </p>
+                            <p className="mt-1 font-mono text-[13px] text-slate-950 font-semibold dark:text-[#e5e7eb]">
+                              {result?.timeComplexity ||
+                                data?.review?.timeComplexity}
+                            </p>
+                          </div>
+                        )}
+                        {(result?.spaceComplexity ||
+                          data?.review?.spaceComplexity) && (
+                          <div className="rounded-lg border border-slate-300 bg-slate-100 px-4 py-3 dark:border-[#9ca3af]/20 dark:bg-black/20">
+                            <p className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
+                              Space Complexity
+                            </p>
+                            <p className="mt-1 font-mono text-[13px] text-slate-950 font-semibold dark:text-[#e5e7eb]">
+                              {result?.spaceComplexity ||
+                                data?.review?.spaceComplexity}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Pet feedback */}
+                    {(result?.petFeedback || data?.review?.petFeedback) && (
+                      <div className="mt-3 rounded-lg border border-[#eab308]/25 bg-[#eab308]/10 px-4 py-3">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-amber-700 dark:text-[#fde047]">
+                          Companion Feedback
+                        </p>
+                        <p className="mt-2 text-[14px] leading-relaxed text-slate-700 dark:text-[#dbeafe]">
+                          {result?.petFeedback || data?.review?.petFeedback}
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                      Bonus
-                    </p>
-                    <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                      +10
-                    </p>
-                    <p className="text-[18px] font-bold text-[#f5c6ff]">Stars</p>
+
+                  {/* Navigation buttons */}
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    <button
+                      onClick={goBackToRoadmap}
+                      className="flex-1 min-w-[150px] rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:border-blue-500/50 hover:text-on-surface transition-colors dark:border-[#1e3a5f] dark:bg-[#0d2135] dark:hover:bg-[#152e46]"
+                    >
+                      Back to Roadmap
+                    </button>
+                    <button
+                      onClick={goToNextChallenge}
+                      disabled={nextChallengeLoading}
+                      className="flex-1 min-w-[150px] rounded-xl bg-hard px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white hover:bg-hard/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
+                    >
+                      {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                    </button>
                   </div>
                 </div>
+              )}
+            </div>
+          )}
+        </section>
+      </div>
 
-                <button
-                  onClick={goToNextChallenge}
-                  disabled={nextChallengeLoading}
-                  className="mt-7 w-full rounded-lg bg-[#66b3ff] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#061524] shadow-[0_10px_28px_rgba(58,127,193,0.24)] transition hover:bg-[#8cc8ff] disabled:cursor-wait disabled:opacity-70"
-                >
-                  {nextChallengeLoading ? "Loading..." : "Next Challenge"}
-                  <span className="ml-2">→</span>
-                </button>
+      <RoadmapAiHelper
+        nodeId={nodeId!}
+        nodeTitle={challenge.title}
+        nodeStatus={data?.node.status || "available"}
+        mode="hard"
+        accentColor="#3a7fc1"
+        accentGradient="linear-gradient(90deg, #3a7fc1, #02457A)"
+        accentGlowWeak="rgba(2,69,122,0.25)"
+      />
 
-                <button
-                  onClick={() => setShowSuccessModal(false)}
-                  className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
-                >
-                  Review Mission
-                </button>
+      {showSuccessModal && result?.correct && challenge && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+          <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#24384b] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+            <button
+              onClick={() => setShowSuccessModal(false)}
+              className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+              aria-label="Close result"
+            >
+              <LucideIcon name="close" className="text-[22px]" />
+            </button>
+
+            <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(37,99,235,0.05)] dark:bg-[#081624] dark:shadow-[inset_0_0_48px_rgba(58,127,193,0.08)]">
+              <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#66b3ff] bg-[#3a7fc1]/14 text-[#b8dcff] shadow-[0_0_30px_rgba(58,127,193,0.24)]">
+                <LucideIcon name="workspace_premium" className="text-[46px]" />
               </div>
+
+              <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                Mission
+                <br />
+                Accomplished
+              </h2>
+
+              <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#0d2135]/80">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#66b3ff]/25 bg-[#66b3ff]/12 text-[#66b3ff]">
+                    <LucideIcon name="psychology" className="text-[24px]" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                      “{result.message || "Correct. Nice work."}”
+                    </p>
+                    <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#66b3ff]">
+                      {speakerName}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-7 rounded-lg bg-blue-50 px-4 py-5 text-center dark:bg-[#102a36]">
+                <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                  XP Earned
+                </p>
+                <p className="mt-2 text-[28px] font-extrabold leading-none text-blue-700 dark:text-[#66b3ff]">
+                  +{xpReward} XP
+                </p>
+              </div>
+
+              <button
+                onClick={goToNextChallenge}
+                disabled={nextChallengeLoading}
+                className="mt-7 w-full rounded-lg bg-hard px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-hard/80"
+              >
+                {nextChallengeLoading ? "Loading..." : "Next Challenge"}
+                <span className="ml-2">→</span>
+              </button>
+
+              <button
+                onClick={() => setShowSuccessModal(false)}
+                className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
+              >
+                Review Mission
+              </button>
             </div>
           </div>
-        )}
-      </main>
-    );
-  };
+        </div>
+      )}
+
+      {showFailureModal && result && !result.correct && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+          <div className="relative flex flex-col w-full max-w-[480px] max-h-[calc(100vh-48px)] rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)] border border-red-500/20">
+            <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.05)] dark:bg-[#2b171a] dark:shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+              <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                <LucideIcon name="close" className="text-[46px]" />
+              </div>
+
+              <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                Mission
+                <br />
+                Failed
+              </h2>
+
+              <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#1b2732]/70">
+                <div className="flex items-start gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                    <LucideIcon name="error" className="text-[24px]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                      “
+                      {result.message ||
+                        "Not quite. Return to the roadmap and try this checkpoint again."}
+                      ”
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowFailureModal(false);
+                  goBackToRoadmap();
+                }}
+                className="mt-7 w-full rounded-lg bg-red-600 hover:bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition-all duration-200"
+              >
+                Return to Roadmap
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {xpToast !== null && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+          <style>{`
+              @keyframes fadeInDown {
+                0% { opacity: 0; transform: translate(-50%, -20px); }
+                10% { opacity: 1; transform: translate(-50%, 0); }
+                90% { opacity: 1; transform: translate(-50%, 0); }
+                100% { opacity: 0; transform: translate(-50%, -20px); }
+              }
+              .animate-xp-toast {
+                animation: fadeInDown 3.5s ease-in-out forwards;
+              }
+            `}</style>
+          <div className="animate-xp-toast bg-white/95 backdrop-blur-md border border-blue-500/40 text-blue-700 font-black px-6 py-3 rounded-full shadow-[0_0_30px_rgba(37,99,235,0.18)] flex items-center gap-2 dark:bg-[#0f2630]/95 dark:border-[#63f1e3]/40 dark:text-[#63f1e3] dark:shadow-[0_0_30px_rgba(99,241,227,0.3)]">
+            <LucideIcon name="stars" className="text-[#63f1e3]" />
+            <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
+              +{xpToast} XP
+            </span>
+          </div>
+        </div>
+      )}
+    </main>
+  );
+};
 
 export default HardNodeChallengePage;
-

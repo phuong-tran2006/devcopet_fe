@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../ui/LucideIcon";
 import React, { useState, useEffect, useRef } from "react";
 
 const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
@@ -126,14 +127,15 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
   };
 
   return (
-    <div className="my-6 rounded-xl overflow-hidden border border-[#1E293B] bg-[#0b1118]">
+    <div className="my-6 rounded-xl overflow-hidden border border-outline/20 bg-surface-container shadow-sm transition-colors duration-300">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-[#161B22] border-b border-[#1E293B]">
+      <div className="flex items-center justify-between px-4 py-3 bg-surface-container-high border-b border-outline/20">
         <div className="flex items-center gap-2">
-          <span className="material-symbols-outlined text-[18px] text-primary-fixed-dim">
-            code_blocks
-          </span>
-          <span className="text-[12px] font-bold text-white tracking-widest uppercase">
+          <LucideIcon
+            name="code_blocks"
+            className="text-[18px] text-primary-fixed-dim"
+          />
+          <span className="text-[12px] font-bold text-on-surface tracking-widest uppercase">
             {title}
           </span>
         </div>
@@ -142,25 +144,21 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
           <button
             onClick={handleReset}
             disabled={status === "running" || status === "loading"}
-            className="text-[12px] font-bold text-on-surface-variant hover:text-white transition-colors disabled:opacity-50 flex items-center gap-1"
+            className="flex items-center gap-1 rounded-lg border border-outline/40 bg-surface-container-lowest px-3 py-1.5 text-[12px] font-bold text-on-surface shadow-sm transition-colors hover:border-primary hover:bg-surface-container disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              refresh
-            </span>
+            <LucideIcon name="refresh" className="text-[16px]" />
             RESET
           </button>
 
           <button
             onClick={handleRun}
             disabled={status === "running" || status === "loading"}
-            className="flex items-center gap-1 bg-primary-fixed-dim hover:bg-primary-fixed text-on-primary-fixed text-[13px] font-bold px-4 py-1.5 rounded-lg transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-1 bg-primary hover:bg-primary/85 text-on-primary text-[13px] font-bold px-4 py-1.5 rounded-lg border border-primary shadow-sm transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-container-high"
           >
             {status === "running" || status === "loading" ? (
               <div className="w-3.5 h-3.5 border-2 border-on-primary-fixed/60 border-t-transparent rounded-full animate-spin" />
             ) : (
-              <span className="material-symbols-outlined text-[16px]">
-                play_arrow
-              </span>
+              <LucideIcon name="play_arrow" className="text-[16px]" />
             )}
             {status === "loading" ? "LOADING..." : "RUN"}
           </button>
@@ -168,20 +166,20 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
       </div>
 
       {/* Editor */}
-      <div className="p-4 border-b border-[#1E293B] relative group">
+      <div className="p-4 border-b border-outline/20 bg-surface-container-low relative group">
         <textarea
           ref={textareaRef}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           onKeyDown={handleKeyDown}
           spellCheck="false"
-          className="custom-scrollbar w-full bg-transparent text-[#e2e8f0] font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none"
+          className="custom-scrollbar code-runner-editor w-full bg-transparent text-on-surface placeholder:text-on-surface-variant font-mono text-[14px] leading-relaxed resize-y min-h-[150px] outline-none selection:bg-primary-fixed-dim/30"
           style={{ fontFamily: "Roboto Mono, monospace" }}
         />
       </div>
 
       {/* Output Panel */}
-      <div className="bg-[#121c25] p-4 relative">
+      <div className="bg-surface-container-high p-4 relative">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">
             Output
@@ -193,14 +191,14 @@ const CodeRunnerBlock = ({ initialCode, title = "TRY IT YOURSELF" }) => {
         <pre
           className={`font-mono text-[13.5px] leading-relaxed whitespace-pre-wrap ${
             status === "loading"
-              ? "animate-pulse text-[#7fe3dd]"
+              ? "animate-pulse text-primary-fixed-dim"
               : output.includes("timed out")
-                ? "text-[#FBBF24]"
+                ? "text-amber-500"
                 : status === "error"
-                  ? "text-[#F87171]"
+                  ? "text-error"
                   : status === "done"
-                    ? "text-[#10B981]"
-                    : "text-[#94A3B8]"
+                    ? "text-emerald-500"
+                    : "text-on-surface-variant"
           }`}
         >
           {output}

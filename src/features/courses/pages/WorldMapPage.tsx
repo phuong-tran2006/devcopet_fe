@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../../../components/ui/LucideIcon";
 import { useEffect, useState, useRef, useMemo, lazy, Suspense } from "react";
 import { useParams } from "@tanstack/react-router";
 import {
@@ -45,27 +46,28 @@ const DIFF_CONFIG = {
 } as const;
 
 type Difficulty = keyof typeof DIFF_CONFIG;
+type ChapterStatus = "completed" | "active" | "locked";
 
 const getDiffConfig = (diff: Difficulty, isLight: boolean) => {
   if (isLight) {
     if (diff === "easy") {
       return {
         label: "Easy",
-        accent: "#0284c7",
-        glow: "rgba(2,132,199,0.65)",
-        glowWeak: "rgba(2,132,199,0.20)",
-        pathColor: "#0284c7",
-        gradient: "linear-gradient(90deg, #0284c7, #0369a1)",
+        accent: "#0f766e",
+        glow: "rgba(15,118,110,0.65)",
+        glowWeak: "rgba(15,118,110,0.20)",
+        pathColor: "#0f766e",
+        gradient: "linear-gradient(90deg, #5eead4, #2dd4bf)",
       };
     }
     if (diff === "medium") {
       return {
         label: "Medium",
-        accent: "#0369a1",
-        glow: "rgba(3,105,161,0.65)",
-        glowWeak: "rgba(3,105,161,0.20)",
-        pathColor: "#0369a1",
-        gradient: "linear-gradient(90deg, #0369a1, #075985)",
+        accent: "#6d28d9",
+        glow: "rgba(109,40,217,0.65)",
+        glowWeak: "rgba(109,40,217,0.20)",
+        pathColor: "#6d28d9",
+        gradient: "linear-gradient(90deg, #c4b5fd, #8b5cf6)",
       };
     }
     if (diff === "hard") {
@@ -82,7 +84,6 @@ const getDiffConfig = (diff: Difficulty, isLight: boolean) => {
   return DIFF_CONFIG[diff];
 };
 
-type ChapterStatus = "completed" | "active" | "locked";
 type SelectedRoadmapNode =
   | (EasyRoadmapNode & { difficulty?: "easy" })
   | (MediumRoadmapNode & { difficulty?: "medium" })
@@ -128,32 +129,28 @@ const getNodeDynamicStyle = (
   if (nodeStatus === "locked") return {};
 
   const style: React.CSSProperties = {
-    boxShadow: `0 0 24px ${cfg.glowWeak}`,
+    boxShadow: isLight ? "0 4px 12px rgba(0,0,0,0.08)" : `0 0 24px ${cfg.glowWeak}`,
     "--node-accent": cfg.accent,
     "--node-glow": cfg.glow,
     "--node-glow-weak": cfg.glowWeak,
   } as any;
 
   if (nodeStatus === "completed") {
-    style.backgroundColor = cfg.accent;
+    style.background = isLight ? cfg.gradient : cfg.accent;
     style.borderColor = isLight
       ? "#475569"
       : difficulty === "easy"
         ? "#c7f0f7"
         : `${cfg.accent}80`;
     style.color = isLight
-      ? "#000000"
-      : difficulty === "easy"
-        ? "#001e2e"
-        : "#ffffff";
+      ? (difficulty === "hard" ? "#ffffff" : "#0f172a")
+      : (difficulty === "easy" ? "#001e2e" : "#ffffff");
   } else if (nodeStatus === "available") {
     style.background = cfg.gradient;
     style.borderColor = "var(--color-background)";
     style.color = isLight
-      ? "#000000"
-      : difficulty === "easy"
-        ? "#001e2e"
-        : "#ffffff";
+      ? (difficulty === "hard" ? "#ffffff" : "#0f172a")
+      : (difficulty === "easy" ? "#001e2e" : "#ffffff");
   }
 
   return style;
@@ -444,7 +441,7 @@ const WorldMapPage = () => {
   };
 
   const scrollToChapter = (
-    chapter: EasyRoadmapChapter | MediumRoadmapChapter,
+    chapter: EasyRoadmapChapter | MediumRoadmapChapter | HardRoadmapChapter,
   ) => {
     setSelectedChapterId(chapter.id);
     const firstNode = chapter.nodes[0];
@@ -459,107 +456,15 @@ const WorldMapPage = () => {
       });
   };
 
-  const renderChapterSidebar = () => {
-    if (loading) {
-      return (
-        <div className="px-3 py-4 text-[12px] text-on-surface-variant">
-          Loading chapters...
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="mx-3 my-4 rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-5">
-          <p className="text-[12px] font-bold text-red-200">Cannot load</p>
-          <p className="mt-1 text-[11px] leading-relaxed text-red-100/70">
-            {error}
-          </p>
-        </div>
-      );
-    }
-
-    const sidebarChapters =
-      difficulty === "hard"
-        ? hardChapters
-        : difficulty === "medium"
-          ? mediumChapters
-          : chapters;
-
-    return sidebarChapters.map((chapter) => {
-      const chapterStatus = getChapterStatus(chapter);
-      const isSelected = selectedChapterId === chapter.id;
-      const meta =
-        difficulty === "easy"
-          ? `${(chapter as EasyRoadmapChapter).lessonCount} lessons • ${chapter.nodeCount} nodes`
-          : `${chapter.nodeCount} nodes`;
-
-      return (
-        <button
-          key={chapter.id}
-          onClick={() => scrollToChapter(chapter)}
-          className={`w-full rounded-xl border px-3 py-3 text-left transition-all duration-200 ${
-            isSelected
-              ? "bg-[#97CADB]/12 border-[#97CADB]/45 shadow-[0_0_16px_rgba(151,202,219,0.12)]"
-              : "bg-on-surface/4 border-on-surface/8 hover:bg-on-surface/7 hover:border-on-surface/18"
-          }`}
-        >
-          <div className="flex items-start gap-3">
-            <div
-              className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border text-[12px] font-extrabold ${
-                chapterStatus === "completed"
-                  ? "bg-[#97CADB] text-[#001e2e] border-[#c7f0f7]"
-                  : chapterStatus === "active"
-                    ? "text-[#001e2e] border-background"
-                    : "bg-surface-container text-on-surface/30 border-on-surface/10"
-              }`}
-              style={
-                chapterStatus === "active"
-                  ? {
-                      background: cfg.gradient,
-                      boxShadow: `0 0 12px ${cfg.glowWeak}`,
-                    }
-                  : {}
-              }
-            >
-              {chapterStatus === "completed" ? (
-                <span className="material-symbols-outlined text-[16px]">
-                  done
-                </span>
-              ) : chapterStatus === "locked" ? (
-                <span className="material-symbols-outlined text-[15px]">
-                  lock
-                </span>
-              ) : (
-                chapter.order
-              )}
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="text-[11px] font-bold uppercase tracking-widest text-on-surface-variant/70">
-                Chapter {chapter.order}
-              </p>
-              <p className="mt-0.5 text-[13px] font-semibold leading-snug text-on-surface">
-                {chapter.title}
-              </p>
-              <p className="mt-1 text-[10px] text-on-surface-variant/55">
-                {meta}
-              </p>
-            </div>
-          </div>
-        </button>
-      );
-    });
-  };
-
   return (
     <div className="relative flex h-[calc(100vh-80px)] w-full overflow-hidden bg-background">
       <aside
-        className={`shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${
+        className={`h-full shrink-0 overflow-hidden transition-all duration-300 ease-in-out ${
           drawerOpen ? "w-[320px]" : "w-0"
         }`}
       >
         <div
-          className={`flex h-full w-[320px] flex-col border-r border-on-surface/8 bg-surface shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
+          className={`flex h-full w-[320px] flex-col border-r border-slate-100 dark:border-on-surface/8 bg-white dark:bg-surface shadow-sm dark:shadow-[8px_0_40px_rgba(0,0,0,0.6)] transition-opacity duration-200 ${
             drawerOpen ? "opacity-100" : "pointer-events-none opacity-0"
           }`}
         >
@@ -570,49 +475,47 @@ const WorldMapPage = () => {
                 style={{
                   background: cfg.glowWeak,
                   borderColor: `${cfg.accent}40`,
-                  boxShadow: `0 0 15px ${cfg.glowWeak}`,
+                  boxShadow: isLight ? "none" : `0 0 15px ${cfg.glowWeak}`,
                 }}
               >
-                <span className="material-symbols-outlined text-[25px]">
-                  psychology
-                </span>
+                <LucideIcon name="psychology" className="text-[25px]" />
               </div>
               <div className="flex flex-col">
-                <span className="text-[15px] font-extrabold text-on-surface">
+                <span className="text-[15px] font-extrabold text-slate-800 dark:text-on-surface">
                   Level {userLevel}
                 </span>
-                <span className="text-[10px] font-medium uppercase tracking-wider text-on-surface-variant">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-slate-400 dark:text-on-surface-variant">
                   {userTitle}
                 </span>
               </div>
             </div>
 
             <div className="mb-3 grid grid-cols-2 gap-2">
-              <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
-                <span
-                  className="material-symbols-outlined text-[16px]"
+              <div className="flex items-center gap-2 rounded-xl border border-slate-100 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/80 px-3 py-2.5">
+                <LucideIcon
+                  name="monetization_on"
+                  className="text-[16px]"
                   style={{ color: cfg.accent }}
-                >
-                  monetization_on
-                </span>
+                />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-slate-400 dark:text-on-surface-variant/70">
                     Roadmap XP
                   </span>
-                  <span className="text-[13px] font-bold text-on-surface">
+                  <span className="text-[13px] font-bold text-slate-800 dark:text-on-surface">
                     {totalXp || "--"} XP
                   </span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 rounded-xl border border-on-surface/10 bg-surface-container/80 px-3 py-2.5">
-                <span className="material-symbols-outlined text-[16px] text-[#FFE052]">
-                  route
-                </span>
+              <div className="flex items-center gap-2 rounded-xl border border-slate-100 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/80 px-3 py-2.5">
+                <LucideIcon
+                  name="route"
+                  className="text-[16px] text-[#FFE052]"
+                />
                 <div className="flex flex-col">
-                  <span className="text-[9px] font-medium uppercase tracking-wide text-on-surface-variant/70">
+                  <span className="text-[9px] font-medium uppercase tracking-wide text-slate-400 dark:text-on-surface-variant/70">
                     Nodes
                   </span>
-                  <span className="text-[13px] font-bold text-on-surface">
+                  <span className="text-[13px] font-bold text-slate-800 dark:text-on-surface">
                     {totalNodes || "--"}
                   </span>
                 </div>
@@ -624,13 +527,13 @@ const WorldMapPage = () => {
                 <span>{difficulty.toUpperCase()} PROGRESS</span>
                 <span>{completionPct}%</span>
               </div>
-              <div className="h-2 overflow-hidden rounded-full bg-surface-container">
+              <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-surface-container">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${completionPct}%`,
                     background: cfg.gradient,
-                    boxShadow: `0 0 10px ${cfg.glowWeak}`,
+                    boxShadow: isLight ? "none" : `0 0 10px ${cfg.glowWeak}`,
                   }}
                 />
               </div>
@@ -638,12 +541,11 @@ const WorldMapPage = () => {
           </div>
 
           <div className="flex shrink-0 items-center gap-2 border-b border-on-surface/5 px-5 pb-3 pt-4">
-            <span
-              className="material-symbols-outlined text-[16px]"
+            <LucideIcon
+              name="format_list_bulleted"
+              className="text-[16px]"
               style={{ color: cfg.accent }}
-            >
-              format_list_bulleted
-            </span>
+            />
             <span className="flex-1 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant">
               Chapters
             </span>
@@ -651,7 +553,7 @@ const WorldMapPage = () => {
               className="text-[10px] font-bold"
               style={{ color: cfg.accent }}
             >
-              {chapters.length || 0}
+              {sidebarChapters.length || 0}
             </span>
           </div>
 
@@ -662,182 +564,137 @@ const WorldMapPage = () => {
               scrollbarColor: "#2a3641 transparent",
             }}
           >
-            {/* Memoized chapter buttons */}
-            {useMemo(
-              () =>
-                sidebarChapters.map((chapter, idx) => {
-                  const chapterStatus = getChapterStatus(chapter);
-                  const isCompleted = chapterStatus === "completed";
-                  const isInProgress = chapterStatus === "active";
-                  const isLocked = chapterStatus === "locked";
+            {sidebarChapters.map((chapter, idx) => {
+              const chapterStatus = getChapterStatus(chapter);
+              const isCompleted = chapterStatus === "completed";
+              const isInProgress = chapterStatus === "active";
+              const isLocked = chapterStatus === "locked";
 
-                  const handleClick = () => {
-                    if (!isLocked) {
-                      scrollToChapter(chapter);
+              return (
+                <button
+                  key={chapter.id}
+                  onClick={() => !isLocked && scrollToChapter(chapter)}
+                  disabled={isLocked}
+                  className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200 ${
+                    isCompleted
+                      ? "border-slate-200/60 hover:border-slate-300 dark:border-on-surface/10 dark:hover:border-on-surface/20 bg-slate-50/50 hover:bg-slate-50 dark:bg-on-surface/4 dark:hover:bg-on-surface/8 cursor-pointer"
+                      : ""
+                  } ${isInProgress ? "ring-1 cursor-pointer" : ""} ${
+                    isLocked
+                      ? "bg-transparent border-slate-100 dark:border-on-surface/5 opacity-35 cursor-not-allowed"
+                      : ""
+                  }`}
+                  style={
+                    isInProgress
+                      ? {
+                          background: `${cfg.glowWeak}`,
+                          borderColor: `${cfg.accent}50`,
+                          boxShadow: isLight ? "none" : `0 0 12px ${cfg.glowWeak}`,
+                          ["--tw-ring-color" as string]: cfg.accent,
+                        }
+                      : {}
+                  }
+                >
+                  <div
+                    className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold ${
+                      isLocked
+                        ? "bg-slate-100 dark:bg-surface-container text-slate-400 dark:text-on-surface/20 border border-slate-200 dark:border-on-surface/10"
+                        : ""
+                    }`}
+                    style={
+                      isCompleted
+                        ? {
+                            backgroundColor: cfg.accent,
+                            borderColor:
+                              difficulty === "easy"
+                                ? "#c7f0f7"
+                                : `${cfg.accent}80`,
+                            color: isLight
+                              ? "#ffffff"
+                              : difficulty === "easy"
+                                ? "#001e2e"
+                                : "#ffffff",
+                            borderWidth: "1px",
+                            borderStyle: "solid",
+                          }
+                        : isInProgress
+                          ? {
+                              background: cfg.gradient,
+                              color: isLight ? (difficulty === "hard" ? "#ffffff" : "#0d1117") : "#fff",
+                              boxShadow: isLight ? "none" : `0 0 10px ${cfg.glowWeak}`,
+                            }
+                          : {}
                     }
-                  };
+                  >
+                    {isCompleted && (
+                      <LucideIcon name="done" className="text-[14px]" />
+                    )}
+                    {isInProgress && (
+                      <span className="text-[11px] font-extrabold">
+                        {idx + 1}
+                      </span>
+                    )}
+                    {isLocked && (
+                      <LucideIcon name="lock" className="text-[13px]" />
+                    )}
+                  </div>
 
-                  return (
-                    <button
-                      key={chapter.id}
-                      onClick={handleClick}
-                      disabled={isLocked}
-                      className={`
-                      w-full flex items-center gap-3 px-3 py-2.5 rounded-xl border text-left transition-all duration-200
-                      ${isCompleted ? "border-on-surface/10 hover:border-on-surface/20 bg-on-surface/4 hover:bg-on-surface/8 cursor-pointer" : ""}
-                      ${isInProgress ? "ring-1 cursor-pointer" : ""}
-                      ${isLocked ? "bg-transparent border-on-surface/5 opacity-35 cursor-not-allowed" : ""}
-                    `}
+                  <div className="flex min-w-0 flex-1 flex-col">
+                    <span
+                      className={`truncate text-[12px] font-semibold leading-snug ${
+                        isLocked
+                          ? "text-on-surface-variant/40"
+                          : "text-on-surface-variant"
+                      }`}
                       style={
                         isInProgress
-                          ? {
-                              background: `${cfg.glowWeak}`,
-                              borderColor: `${cfg.accent}50`,
-                              boxShadow: `0 0 12px ${cfg.glowWeak}`,
-                              ["--tw-ring-color" as string]: cfg.accent,
-                            }
+                          ? { color: isLight ? "#000000" : "#fff" }
                           : {}
                       }
                     >
-                      {/* Status icon */}
-                      <div
-                        className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-bold
-                        ${isLocked ? "bg-surface-container text-on-surface/20 border border-on-surface/10" : ""}
-                      `}
-                        style={
-                          isCompleted
-                            ? {
-                                backgroundColor: cfg.accent,
-                                borderColor:
-                                  difficulty === "easy"
-                                    ? "#c7f0f7"
-                                    : `${cfg.accent}80`,
-                                color: isLight
-                                  ? "#000000"
-                                  : difficulty === "easy"
-                                    ? "#001e2e"
-                                    : "#ffffff",
-                                borderWidth: "1px",
-                                borderStyle: "solid",
-                              }
-                            : isInProgress
-                              ? {
-                                  background: cfg.gradient,
-                                  color: isLight ? "#000000" : "#fff",
-                                  boxShadow: `0 0 10px ${cfg.glowWeak}`,
-                                }
-                              : {}
-                        }
-                      >
-                        {isCompleted && (
-                          <span
-                            className="material-symbols-outlined text-[14px]"
-                            style={{ fontVariationSettings: "'FILL' 1" }}
-                          >
-                            done
-                          </span>
-                        )}
-                        {isInProgress && (
-                          <span className="text-[11px] font-extrabold">
-                            {idx + 1}
-                          </span>
-                        )}
-                        {isLocked && (
-                          <span className="material-symbols-outlined text-[13px]">
-                            lock
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Chapter info */}
-                      <div className="flex flex-col flex-1 min-w-0">
+                      {chapter.title}
+                    </span>
+                    <div className="mt-0.5 flex items-center gap-2">
+                      <span className="text-[9px] text-on-surface-variant/50">
+                        {difficulty === "easy"
+                          ? `${(chapter as EasyRoadmapChapter).lessonCount || 0} lessons • ${chapter.nodeCount || 0} nodes`
+                          : `${chapter.nodeCount || 0} nodes`}
+                      </span>
+                      {isInProgress && (
                         <span
-                          className={`text-[12px] font-semibold truncate leading-snug ${
-                            isLocked
-                              ? "text-on-surface-variant/40"
-                              : "text-on-surface-variant"
-                          }`}
-                          style={
-                            isInProgress
-                              ? { color: isLight ? "#000000" : "#fff" }
-                              : {}
-                          }
+                          className="text-[9px] font-bold uppercase tracking-wide"
+                          style={{ color: cfg.accent }}
                         >
-                          {chapter.title}
-                        </span>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className="text-[9px] text-on-surface-variant/50">
-                            {difficulty === "easy"
-                              ? `${chapter.lessonCount || 0} lessons • ${chapter.nodeCount || 0} nodes`
-                              : `${chapter.nodeCount || 0} nodes`}
-                          </span>
-                          {isInProgress && (
-                            <span
-                              className="text-[9px] font-bold uppercase tracking-wide"
-                              style={{ color: cfg.accent }}
-                            >
-                              Active
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {!isLocked && (
-                        <span className="material-symbols-outlined text-[15px] text-on-surface/20 flex-shrink-0">
-                          chevron_right
+                          Active
                         </span>
                       )}
-                    </button>
-                  );
-                }),
-              [sidebarChapters, cfg, difficulty, isLight],
-            )}
-          </div>
+                    </div>
+                  </div>
 
-          {/* ── Bottom: Stars + Upgrade ── */}
-          <div className="px-4 py-4 border-t border-on-surface/5 flex-shrink-0 flex flex-col gap-2">
-            <div
-              className="border rounded-xl px-3 py-2.5 flex items-center gap-2.5"
-              style={{
-                background: "rgba(255,224,82,0.06)",
-                borderColor: "rgba(255,224,82,0.2)",
-              }}
-            >
-              <span className="material-symbols-outlined text-[18px] text-[#FFE052]">
-                emoji_events
-              </span>
-              <div className="flex flex-col">
-                <span className="text-[10px] text-on-surface-variant uppercase tracking-wider font-semibold">
-                  Stars Collected
-                </span>
-                <span className="text-[13px] font-extrabold text-on-surface">
-                  12 / 150
-                </span>
-              </div>
-            </div>
-            <button
-              className="w-full text-on-surface font-extrabold text-[11px] tracking-wider py-3 rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 uppercase"
-              style={{
-                background: cfg.gradient,
-                boxShadow: `0 4px 20px ${cfg.glowWeak}`,
-              }}
-            >
-              Upgrade to Pro
-            </button>
+                  {!isLocked && (
+                    <LucideIcon
+                      name="chevron_right"
+                      className="text-[15px] text-on-surface/20 flex-shrink-0"
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </aside>
 
       <button
         onClick={() => setDrawerOpen(!drawerOpen)}
-        className={`fixed top-[96px] z-50 hidden h-10 w-10 items-center justify-center rounded-full border border-outline/30 bg-surface-container text-on-surface-variant shadow-lg transition-all duration-300 hover:border-primary-fixed-dim hover:bg-[#17212d] hover:text-primary-fixed-dim lg:flex ${
+        className={`fixed top-[96px] z-50 hidden h-10 w-10 items-center justify-center rounded-full border border-slate-200 dark:border-outline/30 bg-white dark:bg-surface-container text-slate-500 dark:text-on-surface-variant shadow-md transition-all duration-300 hover:border-teal-500 dark:hover:border-primary-fixed-dim hover:bg-slate-50 dark:hover:bg-[#17212d] hover:text-teal-600 dark:hover:text-primary-fixed-dim lg:flex ${
           drawerOpen ? "left-[335px]" : "left-4"
         }`}
         aria-label={drawerOpen ? "Collapse sidebar" : "Expand sidebar"}
       >
-        <span className="material-symbols-outlined text-[22px]">
-          {drawerOpen ? "chevron_left" : "menu"}
-        </span>
+        <LucideIcon
+          name={drawerOpen ? "chevron_left" : "menu"}
+          className="text-[22px]"
+        />
       </button>
 
       <main
@@ -845,7 +702,7 @@ const WorldMapPage = () => {
         onScroll={handleMainScroll}
         className="custom-scrollbar relative w-full flex-1 overflow-y-auto"
       >
-        <section className="z-10 flex min-h-full flex-col items-center justify-start px-4 py-10">
+        <section className="z-10 flex min-h-full flex-col items-center justify-start px-4 pb-4 pt-6">
           <div className="flex w-full max-w-[720px] flex-col">
             <div className="mb-8 flex flex-col justify-between gap-5 border-b border-on-surface/8 pb-7 md:flex-row md:items-center">
               <div className="flex items-center gap-4">
@@ -854,15 +711,14 @@ const WorldMapPage = () => {
                   style={{
                     background: cfg.glowWeak,
                     borderColor: `${cfg.accent}50`,
-                    boxShadow: `0 0 20px ${cfg.glowWeak}`,
+                    boxShadow: isLight ? "none" : `0 0 20px ${cfg.glowWeak}`,
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[26px]"
+                  <LucideIcon
+                    name="terminal"
+                    className=" text-[26px]"
                     style={{ color: cfg.accent }}
-                  >
-                    terminal
-                  </span>
+                  />
                 </div>
                 <div>
                   <h1 className="text-[32px] font-extrabold uppercase leading-none tracking-wide text-on-surface md:text-[38px]">
@@ -881,7 +737,7 @@ const WorldMapPage = () => {
                 </div>
               </div>
 
-              <div className="flex gap-0.5 rounded-xl border border-on-surface/10 bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
+              <div className="flex gap-0.5 rounded-xl border border-slate-200 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/90 p-1 text-[12px] font-bold uppercase tracking-wider">
                 {(["easy", "medium", "hard"] as Difficulty[]).map((d) => {
                   const isLocked =
                     d === "medium"
@@ -898,24 +754,23 @@ const WorldMapPage = () => {
                       onClick={() => !isLocked && setDifficulty(d)}
                       className={`rounded-lg px-5 py-2 transition-all duration-200 flex items-center gap-1.5 ${
                         difficulty === d
-                          ? "text-[#0d1117] shadow-md font-extrabold"
+                          ? "shadow-md font-extrabold"
                           : isLocked
                             ? "text-on-surface-variant/30 cursor-not-allowed opacity-50"
-                            : "text-on-surface-variant hover:bg-on-surface/8 hover:text-on-surface"
+                            : "text-slate-600 dark:text-on-surface-variant hover:bg-slate-200/50 dark:hover:bg-on-surface/8 hover:text-slate-900 dark:hover:text-on-surface"
                       }`}
                       style={
                         difficulty === d
                           ? {
                               background: dCfg.gradient,
-                              boxShadow: `0 2px 12px ${dCfg.glowWeak}`,
+                              color: (isLight && d === "hard") ? "#ffffff" : "#0d1117",
+                              boxShadow: isLight ? "none" : `0 2px 12px ${dCfg.glowWeak}`,
                             }
                           : {}
                       }
                     >
                       {isLocked && (
-                        <span className="material-symbols-outlined text-[14px]">
-                          lock
-                        </span>
+                        <LucideIcon name="lock" className=" text-[14px]" />
                       )}
                       {dCfg.label}
                     </button>
@@ -924,20 +779,20 @@ const WorldMapPage = () => {
               </div>
             </div>
 
-            <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-on-surface/10 bg-surface-container/60 px-5 py-4">
-              <div className="flex items-center justify-between text-[13px] font-bold tracking-wider text-on-surface-variant">
+            <div className="mb-8 flex flex-col gap-2 rounded-2xl border border-slate-200 dark:border-on-surface/10 bg-slate-50 dark:bg-surface-container/60 px-5 py-4">
+              <div className="flex items-center justify-between text-[13px] font-bold tracking-wider text-slate-500 dark:text-on-surface-variant">
                 <span>{DIFF_CONFIG[difficulty].label} Completion</span>
                 <span className="text-[15px]" style={{ color: cfg.accent }}>
                   {completionPct}%
                 </span>
               </div>
-              <div className="h-3 overflow-hidden rounded-full bg-surface-container">
+              <div className="h-3 overflow-hidden rounded-full bg-slate-100 dark:bg-surface-container">
                 <div
                   className="h-full rounded-full transition-all duration-700"
                   style={{
                     width: `${completionPct}%`,
                     background: cfg.gradient,
-                    boxShadow: `0 0 14px ${cfg.glow}`,
+                    boxShadow: isLight ? "none" : `0 0 14px ${cfg.glow}`,
                   }}
                 />
               </div>
@@ -969,9 +824,10 @@ const WorldMapPage = () => {
 
             {!loading && error && (
               <div className="rounded-2xl border border-red-400/20 bg-red-400/10 px-6 py-8 text-center">
-                <span className="material-symbols-outlined mb-3 text-[34px] text-red-200">
-                  error
-                </span>
+                <LucideIcon
+                  name="error"
+                  className=" mb-3 text-[34px] text-red-200"
+                />
                 <h2 className="text-[18px] font-extrabold text-on-surface">
                   {DIFF_CONFIG[difficulty].label} roadmap could not load
                 </h2>
@@ -1026,12 +882,11 @@ const WorldMapPage = () => {
                     borderColor: `${cfg.accent}35`,
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[22px]"
+                  <LucideIcon
+                    name="construction"
+                    className=" text-[22px]"
                     style={{ color: cfg.accent }}
-                  >
-                    construction
-                  </span>
+                  />
                   <div>
                     <p className="text-[13px] font-bold text-on-surface">
                       Coming soon
@@ -1073,7 +928,7 @@ const WorldMapPage = () => {
                         stroke={getDiffConfig("easy", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-easy-roadmap)"
+                        filter={isLight ? undefined : "url(#glow-easy-roadmap)"}
                       />
                     )}
                     {lockedD && (
@@ -1118,7 +973,6 @@ const WorldMapPage = () => {
                         onMouseLeave={() => setHoveredNode(null)}
                         onClick={() => {
                           setSelectedNode({ ...node, difficulty: "easy" });
-                          setSelectedChapterId(node.chapterId);
                         }}
                       >
                         {isFirstInChapter && (
@@ -1144,15 +998,17 @@ const WorldMapPage = () => {
                               </p>
                               <div className="mt-2 flex items-center justify-center gap-3 text-[11px] text-on-surface-variant">
                                 <span className="flex items-center gap-1">
-                                  <span className="material-symbols-outlined text-[12px]">
-                                    bolt
-                                  </span>
+                                  <LucideIcon
+                                    name="bolt"
+                                    className=" text-[12px]"
+                                  />
                                   {node.xp || 0} XP
                                 </span>
                                 <span className="flex items-center gap-1">
-                                  <span className="material-symbols-outlined text-[12px]">
-                                    schedule
-                                  </span>
+                                  <LucideIcon
+                                    name="schedule"
+                                    className=" text-[12px]"
+                                  />
                                   {EASY_CHECKPOINT_DURATION}
                                 </span>
                               </div>
@@ -1184,9 +1040,7 @@ const WorldMapPage = () => {
                           )}
                         >
                           {node.status === "locked" ? (
-                            <span className="material-symbols-outlined text-[18px]">
-                              lock
-                            </span>
+                            <LucideIcon name="lock" className=" text-[18px]" />
                           ) : (
                             node.label
                           )}
@@ -1226,12 +1080,11 @@ const WorldMapPage = () => {
                     borderColor: `${cfg.accent}35`,
                   }}
                 >
-                  <span
-                    className="material-symbols-outlined text-[22px]"
+                  <LucideIcon
+                    name="construction"
+                    className=" text-[22px]"
                     style={{ color: cfg.accent }}
-                  >
-                    construction
-                  </span>
+                  />
                   <div>
                     <p className="text-[13px] font-bold text-on-surface">
                       Coming soon
@@ -1273,7 +1126,7 @@ const WorldMapPage = () => {
                         stroke={getDiffConfig("medium", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-medium-roadmap)"
+                        filter={isLight ? undefined : "url(#glow-medium-roadmap)"}
                       />
                     )}
                     {lockedD && (
@@ -1325,9 +1178,6 @@ const WorldMapPage = () => {
                         onMouseLeave={() => setHoveredNode(null)}
                         onClick={() => {
                           setSelectedNode({ ...node, difficulty: "medium" });
-                          setSelectedChapterId(
-                            chapterForNode?.id ?? node.chapterId ?? null,
-                          );
                         }}
                       >
                         {isFirstInChapter && (
@@ -1384,9 +1234,7 @@ const WorldMapPage = () => {
                           )}
                         >
                           {node.status === "locked" ? (
-                            <span className="material-symbols-outlined text-[18px]">
-                              lock
-                            </span>
+                            <LucideIcon name="lock" className=" text-[18px]" />
                           ) : (
                             node.label
                           )}
@@ -1444,7 +1292,7 @@ const WorldMapPage = () => {
                         stroke={getDiffConfig("hard", isLight).pathColor}
                         strokeLinecap="round"
                         strokeWidth="6"
-                        filter="url(#glow-hard-roadmap)"
+                        filter={isLight ? undefined : "url(#glow-hard-roadmap)"}
                       />
                     )}
                     {lockedD && (
@@ -1495,9 +1343,6 @@ const WorldMapPage = () => {
                         onMouseLeave={() => setHoveredNode(null)}
                         onClick={() => {
                           setSelectedNode({ ...node, difficulty: "hard" });
-                          setSelectedChapterId(
-                            chapterForNode?.id ?? node.chapterId ?? null,
-                          );
                         }}
                       >
                         {isFirstInChapter && (
@@ -1554,9 +1399,7 @@ const WorldMapPage = () => {
                           )}
                         >
                           {node.status === "locked" ? (
-                            <span className="material-symbols-outlined text-[18px]">
-                              lock
-                            </span>
+                            <LucideIcon name="lock" className=" text-[18px]" />
                           ) : (
                             node.label
                           )}
@@ -1595,13 +1438,16 @@ const WorldMapPage = () => {
             disabled={!firstAvailableNodeId}
             style={{
               background: cfg.gradient,
-              boxShadow: `0 4px 20px ${cfg.glowWeak}`,
-              color: isLight ? "#000000" : "#fff",
+              boxShadow: isLight ? "0 4px 14px rgba(0,0,0,0.15)" : `0 4px 20px ${cfg.glowWeak}`,
+              color: isLight
+                ? (difficulty === "hard" ? "#ffffff" : "#0f172a")
+                : "#ffffff",
             }}
           >
-            <span className="material-symbols-outlined text-[20px] transition-transform duration-300 group-hover:rotate-12">
-              my_location
-            </span>
+            <LucideIcon
+              name="my_location"
+              className=" text-[20px] transition-transform duration-300 group-hover:rotate-12"
+            />
           </button>
 
           <div
@@ -1614,11 +1460,9 @@ const WorldMapPage = () => {
             <button
               onClick={scrollToTop}
               title="Scroll to top"
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-on-surface/10 bg-surface-container/90 text-on-surface-variant shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-on-surface/25 hover:text-on-surface active:scale-95"
+              className="flex h-12 w-12 items-center justify-center rounded-full border border-slate-200 dark:border-on-surface/10 bg-white dark:bg-surface-container/90 text-slate-500 dark:text-on-surface-variant shadow-md backdrop-blur-md transition-all duration-300 hover:scale-110 hover:border-slate-300 dark:hover:border-on-surface/25 hover:text-slate-800 dark:hover:text-on-surface active:scale-95"
             >
-              <span className="material-symbols-outlined text-[20px]">
-                arrow_upward
-              </span>
+              <LucideIcon name="arrow_upward" className=" text-[20px]" />
             </button>
           </div>
         </div>

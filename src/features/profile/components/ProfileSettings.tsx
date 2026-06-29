@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { mascotAxolotl } from "../../features/users/constants/authImages";
-import { useAuthStore } from "../../features/users/store/auth.store";
-import { api } from "../../services/axiosClient";
+import { useAuthStore } from "../../users/store/auth.store";
+import { api } from "../../../services/axiosClient";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 interface ProfileSettingsProps {
   theme: "light" | "dark";
@@ -72,29 +72,25 @@ export const ProfileSettings: React.FC<ProfileSettingsProps> = ({ theme }) => {
           <div className="flex items-center gap-4">
             {/* Khung viền Squircle bo bầu độc đáo theo đúng ảnh chụp */}
             <div
-              className={`w-[74px] h-[84px] rounded-[28px] border-2 p-2 flex items-center justify-center transition-colors ${
+              className={`w-[74px] h-[84px] rounded-[28px] border-2 p-2 flex items-center justify-center transition-colors overflow-hidden ${
                 theme === "dark"
                   ? "border-[#1c3242] bg-[#040d14]"
                   : "border-slate-300 bg-slate-100"
               }`}
             >
-              <img
-                src={mascotAxolotl}
-                alt={`${user?.petName || "Axo-Script"} Avatar`}
-                className="w-12 h-12 object-contain"
+              <UserAvatar
+                user={user ?? { username: "User" }}
+                size="xl"
+                className={`!h-full !w-full rounded-[20px] ${
+                  theme === "dark"
+                    ? "bg-[#10232f] text-[#7fe3dd]"
+                    : "bg-teal-50 text-teal-700"
+                }`}
+                imgProps={{
+                  referrerPolicy: "no-referrer",
+                }}
               />
             </div>
-            <button
-              className={`px-4 py-2 text-xs font-semibold rounded-xl border transition-all active:scale-95 ${
-                theme === "dark"
-                  ? "bg-[#142533] hover:bg-[#1c3245] text-slate-300 border-[#223a4d]"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300"
-              }`}
-            >
-              Update
-              <br />
-              Hash
-            </button>
           </div>
         </div>
 

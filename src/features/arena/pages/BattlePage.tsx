@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import MiniPlayerCard from "../components/battle/MiniPlayerCard";
 import TimerRing from "../components/battle/TimerRing";
 import QuestionBoard from "../components/battle/QuestionBoard";
@@ -6,13 +7,14 @@ import OptionButton from "../components/battle/OptionButton";
 import VictoryView from "../components/battle/VictoryView";
 import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
-const optionColors = ["#00bfa5", "#9f7aea", "#84cc16", "#475569"];
+const optionColors = ["#0d9488", "#4f46e5", "#059669", "#4b5563"];
 const optionBgClasses = [
-  "bg-[#00bfa5]",
-  "bg-[#7a5c88]",
-  "bg-[#5a7638]",
-  "bg-[#334155]",
+  "bg-teal-600 dark:bg-teal-500",
+  "bg-indigo-600 dark:bg-indigo-500",
+  "bg-emerald-600 dark:bg-emerald-500",
+  "bg-slate-600 dark:bg-slate-500",
 ];
 
 const getRemainingSeconds = (
@@ -27,6 +29,7 @@ const getRemainingSeconds = (
 };
 
 const BattlePage = () => {
+  const navigate = useNavigate();
   const { user: currentUser } = useAuthStore();
   const {
     status,
@@ -51,6 +54,7 @@ const BattlePage = () => {
   const [timeLeft, setTimeLeft] = useState(() =>
     getRemainingSeconds(serverTime, timeLimitSeconds),
   );
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
   const statusRef = useRef(status);
   const leaveRoomRef = useRef(leaveRoom);
 
@@ -120,6 +124,10 @@ const BattlePage = () => {
     );
   }, [me, players]);
 
+  const handleForfeit = () => {
+    setShowExitConfirm(true);
+  };
+
   const getScore = (userId?: string) =>
     scoreboard.find((item) => item.userId === userId);
   const myScore = getScore(me?.userId);
@@ -146,11 +154,20 @@ const BattlePage = () => {
         </div>
       )}
 
+      {/* Exit/Forfeit Button - absolute positioned top right */}
+      <button
+        onClick={handleForfeit}
+        className="absolute top-4 right-4 z-30 flex items-center gap-1.5 px-3 py-1.5 rounded-xl dark:bg-[#16202a] bg-surface-container-high dark:text-gray-300 text-on-surface hover:bg-error hover:text-white transition-all shadow-md text-[13px] font-black"
+      >
+        <LucideIcon name="logout" className="text-[16px]" />
+        <span>Exit</span>
+      </button>
+
       <div className="flex justify-between items-start w-full max-w-5xl mx-auto relative gap-4">
         <MiniPlayerCard
           name={opponent?.username || "Opponent"}
           avatarUrl={
-            opponent?.avatarUrl || "https://i.pravatar.cc/150?u=arena-opponent"
+            opponent?.avatarUrl || ""
           }
           hpPercentage={Math.min(
             100,
@@ -177,7 +194,7 @@ const BattlePage = () => {
           avatarUrl={
             me?.avatarUrl ||
             (currentUser?.avatarUrl as string) ||
-            "/axolotl.png"
+            ""
           }
           hpPercentage={Math.min(
             100,
@@ -295,6 +312,44 @@ const BattlePage = () => {
           }
         />
       )}
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-[360px] rounded-2xl border border-on-surface/10 dark:border-white/5 bg-surface-container dark:bg-[#121c27] p-5 flex flex-col items-center gap-4 text-center shadow-2xl transition-all duration-300">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 dark:bg-red-500/20 border border-red-500/30 flex items-center justify-center shrink-0">
+              <LucideIcon name="warning" className="text-red-500 text-[24px]" />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <h3 className="text-lg font-black text-on-surface dark:text-white">
+                Exit Match?
+              </h3>
+              <p className="text-[13px] text-on-surface-variant dark:text-gray-400 font-semibold leading-relaxed">
+                Are you sure you want to exit? You may lose points for
+                forfeiting.
+              </p>
+            </div>
+            <div className="flex gap-2.5 w-full mt-1">
+              <button
+                type="button"
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 bg-on-surface/5 dark:bg-white/5 border border-on-surface/10 dark:border-white/10 text-on-surface dark:text-white py-2 rounded-xl text-[13px] font-black hover:bg-on-surface/10 dark:hover:bg-white/10 transition-all cursor-pointer"
+              >
+                CANCEL
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowExitConfirm(false);
+                  leaveRoom();
+                  navigate({ to: "/arena" });
+                }}
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white py-2 rounded-xl text-[13px] font-black transition-all cursor-pointer shadow-md hover:scale-[1.01]"
+              >
+                EXIT MATCH
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -343,33 +398,129 @@ const RoundResultNotice = ({
   answerResult,
   explanation,
 }: RoundResultNoticeProps) => {
+  const { scoreboard, players } = useArenaStore();
+  const { user: currentUser } = useAuthStore();
+  const [countdown, setCountdown] = useState(5);
+
+  useEffect(() => {
+    setCountdown(5);
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [answerResult?.questionId]);
+
+  const currentUserId = useMemo(() => {
+    const rawId = currentUser?.id || currentUser?._id;
+    return rawId ? String(rawId) : undefined;
+  }, [currentUser]);
+
+  const me = useMemo(() => {
+    return (
+      players.find(
+        (player) => currentUserId && player.userId === currentUserId,
+      ) ||
+      players.find((player) => !player.isBot) ||
+      players[0]
+    );
+  }, [currentUserId, players]);
+
+  const myScore = useMemo(() => {
+    return scoreboard.find((item) => item.userId === me?.userId);
+  }, [scoreboard, me]);
+
   const isCorrect = answerResult?.isCorrect;
 
+  let headerText = "INCORRECT!";
+  let pointsText = "+0 PTS";
+  let headerBgClass = "bg-[#9f3f4a]";
+  let headerIcon = "cancel";
+
+  if (answerResult) {
+    if (isCorrect) {
+      headerText = "CORRECT!";
+      pointsText = `+${answerResult.earnedScore} PTS`;
+      headerBgClass = "bg-[#206f6c]";
+      headerIcon = "check_circle";
+    } else {
+      headerText = "INCORRECT!";
+      pointsText = "+0 PTS";
+      headerBgClass = "bg-[#9f3f4a]";
+      headerIcon = "cancel";
+    }
+  } else {
+    headerText = "TIME'S UP!";
+    pointsText = "+0 PTS";
+    headerBgClass = "bg-[#9f3f4a]";
+    headerIcon = "timer_off";
+  }
+
+  const totalScore = answerResult?.totalScore ?? myScore?.score ?? 0;
+  const streak = answerResult?.streak ?? myScore?.streak ?? 0;
+
   return (
-    <div className="absolute inset-x-0 bottom-5 z-30 flex justify-center px-4 pointer-events-none">
-      <div
-        className={`w-full max-w-xl rounded-2xl border p-5 shadow-2xl backdrop-blur-md pointer-events-auto ${isCorrect ? "dark:bg-[#102b2d]/95 bg-tertiary-container border-[#4fd1c5]/50" : "dark:bg-[#32161b]/95 bg-error/10 border-error/40"}`}
-      >
-        <div className="flex items-center justify-between gap-4 mb-2">
-          <div
-            className={`text-[22px] font-black ${isCorrect ? "dark:text-[#4dd0d0] text-primary" : "text-error"}`}
-          >
-            {isCorrect ? "Correct answer" : "Wrong answer"}
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
+      <div className="w-full max-w-[400px] rounded-2xl overflow-hidden shadow-[0_0_40px_rgba(0,0,0,0.15)] dark:shadow-[0_0_40px_rgba(0,0,0,0.5)] border border-on-surface/10 dark:border-white/5 bg-surface-container">
+        {/* Header */}
+        <div
+          className={`px-6 py-4 flex items-center justify-between ${headerBgClass}`}
+        >
+          <div className="flex items-center gap-2">
+            <LucideIcon name={headerIcon} className="text-white text-[24px]" />
+            <span className="text-white text-base font-extrabold tracking-wider">
+              {headerText} {pointsText}
+            </span>
           </div>
-          {answerResult && (
-            <div className="text-right text-[12px] font-black dark:text-gray-300 text-on-surface-variant">
-              +{answerResult.earnedScore} score
-              <br />
-              Total {answerResult.totalScore} - Streak {answerResult.streak}
+        </div>
+
+        <div className="p-5 flex flex-col gap-5">
+          {/* Stats Row */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-surface-container-high dark:bg-[#121c27] border border-on-surface/5 dark:border-white/5 rounded-xl py-3 flex flex-col items-center justify-center">
+              <span className="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 tracking-[0.2em] mb-1">
+                TOTAL
+              </span>
+              <span className="text-2xl font-black text-on-surface dark:text-white">
+                {totalScore}
+              </span>
+            </div>
+            <div className="bg-surface-container-high dark:bg-[#121c27] border border-on-surface/5 dark:border-white/5 rounded-xl py-3 flex flex-col items-center justify-center">
+              <span className="text-[10px] font-bold text-on-surface-variant dark:text-gray-400 tracking-[0.2em] mb-1">
+                STREAK
+              </span>
+              <span className="text-2xl font-black text-on-surface dark:text-white">
+                {streak}
+              </span>
+            </div>
+          </div>
+
+          {/* Explanation */}
+          {explanation && (
+            <div className="flex flex-col gap-2">
+              <span className="text-[11px] font-bold text-on-surface-variant dark:text-gray-400 tracking-[0.2em]">
+                EXPLANATION
+              </span>
+              <div className="bg-surface-container-high dark:bg-[#121c27] border border-on-surface/5 dark:border-white/5 rounded-xl p-4 text-sm text-on-surface-variant dark:text-gray-300 leading-relaxed font-semibold">
+                {explanation}
+              </div>
             </div>
           )}
-        </div>
-        <p className="dark:text-gray-200 text-on-surface-variant text-[14px] leading-relaxed">
-          {explanation ||
-            "Waiting for the round explanation before the next question..."}
-        </p>
-        <div className="mt-4 h-1.5 rounded-full dark:bg-white/10 bg-outline/20 overflow-hidden">
-          <div className="h-full w-2/3 rounded-full dark:bg-[#4dd0d0] bg-primary animate-pulse" />
+
+          {/* Countdown */}
+          <div className="flex items-center justify-between mt-1">
+            <span className="text-xs text-on-surface-variant dark:text-gray-400 font-semibold">
+              Next question in{" "}
+              <strong className="text-on-surface dark:text-white font-bold">
+                {countdown}s
+              </strong>
+            </span>
+            <div className="w-24 h-1.5 rounded-full bg-on-surface/10 dark:bg-white/10 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all duration-1000 ease-linear ${isCorrect ? "bg-[#206f6c]" : "bg-[#9f3f4a]"}`}
+                style={{ width: `${(countdown / 5) * 100}%` }}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -395,10 +546,14 @@ const DragDropAnswer = ({
 }: DragDropAnswerProps) => {
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [dropZoneMap, setDropZoneMap] = useState<Record<string, string>>({});
+  const [dragOverZoneId, setDragOverZoneId] = useState<string | null>(null);
+  const [dragOverItems, setDragOverItems] = useState(false);
 
   useEffect(() => {
     setSelectedItemId(null);
     setDropZoneMap({});
+    setDragOverZoneId(null);
+    setDragOverItems(false);
   }, [poolItems, dropZones]);
 
   const activeMap = submittedMap || dropZoneMap;
@@ -406,11 +561,26 @@ const DragDropAnswer = ({
   const canSubmit =
     dropZones.length > 0 && dropZones.every((zone) => activeMap[zone.id]);
 
+  const handleDrop = (zoneId: string, itemId: string) => {
+    if (disabled || correctMap || !itemId) return;
+    setDropZoneMap((current) => {
+      const next = { ...current };
+      // Remove this item from any other zone it was assigned to
+      for (const [zId, itId] of Object.entries(next)) {
+        if (itId === itemId) {
+          delete next[zId];
+        }
+      }
+      next[zoneId] = itemId;
+      return next;
+    });
+    setSelectedItemId(null);
+  };
+
   const handleZoneClick = (zoneId: string) => {
-    if (disabled) return;
+    if (disabled || correctMap) return;
     if (selectedItemId) {
-      setDropZoneMap((current) => ({ ...current, [zoneId]: selectedItemId }));
-      setSelectedItemId(null);
+      handleDrop(zoneId, selectedItemId);
     } else if (dropZoneMap[zoneId]) {
       setDropZoneMap((current) => {
         const copy = { ...current };
@@ -421,31 +591,93 @@ const DragDropAnswer = ({
   };
 
   return (
-    <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_1.15fr] gap-3">
-      <div className="dark:bg-[#111a22] bg-surface rounded-xl border dark:border-white/5 border-outline/10 p-4">
+    <div className="w-full grid grid-cols-1 md:grid-cols-[1fr_1.15fr] gap-4">
+      {/* Items Section */}
+      <div
+        onDragOver={(e) => {
+          if (disabled || correctMap) return;
+          e.preventDefault();
+        }}
+        onDragEnter={() => {
+          if (disabled || correctMap) return;
+          setDragOverItems(true);
+        }}
+        onDragLeave={() => {
+          setDragOverItems(false);
+        }}
+        onDrop={(e) => {
+          if (disabled || correctMap) return;
+          const itemId = e.dataTransfer.getData("text/plain");
+          if (itemId) {
+            setDropZoneMap((current) => {
+              const next = { ...current };
+              for (const [zId, itId] of Object.entries(next)) {
+                if (itId === itemId) {
+                  delete next[zId];
+                }
+              }
+              return next;
+            });
+          }
+          setSelectedItemId(null);
+          setDragOverItems(false);
+        }}
+        className={`rounded-xl border p-4 transition-all duration-300 ${
+          dragOverItems
+            ? "bg-red-50/60 dark:bg-red-950/10 border-dashed border-red-500 scale-[0.99]"
+            : "bg-slate-100/90 dark:bg-[#121c27] dark:border-white/5 border-slate-200"
+        }`}
+      >
         <p className="text-[11px] uppercase tracking-wider dark:text-gray-500 text-on-surface-variant font-black mb-3">
           Items
         </p>
-        <div className="flex flex-col gap-2">
-          {poolItems.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              disabled={disabled || assignedItemIds.has(item.id)}
-              onClick={() => setSelectedItemId(item.id)}
-              className={`rounded-xl border px-3 py-2.5 text-left text-[14px] font-semibold transition-colors disabled:opacity-50 ${selectedItemId === item.id ? "border-primary bg-primary/10 dark:text-[#4dd0d0] text-primary" : "dark:border-white/10 border-outline/20 dark:bg-[#16202a] bg-surface-container-high dark:text-[#e2e8f0] text-on-surface"}`}
-            >
-              {item.text}
-            </button>
-          ))}
+        <div className="flex flex-col gap-2.5">
+          {poolItems.map((item) => {
+            const isAssigned = assignedItemIds.has(item.id);
+            const isSelected = selectedItemId === item.id;
+
+            let itemClass = "";
+            if (isAssigned) {
+              itemClass =
+                "border-2 border-dashed border-slate-300 dark:border-slate-800 bg-slate-200/50 dark:bg-black/20 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-50";
+            } else if (isSelected) {
+              itemClass =
+                "border-2 border-teal-600 dark:border-[#4dd0d0] bg-teal-50 dark:bg-[#4dd0d0]/10 text-teal-800 dark:text-[#4dd0d0] cursor-grab shadow-md scale-[0.98] ring-2 ring-teal-500/20 dark:ring-[#4dd0d0]/20";
+            } else {
+              itemClass =
+                "border-2 border-slate-300 dark:border-slate-700 bg-white dark:bg-[#16202a] text-slate-800 dark:text-[#e2e8f0] hover:border-slate-500 dark:hover:border-white/20 cursor-grab hover:shadow-sm";
+            }
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                disabled={disabled || isAssigned}
+                draggable={!disabled && !isAssigned}
+                onDragStart={(e) => {
+                  if (disabled) return;
+                  e.dataTransfer.setData("text/plain", item.id);
+                  setSelectedItemId(item.id);
+                }}
+                onDragEnd={() => {
+                  setSelectedItemId(null);
+                }}
+                onClick={() => setSelectedItemId(item.id)}
+                className={`rounded-xl px-3 py-2.5 text-left text-[14px] font-semibold transition-all ${itemClass}`}
+              >
+                {item.text}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      <div className="dark:bg-[#111a22] bg-surface rounded-xl border dark:border-white/5 border-outline/10 p-4">
+      {/* Drop Zones Section */}
+      <div className="bg-slate-100/90 dark:bg-[#121c27] rounded-xl border dark:border-white/5 border-slate-200 p-4 transition-colors duration-300">
         <p className="text-[11px] uppercase tracking-wider dark:text-gray-500 text-on-surface-variant font-black mb-3">
           Drop zones
         </p>
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2.5">
           {dropZones.map((zone) => {
             const assigned = poolItems.find(
               (item) => item.id === activeMap[zone.id],
@@ -457,22 +689,44 @@ const DragDropAnswer = ({
             const isTargetHighlight = Boolean(
               selectedItemId && !assigned && !disabled && !correctMap,
             );
-            const isRemovable = Boolean(
-              !selectedItemId && assigned && !disabled && !correctMap,
-            );
 
-            let borderBgClass =
-              "dark:border-white/10 border-outline/20 dark:bg-[#16202a] bg-surface-container-high transition-all duration-300";
+            const isDragOver = dragOverZoneId === zone.id;
+
+            let borderBgClass = "";
+            let textClass = "";
+            let labelClass = "";
+
             if (correctMap) {
               borderBgClass = isCorrect
-                ? "border-[#4fd1c5] bg-tertiary-container/40"
-                : "border-error bg-error/10";
+                ? "border-2 border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-950/30"
+                : "border-2 border-red-500 dark:border-red-400 bg-red-50 dark:bg-red-950/20";
+              textClass = isCorrect
+                ? "text-emerald-900 dark:text-emerald-300"
+                : "text-red-900 dark:text-red-300";
+              labelClass = isCorrect
+                ? "text-emerald-700/80 dark:text-emerald-500/80"
+                : "text-red-700/80 dark:text-red-500/80";
+            } else if (isDragOver) {
+              borderBgClass =
+                "border-2 border-solid border-teal-600 dark:border-[#4dd0d0] bg-teal-50 dark:bg-[#4dd0d0]/20 scale-[1.02] shadow-md ring-2 ring-teal-500/20 dark:ring-[#4dd0d0]/20";
+              textClass = "text-teal-900 dark:text-teal-200 font-extrabold";
+              labelClass = "text-teal-700 dark:text-[#4dd0d0]";
+            } else if (assigned) {
+              borderBgClass =
+                "border-2 border-solid border-teal-500 dark:border-[#4dd0d0]/80 bg-teal-50 dark:bg-[#4dd0d0]/10 hover:border-teal-600 dark:hover:border-[#4dd0d0] hover:bg-teal-100/50 hover:shadow-sm";
+              textClass = "text-teal-900 dark:text-teal-200 font-extrabold";
+              labelClass = "text-teal-700 dark:text-gray-400";
             } else if (isTargetHighlight) {
               borderBgClass =
-                "dark:border-[#4dd0d0] border-primary dark:bg-[#4dd0d0]/10 bg-primary/5 dark:shadow-[0_0_12px_rgba(77,208,208,0.25)] animate-pulse cursor-pointer";
-            } else if (isRemovable) {
+                "border-2 border-dashed border-teal-500 dark:border-[#4dd0d0] bg-teal-50/20 dark:bg-[#4dd0d0]/5 animate-pulse";
+              textClass = "text-teal-600/60 dark:text-[#4dd0d0]/50 italic";
+              labelClass = "text-teal-700/80 dark:text-[#4dd0d0]/80";
+            } else {
               borderBgClass =
-                "dark:border-white/10 border-outline/20 dark:bg-[#16202a] bg-surface-container-high hover:border-error/40 hover:bg-error/5 cursor-pointer";
+                "border-2 border-dashed border-slate-300 dark:border-slate-700 bg-white dark:bg-[#16202a]/50 hover:border-slate-400 hover:bg-slate-50 dark:hover:border-slate-600 dark:hover:bg-[#16202a]/80";
+              textClass =
+                "text-slate-400 dark:text-slate-500 italic font-normal";
+              labelClass = "text-slate-400 dark:text-slate-500";
             }
 
             return (
@@ -480,14 +734,47 @@ const DragDropAnswer = ({
                 key={zone.id}
                 type="button"
                 disabled={disabled && !correctMap}
+                draggable={!disabled && !correctMap && !!assigned}
+                onDragStart={(e) => {
+                  if (disabled || correctMap || !assigned) return;
+                  e.dataTransfer.setData("text/plain", assigned.id);
+                  setSelectedItemId(assigned.id);
+                }}
+                onDragEnd={() => {
+                  setSelectedItemId(null);
+                  setDragOverZoneId(null);
+                }}
+                onDragOver={(e) => {
+                  if (disabled || correctMap) return;
+                  e.preventDefault();
+                }}
+                onDragEnter={() => {
+                  if (disabled || correctMap) return;
+                  setDragOverZoneId(zone.id);
+                }}
+                onDragLeave={() => {
+                  setDragOverZoneId(null);
+                }}
+                onDrop={(e) => {
+                  if (disabled || correctMap) return;
+                  const itemId = e.dataTransfer.getData("text/plain");
+                  if (itemId) {
+                    handleDrop(zone.id, itemId);
+                  }
+                  setDragOverZoneId(null);
+                }}
                 onClick={() => handleZoneClick(zone.id)}
-                className={`min-h-[58px] rounded-xl border px-3 py-2 text-left ${borderBgClass}`}
+                className={`min-h-[58px] rounded-xl px-3 py-2 text-left transition-all duration-200 cursor-pointer ${borderBgClass}`}
               >
-                <div className="text-[10px] uppercase tracking-wider dark:text-gray-500 text-on-surface-variant font-black mb-1">
+                <div
+                  className={`text-[10px] uppercase tracking-wider font-black mb-1 transition-colors ${labelClass}`}
+                >
                   {zone.label}
                 </div>
-                <div className="font-semibold text-[14px] dark:text-[#e2e8f0] text-on-surface">
-                  {assigned?.text || "Select item, click here"}
+                <div
+                  className={`font-semibold text-[14px] transition-colors ${textClass}`}
+                >
+                  {assigned?.text || "Drag item here or select/click"}
                 </div>
               </button>
             );
@@ -497,7 +784,7 @@ const DragDropAnswer = ({
           type="button"
           disabled={disabled || !canSubmit}
           onClick={() => onSubmit(activeMap)}
-          className="mt-4 w-full rounded-xl dark:bg-[#29b6f6] bg-primary dark:text-[#081015] text-on-primary font-black py-2.5 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="mt-4 w-full rounded-xl dark:bg-[#29b6f6] bg-primary dark:text-[#081015] text-on-primary font-black py-2.5 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:scale-[1.01] active:scale-100 transition-all"
         >
           SUBMIT ANSWER
         </button>

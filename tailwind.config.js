@@ -5,6 +5,9 @@ module.exports = {
     extend: {
       colors: {
         primary: "#a855f7",
+        easy: "var(--color-easy)",
+        medium: "var(--color-medium)",
+        hard: "var(--color-hard)",
       },
       borderRadius: {
         card: "20px",

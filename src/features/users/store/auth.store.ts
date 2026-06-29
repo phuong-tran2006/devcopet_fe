@@ -1,15 +1,36 @@
 import { create } from "zustand";
 import { socketService } from "../../../services/socket.service";
 
-interface User {
+export interface Pet {
+  name: string;
+  level: number;
+  exp: number;
+  nextLevelExp: number;
+  evolutionStage: number;
+  avatar?: string;
+  totalExp?: number;
+  nextLevelThresholdXp?: number;
+  levelRequiredExp?: number;
+}
+
+export interface User {
   id?: string;
   email?: string;
   name?: string;
   username?: string;
   avatarUrl?: string;
   bio?: string;
+
   level?: number;
-  exp?: number;
+  lifetimeXp?: number;
+  currentXp?: number;
+  nextLevelXp?: number;
+
+  globalRank?: number;
+  arenaRank?: string;
+
+  pet?: Pet;
+
   onboardingCompleted?: boolean;
   petProfileInitialized?: boolean;
   petName?: string;
@@ -26,11 +47,21 @@ interface AuthState {
   ) => void;
   logout: () => void;
   checkAuth: () => void;
+  updateUser: (updatedFields: Partial<User>) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   isAuthenticated: false,
   user: null,
+
+  updateUser: (updatedFields) => {
+    set((state) => {
+      if (!state.user) return state;
+      const mergedUser = { ...state.user, ...updatedFields };
+      localStorage.setItem("user", JSON.stringify(mergedUser));
+      return { user: mergedUser };
+    });
+  },
 
   setAuth: (_accessToken, _refreshToken, user) => {
     localStorage.removeItem("accessToken");
@@ -81,16 +112,17 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     try {
       const { api } = await import("../../../services/axiosClient");
-      const response = await api.get("/users/me", {
+      const response = await api.get("/profile/me", {
         _skipAuthRedirect: true,
       } as any);
       const freshUser = response.data;
       const petName =
-        freshUser.petProfileInitialized && freshUser.petName
+        freshUser.pet?.name ||
+        (freshUser.petProfileInitialized && freshUser.petName
           ? (freshUser.petName as string)
           : localStorage.getItem("petName") ||
             (freshUser.petName as string) ||
-            "Axo-Script";
+            "Axo-Script");
       const mergedUser = { ...freshUser, petName };
       localStorage.setItem("petName", petName);
       localStorage.setItem("user", JSON.stringify(mergedUser));

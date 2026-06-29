@@ -2,6 +2,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "@tanstack/react-router";
 import { courseApi } from "../api/course.api";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 /* ───────────── Helper: Dot Grid Decoration ───────────── */
 const DotGrid = ({ className = "", rows = 5, cols = 5 }) => (
@@ -39,7 +40,7 @@ const ModuleIcon = ({ index, isActive }) => {
           : "bg-surface-container text-on-surface-variant/40 border border-outline-variant"
       }`}
     >
-      <span className="material-symbols-outlined text-[24px]">{icon}</span>
+      <LucideIcon name={icon} className="text-[24px]" />
     </div>
   );
 };
@@ -143,11 +144,10 @@ const LessonCard = ({ lesson }) => {
                 : "border-outline-variant bg-transparent"
           }`}
         >
-          <span
-            className={`material-symbols-outlined text-[20px] ${iconColor[status]}`}
-          >
-            {iconMap[status]}
-          </span>
+          <LucideIcon
+            name={iconMap[status]}
+            className={`text-[20px] ${iconColor[status]}`}
+          />
         </div>
         <div>
           <h4
@@ -171,23 +171,8 @@ const LessonCard = ({ lesson }) => {
 
 /* ───────────── Module Section ───────────── */
 const ModuleSection = ({ chapter, index, totalModules }) => {
-  const [lessons, setLessons] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const isActive =
-    chapter.status !== "locked" &&
-    chapter.stateLabel !== "LOCKED" &&
-    chapter.locked !== true &&
-    chapter.canAccess !== false;
-
-  useEffect(() => {
-    const chapterId = chapter._id || chapter.id;
-    courseApi
-      .getLessons(chapterId)
-      .then((data) => setLessons(data || []))
-      .catch(() => setLessons([]))
-      .finally(() => setLoading(false));
-  }, [chapter]);
+  const lessons = chapter.lessons || [];
+  const isActive = chapter.status !== "locked";
 
   const getRankLabel = () => {
     const ranks = [
@@ -231,9 +216,10 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
               </>
             ) : (
               <>
-                <span className="material-symbols-outlined text-[14px] text-on-surface-variant/50">
-                  lock
-                </span>
+                <LucideIcon
+                  name="lock"
+                  className="text-[14px] text-on-surface-variant/50"
+                />
                 <span className="font-label-sm text-[11px] text-on-surface-variant/50 tracking-[0.08em]">
                   Locked
                 </span>
@@ -251,11 +237,7 @@ const ModuleSection = ({ chapter, index, totalModules }) => {
 
       {/* Lessons List */}
       <div className="ml-0 md:ml-[72px] flex flex-col gap-3">
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <div className="w-7 h-7 border-2 border-primary-fixed-dim/60 border-t-transparent rounded-full animate-spin" />
-          </div>
-        ) : lessons.length > 0 ? (
+        {lessons.length > 0 ? (
           lessons.map((lesson) => (
             <LessonCard key={lesson._id || lesson.id} lesson={lesson} />
           ))
@@ -286,16 +268,11 @@ const CourseDetailPage = () => {
     if (!courseId) return;
     setLoading(true);
     courseApi
-      .getCourses()
-      .then((courses) => {
-        const found = courses.find(
-          (c) => c.slug === courseId || c._id === courseId,
-        );
-        if (!found) throw new Error("Course not found");
-        setCourse(found);
-        return courseApi.getChapters(found._id);
+      .getCourseDetail(courseId)
+      .then((detail) => {
+        setCourse(detail.course);
+        setChapters(detail.chapters || []);
       })
-      .then((data) => setChapters(data || []))
       .catch((err) => console.error(err))
       .finally(() => setLoading(false));
   }, [courseId]);
@@ -305,7 +282,8 @@ const CourseDetailPage = () => {
   }, [loadData]);
 
   const handleResetProgress = async () => {
-    if (!course?._id) return;
+    const currentCourseId = course?._id || course?.id;
+    if (!currentCourseId) return;
     if (
       !window.confirm(
         "Are you sure you want to reset your progress for this course? This action cannot be undone.",
@@ -315,7 +293,7 @@ const CourseDetailPage = () => {
     }
     setResetting(true);
     try {
-      await courseApi.resetCourseProgress(course._id);
+      await courseApi.resetCourseProgress(currentCourseId);
       loadData();
     } catch (err) {
       console.error("Failed to reset course progress:", err);
@@ -347,9 +325,10 @@ const CourseDetailPage = () => {
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <span className="material-symbols-outlined text-5xl text-on-surface-variant/40 mb-4">
-          error
-        </span>
+        <LucideIcon
+          name="error"
+          className="text-5xl text-on-surface-variant/40 mb-4"
+        />
         <h2 className="font-headline-md text-on-surface mb-2">
           Course Not Found
         </h2>
@@ -378,9 +357,10 @@ const CourseDetailPage = () => {
     0,
   );
   const overallPercent =
-    totalLessons > 0
+    course.progress?.percent ??
+    (totalLessons > 0
       ? Math.round((totalCompletedLessons / totalLessons) * 100)
-      : 0;
+      : 0);
   const totalUnlockedLessons =
     totalCompletedLessons < totalLessons
       ? totalCompletedLessons + 1
@@ -398,9 +378,7 @@ const CourseDetailPage = () => {
               to="/course"
               className="inline-flex items-center gap-2 text-on-surface-variant/60 hover:text-on-surface transition-colors text-[12px] font-bold mb-6 uppercase tracking-[0.15em]"
             >
-              <span className="material-symbols-outlined text-[14px]">
-                arrow_back
-              </span>
+              <LucideIcon name="arrow_back" className="text-[14px]" />
               All Courses
             </Link>
 
@@ -433,9 +411,10 @@ const CourseDetailPage = () => {
                 <span className="font-label-sm text-[10px] text-on-surface-variant tracking-[0.15em] uppercase">
                   Overall Progress
                 </span>
-                <span className="material-symbols-outlined text-[20px] text-on-surface-variant/40">
-                  insert_chart
-                </span>
+                <LucideIcon
+                  name="insert_chart"
+                  className="text-[20px] text-on-surface-variant/40"
+                />
               </div>
 
               {/* Percentage */}
@@ -477,9 +456,7 @@ const CourseDetailPage = () => {
                 disabled={resetting}
                 className="w-full mt-5 bg-red-950/25 text-red-400 hover:bg-red-950/45 hover:text-red-300 border border-red-900/40 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span className="material-symbols-outlined text-[16px]">
-                  restart_alt
-                </span>
+                <LucideIcon name="restart_alt" className="text-[16px]" />
                 {resetting ? "Resetting..." : "Reset Course Progress"}
               </button>
             </div>
@@ -490,7 +467,7 @@ const CourseDetailPage = () => {
         <div className="relative">
           {chapters.map((chapter, index) => (
             <ModuleSection
-              key={chapter._id}
+              key={chapter._id || chapter.id}
               chapter={chapter}
               index={index}
               totalModules={chapters.length}
@@ -499,9 +476,10 @@ const CourseDetailPage = () => {
 
           {chapters.length === 0 && (
             <div className="bg-surface-container rounded-xl border border-outline-variant p-16 text-center shadow-[0_0_20px_rgba(0,0,0,0.15)]">
-              <span className="material-symbols-outlined text-5xl text-on-surface-variant/30 mb-4">
-                inventory_2
-              </span>
+              <LucideIcon
+                name="inventory_2"
+                className="text-5xl text-on-surface-variant/30 mb-4"
+              />
               <h3 className="font-headline-sm text-on-surface mb-2">
                 No Modules Found
               </h3>

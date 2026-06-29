@@ -1,4 +1,5 @@
 // @ts-nocheck
+import LucideIcon from "../../../components/ui/LucideIcon";
 import React, { useState } from "react";
 import { useAuthStore } from "../../users/store/auth.store";
 
@@ -73,9 +74,10 @@ const QuizPage = () => {
 
   const q = mockQuestions[currentIdx];
   const userLevel = currentUser?.level ?? 1;
-  const userExp = currentUser?.exp ?? 0;
+  const userExp = Number(currentUser?.lifetimeXp ?? 0);
   const userStars = currentUser?.coins ?? 0;
-  const levelProgress = Math.min(100, Math.max(0, userExp % 1000) / 10);
+  const nextLevelXp = Number(currentUser?.nextLevelXp ?? 1000);
+  const levelProgress = nextLevelXp > 0 ? Math.min(100, Math.round((userExp / nextLevelXp) * 100)) : 0;
 
   const handleNext = () => {
     if (currentIdx < mockQuestions.length - 1) {
@@ -118,17 +120,16 @@ const QuizPage = () => {
 
         <div className="flex flex-col gap-3 mb-10">
           <div className="bg-surface-container/50 border border-outline/10 rounded-full px-4 py-2 flex items-center gap-2 w-max">
-            <span className="material-symbols-outlined text-[#4ade80] text-[16px]">
-              add_circle
-            </span>
+            <LucideIcon
+              name="add_circle"
+              className="text-[#4ade80] text-[16px]"
+            />
             <span className="text-[13px] font-bold text-on-surface-variant">
               {userExp.toLocaleString()} XP
             </span>
           </div>
           <div className="bg-surface-container/50 border border-outline/10 rounded-full px-4 py-2 flex items-center gap-2 w-max">
-            <span className="material-symbols-outlined text-[#38bdf8] text-[16px]">
-              star
-            </span>
+            <LucideIcon name="star" className="text-[#38bdf8] text-[16px]" />
             <span className="text-[13px] font-bold text-on-surface-variant">
               {userStars.toLocaleString()}
             </span>
@@ -173,9 +174,7 @@ const QuizPage = () => {
         {/* Left Pane - Options */}
         <div className="flex-1 flex flex-col w-full xl:max-w-[400px]">
           <div className="flex items-center gap-2 mb-6">
-            <span className="material-symbols-outlined text-[#F687B3] text-[20px]">
-              help
-            </span>
+            <LucideIcon name="help" className="text-[#F687B3] text-[20px]" />
             <h3 className="text-[16px] font-bold text-on-surface">
               Knowledge Check
             </h3>
@@ -211,9 +210,7 @@ const QuizPage = () => {
         {/* Right Pane - Editor */}
         <div className="flex-[2] flex flex-col bg-[#161B22] rounded-2xl border border-outline/20 overflow-hidden shadow-2xl relative min-h-[400px]">
           <div className="bg-[#0D1117] border-b border-outline/10 px-4 py-2 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#8a8e94] text-[14px]">
-              code
-            </span>
+            <LucideIcon name="code" className="text-[#8a8e94] text-[14px]" />
             <span className="text-[#8a8e94] text-[12px] font-mono font-bold">
               Main.py
             </span>
@@ -275,9 +272,10 @@ const QuizPage = () => {
             {/* Floating chat bubble */}
             <div className="absolute -top-16 -right-10 bg-surface border border-primary-fixed-dim/40 rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,128,128,0.2)] max-w-[200px]">
               <div className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-[16px] text-primary-fixed-dim shrink-0">
-                  chat
-                </span>
+                <LucideIcon
+                  name="chat"
+                  className=" text-[16px] text-primary-fixed-dim shrink-0"
+                />
                 <span className="text-[12px] text-on-surface font-medium leading-relaxed">
                   {q.hint}
                 </span>
@@ -316,9 +314,10 @@ const QuizPage = () => {
         {/* Left Pane - Blocks */}
         <div className="flex-1 flex flex-col w-full xl:max-w-[400px]">
           <div className="flex items-center gap-2 mb-6">
-            <span className="material-symbols-outlined text-on-surface-variant text-[20px]">
-              view_module
-            </span>
+            <LucideIcon
+              name="view_module"
+              className=" text-on-surface-variant text-[20px]"
+            />
             <h3 className="text-[14px] font-mono text-on-surface-variant uppercase tracking-widest">
               Available Blocks
             </h3>
@@ -337,9 +336,10 @@ const QuizPage = () => {
                       : "bg-[#1E252E] border-[#F687B3]/30 hover:border-[#F687B3] text-[#F687B3] shadow-[0_0_10px_rgba(246,135,179,0.1)] hover:-translate-y-0.5"
                   }`}
                 >
-                  <span className="material-symbols-outlined text-[16px] opacity-50">
-                    drag_indicator
-                  </span>
+                  <LucideIcon
+                    name="drag_indicator"
+                    className="text-[16px] opacity-50"
+                  />
                   {block.text.split("\\n").map((line, i) => (
                     <React.Fragment key={i}>
                       {line}
@@ -355,9 +355,7 @@ const QuizPage = () => {
         {/* Right Pane - Editor with Drop Zones */}
         <div className="flex-[2] flex flex-col bg-[#161B22] rounded-2xl border border-outline/20 overflow-hidden shadow-2xl relative min-h-[500px]">
           <div className="bg-[#0D1117] border-b border-outline/10 px-4 py-2 flex items-center gap-2">
-            <span className="material-symbols-outlined text-[#8a8e94] text-[14px]">
-              code
-            </span>
+            <LucideIcon name="code" className="text-[#8a8e94] text-[14px]" />
             <span className="text-[#8a8e94] text-[12px] font-mono font-bold">
               Main.py
             </span>
@@ -433,9 +431,10 @@ const QuizPage = () => {
             {/* Floating chat bubble */}
             <div className="absolute -top-16 -right-10 bg-surface border border-primary-fixed-dim/40 rounded-2xl p-4 shadow-[0_10px_30px_rgba(0,128,128,0.2)] max-w-[200px]">
               <div className="flex items-start gap-2">
-                <span className="material-symbols-outlined text-[16px] text-primary-fixed-dim shrink-0">
-                  chat
-                </span>
+                <LucideIcon
+                  name="chat"
+                  className="text-[16px] text-primary-fixed-dim shrink-0"
+                />
                 <span className="text-[12px] text-on-surface font-medium leading-relaxed">
                   {q.hint}
                 </span>
@@ -523,9 +522,10 @@ const QuizPage = () => {
                     )}
                   </div>
                   {opt.selected && opt.isCorrect ? (
-                    <span className="material-symbols-outlined text-[#4ade80]">
-                      check_circle
-                    </span>
+                    <LucideIcon
+                      name="check_circle"
+                      className=" text-[#4ade80]"
+                    />
                   ) : (
                     <span className="w-5 h-5 rounded-full border border-outline/30"></span>
                   )}
@@ -595,14 +595,10 @@ const QuizPage = () => {
           <div className="flex flex-col gap-3 mt-6">
             <button className="w-full bg-primary-fixed-dim text-[#002020] font-extrabold text-[15px] py-4 rounded-xl hover:bg-[#009999] transition-all flex items-center justify-center gap-2 shadow-[0_8px_20px_rgba(0,128,128,0.3)] uppercase tracking-wider">
               Next Challenge
-              <span className="material-symbols-outlined text-[20px]">
-                arrow_forward
-              </span>
+              <LucideIcon name="arrow_forward" className="text-[20px]" />
             </button>
             <button className="w-full bg-surface-container border border-outline/20 text-on-surface font-bold text-[13px] py-4 rounded-xl hover:bg-surface-container/80 transition-all flex items-center justify-center gap-2 uppercase tracking-widest">
-              <span className="material-symbols-outlined text-[18px]">
-                grid_view
-              </span>
+              <LucideIcon name="grid_view" className="text-[18px]" />
               Back to Results
             </button>
           </div>
@@ -623,9 +619,7 @@ const QuizPage = () => {
           <div className="px-8 py-6 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-xl bg-surface-container border border-outline/20 flex items-center justify-center">
-                <span className="material-symbols-outlined text-[#4FD1C5]">
-                  verified
-                </span>
+                <LucideIcon name="verified" className="text-[#4FD1C5]" />
               </div>
               <div>
                 <div className="text-[10px] font-bold tracking-widest text-[#4FD1C5] uppercase mb-1">
@@ -667,14 +661,14 @@ const QuizPage = () => {
                 disabled={currentIdx === 0}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all disabled:opacity-50"
               >
-                <span className="material-symbols-outlined">chevron_left</span>
+                <LucideIcon name="chevron_left" className="" />
               </button>
               <button
                 onClick={handleNext}
                 disabled={currentIdx === mockQuestions.length - 1}
                 className="w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-all disabled:opacity-50"
               >
-                <span className="material-symbols-outlined">chevron_right</span>
+                <LucideIcon name="chevron_right" className="" />
               </button>
             </div>
           </div>

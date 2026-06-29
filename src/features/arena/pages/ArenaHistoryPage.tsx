@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
 import type { PublicScoreboardItem } from "../store/arena.store";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 interface HistoryPlayer {
   userId?: string;
@@ -93,16 +94,24 @@ const ArenaHistoryPage = () => {
     const opponentScore = match.finalScoreboard?.find(
       (item) => item.userId !== meId,
     );
+    const isCompletedOrFinished =
+      match.status === "finished" ||
+      match.status === "completed" ||
+      match.status === "disconnected";
+    const isCancelled =
+      match.status === "cancelled" || match.resultType === "cancelled";
     const isDraw =
       match.resultType === "draw" ||
-      (!match.winnerUserId && match.status === "finished");
-    const result = isDraw
-      ? "DRAW"
-      : match.winnerUserId === meId
-        ? "WIN"
-        : match.status === "finished"
-          ? "LOSS"
-          : (match.status || "UNKNOWN").toUpperCase();
+      (!match.resultType && !match.winnerUserId && isCompletedOrFinished);
+    const result = isCancelled
+      ? "CANCELLED"
+      : isDraw
+        ? "DRAW"
+        : match.winnerUserId === meId
+          ? "WIN"
+          : isCompletedOrFinished
+            ? "DEFEAT"
+            : (match.status || "UNKNOWN").toUpperCase();
     const ratingChange =
       match.ratingChanges?.find((item) => item.userId === meId)?.delta ??
       me?.ratingDelta ??
@@ -147,7 +156,7 @@ const ArenaHistoryPage = () => {
         {matches.map((match, index) => {
           const view = getMatchView(match);
           const isWin = view.result === "WIN";
-          const isLoss = view.result === "LOSS";
+          const isLoss = view.result === "LOSS" || view.result === "DEFEAT";
           const isDraw = view.result === "DRAW";
 
           return (
@@ -205,15 +214,18 @@ const ArenaHistoryPage = () => {
                 <div
                   className={`flex items-center gap-1 font-bold text-[16px] ${view.ratingChange > 0 ? "dark:text-[#4dd0d0] text-primary" : view.ratingChange < 0 ? "dark:text-[#ff3b30] text-error" : "dark:text-gray-400 text-on-surface-variant"}`}
                 >
-                  <span className="material-symbols-outlined text-[18px]">
-                    {view.ratingChange > 0
-                      ? "trending_up"
-                      : view.ratingChange < 0
-                        ? "trending_down"
-                        : isDraw
-                          ? "remove"
-                          : "show_chart"}
-                  </span>
+                  <LucideIcon
+                    name={
+                      view.ratingChange > 0
+                        ? "trending_up"
+                        : view.ratingChange < 0
+                          ? "trending_down"
+                          : isDraw
+                            ? "remove"
+                            : "show_chart"
+                    }
+                    className="text-[18px]"
+                  />
                   {view.ratingChange > 0 ? "+" : ""}
                   {view.ratingChange}
                 </div>

@@ -1,6 +1,7 @@
 import React from "react";
 import petVideo from "../../../../assets/videos/conpet.mp4";
 import type { AiUsage } from "../../api/aiChat.api";
+import LucideIcon from "../../../../components/ui/LucideIcon";
 
 interface AiHelperHeaderProps {
   user: any;
@@ -69,7 +70,7 @@ export function AiHelperHeader({
           />
         </div>
         <div className="flex flex-1 flex-col min-w-0">
-          <span className="text-[15px] font-extrabold text-white truncate">
+          <span className="text-[15px] font-extrabold text-on-surface truncate">
             {user
               ? `${user.name || user.username || "User"}'s Pet Helper`
               : "Pet Helper"}
@@ -93,12 +94,11 @@ export function AiHelperHeader({
                   : "rgba(239,68,68,0.1)",
             }}
           >
-            <span
-              className="material-symbols-outlined text-[13px]"
+            <LucideIcon
+              name={usage.remaining > 0 ? "bolt" : "block"}
+              className="text-[13px]"
               style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
-            >
-              {usage.remaining > 0 ? "bolt" : "block"}
-            </span>
+            />
             <span
               className="text-[10px] font-bold tracking-wide"
               style={{ color: usage.remaining > 0 ? accentColor : "#ef4444" }}
@@ -113,7 +113,7 @@ export function AiHelperHeader({
           className="flex h-7 w-7 items-center justify-center rounded-full text-on-surface-variant hover:bg-surface-container hover:text-on-surface transition-colors"
           aria-label="Minimize Pet Helper"
         >
-          <span className="material-symbols-outlined text-[18px]">remove</span>
+          <LucideIcon name="remove" className="text-[18px]" />
         </button>
       </div>
     </>

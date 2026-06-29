@@ -11,10 +11,22 @@ import {
   type SubmitMediumNodeChallengeResponse,
 } from "../api/course.api";
 import RoadmapAiHelper from "../components/RoadmapAiHelper";
+import LucideIcon from "../../../components/ui/LucideIcon";
 
 import { useAuthStore } from "../../users/store/auth.store";
+import {
+  formatQuestionNumber,
+  getNavigationForResponse,
+  getRewardItems,
+  getSpeakerName,
+} from "../utils/challengeResponse";
 
 const OPTION_ORDER: EasyChallengeOptionId[] = ["A", "B", "C", "D"];
+const CHALLENGE_ROUTES = {
+  easy: "/roadmap/$courseSlug/easy/nodes/$nodeId/challenge",
+  medium: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+  hard: "/roadmap/$courseSlug/hard/nodes/$nodeId/challenge",
+} as const;
 
 const sortOptions = (options: MediumMultipleChoiceChallenge["options"]) =>
   [...options].sort(
@@ -79,11 +91,11 @@ const CodeSnippetCard = ({
   if (!codeSnippet) return null;
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#071217] shadow-[0_0_22px_rgba(99,241,227,0.08)]">
-      <div className="border-b border-[#263b44] bg-[#0a161c] px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
+    <div className="overflow-hidden rounded-xl border border-slate-300 bg-slate-50 shadow-[0_12px_28px_rgba(15,23,42,0.10)] dark:border-[#263b44] dark:bg-[#071217] dark:shadow-[0_0_22px_rgba(99,241,227,0.08)]">
+      <div className="border-b border-slate-300 bg-slate-100 px-4 py-3 text-[11px] font-bold uppercase tracking-widest text-violet-700 dark:border-[#263b44] dark:bg-[#0a161c] dark:text-[#63f1e3]">
         {codeSnippet.language}
       </div>
-      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-[#d7f7f4]">
+      <pre className="overflow-x-auto px-5 py-4 font-mono text-[15px] font-semibold leading-7 text-slate-950 dark:text-on-surface">
         <code>{codeSnippet.code}</code>
       </pre>
     </div>
@@ -122,13 +134,10 @@ const FeedbackPanel = ({
       }`}
     >
       <div className="flex items-start gap-3">
-        <span
-          className={`material-symbols-outlined mt-0.5 text-[22px] ${
-            isCorrect ? "text-[#63f1e3]" : "text-amber-200"
-          }`}
-        >
-          {isCorrect ? "check_circle" : "error"}
-        </span>
+        <LucideIcon
+          name={isCorrect ? "check_circle" : "error"}
+          className={`mt-0.5 text-[22px] ${isCorrect ? "text-[#63f1e3]" : "text-amber-200"}`}
+        />
         <div className="min-w-0 flex-1">
           <p
             className={`text-[11px] font-bold uppercase tracking-widest ${
@@ -168,6 +177,14 @@ const FeedbackPanel = ({
   );
 };
 
+const formatTime = (ms: number | null) => {
+  if (ms === null) return "--:--";
+  const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+};
+
 const MediumNodeChallengePage = () => {
   const { courseSlug, nodeId } = useParams({ strict: false });
   const navigate = useNavigate();
@@ -192,11 +209,19 @@ const MediumNodeChallengePage = () => {
   const [result, setResult] =
     useState<SubmitMediumNodeChallengeResponse | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showFailureModal, setShowFailureModal] = useState(false);
   const [nextChallengeLoading, setNextChallengeLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [xpToast, setXpToast] = useState<number | null>(null);
+
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [sessionExpiresAt, setSessionExpiresAt] = useState<string | null>(null);
+  const [sessionServerNow, setSessionServerNow] = useState<string | null>(null);
+  const [remainingTime, setRemainingTime] = useState<number | null>(null);
+  const [isExpired, setIsExpired] = useState(false);
 
   const challenge = data?.challenge ?? null;
   const isReviewMode = data?.node.status === "completed" && !!data.review;
@@ -209,7 +234,19 @@ const MediumNodeChallengePage = () => {
   const dragDropChallenge = isDragDrop
     ? (challenge as MediumDragDropChallenge)
     : null;
-  const canEditDragDrop = !isLockedMode && !isReviewMode && !result;
+  const canEditDragDrop =
+    !isLockedMode && !isReviewMode && !result && !isExpired;
+  const activeNavigation = getNavigationForResponse(
+    result?.navigation,
+    data?.navigation,
+  );
+  const speakerName = getSpeakerName(
+    result?.explanationSpeaker?.name,
+    data?.explanationSpeaker?.name,
+    petName,
+  );
+  const rewardItems = getRewardItems(result?.rewardSummary, challenge?.xp || 0);
+  const xpReward = rewardItems.find((item) => item.type === "xp")?.amount ?? 0;
 
   const options = useMemo(
     () => sortOptions(multipleChoiceChallenge?.options ?? []),
@@ -223,7 +260,7 @@ const MediumNodeChallengePage = () => {
   );
 
   const reviewDropZoneMap =
-    data?.review && "dropZoneMap" in data.review ? data.review.dropZoneMap : {};
+    data?.review?.selectedDropZoneMap ?? data?.review?.dropZoneMap ?? {};
   const canRevealAnswerDetails = isReviewMode || result?.correct === true;
   const correctDropZoneMap =
     canRevealAnswerDetails && result?.correctDropZoneMap
@@ -253,102 +290,146 @@ const MediumNodeChallengePage = () => {
       return;
     }
 
-    let alive = true;
     setLoading(true);
     setError(null);
-    setSubmitError(null);
     setSelectedOptionId(null);
     setDropZoneMap({});
-    setSelectedPoolItemId(null);
-    setDraggingPoolItemId(null);
-    setDragOverZoneId(null);
-    setDragPreview(null);
     setResult(null);
     setShowSuccessModal(false);
-    setNextChallengeLoading(false);
+    setShowFailureModal(false);
+    setSubmitError(null);
+    setSessionId(null);
+    setSessionExpiresAt(null);
+    setSessionServerNow(null);
+    setRemainingTime(null);
+    setIsExpired(false);
+
+    const safeCourseSlug = courseSlug || "python-basic";
 
     Promise.all([
+      courseApi.startRoadmapChallengeSession(safeCourseSlug, "medium", nodeId),
       courseApi.getMediumNodeChallenge(nodeId),
-      courseSlug
-        ? courseApi.getMediumRoadmap(courseSlug)
-        : Promise.resolve(null),
+      courseApi.getMediumRoadmap(safeCourseSlug).catch(() => null),
     ])
-      .then(([response, roadmap]) => {
-        if (!alive) return;
+      .then(([sessionRes, challengeRes, roadmap]) => {
+        setSessionId(sessionRes.sessionId);
+        setSessionExpiresAt(sessionRes.expiresAt);
+        setSessionServerNow(sessionRes.serverNow);
+
         if (roadmap) {
           const nodes = [...roadmap.chapters]
             .sort((a, b) => a.order - b.order)
             .flatMap((chapter) =>
               [...chapter.nodes].sort((a, b) => a.order - b.order),
             );
-          const index = nodes.findIndex((n) => n.id === nodeId);
+          const index = nodes.findIndex((node) => node.id === nodeId);
           if (index >= 0) {
-            response.node.label = (index + 1).toString();
+            challengeRes.node.label = String(index + 1);
           }
         }
-        setData(response);
-        if (response.review) {
-          if ("selectedOptionId" in response.review) {
-            setSelectedOptionId(response.review.selectedOptionId ?? null);
-          }
-          if ("dropZoneMap" in response.review) {
-            setDropZoneMap(response.review.dropZoneMap ?? {});
-          }
+
+        setData(challengeRes);
+        if (challengeRes.review?.selectedOptionId) {
+          setSelectedOptionId(challengeRes.review.selectedOptionId);
         }
-        document.title = `${response.node.label} Medium Challenge | Devcopet`;
+        if (
+          challengeRes.review?.challengeType === "drag_drop" &&
+          challengeRes.review.selectedDropZoneMap
+        ) {
+          setDropZoneMap(challengeRes.review.selectedDropZoneMap);
+        }
       })
       .catch((err) => {
-        if (!alive) return;
-        setError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to load this Medium challenge.",
-        );
-      })
-      .finally(() => {
-        if (alive) setLoading(false);
-      });
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to load challenge details.";
 
-    return () => {
-      alive = false;
-    };
+        if (errMsg === "TIME_EXPIRED") {
+          setError("Time expired");
+          setTimeout(() => {
+            navigate({
+              to: "/roadmap/$worldId",
+              params: { worldId: courseSlug || "python-basic" },
+            });
+          }, 2000);
+        } else {
+          setError(errMsg);
+        }
+      })
+      .finally(() => setLoading(false));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [nodeId, courseSlug]);
 
+  useEffect(() => {
+    if (!sessionExpiresAt || !sessionServerNow) return;
+
+    const serverOffsetMs = new Date(sessionServerNow).getTime() - Date.now();
+
+    const updateTimer = () => {
+      const remaining =
+        new Date(sessionExpiresAt).getTime() - (Date.now() + serverOffsetMs);
+      if (remaining <= 0) {
+        setRemainingTime(0);
+        setIsExpired(true);
+        return true;
+      }
+      setRemainingTime(remaining);
+      return false;
+    };
+
+    const expired = updateTimer();
+    if (expired) return;
+
+    const interval = setInterval(() => {
+      const expired = updateTimer();
+      if (expired) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [sessionExpiresAt, sessionServerNow]);
+
+  useEffect(() => {
+    if (isExpired) {
+      const timer = setTimeout(() => {
+        goBackToRoadmap();
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isExpired]);
+
   const goBackToRoadmap = () => {
+    const target = activeNavigation?.returnToRoadmap;
     navigate({
       to: "/roadmap/$worldId",
-      params: { worldId: courseSlug || "python-basic" },
+      params: { worldId: target?.courseSlug || courseSlug || "python-basic" },
     });
   };
 
-  const goToNextChallenge = async () => {
-    if (!courseSlug || !nodeId || nextChallengeLoading) return;
+  const goToNextChallenge = () => {
+    if (nextChallengeLoading || !data) return;
+
+    const nextChallenge = activeNavigation?.nextChallenge;
+    if (!nextChallenge) {
+      goBackToRoadmap();
+      return;
+    }
 
     setNextChallengeLoading(true);
     try {
-      const roadmap = await courseApi.getMediumRoadmap(courseSlug);
-      const nodes = [...roadmap.chapters]
-        .sort((a, b) => a.order - b.order)
-        .flatMap((chapter) =>
-          [...chapter.nodes].sort((a, b) => a.order - b.order),
-        );
-      const currentIndex = nodes.findIndex((node) => node.id === nodeId);
-      const nextNode = currentIndex >= 0 ? nodes[currentIndex + 1] : null;
-
-      if (!nextNode) {
-        goBackToRoadmap();
-        return;
-      }
-
       navigate({
-        to: "/roadmap/$courseSlug/medium/nodes/$nodeId/challenge",
+        to: CHALLENGE_ROUTES[nextChallenge.mode],
         params: {
-          courseSlug,
-          nodeId: nextNode.id,
+          courseSlug: nextChallenge.courseSlug,
+          nodeId: nextChallenge.nodeId,
         },
-      });
+      } as any);
     } catch (err) {
-      console.error("Unable to open next Medium challenge:", err);
+      console.error("Unable to open next challenge:", err);
       goBackToRoadmap();
     } finally {
       setNextChallengeLoading(false);
@@ -356,19 +437,26 @@ const MediumNodeChallengePage = () => {
   };
 
   const submitChallenge = () => {
-    if (!nodeId || !challenge || submitting || result || isReviewMode) return;
+    if (
+      !nodeId ||
+      !challenge ||
+      submitting ||
+      result ||
+      isReviewMode ||
+      isExpired
+    )
+      return;
+
+    if (!sessionId) {
+      setSubmitError("Session required. Please refresh the page.");
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError(null);
 
-    const requiredDropZoneMap = dropZoneIds.reduce<Record<string, string>>(
-      (acc, zoneId) => {
-        if (dropZoneMap[zoneId]) {
-          acc[zoneId] = dropZoneMap[zoneId];
-        }
-        return acc;
-      },
-      {},
+    const requiredDropZoneMap = Object.fromEntries(
+      dropZoneIds.map((zoneId) => [zoneId, dropZoneMap[zoneId] ?? ""]),
     );
 
     const payload = isMultipleChoice
@@ -383,17 +471,64 @@ const MediumNodeChallengePage = () => {
     }
 
     courseApi
-      .submitMediumNodeChallenge(nodeId, payload)
+      .submitMediumNodeChallenge(nodeId, payload, sessionId)
       .then((response) => {
+        if (
+          response.message === "TIME_EXPIRED" ||
+          (response as any).code === "TIME_EXPIRED"
+        ) {
+          setSubmitError("Time expired");
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+          return;
+        }
+
+        if (
+          response.message === "SESSION_REQUIRED" ||
+          (response as any).code === "SESSION_REQUIRED"
+        ) {
+          setSubmitError("Session required. Please refresh the page.");
+          return;
+        }
+
+        const { xpAwarded, userProgress, rewardSummary } = response;
+        const toastXp = rewardSummary?.xp ?? xpAwarded;
+        if (toastXp && toastXp > 0) {
+          setXpToast(toastXp);
+          window.setTimeout(() => setXpToast(null), 3500);
+        }
+        if (userProgress) {
+          useAuthStore.getState().updateUser({
+            exp: userProgress.exp,
+            level: userProgress.level,
+          });
+        }
+
         setResult(response);
-        setShowSuccessModal(response.correct);
+        if (response.correct) {
+          setShowSuccessModal(true);
+        } else {
+          setShowFailureModal(true);
+        }
       })
       .catch((err) => {
-        setSubmitError(
+        const errMsg =
           err?.response?.data?.message ||
-            err?.message ||
-            "Unable to submit this challenge.",
-        );
+          err?.response?.data?.code ||
+          err?.message ||
+          "Unable to submit this challenge.";
+
+        if (errMsg === "TIME_EXPIRED") {
+          setSubmitError("Time expired");
+          setTimeout(() => {
+            goBackToRoadmap();
+          }, 2000);
+        } else if (errMsg === "SESSION_REQUIRED") {
+          setSubmitError("Session required. Please refresh the page.");
+        } else {
+          setSubmitError(errMsg);
+        }
       })
       .finally(() => setSubmitting(false));
   };
@@ -415,11 +550,22 @@ const MediumNodeChallengePage = () => {
     });
   };
 
-  const assignSelectedPoolItem = (zoneId: string) => {
-    if (!selectedPoolItemId) return;
+  const handleDropZoneClick = (zoneId: string) => {
+    if (!canEditDragDrop) return;
 
-    assignPoolItemToZone(zoneId, selectedPoolItemId);
-    setSelectedPoolItemId(null);
+    if (selectedPoolItemId) {
+      assignPoolItemToZone(zoneId, selectedPoolItemId);
+      setSelectedPoolItemId(null);
+      return;
+    }
+
+    setDropZoneMap((prev) => {
+      if (!prev[zoneId]) return prev;
+
+      const next = { ...prev };
+      delete next[zoneId];
+      return next;
+    });
   };
 
   const startPointerPoolItemDrag = (
@@ -532,15 +678,15 @@ const MediumNodeChallengePage = () => {
       !isCorrect;
 
     if (isCorrect) {
-      return "border-[#63f1e3] bg-[#172d31] text-[#63f1e3]";
+      return "border-teal-600 bg-teal-50 text-teal-950 dark:border-[#63f1e3] dark:bg-[#172d31] dark:text-[#63f1e3]";
     }
     if (isWrong) {
-      return "border-[#ef4444] bg-[#2b171a] text-red-100";
+      return "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#2b171a] dark:text-red-100";
     }
     if (isSelected) {
-      return "border-[#63f1e3] bg-[#13282d] text-on-surface";
+      return "border-violet-700 bg-violet-50 text-slate-950 shadow-[0_0_0_1px_rgba(109,40,217,0.12)] dark:border-[#63f1e3] dark:bg-[#13282d] dark:text-on-surface";
     }
-    return "border-[#1c2b33] bg-[#10191f] text-on-surface-variant hover:border-[#63f1e3]/35 hover:text-on-surface";
+    return "border-slate-200 bg-white text-slate-800 hover:border-teal-500/60 hover:bg-teal-50/60 hover:text-slate-950 dark:border-[#1c2b33] dark:bg-[#10191f] dark:text-on-surface-variant dark:hover:border-[#63f1e3]/35 dark:hover:text-on-surface";
   };
 
   const isDropZoneCorrect = (zoneId: string) => {
@@ -565,6 +711,7 @@ const MediumNodeChallengePage = () => {
     !isLockedMode &&
     !isReviewMode &&
     !result &&
+    !isExpired &&
     (isMultipleChoice
       ? !!selectedOptionId
       : dropZoneIds.length > 0 &&
@@ -595,9 +742,12 @@ const MediumNodeChallengePage = () => {
   const feedbackHint = shouldShowLearningDetails
     ? getChallengeHint(challenge)
     : "";
+  const shouldShowExplanation = Boolean(
+    isReviewMode || (result && result.correct),
+  );
 
   return (
-    <main className="min-h-[calc(100vh-80px)] bg-[#071217] text-on-surface flex flex-col justify-start items-center py-10 px-4">
+    <main className="min-h-[calc(100vh-80px)] bg-[#f4f7fb] text-on-surface flex flex-col justify-start items-center py-10 px-4 dark:bg-[#071217]">
       {loading && (
         <div className="flex min-h-[520px] items-center justify-center">
           <div className="h-11 w-11 animate-spin rounded-full border-4 border-[#63f1e3]/45 border-t-transparent" />
@@ -614,18 +764,33 @@ const MediumNodeChallengePage = () => {
       )}
 
       {!loading && !error && data && challenge && (
-        <div className="w-full max-w-[800px] flex flex-col">
+        <div
+          className={`w-full flex flex-col transition-[max-width] duration-300 ${
+            shouldShowExplanation ? "max-w-[1400px]" : "max-w-[800px]"
+          }`}
+        >
           {/* Back navigation */}
           <div className="flex justify-between items-center mb-6 w-full">
             <button
               onClick={goBackToRoadmap}
               className="inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold uppercase tracking-widest"
             >
-              <span className="material-symbols-outlined text-[16px]">arrow_back</span>
+              <LucideIcon name="arrow_back" className="text-[16px]" />
               Back to Roadmap
             </button>
-            
-            <div className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+
+            <div className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
+              {remainingTime !== null && (
+                <div className="flex items-center gap-2 rounded-xl border border-amber-400/40 bg-amber-50 px-3 py-2 text-amber-600 shadow-sm dark:bg-amber-400/10 dark:text-amber-300">
+                  <LucideIcon name="schedule" className="text-[18px]" />
+                  <span className="hidden text-[10px] tracking-wider sm:inline">
+                    Time left
+                  </span>
+                  <span className="min-w-[3.5rem] font-mono text-[20px] font-black leading-none tracking-normal tabular-nums">
+                    {formatTime(remainingTime)}
+                  </span>
+                </div>
+              )}
               <span>Medium Checkpoint</span>
             </div>
           </div>
@@ -633,16 +798,14 @@ const MediumNodeChallengePage = () => {
           <section className="w-full flex flex-col">
             <div className="mb-6 flex flex-col gap-2">
               <p className="text-[14px] text-on-surface-variant font-medium">
-                {data.node.label} • {data.node.title}
+                {data.node.title}
               </p>
             </div>
 
             {isLockedMode && (
-              <div className="mx-auto mt-12 w-full rounded-xl border border-[#263b44] bg-[#111c23] p-8 text-center shadow-[0_0_28px_rgba(99,241,227,0.08)]">
+              <div className="mx-auto mt-12 w-full rounded-xl border border-slate-200 bg-white p-8 text-center shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)]">
                 <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full border border-on-surface/10 bg-on-surface/5 text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[32px]">
-                    lock
-                  </span>
+                  <LucideIcon name="lock" className="text-[32px]" />
                 </div>
                 <h1 className="mt-5 text-[28px] font-extrabold">
                   Checkpoint Locked
@@ -653,7 +816,7 @@ const MediumNodeChallengePage = () => {
                 </p>
                 <button
                   onClick={goBackToRoadmap}
-                  className="mt-7 rounded-xl border border-[#263b44] bg-[#10191f] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:text-on-surface"
+                  className="mt-7 rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-teal-500/50 hover:text-on-surface dark:border-[#263b44] dark:bg-[#10191f]"
                 >
                   Back to Roadmap
                 </button>
@@ -661,12 +824,16 @@ const MediumNodeChallengePage = () => {
             )}
 
             {!isLockedMode && (
-              <div className="overflow-hidden rounded-xl border border-[#263b44] bg-[#111c23] shadow-[0_0_28px_rgba(99,241,227,0.08)]">
-                <div className="border-b border-[#263b44] bg-[#0c171d] px-6 py-4">
+              <div
+                className={`overflow-hidden rounded-xl border border-slate-200 bg-white shadow-[0_18px_50px_rgba(15,23,42,0.08)] dark:border-[#263b44] dark:bg-[#111c23] dark:shadow-[0_0_28px_rgba(99,241,227,0.08)] ${
+                  shouldShowExplanation ? "challenge-with-explanation" : ""
+                }`}
+              >
+                <div className="challenge-card-header border-b border-slate-200 bg-slate-50 px-6 py-4 dark:border-[#263b44] dark:bg-[#0c171d]">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <div className="min-w-0">
                       <p className="text-[11px] font-extrabold uppercase tracking-widest text-[#63f1e3]">
-                        Question 01
+                        Question {formatQuestionNumber(data.node.label)}
                       </p>
                       <h2 className="mt-1 truncate text-[18px] font-extrabold text-on-surface">
                         {challenge.title}
@@ -686,7 +853,7 @@ const MediumNodeChallengePage = () => {
                   </div>
                 </div>
 
-                <div className="border-b border-[#263b44] px-6 py-7">
+                <div className="challenge-question-section border-b border-slate-200 px-6 py-7 dark:border-[#263b44]">
                   <p className="text-[26px] font-extrabold leading-tight text-on-surface md:text-[32px]">
                     {challenge.question}
                   </p>
@@ -700,18 +867,27 @@ const MediumNodeChallengePage = () => {
                     {options.map((option) => (
                       <button
                         key={option.id}
-                        disabled={isReviewMode || !!result}
+                        disabled={isReviewMode || !!result || isExpired}
                         onClick={() => setSelectedOptionId(option.id)}
                         className={`flex min-h-[68px] items-center justify-between rounded-lg border px-5 text-left transition duration-200 ${getOptionClass(option.id)}`}
                       >
                         <span className="text-[15px] font-semibold">
                           {option.id}) {option.text}
                         </span>
-                        {correctOptionId === option.id && (
-                          <span className="material-symbols-outlined text-[18px]">
-                            check_circle
-                          </span>
-                        )}
+                        <span
+                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                            correctOptionId === option.id
+                              ? "border-teal-600 bg-teal-600 text-white dark:border-[#63f1e3] dark:bg-[#63f1e3] dark:text-[#052023]"
+                              : selectedOptionId === option.id
+                                ? "border-violet-700 bg-violet-100 text-violet-700 dark:border-[#63f1e3] dark:bg-[#63f1e3]/15 dark:text-[#63f1e3]"
+                                : "border-slate-500 text-transparent dark:border-on-surface-variant"
+                          }`}
+                        >
+                          {(correctOptionId === option.id ||
+                            selectedOptionId === option.id) && (
+                            <LucideIcon name="check" className="text-[15px]" />
+                          )}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -719,7 +895,7 @@ const MediumNodeChallengePage = () => {
 
                 {dragDropChallenge && (
                   <div className="grid gap-5 p-6 lg:grid-cols-[1fr_260px]">
-                    <div className="rounded-xl border border-[#263b44] bg-[#0b151b] p-5">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-[#263b44] dark:bg-[#0b151b]">
                       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                         <div>
                           <p className="text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
@@ -734,73 +910,82 @@ const MediumNodeChallengePage = () => {
                           <button
                             type="button"
                             onClick={resetDragDropAnswers}
-                            className="rounded-lg border border-[#263b44] px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3]"
+                            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-[11px] font-bold uppercase tracking-widest text-on-surface-variant transition hover:border-[#63f1e3]/45 hover:text-[#63f1e3] dark:border-[#263b44] dark:bg-transparent"
                           >
                             Reset
                           </button>
                         )}
                       </div>
-                      <div className="whitespace-pre-wrap rounded-xl border border-[#1f333c] bg-[#071217] p-4 font-mono text-[15px] leading-10 text-on-surface">
-                        {renderTemplateParts(
-                          dragDropChallenge.template,
-                          (zoneId) => {
-                            const selectedMap = isReviewMode
-                              ? reviewDropZoneMap
-                              : dropZoneMap;
-                            const selectedItemId = selectedMap?.[zoneId];
-                            const correctItemId = correctDropZoneMap?.[zoneId];
-                            const correct = isDropZoneCorrect(zoneId);
-                            const wrong = isDropZoneWrong(zoneId);
-                            const canAssign =
-                              canEditDragDrop &&
-                              (!!selectedPoolItemId || !!draggingPoolItemId);
-                            const isDragTarget = dragOverZoneId === zoneId;
-                            const isDraggingAnyItem =
-                              canEditDragDrop && !!draggingPoolItemId;
+                      <div className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-white p-4 font-mono text-[15px] text-on-surface dark:border-[#1f333c] dark:bg-[#071217]">
+                        {dragDropChallenge.template
+                          .split("\n")
+                          .map((templateLine, lineIndex) => (
+                            <div
+                              key={`${lineIndex}-${templateLine}`}
+                              className="flex min-h-[56px] flex-wrap items-center gap-x-2 gap-y-2 py-1 leading-6"
+                            >
+                              {renderTemplateParts(templateLine, (zoneId) => {
+                                const selectedMap = isReviewMode
+                                  ? reviewDropZoneMap
+                                  : dropZoneMap;
+                                const selectedItemId = selectedMap?.[zoneId];
+                                const correctItemId =
+                                  correctDropZoneMap?.[zoneId];
+                                const correct = isDropZoneCorrect(zoneId);
+                                const wrong = isDropZoneWrong(zoneId);
+                                const canAssign =
+                                  canEditDragDrop &&
+                                  (!!selectedPoolItemId ||
+                                    !!draggingPoolItemId);
+                                const isDragTarget = dragOverZoneId === zoneId;
+                                const isDraggingAnyItem =
+                                  canEditDragDrop && !!draggingPoolItemId;
 
-                            return (
-                              <button
-                                key={zoneId}
-                                data-drop-zone-id={zoneId}
-                                type="button"
-                                onClick={() => assignSelectedPoolItem(zoneId)}
-                                disabled={!canEditDragDrop}
-                                className={`mx-1 inline-flex min-h-[46px] w-[156px] items-center justify-center rounded-lg border px-3 py-2 align-middle font-sans text-[13px] font-bold transition disabled:cursor-default ${
-                                  correct
-                                    ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
-                                    : wrong
-                                      ? "border-[#ef4444] bg-[#ef4444]/12 text-red-100"
-                                      : isDragTarget
-                                        ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3] shadow-[0_0_24px_rgba(99,241,227,0.28)]"
-                                        : selectedItemId
-                                          ? "border-blue-400 bg-blue-500/15 text-blue-100 shadow-[0_0_16px_rgba(59,130,246,0.16)]"
-                                          : isDraggingAnyItem
-                                            ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
-                                            : canAssign
-                                              ? "border-gray-400 bg-gray-500/15 text-gray-200 shadow-[0_0_14px_rgba(148,163,184,0.14)]"
-                                              : "border-dashed border-gray-500/70 bg-gray-500/10 text-gray-300"
-                                }`}
-                              >
-                                <span className="flex flex-col items-center leading-tight">
-                                  <span>
-                                    {selectedItemId
-                                      ? getPoolItemText(selectedItemId)
-                                      : zoneId}
-                                  </span>
-                                  {wrong && correctItemId && (
-                                    <span className="mt-1 text-[10px] font-semibold text-[#63f1e3]">
-                                      Correct: {getPoolItemText(correctItemId)}
+                                return (
+                                  <button
+                                    key={zoneId}
+                                    data-drop-zone-id={zoneId}
+                                    type="button"
+                                    onClick={() => handleDropZoneClick(zoneId)}
+                                    disabled={!canEditDragDrop}
+                                    className={`inline-flex min-h-[46px] min-w-[156px] max-w-full items-center justify-center rounded-lg border px-3 py-2 align-middle font-sans text-[13px] font-bold transition disabled:cursor-default ${
+                                      correct
+                                        ? "border-[#63f1e3] bg-[#63f1e3]/15 text-[#63f1e3]"
+                                        : wrong
+                                          ? "border-red-500 bg-red-50 text-red-950 dark:border-[#ef4444] dark:bg-[#ef4444]/12 dark:text-red-100"
+                                          : isDragTarget
+                                            ? "border-[#63f1e3] bg-[#63f1e3]/20 text-[#63f1e3] shadow-[0_0_24px_rgba(99,241,227,0.28)]"
+                                            : selectedItemId
+                                              ? "border-blue-500 bg-blue-50 text-blue-950 shadow-[0_0_16px_rgba(37,99,235,0.12)] dark:border-blue-400 dark:bg-blue-500/15 dark:text-blue-100 dark:shadow-[0_0_16px_rgba(59,130,246,0.16)]"
+                                              : isDraggingAnyItem
+                                                ? "border-[#63f1e3]/75 bg-[#63f1e3]/10 text-[#63f1e3] shadow-[0_0_18px_rgba(99,241,227,0.18)]"
+                                                : canAssign
+                                                  ? "border-slate-400 bg-slate-100 text-slate-700 shadow-[0_0_14px_rgba(148,163,184,0.12)] dark:border-gray-400 dark:bg-gray-500/15 dark:text-gray-200 dark:shadow-[0_0_14px_rgba(148,163,184,0.14)]"
+                                                  : "border-dashed border-slate-300 bg-white text-slate-600 dark:border-gray-500/70 dark:bg-gray-500/10 dark:text-gray-300"
+                                    }`}
+                                  >
+                                    <span className="flex flex-col items-center leading-tight">
+                                      <span>
+                                        {selectedItemId
+                                          ? getPoolItemText(selectedItemId)
+                                          : "Drop here"}
+                                      </span>
+                                      {wrong && correctItemId && (
+                                        <span className="mt-1 text-[10px] font-semibold text-[#63f1e3]">
+                                          Correct:{" "}
+                                          {getPoolItemText(correctItemId)}
+                                        </span>
+                                      )}
                                     </span>
-                                  )}
-                                </span>
-                              </button>
-                            );
-                          },
-                        )}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          ))}
                       </div>
                     </div>
 
-                    <div className="rounded-xl border border-[#263b44] bg-[#0b151b] p-5">
+                    <div className="rounded-xl border border-slate-200 bg-slate-50 p-5 dark:border-[#263b44] dark:bg-[#0b151b]">
                       <p className="mb-4 text-[11px] font-bold uppercase tracking-widest text-[#63f1e3]">
                         Pool Items
                       </p>
@@ -837,8 +1022,8 @@ const MediumNodeChallengePage = () => {
                                   : selectedPoolItemId === item.id
                                     ? "cursor-grab border-[#63f1e3] bg-[#63f1e3]/12 text-[#63f1e3]"
                                     : used
-                                      ? "cursor-grab border-[#263b44] bg-[#10191f] text-on-surface-variant/55"
-                                      : "cursor-grab border-[#263b44] bg-[#10191f] text-on-surface-variant hover:text-on-surface"
+                                      ? "cursor-grab border-slate-200 bg-white text-slate-400 dark:border-[#263b44] dark:bg-[#10191f] dark:text-on-surface-variant/55"
+                                      : "cursor-grab border-slate-200 bg-white text-slate-700 hover:border-teal-500/50 hover:text-slate-950 dark:border-[#263b44] dark:bg-[#10191f] dark:text-on-surface-variant dark:hover:text-on-surface"
                               }`}
                             >
                               {item.text}
@@ -851,23 +1036,24 @@ const MediumNodeChallengePage = () => {
                 )}
 
                 {submitError && (
-                  <p className="mx-6 mb-6 rounded-lg border border-red-400/20 bg-red-400/10 px-4 py-3 text-[13px] text-red-100/80">
+                  <p className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 text-[13px] text-red-800 dark:border-red-400/20 dark:bg-red-400/10 dark:text-red-100/80">
                     {submitError}
                   </p>
                 )}
 
                 {result && !result.correct && (
-                  <div className="mx-6 mb-6 rounded-lg border border-red-400/25 bg-red-400/10 px-4 py-3">
+                  <div className="mx-6 mb-6 rounded-lg border border-red-500/25 bg-red-50 px-4 py-3 dark:border-red-400/25 dark:bg-red-400/10">
                     <div className="flex items-start gap-3">
-                      <span className="material-symbols-outlined text-[20px] text-red-300">
-                        error
-                      </span>
+                      <LucideIcon
+                        name="error"
+                        className="text-[20px] text-red-500 dark:text-red-300"
+                      />
                       <div className="min-w-0 flex-1">
-                        <p className="font-bold text-red-100 text-[14px]">
+                        <p className="font-bold text-red-900 text-[14px] dark:text-red-100">
                           {result.message || "Not quite. Try again."}
                         </p>
                         {result.explanation && (
-                          <p className="mt-1 text-[13px] leading-relaxed text-red-100/70">
+                          <p className="mt-1 text-[13px] leading-relaxed text-red-800/75 dark:text-red-100/70">
                             {result.explanation}
                           </p>
                         )}
@@ -876,45 +1062,54 @@ const MediumNodeChallengePage = () => {
                   </div>
                 )}
 
-                {result && !result.correct && !isReviewMode && !isLockedMode && (
-                  <button
-                    onClick={handleTryAgain}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
-                  >
-                    Try Again
-                  </button>
-                )}
+                {result &&
+                  !result.correct &&
+                  !isReviewMode &&
+                  !isLockedMode && (
+                    <button
+                      onClick={handleTryAgain}
+                      className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl border border-[#63f1e3]/45 bg-[#63f1e3]/10 px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#63f1e3] transition hover:bg-[#63f1e3]/15"
+                    >
+                      Try Again
+                    </button>
+                  )}
 
                 {!isReviewMode && !result && !isLockedMode && (
                   <button
                     onClick={submitChallenge}
-                    disabled={!canSubmit || submitting}
-                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] transition hover:bg-[#86fff4] disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
+                    disabled={
+                      !canSubmit || submitting || isExpired || !sessionId
+                    }
+                    className="mx-6 mb-6 w-[calc(100%-3rem)] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white transition hover:bg-medium/80 disabled:cursor-not-allowed disabled:bg-on-surface/10 disabled:text-on-surface-variant/45"
                   >
-                    {submitting ? "Submitting..." : "Submit Answer"}
+                    {isExpired
+                      ? "Time expired"
+                      : submitting
+                        ? "Submitting..."
+                        : "Submit Answer"}
                   </button>
                 )}
 
                 {/* Inline Explanation and Navigation Section */}
                 {(isReviewMode || (result && result.correct)) && (
-                  <div className="mx-6 mb-6 border-t border-[#263b44] pt-6 flex flex-col gap-4">
+                  <div className="challenge-explanation-panel mx-6 mb-6 border-t border-slate-200 pt-6 flex flex-col gap-4 dark:border-[#263b44]">
                     {/* Explanation box */}
-                    <div className="rounded-xl border border-[#63f1e3]/30 bg-[#10262c] p-6 shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
+                    <div className="rounded-xl border border-teal-500/30 bg-teal-50 p-6 shadow-[inset_0_0_12px_rgba(13,148,136,0.05)] dark:border-[#63f1e3]/30 dark:bg-[#10262c] dark:shadow-[inset_0_0_12px_rgba(99,241,227,0.06)]">
                       <div className="mb-4 flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full border border-[#63f1e3] bg-[#63f1e3]/10 text-[#63f1e3]">
-                          <span className="material-symbols-outlined text-[20px]">
-                            pets
-                          </span>
+                          <LucideIcon name="pets" className="text-[20px]" />
                         </div>
                         <div>
                           <p className="font-bold text-on-surface text-[14px] tracking-wide">
-                            {petName} Companion Says
+                            {speakerName} Companion Says
                           </p>
                         </div>
                       </div>
 
                       <p className="text-[14px] leading-relaxed text-on-surface-variant">
-                        {isReviewMode && data.review ? data.review.explanation : result?.explanation}
+                        {isReviewMode && data.review
+                          ? data.review.explanation
+                          : result?.explanation}
                       </p>
                     </div>
 
@@ -922,14 +1117,14 @@ const MediumNodeChallengePage = () => {
                     <div className="flex flex-wrap gap-4 mt-2">
                       <button
                         onClick={goBackToRoadmap}
-                        className="flex-1 min-w-[150px] rounded-xl border border-[#263b44] bg-[#1a2b36] px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:text-on-surface hover:bg-[#203442] transition-colors"
+                        className="flex-1 min-w-[150px] rounded-xl border border-slate-200 bg-white px-5 py-4 text-[13px] font-bold uppercase tracking-widest text-on-surface-variant hover:border-teal-500/50 hover:text-on-surface transition-colors dark:border-[#263b44] dark:bg-[#1a2b36] dark:hover:bg-[#203442]"
                       >
                         Back to Roadmap
                       </button>
                       <button
                         onClick={goToNextChallenge}
                         disabled={nextChallengeLoading}
-                        className="flex-1 min-w-[150px] rounded-xl bg-[#63f1e3] px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-[#052023] hover:bg-[#86fff4] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex-1 min-w-[150px] rounded-xl bg-medium px-5 py-4 text-[13px] font-extrabold uppercase tracking-widest text-white hover:bg-medium/80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg"
                       >
                         {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                       </button>
@@ -941,23 +1136,19 @@ const MediumNodeChallengePage = () => {
           </section>
 
           {showSuccessModal && result?.correct && (
-            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-[#020815]/78 px-4 backdrop-blur-[6px]">
-              <div className="relative w-full max-w-[480px] rounded-3xl bg-[#2a3947] p-5 shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+              <div className="relative flex max-h-[calc(100vh-48px)] w-full max-w-[480px] flex-col rounded-3xl bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
                 <button
                   onClick={() => setShowSuccessModal(false)}
-                  className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-white/8 hover:text-on-surface"
+                  className="absolute right-5 top-5 z-10 flex h-8 w-8 items-center justify-center rounded-full text-on-surface-variant transition hover:bg-slate-200 hover:text-on-surface dark:hover:bg-white/8"
                   aria-label="Close result"
                 >
-                  <span className="material-symbols-outlined text-[22px]">
-                    close
-                  </span>
+                  <LucideIcon name="close" className="text-[22px]" />
                 </button>
 
-                <div className="rounded-xl bg-[#0f2630] px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
-                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-[#00c7bd] bg-[#00c7bd]/10 text-[#9afff7] shadow-[0_0_30px_rgba(0,199,189,0.2)]">
-                    <span className="material-symbols-outlined text-[46px]">
-                      star
-                    </span>
+                <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(13,148,136,0.05)] dark:bg-[#0f2630] dark:shadow-[inset_0_0_48px_rgba(99,241,227,0.06)]">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-teal-500 bg-teal-500/10 text-teal-600 shadow-[0_0_30px_rgba(13,148,136,0.16)] dark:border-[#00c7bd] dark:text-[#9afff7] dark:shadow-[0_0_30px_rgba(0,199,189,0.2)]">
+                    <LucideIcon name="star" className="text-[46px]" />
                   </div>
 
                   <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
@@ -966,56 +1157,35 @@ const MediumNodeChallengePage = () => {
                     Accomplished
                   </h2>
 
-                  <div className="mt-6 rounded-lg border border-on-surface/10 bg-[#1b3440]/70 p-4">
+                  <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 transition-colors duration-300 dark:border-on-surface/10 dark:bg-[#1b3440]/70">
                     <div className="flex items-start gap-3">
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#63f1e3]/25 bg-[#63f1e3]/12 text-[#63f1e3]">
-                        <span className="material-symbols-outlined text-[24px]">
-                          psychology
-                        </span>
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-teal-500/25 bg-teal-500/10 text-teal-600 dark:border-[#63f1e3]/25 dark:bg-[#63f1e3]/12 dark:text-[#63f1e3]">
+                        <LucideIcon name="psychology" className="text-[24px]" />
                       </div>
                       <div>
                         <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
                           “{result.message || "Correct. Nice work."}”
                         </p>
-                        {result.explanation && (
-                          <p className="mt-2 text-[12px] leading-relaxed text-on-surface-variant/80">
-                            {result.explanation}
-                          </p>
-                        )}
-                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-[#63f1e3]">
-                          {petName}
+                        <p className="mt-2 text-[12px] font-bold uppercase tracking-widest text-teal-700 dark:text-[#63f1e3]">
+                          {speakerName}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mt-7 grid grid-cols-2 gap-4">
-                    <div className="rounded-lg bg-[#243932] px-4 py-4 text-center">
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        Reward
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#63f1e3]">
-                        +{challenge.xp}
-                      </p>
-                      <p className="text-[18px] font-bold text-[#63f1e3]">XP</p>
-                    </div>
-                    <div className="rounded-lg bg-[#2e3330] px-4 py-4 text-center">
-                      <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
-                        Bonus
-                      </p>
-                      <p className="mt-2 text-[24px] font-extrabold leading-none text-[#f5c6ff]">
-                        +10
-                      </p>
-                      <p className="text-[18px] font-bold text-[#f5c6ff]">
-                        Stars
-                      </p>
-                    </div>
+                  <div className="mt-7 rounded-lg bg-teal-50 px-4 py-5 text-center dark:bg-[#243932]">
+                    <p className="text-[11px] uppercase tracking-widest text-on-surface-variant">
+                      XP Earned
+                    </p>
+                    <p className="mt-2 text-[28px] font-extrabold leading-none text-teal-700 dark:text-[#63f1e3]">
+                      +{xpReward} XP
+                    </p>
                   </div>
 
                   <button
                     onClick={goToNextChallenge}
                     disabled={nextChallengeLoading}
-                    className="mt-7 w-full rounded-lg bg-[#63f1e3] px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-[#052023] shadow-[0_10px_28px_rgba(99,241,227,0.24)] transition hover:bg-[#86fff4] disabled:cursor-wait disabled:opacity-70"
+                    className="mt-7 w-full rounded-lg bg-medium px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition hover:bg-medium/80"
                   >
                     {nextChallengeLoading ? "Loading..." : "Next Challenge"}
                     <span className="ml-2">→</span>
@@ -1026,6 +1196,50 @@ const MediumNodeChallengePage = () => {
                     className="mt-4 w-full text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant transition hover:text-on-surface"
                   >
                     Review Mission
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {showFailureModal && result && !result.correct && (
+            <div className="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/45 px-4 backdrop-blur-[6px] dark:bg-[#020815]/78">
+              <div className="relative flex max-h-[calc(100vh-48px)] w-full max-w-[480px] flex-col rounded-3xl border border-red-500/20 bg-white p-5 shadow-[0_0_60px_rgba(15,23,42,0.24)] dark:bg-[#2a3947] dark:shadow-[0_0_60px_rgba(0,0,0,0.45)]">
+                <div className="rounded-xl bg-slate-50 px-8 pb-7 pt-8 shadow-[inset_0_0_48px_rgba(239,68,68,0.05)] dark:bg-[#2b171a] dark:shadow-[inset_0_0_48px_rgba(239,68,68,0.06)]">
+                  <div className="mx-auto mb-7 flex h-[88px] w-[88px] items-center justify-center rounded-full border border-red-500/30 bg-red-500/10 text-red-500 shadow-[0_0_30px_rgba(239,68,68,0.2)]">
+                    <LucideIcon name="close" className="text-[46px]" />
+                  </div>
+
+                  <h2 className="text-center text-[28px] font-light uppercase leading-none tracking-wide text-on-surface">
+                    Mission
+                    <br />
+                    Failed
+                  </h2>
+
+                  <div className="mt-6 rounded-lg border border-slate-200 bg-white p-4 dark:border-on-surface/10 dark:bg-[#1b2732]/70">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-red-500/25 bg-red-500/12 text-red-500">
+                        <LucideIcon name="error" className="text-[24px]" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[13px] italic leading-relaxed text-on-surface-variant">
+                          “
+                          {result.message ||
+                            "Not quite. Return to the roadmap and try this checkpoint again."}
+                          ”
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowFailureModal(false);
+                      goBackToRoadmap();
+                    }}
+                    className="mt-7 w-full rounded-lg bg-red-600 hover:bg-red-500 px-5 py-4 text-[12px] font-extrabold uppercase tracking-[0.18em] text-white shadow-lg transition-all duration-200"
+                  >
+                    Return to Roadmap
                   </button>
                 </div>
               </div>
@@ -1056,6 +1270,28 @@ const MediumNodeChallengePage = () => {
           accentGradient="linear-gradient(to right, #00a99d, #223746)"
           accentGlowWeak="rgba(99,241,227,0.2)"
         />
+      )}
+
+      {xpToast !== null && (
+        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-[9999] pointer-events-none">
+          <style>{`
+            @keyframes fadeInDown {
+              0% { opacity: 0; transform: translate(-50%, -20px); }
+              10% { opacity: 1; transform: translate(-50%, 0); }
+              90% { opacity: 1; transform: translate(-50%, 0); }
+              100% { opacity: 0; transform: translate(-50%, -20px); }
+            }
+            .animate-xp-toast {
+              animation: fadeInDown 3.5s ease-in-out forwards;
+            }
+          `}</style>
+          <div className="animate-xp-toast flex items-center gap-2 rounded-full border border-teal-500/40 bg-white/95 px-6 py-3 font-black text-teal-700 shadow-[0_0_30px_rgba(13,148,136,0.18)] backdrop-blur-md dark:border-[#63f1e3]/40 dark:bg-[#0f2630]/95 dark:text-[#63f1e3] dark:shadow-[0_0_30px_rgba(99,241,227,0.3)]">
+            <LucideIcon name="stars" className="text-[#63f1e3]" />
+            <span className="text-[16px] tracking-wider font-extrabold animate-bounce">
+              +{xpToast} XP
+            </span>
+          </div>
+        </div>
       )}
     </main>
   );

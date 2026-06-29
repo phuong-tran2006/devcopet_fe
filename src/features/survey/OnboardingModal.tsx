@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import heroMascotVideo from "../../assets/videos/7936438193787.mp4";
 import TransparentVideo from "../../components/ui/TransparentVideo";
+import LucideIcon from "../../components/ui/LucideIcon";
 
 interface OnboardingModalProps {
   isOpen: boolean;
@@ -71,9 +72,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
           <div className="space-y-3 pt-2">
             <div className="bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#2dd4bf] dark:hover:border-[#2dd4bf]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-[#1a2b3c] flex items-center justify-center text-teal-600 dark:text-[#2dd4bf] shrink-0">
-                <span className="material-symbols-outlined text-[20px]">
-                  psychology
-                </span>
+                <LucideIcon name="psychology" className="text-[20px]" />
               </div>
               <div>
                 <h4 className="text-gray-900 dark:text-white font-bold text-[15px] mb-1">
@@ -88,9 +87,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
 
             <div className="bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#a78bfa] dark:hover:border-[#a78bfa]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-purple-50 dark:bg-[#1a2336] flex items-center justify-center text-purple-600 dark:text-[#a78bfa] shrink-0">
-                <span className="material-symbols-outlined text-[20px]">
-                  forum
-                </span>
+                <LucideIcon name="forum" className="text-[20px]" />
               </div>
               <div>
                 <h4 className="text-gray-900 dark:text-white font-bold text-[15px] mb-1">
@@ -105,9 +102,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
 
             <div className="bg-white dark:bg-[#151e29] border border-black dark:border-[#1e293b] rounded-xl p-4 flex gap-4 items-start hover:border-[#4ade80] dark:hover:border-[#4ade80]/40 transition-colors">
               <div className="w-10 h-10 rounded-lg bg-green-50 dark:bg-[#182a22] flex items-center justify-center text-green-600 dark:text-[#4ade80] shrink-0">
-                <span className="material-symbols-outlined text-[20px]">
-                  trending_up
-                </span>
+                <LucideIcon name="trending_up" className="text-[20px]" />
               </div>
               <div>
                 <h4 className="text-gray-900 dark:text-white font-bold text-[15px] mb-1">
@@ -127,9 +122,7 @@ const OnboardingModal = ({ isOpen, onBeginSurvey }: OnboardingModalProps) => {
               className="flex-1 md:flex-none flex items-center justify-center gap-2 bg-gradient-to-r from-[#e8bce1] to-[#d4a8d4] text-[#4a2e4f] font-extrabold text-[15px] py-3 px-8 rounded-lg hover:brightness-110 active:scale-95 transition-all duration-300 shadow-[0_0_20px_rgba(232,188,225,0.3)]"
             >
               Begin Survey{" "}
-              <span className="material-symbols-outlined text-[18px]">
-                arrow_forward
-              </span>
+              <LucideIcon name="arrow_forward" className="text-[18px]" />
             </button>
           </div>
         </div>

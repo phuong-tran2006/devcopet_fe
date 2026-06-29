@@ -1,5 +1,6 @@
 // @ts-nocheck
-import React, { useEffect, useRef, useState } from "react";
+import LucideIcon from "../../../components/ui/LucideIcon";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams, Link } from "@tanstack/react-router";
 import ReactMarkdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
@@ -9,8 +10,10 @@ import CodeRunnerBlock from "../../../components/CodeRunnerBlock";
 import CourseSidebar from "../components/CourseSidebar";
 import { courseApi } from "../api/course.api";
 import LessonQuiz from "../../quizzes/components/LessonQuiz";
+import { useTheme } from "../../../contexts/ThemeContext";
+import { highContrastLight } from "../../../styles/syntaxThemes";
 
-const markdownComponents = {
+const createMarkdownComponents = (isLight: boolean) => ({
   code({ node, inline, className, children, ...props }) {
     const language = className ? className.replace("language-", "").trim() : "";
 
@@ -25,10 +28,26 @@ const markdownComponents = {
         <SyntaxHighlighter
           {...props}
           children={String(children).replace(/\n$/, "")}
-          style={atomDark}
+          style={isLight ? highContrastLight : atomDark}
           language={language}
           PreTag="div"
-          className="rounded-xl my-6 border border-outline/20 !bg-surface-container-low"
+          customStyle={{
+            margin: "24px 0",
+            borderRadius: "10px",
+            border: isLight ? "1px solid #d4e0eb" : "1px solid #263443",
+            background: isLight ? "#eef4f8" : "#101820",
+            color: isLight ? "#263447" : "#d6e4ef",
+            fontSize: "14px",
+            lineHeight: 1.65,
+            padding: "16px 18px",
+            boxShadow: "none",
+          }}
+          codeTagProps={{
+            style: {
+              fontFamily: "JetBrains Mono, Roboto Mono, monospace",
+            },
+          }}
+          className="rounded-xl"
         />
       );
     }
@@ -36,15 +55,16 @@ const markdownComponents = {
     return (
       <code
         {...props}
-        className={`${className} bg-surface-container-highest text-primary px-1.5 py-0.5 rounded font-code-md text-[13px]`}
+        className={`${className} rounded border border-[#bfd0dd] bg-[#e7f0f5] px-1.5 py-0.5 font-code-md text-[13px] text-[#0f5c66] dark:border-outline/20 dark:bg-surface-container-high dark:text-[#8fd3dd]`}
       >
         {children}
       </code>
     );
   },
-};
+});
 
 const LessonDetailPage = () => {
+  const { theme } = useTheme();
   const { lessonId } = useParams({ strict: false });
   const navigate = useNavigate();
   const [lesson, setLesson] = useState(null);
@@ -56,6 +76,10 @@ const LessonDetailPage = () => {
   const contentScrollRef = useRef(null);
   const [quizPassed, setQuizPassed] = useState(false);
   const [sidebarRefreshKey, setSidebarRefreshKey] = useState(0);
+  const markdownComponents = useMemo(
+    () => createMarkdownComponents(theme === "light"),
+    [theme],
+  );
   const lastScrollRef = useRef({
     scrollTop: 0,
 
@@ -242,9 +266,10 @@ const LessonDetailPage = () => {
     const isLocked = loadError?.status === 403;
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-        <span className="material-symbols-outlined text-5xl text-on-surface-variant mb-4">
-          {isLocked ? "lock" : "error"}
-        </span>
+        <LucideIcon
+          name="error"
+          className="text-5xl text-on-surface-variant mb-4"
+        />
         <h2 className="font-headline-md text-on-surface mb-2">
           {isLocked ? "Lesson Locked" : "Lesson Unavailable"}
         </h2>
@@ -297,16 +322,17 @@ const LessonDetailPage = () => {
           onClick={() => setIsSidebarOpen((prev) => !prev)}
           className={`
       hidden lg:flex fixed top-[96px] z-50 h-10 w-10 items-center justify-center
-      rounded-full border border-outline/30 bg-surface-container text-on-surface-variant
-      shadow-lg transition-all duration-300
-      hover:border-primary-fixed-dim hover:text-primary-fixed-dim hover:bg-surface-container-high
+      rounded-full border border-slate-200 dark:border-outline/30 bg-white dark:bg-surface-container text-slate-500 dark:text-on-surface-variant
+      shadow-md transition-all duration-300
+      hover:border-teal-500 dark:hover:border-primary-fixed-dim hover:text-teal-600 dark:hover:text-primary-fixed-dim hover:bg-slate-50 dark:hover:bg-surface-container-high
       ${isSidebarOpen ? "left-[415px]" : "left-4"}
     `}
           aria-label={isSidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
         >
-          <span className="material-symbols-outlined text-[22px]">
-            {isSidebarOpen ? "chevron_left" : "menu"}
-          </span>
+          <LucideIcon
+            name={isSidebarOpen ? "chevron_left" : "menu"}
+            className="text-[22px]"
+          />
         </button>
       )}
       {/* Cột phải: Nội dung bài học */}
@@ -315,17 +341,17 @@ const LessonDetailPage = () => {
         className="flex-1 w-full relative pb-20 px-4 md:px-10 lg:px-16 overflow-y-auto custom-scrollbar"
       >
         {/* Mobile Hamburger menu */}
-        <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-outline-variant pb-4">
+        <div className="lg:hidden mt-4 mb-6 flex items-center justify-between border-b border-slate-200 dark:border-outline-variant pb-4">
           <button
             onClick={() => setIsMobileSidebarOpen(true)}
-            className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors"
+            className="flex items-center gap-2 text-slate-600 dark:text-on-surface-variant hover:text-slate-900 dark:hover:text-on-surface transition-colors"
           >
-            <span className="material-symbols-outlined text-[20px]">menu</span>
+            <LucideIcon name="menu" className="text-[20px]" />
             <span className="font-label-sm tracking-widest text-[11px] uppercase font-bold">
               Danh sách bài học
             </span>
           </button>
-          <span className="font-label-sm text-primary-fixed-dim tracking-widest text-[10px] uppercase border border-primary-fixed-dim/30 px-2 py-1 rounded bg-primary-fixed-dim/10">
+          <span className="font-label-sm text-teal-600 dark:text-primary-fixed-dim tracking-widest text-[10px] uppercase border border-teal-500/30 dark:border-primary-fixed-dim/30 px-2 py-1 rounded bg-teal-500/10 dark:bg-primary-fixed-dim/10">
             Bài 2
           </span>
         </div>
@@ -336,42 +362,43 @@ const LessonDetailPage = () => {
             onClick={() => window.history.back()}
             className="lg:hidden inline-flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors text-[13px] font-bold mb-8 uppercase tracking-widest"
           >
-            <span className="material-symbols-outlined text-[16px]">
-              arrow_back
-            </span>
+            <LucideIcon name="arrow_back" className="text-[16px]" />
             Back to Modules
           </button>
 
           {/* Current Lesson Dashboard Info */}
-          <div className="bg-surface-variant/20 border border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-lg">
-            <div className="p-4 bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
-              <span className="material-symbols-outlined text-4xl text-primary-fixed-dim">
-                play_lesson
-              </span>
+          <div className="bg-slate-50 dark:bg-surface-variant/20 border border-slate-200 dark:border-outline/20 rounded-2xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-start md:items-center shadow-sm">
+            <div className="p-4 bg-teal-500/10 dark:bg-primary-fixed-dim/10 rounded-xl flex-shrink-0">
+              <LucideIcon
+                name="play_lesson"
+                className="text-4xl text-teal-600 dark:text-primary-fixed-dim"
+              />
             </div>
             <div className="flex-1">
-              <div className="text-[12px] font-bold text-primary-fixed-dim uppercase tracking-widest mb-1">
+              <div className="text-[12px] font-bold text-teal-600 dark:text-primary-fixed-dim uppercase tracking-widest mb-1">
                 Currently Learning
               </div>
-              <h2 className="font-headline-sm text-on-surface text-[20px] mb-2 font-bold">
+              <h2 className="font-headline-sm text-slate-900 dark:text-on-surface text-[20px] mb-2 font-bold">
                 {lesson.title}
               </h2>
-              <p className="text-on-surface-variant text-[14px] line-clamp-2">
+              <p className="text-slate-600 dark:text-on-surface-variant text-[14px] line-clamp-2">
                 {lesson.description ||
                   "Review the concepts from this lesson before taking the quiz. Make sure you understand the core logic!"}
               </p>
             </div>
             <div className="flex flex-col gap-2 flex-shrink-0 w-full md:w-auto">
-              <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px] text-[#4ade80]">
-                  military_tech
-                </span>
+              <div className="flex items-center gap-2 text-[13px] font-bold text-slate-500 dark:text-on-surface-variant">
+                <LucideIcon
+                  name="military_tech"
+                  className="text-[18px] text-emerald-500"
+                />
                 XP Reward: {lesson.points || 100}
               </div>
-              <div className="flex items-center gap-2 text-[13px] font-bold text-on-surface-variant">
-                <span className="material-symbols-outlined text-[18px] text-[#f87171]">
-                  local_fire_department
-                </span>
+              <div className="flex items-center gap-2 text-[13px] font-bold text-slate-500 dark:text-on-surface-variant">
+                <LucideIcon
+                  name="local_fire_department"
+                  className="text-[18px] text-red-500"
+                />
                 Difficulty:{" "}
                 <span className="capitalize">
                   {lesson.difficulty || "Normal"}
@@ -381,11 +408,11 @@ const LessonDetailPage = () => {
           </div>
 
           {/* Lesson Header */}
-          <header className="mb-10 pb-8 border-b border-outline/20">
-            <div className="inline-block px-3 py-1 bg-primary-fixed-dim/10 text-primary-fixed-dim border border-primary-fixed-dim/20 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">
+          <header className="mb-10 pb-8 border-b border-slate-100 dark:border-outline/20">
+            <div className="inline-block px-3 py-1 bg-teal-500/10 dark:bg-primary-fixed-dim/10 text-teal-700 dark:text-primary-fixed-dim border border-teal-500/20 dark:border-primary-fixed-dim/20 rounded-full text-[10px] font-bold tracking-widest uppercase mb-4">
               Lesson Content
             </div>
-            <h1 className="font-headline-lg text-[32px] md:text-[42px] font-bold text-on-surface leading-tight mb-4">
+            <h1 className="font-headline-lg text-[32px] md:text-[42px] font-bold text-slate-900 dark:text-on-surface leading-tight mb-4">
               {lesson.title}
             </h1>
           </header>
@@ -400,9 +427,17 @@ const LessonDetailPage = () => {
             </ReactMarkdown>
           </article>
 
+          {/* Quiz Section */}
+          <LessonQuiz
+            key={lesson._id}
+            lessonId={lesson._id}
+            onQuizPassed={handleQuizPassed}
+            onFinishReview={handleFinishReview}
+          />
+
           {/* Next Lesson Button */}
           {(lesson.status === "completed" || quizPassed) && (
-            <div className="mt-8 flex justify-end gap-4 border-t border-outline/20 pt-6">
+            <div className="mt-8 flex justify-end gap-4 border-t border-slate-100 dark:border-outline/20 pt-6">
               {lesson.nextLessonId ? (
                 <button
                   onClick={() => {
@@ -411,35 +446,23 @@ const LessonDetailPage = () => {
                       params: { lessonId: lesson.nextLessonId },
                     });
                   }}
-                  className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                  className="bg-teal-700 hover:bg-teal-800 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.15)] dark:shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Next Lesson
-                  <span className="material-symbols-outlined text-[20px]">
-                    arrow_forward
-                  </span>
+                  <LucideIcon name="arrow_forward" className="text-[20px]" />
                 </button>
               ) : (
                 <Link
                   to="/courses/$courseId"
                   params={{ courseId: String(lesson.courseId) }}
-                  className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                  className="bg-teal-700 hover:bg-teal-800 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.15)] dark:shadow-[0_0_15px_rgba(0,218,248,0.4)]"
                 >
                   Back to Course Curriculum
-                  <span className="material-symbols-outlined text-[20px]">
-                    assignment
-                  </span>
+                  <LucideIcon name="assignment" className="text-[20px]" />
                 </Link>
               )}
             </div>
           )}
-
-          {/* Quiz Section */}
-          <LessonQuiz
-            key={lesson._id}
-            lessonId={lesson._id}
-            onQuizPassed={handleQuizPassed}
-            onFinishReview={handleFinishReview}
-          />
         </div>
       </main>
 
@@ -459,9 +482,7 @@ const LessonDetailPage = () => {
                 onClick={() => setIsMobileSidebarOpen(false)}
                 className="flex items-center justify-center h-10 w-10 rounded-full bg-surface-container-high text-on-surface-variant hover:text-on-surface border border-outline/20 shadow-lg"
               >
-                <span className="material-symbols-outlined text-[20px]">
-                  close
-                </span>
+                <LucideIcon name="close" className="text-[20px]" />
               </button>
             </div>
             <div className="flex-1 h-full overflow-hidden">

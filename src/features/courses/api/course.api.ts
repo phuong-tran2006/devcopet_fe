@@ -1,6 +1,85 @@
 import { api } from "../../../services/axiosClient";
 
 export type EasyRoadmapNodeStatus = "locked" | "available" | "completed";
+export type RoadmapMode = "easy" | "medium" | "hard";
+
+export interface CourseProgressSummary {
+  completedLessons: number;
+  totalLessons: number;
+  percent: number;
+}
+
+export interface CourseDetailLesson {
+  id: string;
+  _id?: string;
+  title: string;
+  description?: string;
+  order?: number;
+  status: EasyRoadmapNodeStatus;
+  canAccess: boolean;
+  [key: string]: unknown;
+}
+
+export interface CourseDetailChapter {
+  id: string;
+  _id?: string;
+  title: string;
+  order: number;
+  status: EasyRoadmapNodeStatus;
+  progress: CourseProgressSummary;
+  lessons: CourseDetailLesson[];
+  [key: string]: unknown;
+}
+
+export interface CourseDetailResponse {
+  course: {
+    id: string;
+    _id?: string;
+    slug?: string;
+    title: string;
+    description?: string;
+    programmingLanguage?: string;
+    level?: string;
+    totalChapters?: number;
+    totalLessons?: number;
+    progress?: CourseProgressSummary;
+    [key: string]: unknown;
+  };
+  chapters: CourseDetailChapter[];
+}
+
+export interface RewardSummaryItem {
+  label: string;
+  amount: number;
+  type: string;
+}
+
+export interface RewardSummary {
+  xp?: number;
+  stars?: number;
+  coins?: number;
+  petExp?: number;
+  items?: RewardSummaryItem[];
+}
+
+export interface ExplanationSpeaker {
+  name: string;
+  type: "PET" | "SYSTEM" | string;
+}
+
+export interface ChallengeNavigationTarget {
+  courseSlug: string;
+  mode: RoadmapMode;
+}
+
+export interface ChallengeNavigation {
+  returnToRoadmap: ChallengeNavigationTarget;
+  nextChallenge: {
+    nodeId: string;
+    mode: RoadmapMode;
+    courseSlug: string;
+  } | null;
+}
 
 export interface EasyRoadmapNode {
   id: string;
@@ -69,6 +148,11 @@ export interface EasyNodeChallengeReview {
   completedAt?: string;
 }
 
+export interface UserProgressSnapshot {
+  exp: number;
+  level: number;
+}
+
 export interface EasyNodeChallengeResponse {
   node: {
     id: string;
@@ -81,6 +165,14 @@ export interface EasyNodeChallengeResponse {
   challenge: EasyNodeChallenge | null;
   review?: EasyNodeChallengeReview;
   message?: string;
+  explanationSpeaker?: ExplanationSpeaker;
+  navigation?: ChallengeNavigation;
+  nextNode?: {
+    id: string;
+    label: string;
+    title: string;
+    status: EasyRoadmapNodeStatus;
+  } | null;
 }
 
 export interface SubmitEasyNodeChallengeResponse {
@@ -89,6 +181,11 @@ export interface SubmitEasyNodeChallengeResponse {
   correctOptionId?: EasyChallengeOptionId;
   explanation?: string;
   review?: EasyNodeChallengeReview;
+  xpAwarded?: number;
+  userProgress?: UserProgressSnapshot;
+  rewardSummary?: RewardSummary;
+  explanationSpeaker?: ExplanationSpeaker;
+  navigation?: ChallengeNavigation;
 }
 
 export type MediumChallengeType = "multiple_choice" | "drag_drop";
@@ -179,26 +276,30 @@ export type MediumNodeChallenge =
   | MediumMultipleChoiceChallenge
   | MediumDragDropChallenge;
 
-export type MediumNodeChallengeReview =
-  | {
-      selectedOptionId?: EasyChallengeOptionId;
-      correctOptionId?: EasyChallengeOptionId;
-      correct: boolean;
-      explanation: string;
-      completedAt?: string;
-    }
-  | {
-      dropZoneMap?: Record<string, string>;
-      correctDropZoneMap?: Record<string, string>;
-      correct: boolean;
-      explanation: string;
-      completedAt?: string;
-    };
+export type MediumNodeChallengeReview = {
+  challengeType?: "multiple_choice" | "drag_drop";
+  selectedOptionId?: EasyChallengeOptionId;
+  correctOptionId?: EasyChallengeOptionId;
+  selectedDropZoneMap?: Record<string, string>;
+  dropZoneMap?: Record<string, string>;
+  correctDropZoneMap?: Record<string, string>;
+  correct: boolean;
+  explanation: string;
+  completedAt?: string;
+};
 
 export interface MediumNodeChallengeResponse {
   node: MediumChallengeNode;
   challenge: MediumNodeChallenge;
   review?: MediumNodeChallengeReview;
+  explanationSpeaker?: ExplanationSpeaker;
+  navigation?: ChallengeNavigation;
+  nextNode?: {
+    id: string;
+    label: string;
+    title: string;
+    status: EasyRoadmapNodeStatus;
+  } | null;
 }
 
 export type SubmitMediumNodeChallengePayload =
@@ -217,6 +318,11 @@ export interface SubmitMediumNodeChallengeResponse {
   correctOptionId?: EasyChallengeOptionId;
   correctDropZoneMap?: Record<string, string>;
   explanation?: string;
+  xpAwarded?: number;
+  userProgress?: UserProgressSnapshot;
+  rewardSummary?: RewardSummary;
+  explanationSpeaker?: ExplanationSpeaker;
+  navigation?: ChallengeNavigation;
 }
 
 export type HardChallengeType =
@@ -368,6 +474,8 @@ export interface HardNodeChallengeResponse {
   node: HardChallengeNode;
   challenge: HardNodeChallenge;
   review?: HardNodeChallengeReview;
+  explanationSpeaker?: ExplanationSpeaker;
+  navigation?: ChallengeNavigation;
 }
 
 export interface OptionPayload {
@@ -413,11 +521,29 @@ export interface SubmitHardNodeChallengeResponse {
   correctMatchingMap?: Record<string, string>;
   correctOrderedIds?: string[];
   correctDropZoneMap?: Record<string, string>;
+  xpAwarded?: number;
+  userProgress?: UserProgressSnapshot;
+  rewardSummary?: RewardSummary;
+  explanationSpeaker?: ExplanationSpeaker;
+  navigation?: ChallengeNavigation;
+}
+
+export interface StartChallengeSessionResponse {
+  sessionId: string;
+  startedAt: string;
+  expiresAt: string;
+  serverNow: string;
+  timeLimitSeconds: number;
 }
 
 export const courseApi = {
   getCourses: async () => {
     const response = await api.get(`/courses`);
+    return response.data;
+  },
+
+  getCourseDetail: async (courseId: string): Promise<CourseDetailResponse> => {
+    const response = await api.get(`/courses/${courseId}/detail`);
     return response.data;
   },
 
@@ -453,13 +579,25 @@ export const courseApi = {
     return response.data;
   },
 
+  startRoadmapChallengeSession: async (
+    courseSlug: string,
+    mode: RoadmapMode,
+    nodeId: string,
+  ): Promise<StartChallengeSessionResponse> => {
+    const response = await api.post(
+      `/roadmaps/${courseSlug}/${mode}/nodes/${nodeId}/session/start`,
+    );
+    return response.data;
+  },
+
   submitEasyNodeChallenge: async (
     nodeId: string,
     selectedOptionId: EasyChallengeOptionId,
+    sessionId?: string,
   ): Promise<SubmitEasyNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/easy/nodes/${nodeId}/challenge/submit`,
-      { selectedOptionId },
+      { selectedOptionId, sessionId, answer: selectedOptionId },
     );
     return response.data;
   },
@@ -483,10 +621,11 @@ export const courseApi = {
   submitMediumNodeChallenge: async (
     nodeId: string,
     payload: SubmitMediumNodeChallengePayload,
+    sessionId?: string,
   ): Promise<SubmitMediumNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/medium/nodes/${nodeId}/challenge/submit`,
-      payload,
+      { ...payload, sessionId, answer: payload },
     );
     return response.data;
   },
@@ -506,10 +645,11 @@ export const courseApi = {
   submitHardNodeChallenge: async (
     nodeId: string,
     payload: SubmitHardNodeChallengePayload,
+    sessionId?: string,
   ): Promise<SubmitHardNodeChallengeResponse> => {
     const response = await api.post(
       `/roadmaps/hard/nodes/${nodeId}/challenge/submit`,
-      payload,
+      { ...payload, sessionId, answer: payload },
     );
     return response.data;
   },

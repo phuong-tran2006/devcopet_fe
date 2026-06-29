@@ -2,6 +2,7 @@ import React from "react";
 import MarkdownRenderer from "../../../../components/MarkdownRenderer";
 import type { ChatMessage } from "./useAiChat";
 import type { AiPrompt, PromptId, AiRelatedLesson } from "../../api/aiChat.api";
+import LucideIcon from "../../../../components/ui/LucideIcon";
 
 interface AiHelperMessagesProps {
   history: ChatMessage[];
@@ -48,17 +49,15 @@ export function AiHelperMessages({
               border: `1px solid ${aiPrimary}40`,
             }}
           >
-            <span
-              className="material-symbols-outlined text-[16px]"
+            <LucideIcon
+              name="pets"
+              className="text-[16px]"
               style={{ color: aiPrimary }}
-            >
-              pets
-            </span>
+            />
           </div>
           <div
-            className="rounded-2xl rounded-tl-sm px-4 py-3 text-[13px] leading-relaxed text-on-surface shadow-sm"
+            className="rounded-2xl rounded-tl-sm px-4 py-3 text-[13px] leading-relaxed text-on-surface shadow-sm bg-surface-container-high/50 transition-colors duration-300"
             style={{
-              backgroundColor: "rgba(15, 23, 42, 0.4)",
               border: `1px solid ${aiPrimary}30`,
             }}
           >
@@ -76,7 +75,7 @@ export function AiHelperMessages({
         <div key={msg.id} className="mb-6">
           <div className="mb-4 flex justify-end">
             <div
-              className="max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-[14px] font-medium text-white shadow-sm"
+              className="max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-[14px] font-medium text-on-surface shadow-sm transition-colors duration-300"
               style={{
                 backgroundColor: `${aiSecondary}40`,
                 border: `1px solid ${aiSecondary}60`,
@@ -87,10 +86,9 @@ export function AiHelperMessages({
           </div>
           <div className="ai-answer-appear">
             <div
-              className="mb-4 rounded-xl border px-6 py-5 shadow-sm"
+              className="mb-4 rounded-xl border px-6 py-5 shadow-sm bg-surface-container-high/50 transition-colors duration-300"
               style={{
                 borderColor: `${aiPrimary}30`,
-                backgroundColor: "rgba(15, 23, 42, 0.4)",
                 boxShadow: `inset 0 0 30px ${aiPrimary}10`,
               }}
             >
@@ -107,12 +105,11 @@ export function AiHelperMessages({
                   backgroundColor: `${aiSecondary}15`,
                 }}
               >
-                <span
-                  className="material-symbols-outlined text-[18px] shrink-0"
+                <LucideIcon
+                  name="menu_book"
+                  className="text-[18px] shrink-0"
                   style={{ color: aiSecondary }}
-                >
-                  menu_book
-                </span>
+                />
                 <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
                     Review Related Lesson
@@ -124,12 +121,11 @@ export function AiHelperMessages({
                     {msg.relatedLesson.title}
                   </span>
                 </div>
-                <span
-                  className="material-symbols-outlined text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                <LucideIcon
+                  name="arrow_forward"
+                  className="text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
                   style={{ color: accentColor }}
-                >
-                  arrow_forward
-                </span>
+                />
               </button>
             )}
           </div>
@@ -144,7 +140,7 @@ export function AiHelperMessages({
         return (
           <div className="mb-4 flex justify-end">
             <div
-              className="max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-[14px] font-medium text-white shadow-sm"
+              className="max-w-[85%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-[14px] font-medium text-on-surface shadow-sm transition-colors duration-300"
               style={{
                 backgroundColor: `${aiSecondary}40`,
                 border: `1px solid ${aiSecondary}60`,
@@ -158,32 +154,46 @@ export function AiHelperMessages({
 
       {/* Loading answer shimmer */}
       {asking && (
-        <div className="mb-4 flex flex-col gap-2">
-          <div
-            className="ai-shimmer h-3 w-[85%] rounded-full"
-            style={{ backgroundColor: `${aiPrimary}20` }}
-          />
-          <div
-            className="ai-shimmer h-3 w-[70%] rounded-full"
-            style={{
-              backgroundColor: `${aiSecondary}20`,
-              animationDelay: "0.15s",
-            }}
-          />
-          <div
-            className="ai-shimmer h-3 w-[90%] rounded-full"
-            style={{
-              backgroundColor: `${aiPrimary}15`,
-              animationDelay: "0.3s",
-            }}
-          />
-          <div
-            className="ai-shimmer h-3 w-[60%] rounded-full"
-            style={{
-              backgroundColor: `${aiSecondary}20`,
-              animationDelay: "0.45s",
-            }}
-          />
+        <div className="mb-4 flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <div
+              className="h-1.5 w-1.5 rounded-full animate-pulse"
+              style={{ backgroundColor: aiPrimary }}
+            />
+            <span
+              className="text-[11px] font-bold uppercase tracking-wider"
+              style={{ color: aiPrimary }}
+            >
+              Thinking…
+            </span>
+          </div>
+          <div className="flex flex-col gap-2">
+            <div
+              className="ai-shimmer h-3 w-[85%] rounded-full"
+              style={{ backgroundColor: `${aiPrimary}20` }}
+            />
+            <div
+              className="ai-shimmer h-3 w-[70%] rounded-full"
+              style={{
+                backgroundColor: `${aiSecondary}20`,
+                animationDelay: "0.15s",
+              }}
+            />
+            <div
+              className="ai-shimmer h-3 w-[90%] rounded-full"
+              style={{
+                backgroundColor: `${aiPrimary}15`,
+                animationDelay: "0.3s",
+              }}
+            />
+            <div
+              className="ai-shimmer h-3 w-[60%] rounded-full"
+              style={{
+                backgroundColor: `${aiSecondary}20`,
+                animationDelay: "0.45s",
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -191,10 +201,9 @@ export function AiHelperMessages({
       {answer && !asking && (
         <div ref={answerRef} className="ai-answer-appear">
           <div
-            className="mb-4 rounded-xl border px-6 py-5 shadow-sm"
+            className="mb-4 rounded-xl border px-6 py-5 shadow-sm bg-surface-container-high/50 transition-colors duration-300"
             style={{
               borderColor: `${aiPrimary}30`,
-              backgroundColor: "rgba(15, 23, 42, 0.4)",
               boxShadow: `inset 0 0 30px ${aiPrimary}10`,
             }}
           >
@@ -214,12 +223,11 @@ export function AiHelperMessages({
                 backgroundColor: `${aiSecondary}15`,
               }}
             >
-              <span
-                className="material-symbols-outlined text-[18px] shrink-0"
+              <LucideIcon
+                name="menu_book"
+                className="text-[18px] shrink-0"
                 style={{ color: aiSecondary }}
-              >
-                menu_book
-              </span>
+              />
               <div className="flex flex-col min-w-0 flex-1">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/70">
                   Review Related Lesson
@@ -231,12 +239,11 @@ export function AiHelperMessages({
                   {relatedLesson.title}
                 </span>
               </div>
-              <span
-                className="material-symbols-outlined text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+              <LucideIcon
+                name="arrow_forward"
+                className="text-[16px] shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
                 style={{ color: accentColor }}
-              >
-                arrow_forward
-              </span>
+              />
             </button>
           )}
         </div>

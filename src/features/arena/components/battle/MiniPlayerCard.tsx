@@ -1,3 +1,5 @@
+import LucideIcon from "../../../../components/ui/LucideIcon";
+
 interface MiniPlayerCardProps {
   name: string;
   avatarUrl: string;
@@ -26,12 +28,23 @@ const MiniPlayerCard = ({
   return (
     <div className="flex items-center dark:bg-[#111921] bg-surface-container rounded-xl p-2 shadow-lg border dark:border-white/5 border-outline/10 w-[230px] transition-colors duration-300">
       {!isRightAlign && (
-        <div className="w-10 h-10 rounded-full border-2 dark:border-[#e69b9b] border-error overflow-hidden shrink-0 mr-2.5 p-0.5 transition-colors duration-300">
-          <img
-            src={avatarUrl}
-            alt={name}
-            className="w-full h-full rounded-full object-cover"
-          />
+        <div className="w-10 h-10 rounded-full border-2 dark:border-[#e69b9b] border-error overflow-hidden shrink-0 mr-2.5 p-0.5 transition-colors duration-300 flex items-center justify-center text-[13px] font-bold dark:text-white text-on-surface">
+          {avatarUrl && !avatarUrl.includes("pravatar.cc") ? (
+            <img
+              src={avatarUrl}
+              alt={name}
+              className="w-full h-full rounded-full object-cover"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  parent.innerText = name.charAt(0).toUpperCase();
+                }
+              }}
+            />
+          ) : (
+            <span>{name.charAt(0).toUpperCase()}</span>
+          )}
         </div>
       )}
 
@@ -44,7 +57,11 @@ const MiniPlayerCard = ({
             {name}
           </span>
           <span
-            className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${answered ? "dark:bg-[#1e4e50] bg-primary/10 text-primary" : "dark:bg-white/5 bg-outline/10 dark:text-gray-500 text-on-surface-variant"}`}
+            className={`text-[10px] font-black px-2 py-0.5 rounded-full shrink-0 ${
+              answered
+                ? "dark:bg-[#1e4e50] bg-primary/10 text-primary"
+                : "dark:bg-white/5 bg-outline/10 dark:text-gray-500 text-on-surface-variant"
+            }`}
           >
             {answered ? "LOCKED" : "..."}
           </span>
@@ -70,22 +87,32 @@ const MiniPlayerCard = ({
       </div>
 
       {isRightAlign && (
-        <div className="w-10 h-10 rounded-full border-2 dark:border-[#81e6d9] border-primary overflow-hidden shrink-0 ml-2.5 p-0.5 transition-colors duration-300">
-          <img
-            src={avatarUrl}
-            alt={name}
-            className="w-full h-full rounded-full object-contain dark:bg-[#0e141a] bg-surface"
-          />
+        <div className="w-10 h-10 rounded-full border-2 dark:border-[#81e6d9] border-primary overflow-hidden shrink-0 ml-2.5 p-0.5 transition-colors duration-300 flex items-center justify-center text-[13px] font-bold dark:text-white text-on-surface">
+          {avatarUrl && !avatarUrl.includes("pravatar.cc") ? (
+            <img
+              src={avatarUrl}
+              alt={name}
+              className="w-full h-full rounded-full object-contain dark:bg-[#0e141a] bg-surface"
+              onError={(e) => {
+                e.currentTarget.style.display = "none";
+                const parent = e.currentTarget.parentElement;
+                if (parent) {
+                  parent.innerText = name.charAt(0).toUpperCase();
+                }
+              }}
+            />
+          ) : (
+            <span>{name.charAt(0).toUpperCase()}</span>
+          )}
         </div>
       )}
 
       <div className="shrink-0 flex items-center justify-center w-7 h-7 ml-2">
-        <span
-          className="material-symbols-outlined transition-colors duration-300"
+        <LucideIcon
+          name={icon}
+          className="transition-colors duration-300"
           style={{ color: iconColor, fontSize: "18px" }}
-        >
-          {icon}
-        </span>
+        />
       </div>
     </div>
   );
