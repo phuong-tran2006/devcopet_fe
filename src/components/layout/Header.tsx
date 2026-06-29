@@ -11,6 +11,7 @@ import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
 import NotificationDropdown from "./NotificationDropdown";
 import DailyMissionDropdown from "./DailyMissionDropdown";
+import { mascotAxolotl } from "../../features/users/constants/authImages";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
@@ -34,7 +35,9 @@ const Header = () => {
   const location = useLocation();
   const isOnboarding = location.pathname === "/onboarding";
 
-  const [activeDropdown, setActiveDropdown] = React.useState<"notifications" | "missions" | null>(null);
+  const [activeDropdown, setActiveDropdown] = React.useState<
+    "notifications" | "missions" | null
+  >(null);
 
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -58,9 +61,14 @@ const Header = () => {
           <Link
             to="/"
             onClick={() => triggerHaptic(40)}
-            className="font-headline-sm text-headline-sm tracking-tighter text-primary-fixed-dim font-bold"
+            className="flex items-center rounded-full transition-opacity hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary-fixed-dim"
+            aria-label="DevCopet home"
           >
-            DevCopet
+            <img
+              src={user?.pet?.avatar || mascotAxolotl}
+              alt=""
+              className="h-11 w-11 rounded-full object-cover object-top"
+            />
           </Link>
           {!isOnboarding && (
             <div className="hidden md:flex gap-8 items-center">
@@ -99,7 +107,11 @@ const Header = () => {
                     isOpen={activeDropdown === "notifications"}
                     onToggle={() => {
                       triggerHaptic(40);
-                      setActiveDropdown(activeDropdown === "notifications" ? null : "notifications");
+                      setActiveDropdown(
+                        activeDropdown === "notifications"
+                          ? null
+                          : "notifications",
+                      );
                     }}
                     onClose={() => setActiveDropdown(null)}
                   />
@@ -107,7 +119,9 @@ const Header = () => {
                     isOpen={activeDropdown === "missions"}
                     onToggle={() => {
                       triggerHaptic(40);
-                      setActiveDropdown(activeDropdown === "missions" ? null : "missions");
+                      setActiveDropdown(
+                        activeDropdown === "missions" ? null : "missions",
+                      );
                     }}
                     onClose={() => setActiveDropdown(null)}
                   />
@@ -136,7 +150,13 @@ const Header = () => {
                             e.currentTarget.style.display = "none";
                             const parent = e.currentTarget.parentElement;
                             if (parent) {
-                              parent.innerText = (user?.name || user?.username || "U").charAt(0).toUpperCase();
+                              parent.innerText = (
+                                user?.name ||
+                                user?.username ||
+                                "U"
+                              )
+                                .charAt(0)
+                                .toUpperCase();
                             }
                           }}
                         />
