@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import LucideIcon from "../../../components/ui/LucideIcon";
 import { profileApi } from "../api/profile.api";
 import { useAuthStore } from "../../users/store/auth.store";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 interface LeaderboardEntry {
   _id?: string;
@@ -79,11 +80,10 @@ const LeaderboardWidget = () => {
             return (
               <div
                 key={entry._id || entry.id || rank}
-                className={`flex items-center p-3 rounded-xl transition-colors duration-300 ${
-                  isMe
+                className={`flex items-center p-3 rounded-xl transition-colors duration-300 ${isMe
                     ? "bg-primary-fixed/30 border border-primary-fixed-dim/30"
                     : "bg-transparent hover:bg-surface-container"
-                }`}
+                  }`}
               >
                 <span
                   className={`w-6 text-sm font-bold text-center mr-3 transition-colors duration-300 ${isMe ? "text-primary-fixed-dim" : "text-on-surface-variant"}`}
@@ -91,28 +91,16 @@ const LeaderboardWidget = () => {
                   {rank || "—"}
                 </span>
                 <div
-                  className={`w-8 h-8 rounded shrink-0 flex items-center justify-center text-xs font-bold mr-3 transition-colors duration-300 overflow-hidden ${
-                    isMe
+                  className={`w-8 h-8 rounded shrink-0 flex items-center justify-center text-xs font-bold mr-3 transition-colors duration-300 overflow-hidden ${isMe
                       ? "bg-primary-fixed-dim text-white"
                       : "bg-surface-container text-on-surface-variant"
-                  }`}
+                    }`}
                 >
-                  {entry.avatarUrl ? (
-                    <img
-                      src={entry.avatarUrl}
-                      alt={displayName}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        if (e.currentTarget.parentElement) {
-                          e.currentTarget.parentElement.innerText =
-                            displayName.charAt(0).toUpperCase();
-                        }
-                      }}
-                    />
-                  ) : (
-                    displayName.charAt(0).toUpperCase()
-                  )}
+                  <UserAvatar
+                    avatarUrl={entry.avatarUrl}
+                    name={displayName}
+                    className="w-full h-full bg-transparent text-inherit"
+                  />
                 </div>
                 <span
                   className={`flex-1 text-sm font-semibold transition-colors duration-300 truncate ${isMe ? "text-on-surface" : "text-on-surface-variant"}`}

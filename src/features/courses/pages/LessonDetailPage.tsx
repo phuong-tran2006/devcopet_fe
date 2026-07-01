@@ -431,7 +431,7 @@ const LessonDetailPage = () => {
                       params: { lessonId: lesson.nextLessonId },
                     });
                   }}
-                  className="bg-teal-700 hover:bg-teal-800 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.15)] dark:shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                  className="bg-teal-600 hover:bg-teal-700 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md dark:shadow-[0_0_15px_rgba(0,218,248,0.4)] dark:hover:bg-primary-fixed"
                 >
                   Next Lesson
                   <LucideIcon name="arrow_forward" className="text-[20px]" />
@@ -440,7 +440,7 @@ const LessonDetailPage = () => {
                 <Link
                   to="/courses/$courseId"
                   params={{ courseId: String(lesson.courseId) }}
-                  className="bg-teal-700 hover:bg-teal-800 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-[0_4px_12px_rgba(13,148,136,0.15)] dark:shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                  className="bg-teal-600 hover:bg-teal-700 dark:bg-primary-fixed-dim text-white dark:text-on-primary-fixed font-bold px-8 py-3.5 rounded-xl hover:scale-105 active:scale-95 transition-all flex items-center justify-center gap-2 shadow-sm hover:shadow-md dark:shadow-[0_0_15px_rgba(0,218,248,0.4)] dark:hover:bg-primary-fixed"
                 >
                   Back to Course Curriculum
                   <LucideIcon name="assignment" className="text-[20px]" />

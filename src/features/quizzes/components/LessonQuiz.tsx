@@ -176,8 +176,12 @@ const LessonQuizInner = ({
         className={`bg-surface-container rounded-xl border p-6 shadow-lg transition-colors ${
           isReviewMode && qResult
             ? qResult.isCorrect
-              ? "border-[#4ade80]/30"
-              : "border-[#f87171]/30"
+              ? isLight
+                ? "border-emerald-200 shadow-lg shadow-emerald-100/50"
+                : "border-[#4ade80]/30 shadow-lg shadow-[#4ade80]/5"
+              : isLight
+                ? "border-rose-200 shadow-lg shadow-rose-100/50"
+                : "border-[#f87171]/30 shadow-lg shadow-[#f87171]/5"
             : "border-outline/20"
         }`}
       >
@@ -239,11 +243,13 @@ const LessonQuizInner = ({
               }
             } else {
               if (isCorrectOption) {
-                style =
-                  "border-[#4ade80]/50 bg-[#4ade80]/15 text-[#4ade80] cursor-default";
+                style = isLight
+                  ? "bg-emerald-50 border-emerald-300 text-emerald-800 cursor-default shadow-sm font-semibold"
+                  : "border-[#4ade80]/50 bg-[#4ade80]/15 text-[#4ade80] cursor-default";
               } else if (isWrongSelected) {
-                style =
-                  "border-[#f87171]/50 bg-[#f87171]/15 text-[#f87171] cursor-default";
+                style = isLight
+                  ? "bg-rose-50 border-rose-300 text-rose-800 cursor-default shadow-sm"
+                  : "border-[#f87171]/50 bg-[#f87171]/15 text-[#f87171] cursor-default";
               } else {
                 style =
                   "border-outline/10 bg-surface/20 text-on-surface-variant/50 cursor-default opacity-60";
@@ -255,16 +261,22 @@ const LessonQuizInner = ({
                 key={opt.id}
                 onClick={() => handleSelect(questionKey, opt.id)}
                 disabled={isReviewMode || phase === "submitting"}
-                className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 ${style}`}
+                className={`w-full text-left p-4 rounded-xl border transition-all duration-200 flex items-center justify-between gap-3 ${style} ${
+                  isReviewMode && isCorrectOption ? "animate-quiz-pulse-once" : ""
+                }`}
               >
                 <div className="flex items-center gap-4">
                   <span
                     className={`flex-shrink-0 w-7 h-7 rounded-full border text-[12px] font-bold flex items-center justify-center uppercase transition-all ${
                       isReviewMode
                         ? isCorrectOption
-                          ? "border-[#4ade80] text-[#4ade80]"
+                          ? isLight
+                            ? "border-emerald-500 bg-emerald-500 text-white"
+                            : "border-[#4ade80] text-[#4ade80]"
                           : isWrongSelected
-                            ? "border-[#f87171] text-[#f87171]"
+                            ? isLight
+                              ? "border-rose-500 bg-rose-500 text-white"
+                              : "border-[#f87171] text-[#f87171]"
                             : "border-outline/20 text-on-surface/30"
                         : isSelected
                           ? "border-primary-fixed-dim text-primary-fixed-dim bg-primary-fixed-dim/10"
@@ -279,13 +291,13 @@ const LessonQuizInner = ({
                 {isReviewMode && isCorrectOption && (
                   <LucideIcon
                     name="check_circle"
-                    className=" text-[22px] text-[#4ade80] flex-shrink-0"
+                    className={`text-[22px] flex-shrink-0 ${isLight ? "text-emerald-600" : "text-[#4ade80]"}`}
                   />
                 )}
                 {isReviewMode && isWrongSelected && (
                   <LucideIcon
                     name="cancel"
-                    className=" text-[22px] text-[#f87171] flex-shrink-0"
+                    className={`text-[22px] flex-shrink-0 ${isLight ? "text-rose-600" : "text-[#f87171]"}`}
                   />
                 )}
               </button>
@@ -297,23 +309,37 @@ const LessonQuizInner = ({
         {isReviewMode && qResult && (
           <div className="mt-8 flex flex-col gap-3 animate-in fade-in slide-in-from-top-2 duration-300">
             <div
-              className={`inline-flex items-center gap-2 text-[15px] font-bold ${
-                qResult.isCorrect ? "text-[#4ade80]" : "text-[#f87171]"
-              }`}
+              className="inline-flex items-center gap-2 text-[15px] font-bold"
             >
               <LucideIcon
                 name={qResult.isCorrect ? "check_circle" : "cancel"}
-                className="text-[22px]"
+                className={`text-[22px] ${
+                  qResult.isCorrect
+                    ? isLight ? "text-emerald-600" : "text-[#4ade80]"
+                    : isLight ? "text-rose-600" : "text-[#f87171]"
+                }`}
               />
-              {qResult.isCorrect ? "Correct!" : "Incorrect"}
-              <span className="text-on-surface-variant font-normal text-[13px] ml-1">
+              <span className={
+                qResult.isCorrect
+                  ? isLight ? "text-emerald-600 font-extrabold text-[16px] tracking-wide" : "text-[#4ade80]"
+                  : isLight ? "text-rose-600 font-extrabold text-[16px] tracking-wide" : "text-[#f87171]"
+              }>
+                {qResult.isCorrect ? "Correct!" : "Incorrect"}
+              </span>
+              <span className="text-on-surface-variant font-normal text-[13px] ml-2">
                 (+{qResult.earnedPoints}/{qResult.points} XP)
               </span>
             </div>
 
             {qResult.explanation && (
-              <div className="p-6 rounded-xl bg-surface-container-low border-l-[6px] border-primary-fixed-dim text-[15px] leading-relaxed text-on-surface shadow-inner">
-                <span className="font-bold text-primary-fixed-dim block mb-2 text-[12px] uppercase tracking-widest">
+              <div className={`p-6 rounded-2xl border text-[15px] leading-relaxed text-on-surface shadow-sm ${
+                isLight
+                  ? "bg-white border-slate-200 border-l-4 border-l-teal-600"
+                  : "bg-surface-container-low border-outline/20 border-l-[6px] border-l-primary-fixed-dim shadow-inner"
+              }`}>
+                <span className={`font-bold block mb-2 text-[12px] uppercase tracking-widest ${
+                  isLight ? "text-teal-700" : "text-primary-fixed-dim"
+                }`}>
                   Explanation
                 </span>
                 {qResult.explanation}
@@ -452,7 +478,9 @@ const LessonQuizInner = ({
             className={`flex-shrink-0 font-bold px-8 py-3.5 rounded-xl transition-all flex items-center gap-2 ${
               result.passed
                 ? "bg-[#4ade80]/10 text-[#4ade80] border border-[#4ade80]/40 hover:bg-[#4ade80]/20"
-                : "bg-primary-fixed-dim text-on-primary-fixed hover:bg-primary-fixed hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
+                : isLight
+                  ? "bg-teal-600 text-white hover:bg-teal-700 hover:scale-105 active:scale-95 shadow-sm hover:shadow-md border border-teal-700/10"
+                  : "bg-primary-fixed-dim text-on-primary-fixed hover:bg-primary-fixed hover:scale-105 active:scale-95 shadow-[0_0_15px_rgba(0,218,248,0.4)]"
             }`}
           >
             <LucideIcon
@@ -481,9 +509,9 @@ const LessonQuizInner = ({
               </div>
             </div>
 
-            <div className="w-full h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+            <div className={`w-full h-1.5 rounded-full overflow-hidden ${isLight ? "bg-slate-200" : "bg-[#1b2532]"}`}>
               <div
-                className="h-full bg-primary-fixed-dim transition-all duration-300"
+                className={`h-full transition-all duration-300 ${isLight ? "bg-teal-500" : "bg-primary-fixed-dim"}`}
                 style={{
                   width: `${((reviewQuestionIdx + 1) / questions.length) * 100}%`,
                 }}
@@ -500,7 +528,11 @@ const LessonQuizInner = ({
                 setReviewQuestionIdx((prev) => Math.max(prev - 1, 0))
               }
               disabled={isFirstReviewQuestion}
-              className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className={`border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+                isLight
+                  ? "hover:border-teal-600 hover:text-teal-600"
+                  : "hover:border-primary-fixed-dim hover:text-primary-fixed-dim"
+              }`}
             >
               <span className="inline-flex items-center gap-2">
                 <LucideIcon name="arrow_back" className=" text-[18px]" />
@@ -512,7 +544,11 @@ const LessonQuizInner = ({
               <button
                 type="button"
                 onClick={() => setReviewQuestionIdx((prev) => prev + 1)}
-                className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+                className={
+                  isLight
+                    ? "bg-teal-600 text-white hover:bg-teal-700 font-bold px-10 py-3.5 rounded-xl transition-all shadow-sm hover:shadow-md border border-teal-700/10 flex items-center gap-2"
+                    : "bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+                }
               >
                 Next Review
                 <LucideIcon name="arrow_forward" className=" text-[18px]" />
@@ -521,7 +557,11 @@ const LessonQuizInner = ({
               <button
                 type="button"
                 onClick={handleFinishReview}
-                className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+                className={
+                  isLight
+                    ? "bg-teal-600 text-white hover:bg-teal-700 font-bold px-10 py-3.5 rounded-xl transition-all shadow-sm hover:shadow-md border border-teal-700/10 flex items-center gap-2"
+                    : "bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] flex items-center gap-2"
+                }
               >
                 Finish Review
                 <LucideIcon name="check_circle" className=" text-[18px]" />
@@ -556,9 +596,9 @@ const LessonQuizInner = ({
           </div>
         </div>
         {/* Progress Bar */}
-        <div className="w-full h-1.5 bg-[#1b2532] rounded-full overflow-hidden">
+        <div className={`w-full h-1.5 rounded-full overflow-hidden ${isLight ? "bg-slate-200" : "bg-[#1b2532]"}`}>
           <div
-            className="h-full bg-primary-fixed-dim transition-all duration-300"
+            className={`h-full transition-all duration-300 ${isLight ? "bg-teal-500" : "bg-primary-fixed-dim"}`}
             style={{
               width: `${((currentQuestionIdx + 1) / questions.length) * 100}%`,
             }}
@@ -595,7 +635,11 @@ const LessonQuizInner = ({
           type="button"
           onClick={handlePrevious}
           disabled={currentQuestionIdx === 0 || isSubmitting}
-          className="border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl hover:border-primary-fixed-dim hover:text-primary-fixed-dim transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          className={`border border-outline/30 text-on-surface-variant font-bold px-6 py-3.5 rounded-xl transition-all disabled:opacity-40 disabled:cursor-not-allowed ${
+            isLight
+              ? "hover:border-teal-600 hover:text-teal-600"
+              : "hover:border-primary-fixed-dim hover:text-primary-fixed-dim"
+          }`}
         >
           <span className="inline-flex items-center gap-2">
             <LucideIcon name="arrow_back" className=" text-[18px]" />
@@ -607,7 +651,11 @@ const LessonQuizInner = ({
           type="button"
           onClick={handleNextOrSubmit}
           disabled={!selectedOptionId || isSubmitting}
-          className="bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none flex items-center gap-2"
+          className={
+            isLight
+              ? "bg-teal-600 text-white hover:bg-teal-700 font-bold px-10 py-3.5 rounded-xl transition-all shadow-sm hover:shadow-md border border-teal-700/10 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              : "bg-primary-fixed-dim text-on-primary-fixed font-bold px-10 py-3.5 rounded-xl hover:bg-primary-fixed hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(0,218,248,0.4)] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:shadow-none flex items-center gap-2"
+          }
         >
           {isSubmitting ? (
             <>

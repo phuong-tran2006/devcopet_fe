@@ -1,28 +1,13 @@
-import type { ImgHTMLAttributes } from "react";
-
-/**
- * Flexible user type accepted by `UserAvatar`.
- * Covers auth-store `User`, leaderboard entries, arena players, etc.
- */
-export type UserAvatarUser = {
-  id?: string;
-  userId?: string;
-  name?: string;
-  displayName?: string;
-  username?: string;
-  avatarUrl?: string | null;
-  avatar?: string | null;
-  picture?: string | null;
-  photoUrl?: string | null;
-  profileImage?: string | null;
-};
+import { useState, type ImgHTMLAttributes } from "react";
 
 export type UserAvatarSize = "xs" | "sm" | "md" | "lg" | "xl";
 
 interface UserAvatarProps {
-  /** User-like object from any data source. */
-  user: UserAvatarUser;
-  /** Predefined size preset. Defaults to `"md"`. */
+  /** The URL of the avatar image. */
+  avatarUrl?: string | null;
+  /** The name used for the fallback initial. */
+  name?: string;
+  /** Predefined size preset. Only applied if className doesn't specify size. */
   size?: UserAvatarSize;
   /** Extra classes applied to the outer wrapper element. */
   className?: string;
@@ -39,85 +24,51 @@ const SIZE_CLASSES: Record<UserAvatarSize, string> = {
 };
 
 /**
- * Resolve a canonical avatar URL from a user-like object.
- *
- * Priority: `avatarUrl` → `avatar` → `picture` → `photoUrl` → `profileImage`
- *
- * URLs containing `pravatar.cc` are treated as placeholder/random images and
- * are therefore excluded.
- */
-export function resolveAvatarUrl(user: UserAvatarUser): string | undefined {
-  const raw =
-    user.avatarUrl ??
-    user.avatar ??
-    user.picture ??
-    user.photoUrl ??
-    user.profileImage ??
-    undefined;
-
-  if (!raw) return undefined;
-  if (typeof raw === "string" && raw.includes("pravatar.cc")) return undefined;
-  return raw;
-}
-
-/**
- * Derive the display name from a user-like object.
- */
-export function resolveDisplayName(user: UserAvatarUser): string {
-  return (
-    user.displayName || user.name || user.username || "User"
-  );
-}
-
-/**
- * Return the uppercased first character of the user's display name.
- */
-export function resolveInitial(user: UserAvatarUser): string {
-  const name = resolveDisplayName(user);
-  return name.trim().charAt(0).toUpperCase() || "?";
-}
-
-/**
  * Shared avatar component that ensures the same user always renders the same
  * avatar across the entire application.
  *
- * - Shows the `avatarUrl` image when available.
- * - Falls back to the first letter of the user's display name.
+ * - Shows the `avatarUrl` image when available and valid.
  * - Filters out known placeholder URLs (e.g. pravatar.cc).
+ * - Falls back to the first letter of the user's name/email.
+ * - If image fails to load, gracefully falls back to the initial.
  */
 export default function UserAvatar({
-  user,
+  avatarUrl,
+  name,
   size = "md",
   className = "",
   imgProps,
 }: UserAvatarProps) {
-  const avatarUrl = resolveAvatarUrl(user);
-  const displayName = resolveDisplayName(user);
-  const initial = resolveInitial(user);
-  const sizeClass = SIZE_CLASSES[size];
+  const [imageError, setImageError] = useState(false);
 
-  if (avatarUrl) {
-    return (
-      <img
-        src={avatarUrl}
-        alt={displayName}
-        {...imgProps}
-        className={`${sizeClass} rounded-full object-cover ${className}`}
-        onError={(e) => {
-          // On load failure, replace with the initial letter
-          e.currentTarget.style.display = "none";
-          const parent = e.currentTarget.parentElement;
-          if (parent) {
-            parent.innerText = initial;
-          }
-        }}
-      />
-    );
-  }
+  const hasValidUrl =
+    avatarUrl &&
+    typeof avatarUrl === "string" &&
+    !avatarUrl.includes("pravatar.cc");
+
+  const displayName = name || "User";
+  const initial = displayName.trim().charAt(0).toUpperCase() || "?";
+
+  const hasCustomWidth = className.includes("w-") || className.includes("size-");
+  const sizeClass = hasCustomWidth ? "" : SIZE_CLASSES[size];
+
+  const showImage = hasValidUrl && !imageError;
 
   return (
-    <span className={`${sizeClass} inline-flex items-center justify-center font-bold ${className}`}>
-      {initial}
-    </span>
+    <div
+      className={`relative inline-flex items-center justify-center font-bold rounded-full overflow-hidden shrink-0 select-none ${sizeClass} ${className}`}
+    >
+      {showImage ? (
+        <img
+          src={avatarUrl || undefined}
+          alt={displayName}
+          {...imgProps}
+          className="w-full h-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <span>{initial}</span>
+      )}
+    </div>
   );
 }

@@ -1,4 +1,5 @@
 import LucideIcon from "../../../components/ui/LucideIcon";
+import UserAvatar from "../../../components/ui/UserAvatar";
 interface OpponentCardProps {
   status: "idle" | "searching" | "found";
   opponent?: {
@@ -71,26 +72,11 @@ const OpponentCard = ({ status, opponent }: OpponentCardProps) => {
           <div className="relative mb-3">
             <div className="absolute inset-0 rounded-full border-2 border-[#ff3b30] blur-[4px] animate-pulse" />
             <div className="w-[78px] h-[78px] rounded-full border-2 border-[#ff3b30] overflow-hidden p-0.5 relative z-10 dark:bg-[#0e141a] bg-surface transition-colors duration-300 flex items-center justify-center text-xl font-bold dark:text-white text-on-surface">
-              {opponent?.avatarUrl &&
-              !opponent.avatarUrl.includes("pravatar.cc") ? (
-                <img
-                  src={opponent.avatarUrl}
-                  alt="Opponent"
-                  className="w-full h-full rounded-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    const parent = e.currentTarget.parentElement;
-                    if (parent) {
-                      parent.innerText =
-                        opponent?.username?.charAt(0)?.toUpperCase() || "O";
-                    }
-                  }}
-                />
-              ) : (
-                <span>
-                  {opponent?.username?.charAt(0)?.toUpperCase() || "O"}
-                </span>
-              )}
+              <UserAvatar
+                avatarUrl={opponent?.avatarUrl}
+                name={opponent?.username}
+                className="w-full h-full bg-transparent"
+              />
             </div>
           </div>
           <h3 className="text-[20px] font-extrabold dark:text-white text-on-surface mb-2 transition-colors duration-300 truncate max-w-[210px]">

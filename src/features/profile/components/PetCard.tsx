@@ -41,6 +41,15 @@ const PetCard = () => {
     setNextPetName(petName);
   }, [petName]);
 
+  useEffect(() => {
+    if (message === "Pet fed successfully!") {
+      const timer = setTimeout(() => {
+        setMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const updatePetName = async () => {
     if (!nextPetName.trim() || saving) return;
 
@@ -315,12 +324,24 @@ const PetCard = () => {
           </div>
 
           {message ? (
-            <p className={`text-xs font-semibold text-center mt-1 ${message.includes("successfully") || message.includes("updated")
-                ? "text-success"
-                : "text-error"
+            <div className="relative flex flex-col items-center justify-center">
+              <p className={`text-xs font-semibold text-center mt-1 ${
+                message === "Pet fed successfully!"
+                  ? `${theme === "dark" ? "text-cyan-300" : "text-teal-600"} animate-pet-glow-pulse`
+                  : message.includes("successfully") || message.includes("updated")
+                  ? "text-success"
+                  : "text-error"
               }`}>
-              {message}
-            </p>
+                {message}
+              </p>
+              {message === "Pet fed successfully!" && (
+                <span className={`absolute -top-5 text-[11px] font-extrabold tracking-wider pointer-events-none select-none animate-pet-exp-float ${
+                  theme === "dark" ? "text-cyan-300" : "text-teal-600"
+                }`}>
+                  + Pet EXP
+                </span>
+              )}
+            </div>
           ) : null}
         </div>
       </div>

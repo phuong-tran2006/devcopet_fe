@@ -11,6 +11,7 @@ import { useAuthStore } from "../../features/users/store/auth.store";
 import { useTheme } from "../../contexts/ThemeContext";
 import NotificationDropdown from "./NotificationDropdown";
 import DailyMissionDropdown from "./DailyMissionDropdown";
+import UserAvatar from "../ui/UserAvatar";
 
 const NavLink = ({ to, label, exact = false, onClick }) => {
   const matchRoute = useMatchRoute();
@@ -126,28 +127,11 @@ const Header = () => {
                 <>
                   {/* Profile Dropdown */}
                   <div className="relative group cursor-pointer ml-2 z-50">
-                    <div className="w-9 h-9 rounded-full bg-primary-fixed-dim/20 flex items-center justify-center text-primary-fixed-dim text-sm font-bold border border-primary-fixed-dim/30 group-hover:border-primary-fixed-dim transition-all duration-300 shadow-[0_0_10px_rgba(0,218,248,0.3)] overflow-hidden">
-                      {user?.avatarUrl ? (
-                        <img
-                          src={user.avatarUrl}
-                          alt={user?.name || user?.username || "User"}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none";
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerText = (user?.name || user?.username || "U").charAt(0).toUpperCase();
-                            }
-                          }}
-                        />
-                      ) : (
-                        <>
-                          {(user?.name || user?.username || user?.email || "U")
-                            .charAt(0)
-                            ?.toUpperCase()}
-                        </>
-                      )}
-                    </div>
+                    <UserAvatar
+                      avatarUrl={user?.avatarUrl}
+                      name={user?.name || user?.username || user?.email}
+                      className="w-9 h-9 bg-primary-fixed-dim/20 text-primary-fixed-dim text-sm border border-primary-fixed-dim/30 group-hover:border-primary-fixed-dim transition-all duration-300 shadow-[0_0_10px_rgba(0,218,248,0.3)]"
+                    />
 
                     {/* Dropdown Menu */}
                     <div className="absolute top-full right-0 w-40 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">

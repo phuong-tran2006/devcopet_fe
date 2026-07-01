@@ -1,3 +1,5 @@
+import UserAvatar from "../../../components/ui/UserAvatar";
+
 interface PlayerCardProps {
   name?: string;
   level?: number;
@@ -26,22 +28,11 @@ const PlayerCard = ({
       <div className="relative mb-3">
         <div className="absolute inset-0 rounded-full border-2 dark:border-[#00ffff] border-primary blur-[4px] animate-pulse" />
         <div className="w-[78px] h-[78px] rounded-full border-2 dark:border-[#00ffff] border-primary overflow-hidden p-0.5 relative z-10 dark:bg-[#0e141a] bg-surface flex items-center justify-center text-xl font-bold dark:text-white text-on-surface">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={name}
-              className="w-full h-full rounded-full object-cover"
-              onError={(e) => {
-                e.currentTarget.style.display = "none";
-                const parent = e.currentTarget.parentElement;
-                if (parent) {
-                  parent.innerText = name.charAt(0).toUpperCase();
-                }
-              }}
-            />
-          ) : (
-            <span>{name.charAt(0).toUpperCase()}</span>
-          )}
+          <UserAvatar
+            avatarUrl={avatarUrl}
+            name={name}
+            className="w-full h-full bg-transparent"
+          />
         </div>
       </div>
 

@@ -634,4 +634,93 @@
       transform: translateY(0);
     }
   }
+
+  /* Pet Feed Success Animations */
+  .animate-pet-exp-float {
+    animation: petExpFloat 2.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+
+  .animate-pet-glow-pulse {
+    animation: petGlowPulse 2s ease-in-out infinite;
+  }
+
+  @keyframes petExpFloat {
+    0% {
+      opacity: 0;
+      transform: translateY(6px) scale(0.96);
+    }
+    15% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-20px) scale(1.04);
+    }
+  }
+
+  @keyframes petGlowPulse {
+    0%, 100% {
+      opacity: 0.95;
+      filter: drop-shadow(0 0 2px rgba(13, 148, 136, 0.25));
+    }
+    50% {
+      opacity: 1;
+      filter: drop-shadow(0 0 8px rgba(13, 148, 136, 0.5));
+    }
+  }
+
+  @keyframes petGlowPulseDark {
+    0%, 100% {
+      opacity: 0.95;
+      filter: drop-shadow(0 0 3px rgba(34, 211, 238, 0.35));
+    }
+    50% {
+      opacity: 1;
+      filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.7));
+    }
+  }
+
+  .dark .animate-pet-glow-pulse {
+    animation: petGlowPulseDark 2s ease-in-out infinite;
+  }
+
+  /* Single pulse animation for correct quiz option */
+  .animate-quiz-pulse-once {
+    animation: quizPulseOnce 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
+
+  @keyframes quizPulseOnce {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+    }
+    50% {
+      transform: scale(1.015);
+      box-shadow: 0 0 0 8px rgba(16, 185, 129, 0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes quizPulseOnceDark {
+    0% {
+      transform: scale(1);
+      box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4);
+    }
+    50% {
+      transform: scale(1.015);
+      box-shadow: 0 0 0 8px rgba(6, 182, 212, 0);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
+
+  .dark .animate-quiz-pulse-once {
+    animation: quizPulseOnceDark 0.45s cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
 }
+
+

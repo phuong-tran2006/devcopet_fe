@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 interface LeaderboardItem {
   rank: number;
@@ -113,22 +114,11 @@ const ArenaRankingPage = () => {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center text-[13px] font-black overflow-hidden ${isTop3 ? "dark:bg-white/10 bg-surface-container-highest" : "dark:bg-[#1a2632] bg-surface-container-high"}`}
                 >
-                  {player.avatarUrl ? (
-                    <img
-                      src={player.avatarUrl}
-                      alt={player.username}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        e.currentTarget.style.display = "none";
-                        const parent = e.currentTarget.parentElement;
-                        if (parent) {
-                          parent.innerText = getInitials(player.username);
-                        }
-                      }}
-                    />
-                  ) : (
-                    getInitials(player.username)
-                  )}
+                  <UserAvatar
+                    avatarUrl={player.avatarUrl}
+                    name={player.username}
+                    className="w-full h-full bg-transparent"
+                  />
                 </div>
                 <div className="min-w-0">
                   <div

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuthStore } from "../../users/store/auth.store";
 import { profileApi } from "../../profile/api/profile.api";
 import LucideIcon from "../../../components/ui/LucideIcon";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 type LeaderboardUser = {
   userId?: string;
@@ -152,24 +153,13 @@ const LeaderboardPage = () => {
     });
   }, [users, currentUser]);
 
-  const renderAvatar = (user: Pick<DisplayUser, "avatarUrl" | "name">) =>
-    user.avatarUrl ? (
-      <img
-        src={user.avatarUrl}
-        alt={user.name}
-        className="h-full w-full object-cover"
-        onError={(event) => {
-          event.currentTarget.style.display = "none";
-          if (event.currentTarget.parentElement) {
-            event.currentTarget.parentElement.innerText = user.name
-              ? user.name.charAt(0).toUpperCase()
-              : "?";
-          }
-        }}
-      />
-    ) : (
-      <span>{user.name ? user.name.charAt(0).toUpperCase() : "?"}</span>
-    );
+  const renderAvatar = (user: Pick<DisplayUser, "avatarUrl" | "name">) => (
+    <UserAvatar
+      avatarUrl={user.avatarUrl}
+      name={user.name}
+      className="w-full h-full bg-transparent"
+    />
+  );
 
   return (
     <main className="min-h-[calc(100vh-80px)] w-full bg-background relative overflow-x-hidden font-sans pb-24 text-on-surface">
@@ -288,6 +278,51 @@ const LeaderboardPage = () => {
               })}
             </div>
 
+            {/* Your Ranking — separate section */}
+            {currentUserRank && (
+              <div className="mb-8">
+                <h2 className="text-[24px] font-extrabold tracking-tight text-on-surface mb-4">
+                  Your Ranking
+                </h2>
+                <div className="bg-white dark:bg-surface-container/50 border-2 border-slate-300 dark:border-primary-fixed-dim/50 rounded-[24px] p-5 lg:p-6 shadow-sm dark:shadow-[0_0_20px_rgba(0,128,128,0.1)] flex items-center gap-4 relative overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-600 dark:bg-primary-fixed-dim rounded-l-[24px]" />
+                  <div className="w-10 text-[18px] font-mono font-extrabold text-teal-600 dark:text-primary-fixed-dim transition-colors pl-2">
+                    {currentUserRank.rank < 10
+                      ? `0${currentUserRank.rank}`
+                      : currentUserRank.rank}
+                  </div>
+                  <div className="w-12 h-12 rounded-full bg-surface border-2 border-teal-200 dark:border-primary-fixed-dim/40 flex items-center justify-center overflow-hidden shrink-0 text-[16px] font-black text-primary-fixed-dim">
+                    {renderAvatar(currentUserRank)}
+                  </div>
+                  <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[16px] font-extrabold text-on-surface truncate">
+                        {currentUserRank.name}
+                      </span>
+                      <span className="hidden sm:inline-flex px-2.5 py-1 rounded bg-[#D8BFD8]/10 text-secondary border border-[#D8BFD8]/30 text-[10px] font-extrabold uppercase tracking-widest whitespace-nowrap">
+                        {currentUserRank.badge}
+                      </span>
+                    </div>
+                    <span className="text-[13px] text-on-surface-variant font-medium">
+                      {currentUserRank.level}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-8 ml-auto pl-4">
+                    <div className="flex flex-col items-end">
+                      <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
+                        Lifetime XP
+                      </span>
+                      <span className="text-[15px] font-mono font-bold text-on-surface">
+                        {currentUserRank.currentXpFormatted}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Main Rankings — separate section */}
             <div className="bg-white dark:bg-surface-container/50 border border-slate-300 dark:border-on-surface/10 rounded-[24px] p-6 lg:p-8 relative shadow-sm">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
                 <h2 className="text-[24px] font-extrabold tracking-tight text-on-surface">
@@ -353,44 +388,6 @@ const LeaderboardPage = () => {
                     </div>
                   ))}
               </div>
-
-              {currentUserRank && (
-                <div className="mt-8 -mx-4 px-4 py-4 rounded-xl border-2 border-slate-300 dark:border-primary-fixed-dim/50 bg-slate-50 dark:bg-primary-fixed-dim/5 shadow-sm dark:shadow-[0_0_20px_rgba(0,128,128,0.1)] flex items-center gap-4 relative overflow-hidden group">
-                  <div className="absolute top-0 left-0 w-1.5 h-full bg-teal-600 dark:bg-primary-fixed-dim" />
-                  <div className="w-8 text-[15px] font-mono font-extrabold text-teal-600 dark:text-primary-fixed-dim transition-colors">
-                    {currentUserRank.rank < 10
-                      ? `0${currentUserRank.rank}`
-                      : currentUserRank.rank}
-                  </div>
-                  <div className="w-10 h-10 rounded-full bg-surface border border-teal-200 dark:border-primary-fixed-dim/40 flex items-center justify-center overflow-hidden shrink-0 text-[14px] font-black text-primary-fixed-dim">
-                    {renderAvatar(currentUserRank)}
-                  </div>
-                  <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
-                    <div className="flex items-center gap-3">
-                      <span className="text-[15px] font-extrabold text-on-surface truncate">
-                        {currentUserRank.name}
-                      </span>
-                      <span className="hidden sm:inline-flex px-2 py-0.5 rounded bg-[#D8BFD8]/10 text-secondary border border-[#D8BFD8]/30 text-[9px] font-extrabold uppercase tracking-widest whitespace-nowrap">
-                        {currentUserRank.badge}
-                      </span>
-                    </div>
-                    <span className="text-[12px] text-on-surface-variant font-medium">
-                      {currentUserRank.level}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-8 ml-auto pl-4">
-                    <div className="hidden md:flex flex-col items-end">
-                      <span className="text-[9px] uppercase tracking-widest text-on-surface-variant font-bold">
-                        Lifetime XP
-                      </span>
-                      <span className="text-[13px] font-mono font-bold text-on-surface">
-                        {currentUserRank.currentXpFormatted}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
 
               {rankings.length > 5 && (
                 <div className="mt-8 flex justify-center">

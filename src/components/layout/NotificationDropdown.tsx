@@ -144,9 +144,8 @@ const NotificationDropdown = ({
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={onToggle}
-        className={`w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center transition-all text-on-surface relative ${
-          isOpen ? "bg-on-surface/10 border-primary-fixed-dim/45 shadow-[0_0_15px_rgba(0,218,248,0.25)]" : "hover:bg-on-surface/10"
-        }`}
+        className={`w-10 h-10 rounded-full border border-outline/20 flex items-center justify-center transition-all text-on-surface relative ${isOpen ? "bg-on-surface/10 border-primary-fixed-dim/45 shadow-[0_0_15px_rgba(0,218,248,0.25)]" : "hover:bg-on-surface/10"
+          }`}
       >
         <LucideIcon name="notifications" className="text-[20px]" />
         {/* Unread Badge */}
@@ -157,11 +156,10 @@ const NotificationDropdown = ({
 
       {/* Dropdown Panel */}
       <div
-        className={`absolute top-[52px] right-[-80px] w-[320px] bg-surface-container-high/95 backdrop-blur-xl border border-on-surface/10 rounded-[1.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 origin-top-right z-50 ${
-          isOpen
+        className={`absolute top-[52px] right-[-80px] w-[320px] bg-surface-container-high/95 backdrop-blur-xl border border-on-surface/10 rounded-[1.5rem] shadow-[0_10px_40px_rgba(0,0,0,0.4)] overflow-hidden transition-all duration-300 origin-top-right z-50 ${isOpen
             ? "opacity-100 scale-100 visible"
             : "opacity-0 scale-95 invisible"
-        }`}
+          }`}
       >
         {/* Header */}
         <div className="px-6 py-5 border-b border-on-surface/10 flex justify-between items-center bg-on-surface/5">
@@ -212,17 +210,15 @@ const NotificationDropdown = ({
                 <div
                   key={notif.id}
                   onClick={() => !notif.isRead && handleMarkAsRead(notif.id)}
-                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex gap-4 relative cursor-pointer hover:bg-on-surface/10 transition-colors ${
-                    !notif.isRead ? "border-primary-fixed-dim/20 bg-primary-fixed-dim/5" : ""
-                  }`}
+                  className={`bg-on-surface/5 border border-on-surface/10 rounded-2xl p-4 flex gap-4 relative cursor-pointer hover:bg-on-surface/10 transition-colors ${!notif.isRead ? "border-primary-fixed-dim/20 bg-primary-fixed-dim/5" : ""
+                    }`}
                 >
                   {/* Icon */}
                   <div
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-                      notif.type.toLowerCase().includes("level")
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${notif.type.toLowerCase().includes("level")
                         ? "bg-[#b3a6d9]/20 text-[#b3a6d9]"
                         : "bg-primary-fixed-dim/20 text-primary-fixed-dim"
-                    }`}
+                      }`}
                   >
                     <LucideIcon name={getIconName(notif.type)} className="text-[24px]" />
                   </div>

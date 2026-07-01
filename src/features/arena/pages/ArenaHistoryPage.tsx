@@ -3,6 +3,7 @@ import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
 import type { PublicScoreboardItem } from "../store/arena.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 interface HistoryPlayer {
   userId?: string;
@@ -194,15 +195,11 @@ const ArenaHistoryPage = () => {
 
                 <div className="flex items-center gap-3 flex-row-reverse min-w-0">
                   <div className="w-10 h-10 rounded-full dark:bg-[#1a2632] bg-surface-container-high flex items-center justify-center text-[13px] font-black overflow-hidden shrink-0">
-                    {view.opponentAvatar ? (
-                      <img
-                        src={view.opponentAvatar}
-                        alt={view.opponentName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      view.opponentName.slice(0, 2).toUpperCase()
-                    )}
+                    <UserAvatar
+                      avatarUrl={view.opponentAvatar}
+                      name={view.opponentName}
+                      className="w-full h-full bg-transparent"
+                    />
                   </div>
                   <span className="font-bold dark:text-[#f3d9e9] text-on-surface truncate">
                     {view.opponentName}

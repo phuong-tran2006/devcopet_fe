@@ -4,6 +4,7 @@ import { api } from "../../../services/axiosClient";
 import { useAuthStore } from "../../users/store/auth.store";
 import { useArenaStore } from "../store/arena.store";
 import LucideIcon from "../../../components/ui/LucideIcon";
+import UserAvatar from "../../../components/ui/UserAvatar";
 
 interface ArenaProfile {
   arenaRating: number;
@@ -54,32 +55,11 @@ const ArenaSidebar = () => {
       <div className="flex flex-col items-center mb-10">
         <div className="w-[84px] h-[84px] rounded-[24px] dark:bg-[#0b1219] bg-surface border-2 dark:border-[#e6c1d8] border-primary-fixed-dim flex items-center justify-center p-1 dark:shadow-[0_0_20px_rgba(230,193,216,0.15)] shadow-md mb-4 overflow-hidden transition-colors duration-300">
           <div className="w-full h-full rounded-[20px] dark:bg-gradient-to-b dark:from-[#14232e] dark:to-[#0b1219] bg-surface-container-high flex items-center justify-center shadow-inner overflow-hidden text-xl font-bold dark:text-white text-on-surface">
-            {currentUser?.avatarUrl ? (
-              <img
-                src={currentUser.avatarUrl}
-                alt={currentUser?.name || currentUser?.username || "User"}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = "none";
-                  const parent = e.currentTarget.parentElement;
-                  if (parent) {
-                    parent.innerText = (
-                      currentUser?.name ||
-                      currentUser?.username ||
-                      "U"
-                    )
-                      .charAt(0)
-                      .toUpperCase();
-                  }
-                }}
-              />
-            ) : (
-              <span>
-                {(currentUser?.name || currentUser?.username || "U")
-                  .charAt(0)
-                  .toUpperCase()}
-              </span>
-            )}
+            <UserAvatar
+              avatarUrl={currentUser?.avatarUrl}
+              name={currentUser?.name || currentUser?.username || currentUser?.email}
+              className="w-full h-full bg-transparent"
+            />
           </div>
         </div>
         <h2 className="text-[24px] font-extrabold dark:text-[#f3d9e9] text-on-surface mb-1 tracking-wide transition-colors duration-300">
